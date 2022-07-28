@@ -1,20 +1,25 @@
 import * as React from "react";
 import { HeaderAction, HeaderActionProps } from "./components/header";
-import { BrowserRouter, Routes, Route } from "react-router-dom";
+import { HeroBullets } from "./components/hero-header";
+import { Routes, Route } from "react-router-dom";
 
 const headerLinks = {
   links: [
     {
       link: "/",
-      label: "Features",
+      label: "Restaurants",
       dropDownLinks: [
         { link: "/", label: "Features" },
         { link: "/", label: "Features" },
       ],
     },
     {
-      link: "/",
-      label: "Features",
+      link: "/auth/signup",
+      label: "Catering",
+    },
+    {
+      link: "/auth/signup",
+      label: "Grocery",
     },
   ],
 };
@@ -22,10 +27,11 @@ const headerLinks = {
 function App() {
   return (
     <React.Fragment>
-      <BrowserRouter>
-        <HeaderAction links={headerLinks.links}></HeaderAction>
-        <div>hello</div>
-      </BrowserRouter>
+      <HeaderAction links={headerLinks.links}></HeaderAction>
+      <Routes>
+        <Route path="/" element={<HeroBullets />}></Route>
+        <Route path="/auth/signup" element={<div>we navigated</div>}></Route>
+      </Routes>
     </React.Fragment>
   );
 }

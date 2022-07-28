@@ -86,14 +86,18 @@ export const HeaderAction = ({ links }: HeaderActionProps) => {
   // drop down menu items
   const items = links.map((link) => {
     const menuItems = link.dropDownLinks?.map((item) => (
-      <Menu.Item component={Link} to={item.link} key={item.link}>
+      <Menu.Item component={Link} to={item.link}>
         {item.label}
       </Menu.Item>
     ));
 
     if (menuItems) {
       return (
-        <Menu key={link.label} trigger={"hover"} exitTransitionDuration={0}>
+        <Menu
+          trigger={"hover"}
+          position="right-start"
+          exitTransitionDuration={0}
+        >
           <Menu.Target>
             <Link
               to={link.link}
@@ -113,7 +117,6 @@ export const HeaderAction = ({ links }: HeaderActionProps) => {
 
     return (
       <Link
-        key={link.label}
         to={link.link}
         className={classes.link}
         //onClick={(event) => event.preventDefault()}
@@ -148,10 +151,25 @@ export const HeaderAction = ({ links }: HeaderActionProps) => {
           </Transition>
         </Group>
         <Group>
-          <Button variant="outline" radius="sm" sx={{ height: 35 }}>
+          <div className={classes.link}>Contact us</div>
+          <Button
+            component={Link}
+            to="/"
+            variant="outline"
+            color="dark"
+            radius="sm"
+            sx={{ height: 35 }}
+          >
             Login
           </Button>
-          <Button radius="sm" sx={{ height: 35 }}>
+          <Button
+            variant="filled"
+            color="dark"
+            component={Link}
+            to="/"
+            radius="sm"
+            sx={{ height: 35 }}
+          >
             Sign up
           </Button>
         </Group>
