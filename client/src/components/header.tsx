@@ -17,6 +17,12 @@ import { IconChevronDown } from "@tabler/icons";
 const HEADER_HEIGHT = 60;
 
 const useStyles = createStyles((theme) => ({
+  header: {
+    backgroundColor: theme.colors.orange[0],
+    borderBottom: `0.5px solid ${
+      theme.colorScheme === "dark" ? "transparent" : theme.colors.dark[1]
+    }`,
+  },
   inner: {
     height: HEADER_HEIGHT,
     display: "flex",
@@ -37,12 +43,19 @@ const useStyles = createStyles((theme) => ({
   },
 
   dropdown: {
+    backgroundColor: theme.colors.orange[0],
+    border: `0.5px solid ${theme.colors.dark[1]}`,
+  },
+
+  item: {
     position: "fixed",
     top: HEADER_HEIGHT,
 
     [theme.fn.largerThan("sm")]: {
       display: "none",
     },
+    backgroundColor: theme.colors.orange[0],
+    border: `0.5px solid ${theme.colors.dark[1]}`,
   },
 
   link: {
@@ -54,11 +67,12 @@ const useStyles = createStyles((theme) => ({
     color:
       theme.colorScheme === "dark"
         ? theme.colors.dark[0]
-        : theme.colors.gray[7],
+        : theme.colors.dark[5],
     fontSize: theme.fontSizes.sm,
-    fontWeight: 550,
+    fontWeight: 600,
 
     "&:hover": {
+      border: `1px solid`,
       backgroundColor:
         theme.colorScheme === "dark"
           ? theme.colors.dark[6]
@@ -110,7 +124,9 @@ export const HeaderAction = ({ links }: HeaderActionProps) => {
               </Center>
             </Link>
           </Menu.Target>
-          <Menu.Dropdown>{menuItems}</Menu.Dropdown>
+          <Menu.Dropdown className={classes.dropdown}>
+            {menuItems}
+          </Menu.Dropdown>
         </Menu>
       );
     }
@@ -127,7 +143,7 @@ export const HeaderAction = ({ links }: HeaderActionProps) => {
   });
 
   return (
-    <Header height={HEADER_HEIGHT} mb={10}>
+    <Header height={HEADER_HEIGHT} className={classes.header}>
       <Container className={classes.inner} fluid>
         <Group spacing={100}>
           <div>Logo</div>
@@ -144,7 +160,7 @@ export const HeaderAction = ({ links }: HeaderActionProps) => {
           />
           <Transition transition="pop-top-left" duration={50} mounted={opened}>
             {(styles) => (
-              <Paper className={classes.dropdown} withBorder style={styles}>
+              <Paper className={classes.item} withBorder style={styles}>
                 {items}
               </Paper>
             )}
@@ -158,7 +174,7 @@ export const HeaderAction = ({ links }: HeaderActionProps) => {
             variant="outline"
             color="dark"
             radius="sm"
-            sx={{ height: 35 }}
+            sx={{ height: HEADER_HEIGHT / 2 }}
           >
             Login
           </Button>
@@ -168,7 +184,7 @@ export const HeaderAction = ({ links }: HeaderActionProps) => {
             component={Link}
             to="/"
             radius="sm"
-            sx={{ height: 35 }}
+            sx={{ height: HEADER_HEIGHT / 2 }}
           >
             Sign up
           </Button>

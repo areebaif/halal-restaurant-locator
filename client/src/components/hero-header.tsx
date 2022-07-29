@@ -36,10 +36,11 @@ const useStyles = createStyles((theme) => ({
   },
 
   content: {
-    paddingTop: theme.spacing.xl * 1,
+    paddingTop: theme.spacing.xl * 2,
     paddingBottom: theme.spacing.xl * 2,
+    paddingLeft: theme.spacing.xl * 1.5,
     marginRight: theme.spacing.xl * 3,
-    maxWidth: 600,
+    maxWidth: 550,
 
     [theme.fn.smallerThan("md")]: {
       marginRight: 0,
@@ -49,13 +50,9 @@ const useStyles = createStyles((theme) => ({
   title: {
     color: theme.colorScheme === "dark" ? theme.white : theme.black,
     //fontFamily: `Greycliff CF, ${theme.fontFamily}`,
-    fontSize: 50,
+    fontSize: theme.fontSizes.xl * 2,
     lineHeight: 1.5,
     fontWeight: 700,
-
-    [theme.fn.smallerThan("xs")]: {
-      fontSize: 28,
-    },
   },
 
   control: {
@@ -69,14 +66,14 @@ export function HeroBullets() {
   const { classes } = useStyles();
   return (
     <div className={classes.root}>
-      <Container size="lg">
+      <Container size="xl">
         <div className={classes.inner}>
           <div className={classes.content}>
             <Title className={classes.title}>
               Explore halal food options near you
             </Title>
 
-            <Text size="xl" mt={30}>
+            <Text size="lg" mt={30}>
               Find halal options near you with ease – We update our library
               every day to include new places near you!
             </Text>
@@ -84,15 +81,15 @@ export function HeroBullets() {
               mt={30}
               mb={40}
               spacing="sm"
-              size="md"
+              size="sm"
               icon={
-                <ThemeIcon color="grey" size={15} radius="xl">
-                  <IconCheck size={12} stroke={1.5} />
+                <ThemeIcon color="grey" size={13} radius="xl">
+                  <IconCheck size={10} stroke={1.5} />
                 </ThemeIcon>
               }
             >
               <List.Item>
-                <b>Save Time</b> – Ypur one stop solution to finding halal food
+                <b>Save Time</b> – Your one stop solution to finding halal food
               </List.Item>
               <List.Item>
                 <b>Have guests over?</b> – Find catering options near you

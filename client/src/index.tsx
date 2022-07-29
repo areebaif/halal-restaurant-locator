@@ -3,6 +3,8 @@ import ReactDOM from "react-dom/client";
 import { BrowserRouter } from "react-router-dom";
 import App from "./App";
 import reportWebVitals from "./reportWebVitals";
+import { MantineProvider } from "@mantine/core";
+import { theme } from "./components/theme/theme";
 
 const root = ReactDOM.createRoot(
   document.getElementById("root") as HTMLElement
@@ -10,7 +12,9 @@ const root = ReactDOM.createRoot(
 root.render(
   <React.StrictMode>
     <BrowserRouter>
-      <App />
+      <MantineProvider withGlobalStyles withNormalizeCSS theme={theme}>
+        <App />
+      </MantineProvider>
     </BrowserRouter>
   </React.StrictMode>
 );
