@@ -20,7 +20,7 @@ const useStyles = createStyles((theme) => ({
   header: {
     backgroundColor: theme.colors.orange[0],
     borderBottom: `0.5px solid ${
-      theme.colorScheme === "dark" ? "transparent" : theme.colors.dark[1]
+      theme.colorScheme === "dark" ? "light" : theme.colors.dark[1]
     }`,
   },
   inner: {
@@ -167,6 +167,7 @@ export const HeaderAction = ({ links }: HeaderActionProps) => {
           </Transition>
         </Group>
         <Group>
+          {/*TODO: define navigation links */}
           <div className={classes.link}>Contact us</div>
           <Button
             component={Link}

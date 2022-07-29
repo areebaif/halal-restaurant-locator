@@ -52,7 +52,7 @@ const useStyles = createStyles((theme) => ({
     //fontFamily: `Greycliff CF, ${theme.fontFamily}`,
     fontSize: theme.fontSizes.xl * 2,
     lineHeight: 1.5,
-    fontWeight: 700,
+    fontWeight: 600,
   },
 
   control: {
@@ -89,7 +89,7 @@ export function HeroBullets() {
               }
             >
               <List.Item>
-                <b>Save Time</b> – Your one stop solution to finding halal food
+                <b>Save time</b> – Your one stop solution to finding halal food
               </List.Item>
               <List.Item>
                 <b>Have guests over?</b> – Find catering options near you
@@ -99,7 +99,7 @@ export function HeroBullets() {
                 near you
               </List.Item>
             </List>
-
+            {/* TODO: Link React router here to the button*/}
             <Button size="md" color="dark" variant="outline">
               <Text color="dark">Get started</Text>
             </Button>
