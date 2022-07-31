@@ -49,7 +49,7 @@ const useStyles = createStyles((theme) => ({
 
   title: {
     color: theme.colorScheme === "dark" ? theme.white : theme.black,
-    //fontFamily: `Greycliff CF, ${theme.fontFamily}`,
+
     fontSize: theme.fontSizes.xl * 2,
     lineHeight: 1.5,
     fontWeight: 600,
@@ -62,7 +62,7 @@ const useStyles = createStyles((theme) => ({
   },
 }));
 
-export function HeroBullets() {
+export const HeroBullets: React.FC = () => {
   const { classes } = useStyles();
   return (
     <div className={classes.root}>
@@ -108,4 +108,4 @@ export function HeroBullets() {
       </Container>
     </div>
   );
-}
+};
