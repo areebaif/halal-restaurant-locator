@@ -2,6 +2,7 @@ import * as React from "react";
 import { HeaderAction, HeaderActionProps } from "./components/header";
 import { HeroBullets } from "./components/hero-header";
 import { Routes, Route } from "react-router-dom";
+import { Layout } from "./components/Layout";
 
 const headerLinks = {
   links: [
@@ -29,7 +30,7 @@ function App() {
     <React.Fragment>
       <HeaderAction links={headerLinks.links}></HeaderAction>
       <Routes>
-        <Route path="/" element={<HeroBullets />}></Route>
+        <Route path="/" element={<Layout />}></Route>
         <Route path="/auth/signup" element={<div>we navigated</div>}></Route>
       </Routes>
     </React.Fragment>

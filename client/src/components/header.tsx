@@ -18,7 +18,7 @@ const HEADER_HEIGHT = 60;
 
 const useStyles = createStyles((theme) => ({
   header: {
-    backgroundColor: theme.colors.orange[0],
+    backgroundColor: theme.colors.gray[0],
     borderBottom: `0.5px solid ${
       theme.colorScheme === "dark" ? "light" : theme.colors.dark[1]
     }`,
@@ -43,7 +43,7 @@ const useStyles = createStyles((theme) => ({
   },
 
   dropdown: {
-    backgroundColor: theme.colors.orange[0],
+    //backgroundColor: theme.colors.orange[0],
     border: `0.5px solid ${theme.colors.dark[1]}`,
   },
 
@@ -54,7 +54,7 @@ const useStyles = createStyles((theme) => ({
     [theme.fn.largerThan("sm")]: {
       display: "none",
     },
-    backgroundColor: theme.colors.orange[0],
+    //backgroundColor: theme.colors.orange[0],
     border: `0.5px solid ${theme.colors.dark[1]}`,
   },
 
@@ -76,7 +76,7 @@ const useStyles = createStyles((theme) => ({
       backgroundColor:
         theme.colorScheme === "dark"
           ? theme.colors.dark[6]
-          : theme.colors.gray[0],
+          : theme.colors.gray[1],
     },
   },
 
