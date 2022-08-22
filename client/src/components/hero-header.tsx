@@ -1,7 +1,5 @@
 import {
   createStyles,
-  Image,
-  Container,
   Title,
   Button,
   Text,
@@ -12,6 +10,7 @@ import { IconCheck } from "@tabler/icons";
 
 const useStyles = createStyles((theme) => ({
   root: {
+    backgroundColor: theme.colors.gray[0],
     height: "100%",
     width: "100%",
     backgroundSize: "cover",
@@ -29,7 +28,7 @@ const useStyles = createStyles((theme) => ({
     display: "flex",
     justifyContent: "space-between",
 
-    [theme.fn.smallerThan("md")]: {
+    [theme.fn.smallerThan("sm")]: {
       flexDirection: "column",
     },
   },
@@ -43,13 +42,16 @@ const useStyles = createStyles((theme) => ({
   content: {
     paddingTop: theme.spacing.xl * 2,
     paddingBottom: theme.spacing.xl * 2,
-    paddingLeft: theme.spacing.xl * 4,
+    paddingLeft: theme.spacing.xl * 3,
+    paddingRight: theme.spacing.xl * 3,
     marginRight: theme.spacing.xl * 3,
-    maxWidth: "40%",
+    maxWidth: "45%",
     color: theme.white,
 
     [theme.fn.smallerThan("md")]: {
+      maxWidth: "100%",
       marginRight: 0,
+      color: theme.colors.dark[5],
     },
   },
 
@@ -59,10 +61,18 @@ const useStyles = createStyles((theme) => ({
     fontSize: theme.fontSizes.xl * 2,
     lineHeight: 1.5,
     fontWeight: 600,
+    [theme.fn.smallerThan("md")]: {
+      marginRight: 0,
+      color: theme.colors.dark[5],
+    },
   },
 
   item: {
     color: "white",
+    [theme.fn.smallerThan("md")]: {
+      marginRight: 0,
+      color: theme.colors.dark[5],
+    },
   },
   control: {
     [theme.fn.smallerThan("xs")]: {
