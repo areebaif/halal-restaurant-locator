@@ -2,7 +2,8 @@ import * as React from "react";
 import util from "util";
 import mapboxgl from "mapbox-gl"; // eslint-disable-line import/no-webpack-loader-syntax
 
-const data = {
+// We have to explicitly type defination the data source otherwise mapObject.addSource tries to reach out URL by default and throws error
+const data: GeoJSON.FeatureCollection = {
   features: [
     {
       type: "Feature",
@@ -111,6 +112,8 @@ const data = {
   ],
   type: "FeatureCollection",
 };
+
+const dataTwo = JSON.stringify(data);
 mapboxgl.accessToken = `${process.env.REACT_APP_MAPBOX_ACCESS}`;
 
 export const MapContainer: React.FC = () => {
@@ -136,32 +139,46 @@ export const MapContainer: React.FC = () => {
         (error, image) => {
           if (error) throw error;
           if (!image) throw error;
+          console.log("I am image", image);
+
           mapObject.addImage("custom-marker", image);
-          console.log(" I am here");
-          // Add a GeoJSON source with 2 points
+          // after image loaded add source
+          mapObject.addSource("some id", {
+            type: "geojson",
+            // Documentation: A GeoJSON source. Data must be provided via a "data" property, whose value can be a URL or inline GeoJSON.
+            // Adding a variable as data source only works because we have explicity mentioned data source as having interface GeoJSON.FeatureCollection
+            // Othereise it tries to reach a URL to add data.
+            data: data,
+          });
         }
       );
-      mapObject.addSource("some id", {
-        type: "geojson",
-        data: "https://d2ad6b4ur7yvpq.cloudfront.net/naturalearth-3.3.0/ne_10m_ports.geojson",
-      });
     });
-    const source = mapObject.getSource("some id");
-    // mapObject.on("idle", () => {
-    //   mapObject.addLayer({
-    //     id: "points",
-    //     type: "symbol",
-    //     source: "test",
-    //     layout: {
-    //       "icon-image": "custom-marker",
-    //       // get the title name from the source's "title" property
-    //       "text-field": ["get", "title"],
-    //       "text-font": ["Open Sans Semibold", "Arial Unicode MS Bold"],
-    //       "text-offset": [0, 1.25],
-    //       "text-anchor": "top",
-    //     },
-    //   });
-    //  });
+
+    mapObject.on("idle", () => {
+      console.log("idle state");
+      // mapObject.isSourceLoaded throws error when the value is false, however the error does not stop the execution of code
+      // The error also results in mapObject.on("idle") running twice.
+      if (
+        mapObject.isSourceLoaded("some id") &&
+        !mapObject.getLayer("points")
+      ) {
+        mapObject.addLayer({
+          id: "points",
+          type: "symbol",
+          source: "some id",
+          layout: {
+            "icon-image": "custom-marker",
+            //get the title name from the source's "title" property
+            "text-field": ["get", "title"],
+            "text-font": ["Open Sans Semibold", "Arial Unicode MS Bold"],
+            "text-offset": [0, 1.25],
+            "text-anchor": "top",
+          },
+        });
+      }
+
+      //onsole.log(" I am here", console.log(mapObject.getLayer("points")));
+    });
   });
   return (
     <div>
