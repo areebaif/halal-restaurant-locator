@@ -147,8 +147,6 @@ export const MapContainer: React.FC = () => {
       });
     });
     const source = mapObject.getSource("some id");
-    console.log(source);
-    console.log("boolean source loaded", mapObject.isSourceLoaded("test"));
     // mapObject.on("idle", () => {
     //   mapObject.addLayer({
     //     id: "points",
