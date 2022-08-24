@@ -1,6 +1,6 @@
 import * as React from "react";
-import util from "util";
-import mapboxgl from "mapbox-gl"; // eslint-disable-line import/no-webpack-loader-syntax
+import mapboxgl, { CirclePaint } from "mapbox-gl"; // eslint-disable-line import/no-webpack-loader-syntax
+import Map, { Marker, Source, Layer, Popup, useMap } from "react-map-gl";
 
 // We have to explicitly type defination the data source otherwise mapObject.addSource tries to reach out URL by default and throws error
 const data: GeoJSON.FeatureCollection = {
@@ -112,77 +112,61 @@ const data: GeoJSON.FeatureCollection = {
   ],
   type: "FeatureCollection",
 };
-
-const dataTwo = JSON.stringify(data);
 mapboxgl.accessToken = `${process.env.REACT_APP_MAPBOX_ACCESS}`;
 
+// Mapbox needs a string as data source Id, layerId
+const dataSourceId = "some id";
+const layerId = "points";
+
+// export const PopupComponent: React.FC<{
+//   latitude: number;
+//   longitude: number;
+// }> = ({ latitude, longitude }) => {
+//   const [showPopup, setShowPopup] = React.useState(false);
+//   const [lat, setLat] = React.useState<number>(latitude);
+//   const [lng, setLng] = React.useState(longitude);
+
+//   return <Popup longitude={lng} latitude={lat}></Popup>;
+// };
+
 export const MapContainer: React.FC = () => {
-  const mapContainer = React.useRef<any>(null);
-  const mapRef = React.useRef<mapboxgl.Map | null>(null);
-  const [lng, setLng] = React.useState(-70.9);
-  const [lat, setLat] = React.useState(42.35);
-  const [zoom, setZoom] = React.useState(9);
-
-  React.useEffect(() => {
-    if (mapRef.current) return; // initialize map only once
-    const mapObject = new mapboxgl.Map({
-      container: mapContainer.current,
-      style: "mapbox://styles/mapbox/streets-v11",
-      center: [lng, lat],
-      zoom: zoom,
-    });
-    mapRef.current = mapObject;
-    mapObject.on("load", async () => {
-      // const loadImagePromise = util.promisify(mapObject.loadImage)
-      mapObject.loadImage(
-        "https://docs.mapbox.com/mapbox-gl-js/assets/custom_marker.png",
-        (error, image) => {
-          if (error) throw error;
-          if (!image) throw error;
-          console.log("I am image", image);
-
-          mapObject.addImage("custom-marker", image);
-          // after image loaded add source
-          mapObject.addSource("some id", {
-            type: "geojson",
-            // Documentation: A GeoJSON source. Data must be provided via a "data" property, whose value can be a URL or inline GeoJSON.
-            // Adding a variable as data source only works because we have explicity mentioned data source as having interface GeoJSON.FeatureCollection
-            // Othereise it tries to reach a URL to add data.
-            data: data,
-          });
-        }
-      );
-    });
-
-    mapObject.on("idle", () => {
-      console.log("idle state");
-      // mapObject.isSourceLoaded throws error when the value is false, however the error does not stop the execution of code
-      // The error also results in mapObject.on("idle") running twice.
-      if (
-        mapObject.isSourceLoaded("some id") &&
-        !mapObject.getLayer("points")
-      ) {
-        mapObject.addLayer({
-          id: "points",
-          type: "symbol",
-          source: "some id",
-          layout: {
-            "icon-image": "custom-marker",
-            //get the title name from the source's "title" property
-            "text-field": ["get", "title"],
-            "text-font": ["Open Sans Semibold", "Arial Unicode MS Bold"],
-            "text-offset": [0, 1.25],
-            "text-anchor": "top",
-          },
-        });
-      }
-
-      //onsole.log(" I am here", console.log(mapObject.getLayer("points")));
-    });
+  const mapRef = React.useRef<any>(null);
+  const [viewState, setViewState] = React.useState({
+    latitude: 41.45,
+    longitude: -88.53,
+    zoom: 7.2,
   });
+
+  // TODO: styling spec should conform to mapbox-layer-styling
+  const layerStyle: { id: string; type: string; paint: CirclePaint } = {
+    id: "point",
+    type: "circle",
+    paint: {
+      "circle-radius": 5,
+      "circle-color": "#007cbf",
+    },
+  };
+
+  const onMouseEnter = (e: any) => {
+    console.log("e", e);
+    console.log("here");
+    console.log("lol", mapRef);
+  };
+
   return (
-    <div>
-      <div ref={mapContainer} style={{ height: "400px" }} />
-    </div>
+    <Map
+      ref={mapRef}
+      {...viewState}
+      onMove={(evt) => setViewState(evt.viewState)}
+      style={{ width: "100%", height: 600 }}
+      mapStyle="mapbox://styles/mapbox/streets-v9"
+      mapboxAccessToken={process.env.REACT_APP_MAPBOX_ACCESS}
+      interactiveLayerIds={[layerId]}
+      onMouseEnter={onMouseEnter}
+    >
+      <Source id={dataSourceId} type="geojson" data={data}>
+        <Layer id={layerId} type="circle" paint={layerStyle.paint} />
+      </Source>
+    </Map>
   );
 };
