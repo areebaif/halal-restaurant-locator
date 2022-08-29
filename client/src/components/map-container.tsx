@@ -1,6 +1,14 @@
 import * as React from "react";
 import mapboxgl, { CirclePaint } from "mapbox-gl"; // eslint-disable-line import/no-webpack-loader-syntax
-import Map, { Marker, Source, Layer, Popup, useMap } from "react-map-gl";
+
+import Map, {
+  Marker,
+  Source,
+  Layer,
+  Popup,
+  useMap,
+  MapLayerMouseEvent,
+} from "react-map-gl";
 
 // We have to explicitly type defination the data source otherwise mapObject.addSource tries to reach out URL by default and throws error
 const data: GeoJSON.FeatureCollection = {
@@ -130,7 +138,10 @@ const layerId = "points";
 // };
 
 export const MapContainer: React.FC = () => {
-  const mapRef = React.useRef<any>(null);
+  const mapRef = React.useRef<any>();
+  const [showPopup, setShowPopup] = React.useState(false);
+  const [popupLat, setPopupLat] = React.useState(0);
+  const [popupLng, setPopupLng] = React.useState(0);
   const [viewState, setViewState] = React.useState({
     latitude: 41.45,
     longitude: -88.53,
@@ -147,10 +158,29 @@ export const MapContainer: React.FC = () => {
     },
   };
 
-  const onMouseEnter = (e: any) => {
-    console.log("e", e);
-    console.log("here");
-    console.log("lol", mapRef);
+  const onMouseEnter = (e: MapLayerMouseEvent) => {
+    console.log("hello", e);
+    mapRef.current.on("mouseenter", "points", () => {
+      console.log("I am in");
+    });
+    if (e.features) {
+      console.log("e", e.features[0].geometry);
+      const coordinatesObject = e.features[0].geometry as GeoJSON.Point;
+      const coordinates = coordinatesObject.coordinates.slice();
+      const description = e.features[0].properties;
+
+      // Ensure that if the map is zoomed out such that multiple
+      // copies of the feature are visible, the popup appears
+      // over the copy being pointed to.
+      while (Math.abs(e.lngLat.lng - coordinates[0]) > 180) {
+        coordinates[0] += e.lngLat.lng > coordinates[0] ? 360 : -360;
+      }
+      // TODO: coordinates value will be where you show popup
+      setPopupLat(coordinates[1]);
+      setPopupLng(coordinates[0]);
+      setShowPopup(true);
+      console.log(popupLng, popupLat, coordinates);
+    }
   };
 
   return (
@@ -158,7 +188,7 @@ export const MapContainer: React.FC = () => {
       ref={mapRef}
       {...viewState}
       onMove={(evt) => setViewState(evt.viewState)}
-      style={{ width: "100%", height: 600 }}
+      style={{ width: "100%", maxHeight: 600, minHeight: 600, height: 600 }}
       mapStyle="mapbox://styles/mapbox/streets-v9"
       mapboxAccessToken={process.env.REACT_APP_MAPBOX_ACCESS}
       interactiveLayerIds={[layerId]}
@@ -166,6 +196,26 @@ export const MapContainer: React.FC = () => {
     >
       <Source id={dataSourceId} type="geojson" data={data}>
         <Layer id={layerId} type="circle" paint={layerStyle.paint} />
+        {showPopup && (
+          <Popup
+            longitude={popupLng}
+            latitude={popupLat}
+            anchor="top"
+            style={{
+              position: "absolute",
+              top: 0,
+              left: 0,
+              display: "flex",
+              border: "1px solid black",
+              backgroundColor: "white",
+            }}
+            onClose={() => {
+              setShowPopup(false);
+            }}
+          >
+            <div>You are here</div>
+          </Popup>
+        )}
       </Source>
     </Map>
   );
