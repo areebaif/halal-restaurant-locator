@@ -3,6 +3,9 @@ import { HeaderAction, HeaderActionProps } from "./components/header";
 import { HeroBullets } from "./components/hero-header";
 import { Routes, Route } from "react-router-dom";
 import { Layout } from "./components/Layout";
+import { config } from "dotenv";
+
+console.log("hello", process.env.REACT_APP_MAPBOX_ACCESS);
 
 const headerLinks = {
   links: [
