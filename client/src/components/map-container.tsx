@@ -1,5 +1,6 @@
 import * as React from "react";
 import mapboxgl, { CirclePaint } from "mapbox-gl"; // eslint-disable-line import/no-webpack-loader-syntax
+import { Text, Box } from "@mantine/core";
 
 import Map, {
   Marker,
@@ -126,22 +127,15 @@ mapboxgl.accessToken = `${process.env.REACT_APP_MAPBOX_ACCESS}`;
 const dataSourceId = "some id";
 const layerId = "points";
 
-// export const PopupComponent: React.FC<{
-//   latitude: number;
-//   longitude: number;
-// }> = ({ latitude, longitude }) => {
-//   const [showPopup, setShowPopup] = React.useState(false);
-//   const [lat, setLat] = React.useState<number>(latitude);
-//   const [lng, setLng] = React.useState(longitude);
-
-//   return <Popup longitude={lng} latitude={lat}></Popup>;
-// };
-
 export const MapContainer: React.FC = () => {
   const mapRef = React.useRef<any>();
+  const [activePlace, setActivePlace] = React.useState({
+    latitude: 0,
+    longitude: 0,
+    title: "",
+    description: "",
+  });
   const [showPopup, setShowPopup] = React.useState(false);
-  const [popupLat, setPopupLat] = React.useState(0);
-  const [popupLng, setPopupLng] = React.useState(0);
   const [viewState, setViewState] = React.useState({
     latitude: 41.45,
     longitude: -88.53,
@@ -159,12 +153,11 @@ export const MapContainer: React.FC = () => {
   };
 
   const onMouseEnter = (e: MapLayerMouseEvent) => {
-    console.log("hello", e);
     mapRef.current.on("mouseenter", "points", () => {
-      console.log("I am in");
+      // NOTE: This event does fire but e.features is not defined inside this call callback
     });
+    // NOTE: There is a property e.layers which tells you on which map layer this event was triggered
     if (e.features) {
-      console.log("e", e.features[0].geometry);
       const coordinatesObject = e.features[0].geometry as GeoJSON.Point;
       const coordinates = coordinatesObject.coordinates.slice();
       const description = e.features[0].properties;
@@ -175,11 +168,15 @@ export const MapContainer: React.FC = () => {
       while (Math.abs(e.lngLat.lng - coordinates[0]) > 180) {
         coordinates[0] += e.lngLat.lng > coordinates[0] ? 360 : -360;
       }
-      // TODO: coordinates value will be where you show popup
-      setPopupLat(coordinates[1]);
-      setPopupLng(coordinates[0]);
+      setActivePlace({
+        ...activePlace,
+        latitude: coordinates[1],
+        longitude: coordinates[0],
+        title: description?.title,
+        description: description?.description,
+      });
       setShowPopup(true);
-      console.log(popupLng, popupLat, coordinates);
+      console.log(activePlace, coordinates, description);
     }
   };
 
@@ -198,22 +195,41 @@ export const MapContainer: React.FC = () => {
         <Layer id={layerId} type="circle" paint={layerStyle.paint} />
         {showPopup && (
           <Popup
-            longitude={popupLng}
-            latitude={popupLat}
+            longitude={activePlace.longitude}
+            offset={-5}
+            latitude={activePlace.latitude}
             anchor="top"
+            closeButton={false}
+            closeOnClick={true}
             style={{
               position: "absolute",
               top: 0,
               left: 0,
               display: "flex",
-              border: "1px solid black",
-              backgroundColor: "white",
             }}
             onClose={() => {
               setShowPopup(false);
             }}
           >
-            <div>You are here</div>
+            <div
+              // This div and transparent backgroubnd is added so that popup remains open on hover
+              style={{ border: "10px solid rgba(0, 0, 0, 0)" }}
+              onMouseLeave={() => setShowPopup(false)}
+            >
+              <Box
+                sx={(theme) => ({
+                  backgroundColor: "white",
+                  textAlign: "center",
+                  padding: theme.spacing.xl,
+                  borderRadius: theme.radius.md,
+                  cursor: "pointer",
+                })}
+              >
+                <Text>
+                  {activePlace.title}: {activePlace.description}
+                </Text>
+              </Box>
+            </div>
           </Popup>
         )}
       </Source>
