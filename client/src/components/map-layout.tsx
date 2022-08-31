@@ -1,7 +1,20 @@
 import * as React from "react";
+import { Grid } from "@mantine/core";
 import { MapContainer } from "./map-container";
 import { ListContainer } from "./result-list";
-const testData: GeoJSON.FeatureCollection = {
+
+// We have to explicitly type defination the data source otherwise mapObject.addSource tries to reach out URL by default and throws error
+// Note: We can add any property to properties object. I have added index for easy manupulation in react. The Map object does generate a unique id
+// We cannot use that id in react
+export interface LocationPropertiesProps {
+  title: string;
+  description: string;
+  index: number;
+}
+const testData: GeoJSON.FeatureCollection<
+  GeoJSON.Geometry,
+  LocationPropertiesProps
+> = {
   features: [
     {
       type: "Feature",
@@ -156,21 +169,25 @@ export const PlacesDisplayComponent: React.FC = () => {
   };
 
   return (
-    <React.Fragment>
-      <MapContainer
-        locationData={data}
-        openPopup={openPopup}
-        closePopup={closePopUp}
-        showPopup={showPopup}
-        activePlace={activePlace}
-      />
-      <ListContainer
-        locationData={data}
-        openPopup={openPopup}
-        closePopup={closePopUp}
-        showPopup={showPopup}
-        activePlace={activePlace}
-      />
-    </React.Fragment>
+    <Grid>
+      <Grid.Col md={6} lg={6}>
+        <ListContainer
+          locationData={data}
+          openPopup={openPopup}
+          closePopup={closePopUp}
+          showPopup={showPopup}
+          activePlace={activePlace}
+        />
+      </Grid.Col>
+      <Grid.Col md={6} lg={6}>
+        <MapContainer
+          locationData={data}
+          openPopup={openPopup}
+          closePopup={closePopUp}
+          showPopup={showPopup}
+          activePlace={activePlace}
+        />
+      </Grid.Col>
+    </Grid>
   );
 };

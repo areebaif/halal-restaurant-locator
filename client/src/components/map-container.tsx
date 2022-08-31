@@ -1,12 +1,10 @@
 import * as React from "react";
 import mapboxgl, { CirclePaint } from "mapbox-gl"; // eslint-disable-line import/no-webpack-loader-syntax
 import { Text, Box } from "@mantine/core";
-
 import Map, { Source, Layer, Popup, MapLayerMouseEvent } from "react-map-gl";
-import { activeMarkerProps } from "./map-layout";
 
-// We have to explicitly type defination the data source otherwise mapObject.addSource tries to reach out URL by default and throws error
-// Note: We can add any property to properties object. I have added index for easy manupulation in react
+import { activeMarkerProps } from "./map-layout";
+import { LocationPropertiesProps } from "./map-layout";
 
 mapboxgl.accessToken = `${process.env.REACT_APP_MAPBOX_ACCESS}`;
 
@@ -15,7 +13,10 @@ const dataSourceId = "some id";
 const layerId = "points";
 
 export type MapProps = {
-  locationData: GeoJSON.FeatureCollection;
+  locationData: GeoJSON.FeatureCollection<
+    GeoJSON.Geometry,
+    LocationPropertiesProps
+  >;
   openPopup: (data: activeMarkerProps) => void;
   closePopup: () => void;
   showPopup: boolean;
@@ -71,8 +72,6 @@ export const MapContainer: React.FC<MapProps> = ({
         description: description?.description,
         index: description?.index,
       });
-      //setShowPopup(true);
-      console.log("hello", e.features);
     }
   };
 
@@ -87,7 +86,12 @@ export const MapContainer: React.FC<MapProps> = ({
       interactiveLayerIds={[layerId]}
       onMouseEnter={onMouseEnter}
     >
-      <Source id={dataSourceId} type="geojson" data={locationData}>
+      <Source
+        id={dataSourceId}
+        type="geojson"
+        data={locationData}
+        generateId={true}
+      >
         <Layer id={layerId} type="circle" paint={layerStyle.paint} />
         {showPopup && (
           <Popup
