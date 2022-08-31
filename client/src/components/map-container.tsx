@@ -2,140 +2,35 @@ import * as React from "react";
 import mapboxgl, { CirclePaint } from "mapbox-gl"; // eslint-disable-line import/no-webpack-loader-syntax
 import { Text, Box } from "@mantine/core";
 
-import Map, {
-  Marker,
-  Source,
-  Layer,
-  Popup,
-  useMap,
-  MapLayerMouseEvent,
-} from "react-map-gl";
+import Map, { Source, Layer, Popup, MapLayerMouseEvent } from "react-map-gl";
+import { activeMarkerProps } from "./map-layout";
 
 // We have to explicitly type defination the data source otherwise mapObject.addSource tries to reach out URL by default and throws error
-const data: GeoJSON.FeatureCollection = {
-  features: [
-    {
-      type: "Feature",
-      properties: {
-        title: "Lincoln Park",
-        description: "A northside park that is home to the Lincoln Park Zoo",
-      },
-      geometry: {
-        coordinates: [-87.637596, 41.940403],
-        type: "Point",
-      },
-    },
-    {
-      type: "Feature",
-      properties: {
-        title: "Burnham Park",
-        description: "A lakefront park on Chicago's south side",
-      },
-      geometry: {
-        coordinates: [-87.603735, 41.829985],
-        type: "Point",
-      },
-    },
-    {
-      type: "Feature",
-      properties: {
-        title: "Millennium Park",
-        description:
-          "A downtown park known for its art installations and unique architecture",
-      },
-      geometry: {
-        coordinates: [-87.622554, 41.882534],
-        type: "Point",
-      },
-    },
-    {
-      type: "Feature",
-      properties: {
-        title: "Grant Park",
-        description:
-          "A downtown park that is the site of many of Chicago's favorite festivals and events",
-      },
-      geometry: {
-        coordinates: [-87.619185, 41.876367],
-        type: "Point",
-      },
-    },
-    {
-      type: "Feature",
-      properties: {
-        title: "Humboldt Park",
-        description: "A large park on Chicago's northwest side",
-      },
-      geometry: {
-        coordinates: [-87.70199, 41.905423],
-        type: "Point",
-      },
-    },
-    {
-      type: "Feature",
-      properties: {
-        title: "Douglas Park",
-        description:
-          "A large park near in Chicago's North Lawndale neighborhood",
-      },
-      geometry: {
-        coordinates: [-87.699329, 41.860092],
-        type: "Point",
-      },
-    },
-    {
-      type: "Feature",
-      properties: {
-        title: "Calumet Park",
-        description:
-          "A park on the Illinois-Indiana border featuring a historic fieldhouse",
-      },
-      geometry: {
-        coordinates: [-87.530221, 41.715515],
-        type: "Point",
-      },
-    },
-    {
-      type: "Feature",
-      properties: {
-        title: "Jackson Park",
-        description:
-          "A lakeside park that was the site of the 1893 World's Fair",
-      },
-      geometry: {
-        coordinates: [-87.580389, 41.783185],
-        type: "Point",
-      },
-    },
-    {
-      type: "Feature",
-      properties: {
-        title: "Columbus Park",
-        description: "A large park in Chicago's Austin neighborhood",
-      },
-      geometry: {
-        coordinates: [-87.769775, 41.873683],
-        type: "Point",
-      },
-    },
-  ],
-  type: "FeatureCollection",
-};
+// Note: We can add any property to properties object. I have added index for easy manupulation in react
+
 mapboxgl.accessToken = `${process.env.REACT_APP_MAPBOX_ACCESS}`;
 
 // Mapbox needs a string as data source Id, layerId
 const dataSourceId = "some id";
 const layerId = "points";
 
-export const MapContainer: React.FC = () => {
+export type MapProps = {
+  locationData: GeoJSON.FeatureCollection;
+  openPopup: (data: activeMarkerProps) => void;
+  closePopup: () => void;
+  showPopup: boolean;
+  activePlace: activeMarkerProps;
+};
+
+export const MapContainer: React.FC<MapProps> = ({
+  locationData,
+  openPopup,
+  closePopup,
+  activePlace,
+  showPopup,
+}) => {
   const mapRef = React.useRef<any>();
-  const [activePlace, setActivePlace] = React.useState({
-    latitude: 0,
-    longitude: 0,
-    title: "",
-    description: "",
-  });
-  const [showPopup, setShowPopup] = React.useState(false);
+
   const [viewState, setViewState] = React.useState({
     latitude: 41.45,
     longitude: -88.53,
@@ -168,15 +63,16 @@ export const MapContainer: React.FC = () => {
       while (Math.abs(e.lngLat.lng - coordinates[0]) > 180) {
         coordinates[0] += e.lngLat.lng > coordinates[0] ? 360 : -360;
       }
-      setActivePlace({
+      openPopup({
         ...activePlace,
         latitude: coordinates[1],
         longitude: coordinates[0],
         title: description?.title,
         description: description?.description,
+        index: description?.index,
       });
-      setShowPopup(true);
-      console.log(activePlace, coordinates, description);
+      //setShowPopup(true);
+      console.log("hello", e.features);
     }
   };
 
@@ -191,7 +87,7 @@ export const MapContainer: React.FC = () => {
       interactiveLayerIds={[layerId]}
       onMouseEnter={onMouseEnter}
     >
-      <Source id={dataSourceId} type="geojson" data={data}>
+      <Source id={dataSourceId} type="geojson" data={locationData}>
         <Layer id={layerId} type="circle" paint={layerStyle.paint} />
         {showPopup && (
           <Popup
@@ -208,13 +104,13 @@ export const MapContainer: React.FC = () => {
               display: "flex",
             }}
             onClose={() => {
-              setShowPopup(false);
+              closePopup();
             }}
           >
             <div
               // This div and transparent backgroubnd is added so that popup remains open on hover
               style={{ border: "10px solid rgba(0, 0, 0, 0)" }}
-              onMouseLeave={() => setShowPopup(false)}
+              onMouseLeave={() => closePopup()}
             >
               <Box
                 sx={(theme) => ({
