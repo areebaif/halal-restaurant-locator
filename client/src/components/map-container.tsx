@@ -8,10 +8,6 @@ import { LocationPropertiesProps } from "./map-layout";
 
 mapboxgl.accessToken = `${process.env.REACT_APP_MAPBOX_ACCESS}`;
 
-// Mapbox needs a string as data source Id, layerId
-const dataSourceId = "some id";
-const layerId = "points";
-
 export type MapProps = {
   locationData: GeoJSON.FeatureCollection<
     GeoJSON.Geometry,
@@ -19,8 +15,12 @@ export type MapProps = {
   >;
   openPopup: (data: activeMarkerProps) => void;
   closePopup: () => void;
-  showPopup: boolean;
+  showPopup?: boolean;
   activePlace: activeMarkerProps;
+  onLocationHover?: (data: activeMarkerProps) => void;
+  mapRef?: any;
+  dataSourceId: string;
+  layerId: string;
 };
 
 export const MapContainer: React.FC<MapProps> = ({
@@ -29,9 +29,11 @@ export const MapContainer: React.FC<MapProps> = ({
   closePopup,
   activePlace,
   showPopup,
+  onLocationHover,
+  mapRef,
+  dataSourceId,
+  layerId,
 }) => {
-  const mapRef = React.useRef<any>();
-
   const [viewState, setViewState] = React.useState({
     latitude: 41.45,
     longitude: -88.53,
@@ -43,7 +45,12 @@ export const MapContainer: React.FC<MapProps> = ({
     id: "point",
     type: "circle",
     paint: {
-      "circle-radius": 5,
+      "circle-radius": [
+        "case",
+        ["boolean", ["feature-state", "hover"], false],
+        10,
+        5,
+      ],
       "circle-color": "#007cbf",
     },
   };
@@ -57,6 +64,7 @@ export const MapContainer: React.FC<MapProps> = ({
       const coordinatesObject = e.features[0].geometry as GeoJSON.Point;
       const coordinates = coordinatesObject.coordinates.slice();
       const description = e.features[0].properties;
+      const index: number = description?.index;
 
       // Ensure that if the map is zoomed out such that multiple
       // copies of the feature are visible, the popup appears
@@ -64,6 +72,20 @@ export const MapContainer: React.FC<MapProps> = ({
       while (Math.abs(e.lngLat.lng - coordinates[0]) > 180) {
         coordinates[0] += e.lngLat.lng > coordinates[0] ? 360 : -360;
       }
+
+      onLocationHover?.({
+        latitude: coordinates[1],
+        longitude: coordinates[0],
+        title: description?.title,
+        description: description?.description,
+        index: description?.index,
+      });
+
+      // setting up hover interactivity:
+      mapRef.current.setFeatureState(
+        { source: dataSourceId, id: index },
+        { hover: true }
+      );
       openPopup({
         ...activePlace,
         latitude: coordinates[1],
@@ -75,8 +97,19 @@ export const MapContainer: React.FC<MapProps> = ({
     }
   };
 
+  const onMouseLeave = () => {
+    // disable hover interactivity on map
+    mapRef.current.setFeatureState(
+      { source: dataSourceId, id: activePlace.index },
+      { hover: false }
+    );
+    // close Popup
+    closePopup();
+  };
+
   return (
     <Map
+      reuseMaps={true}
       ref={mapRef}
       {...viewState}
       onMove={(evt) => setViewState(evt.viewState)}
@@ -96,7 +129,7 @@ export const MapContainer: React.FC<MapProps> = ({
         {showPopup && (
           <Popup
             longitude={activePlace.longitude}
-            offset={-5}
+            offset={-10}
             latitude={activePlace.latitude}
             anchor="top"
             closeButton={false}
@@ -107,14 +140,13 @@ export const MapContainer: React.FC<MapProps> = ({
               left: 0,
               display: "flex",
             }}
-            onClose={() => {
-              closePopup();
-            }}
           >
             <div
               // This div and transparent backgroubnd is added so that popup remains open on hover
               style={{ border: "10px solid rgba(0, 0, 0, 0)" }}
-              onMouseLeave={() => closePopup()}
+              onMouseLeave={() => {
+                onMouseLeave();
+              }}
             >
               <Box
                 sx={(theme) => ({

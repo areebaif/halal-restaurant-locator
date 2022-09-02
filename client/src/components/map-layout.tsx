@@ -3,6 +3,9 @@ import { Grid } from "@mantine/core";
 import { MapContainer } from "./map-container";
 import { ListContainer } from "./result-list";
 
+// Mapbox needs a string as data source Id, layerId
+const dataSourceId = "some id";
+const layerId = "points";
 // We have to explicitly type defination the data source otherwise mapObject.addSource tries to reach out URL by default and throws error
 // Note: We can add any property to properties object. I have added index for easy manupulation in react. The Map object does generate a unique id
 // We cannot use that id in react
@@ -138,23 +141,29 @@ export type activeMarkerProps = {
   longitude: number;
   title: string;
   description: string;
-  index: number | undefined;
+  index: number | null;
 };
 
 export const PlacesDisplayComponent: React.FC = () => {
+  const mapRef = React.useRef<any>();
+  console.log(mapRef.current?.getMap());
   const [data, setData] = React.useState(testData);
   const [activePlace, setActivePlace] = React.useState<activeMarkerProps>({
     latitude: 0,
     longitude: 0,
     title: "",
     description: "",
-    index: undefined,
+    index: null,
   });
   const [showPopup, setShowPopup] = React.useState(false);
 
   const openPopup = (data: activeMarkerProps) => {
     setActivePlace({ ...data });
     setShowPopup(true);
+  };
+
+  const onLocationHover = (data: activeMarkerProps) => {
+    setActivePlace({ ...data });
   };
 
   const closePopUp = () => {
@@ -164,7 +173,7 @@ export const PlacesDisplayComponent: React.FC = () => {
       longitude: 0,
       title: "",
       description: "",
-      index: undefined,
+      index: null,
     });
   };
 
@@ -175,8 +184,10 @@ export const PlacesDisplayComponent: React.FC = () => {
           locationData={data}
           openPopup={openPopup}
           closePopup={closePopUp}
-          showPopup={showPopup}
           activePlace={activePlace}
+          mapRef={mapRef}
+          dataSourceId={dataSourceId}
+          layerId={layerId}
         />
       </Grid.Col>
       <Grid.Col md={6} lg={6}>
@@ -186,6 +197,10 @@ export const PlacesDisplayComponent: React.FC = () => {
           closePopup={closePopUp}
           showPopup={showPopup}
           activePlace={activePlace}
+          onLocationHover={onLocationHover}
+          mapRef={mapRef}
+          dataSourceId={dataSourceId}
+          layerId={layerId}
         />
       </Grid.Col>
     </Grid>
