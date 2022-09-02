@@ -5,8 +5,6 @@ import { Routes, Route } from "react-router-dom";
 import { Layout } from "./components/Layout";
 import { config } from "dotenv";
 
-console.log("hello", process.env.REACT_APP_MAPBOX_ACCESS);
-
 const headerLinks = {
   links: [
     {
