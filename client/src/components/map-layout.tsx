@@ -136,6 +136,8 @@ const testDataTwo: GeoJSON.FeatureCollection<
   ],
   type: "FeatureCollection",
 };
+
+// This data has london points
 const testData: GeoJSON.FeatureCollection<
   GeoJSON.Geometry,
   LocationPropertiesProps
@@ -292,7 +294,7 @@ export type activeMarkerProps = {
 
 export const PlacesDisplayComponent: React.FC = () => {
   const mapRef = React.useRef<any>();
-  const [data, setData] = React.useState(testData);
+  const [data, setData] = React.useState(testDataTwo);
   const [activePlace, setActivePlace] = React.useState<activeMarkerProps>({
     latitude: 0,
     longitude: 0,
@@ -317,8 +319,8 @@ export const PlacesDisplayComponent: React.FC = () => {
       index: null,
     });
   };
-  // TODO: fix function we are updating
-  const onUpdateData = (
+
+  const onSeacrhQuery = (
     data: GeoJSON.FeatureCollection<GeoJSON.Geometry, LocationPropertiesProps>
   ) => {
     setData(data);
@@ -347,7 +349,7 @@ export const PlacesDisplayComponent: React.FC = () => {
           mapRef={mapRef}
           dataSourceId={dataSourceId}
           layerId={layerId}
-          setData={onUpdateData}
+          onSearch={onSeacrhQuery}
         />
       </Grid.Col>
     </Grid>

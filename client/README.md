@@ -2,6 +2,12 @@
 
 This project was bootstrapped with [Create React App](https://github.com/facebook/create-react-app).
 
+## Onse Time Setup to Run in Development Mode:
+
+Create an .env file in the root of the project and set the following environment varibale
+
+REACT_APP_MAPBOX_ACCESS={Your Map Token Value}
+
 ## Available Scripts
 
 In the project directory, you can run:

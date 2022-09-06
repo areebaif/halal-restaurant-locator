@@ -288,7 +288,7 @@ export type MapProps = {
   mapRef?: any;
   dataSourceId: string;
   layerId: string;
-  setData?: (
+  onSearch?: (
     data: GeoJSON.FeatureCollection<GeoJSON.Geometry, LocationPropertiesProps>
   ) => void;
 };
@@ -302,7 +302,7 @@ export const MapContainer: React.FC<MapProps> = ({
   mapRef,
   dataSourceId,
   layerId,
-  setData,
+  onSearch,
 }) => {
   const [viewState, setViewState] = React.useState({
     latitude: 41.45,
@@ -339,11 +339,6 @@ export const MapContainer: React.FC<MapProps> = ({
         coordinates[0] += e.lngLat.lng > coordinates[0] ? 360 : -360;
       }
 
-      // setting up hover interactivity inside layer of map:
-      mapRef.current.setFeatureState(
-        { source: dataSourceId, id: index },
-        { hover: true }
-      );
       openPopup({
         ...activePlace,
         latitude: coordinates[1],
@@ -352,17 +347,23 @@ export const MapContainer: React.FC<MapProps> = ({
         description: description?.description,
         index: description?.index,
       });
+
+      // setting up hover interactivity inside layer of map:
+      mapRef.current.setFeatureState(
+        { source: dataSourceId, id: index },
+        { hover: true }
+      );
     }
   };
   // TODO: searching and filtering will update result instead of onclick handler
   // Right now this works with onClick
   const onClick = () => {
     // SetData in react hook
-    setData?.(testData);
+    onSearch?.(testData);
     const geoJsonSource = mapRef.current.getSource(dataSourceId);
     console.log(" geojson soiurce", geoJsonSource);
-    // setData on mapsource
-    geoJsonSource.setData(testDataTwo);
+    // setData on mapsource: It does not update even if you tell react to update, we have to use map inbuilt methods to update mapdata to limit map renders, inistialising  for billing
+    geoJsonSource.setData(testData);
   };
 
   const onMouseLeave = () => {
