@@ -2,6 +2,7 @@ import * as React from "react";
 import { Grid } from "@mantine/core";
 import { MapContainer } from "./map-container";
 import { ListContainer } from "./result-list";
+import { CityInput } from "./search-component";
 
 // Mapbox needs a string as data source Id, layerId
 const dataSourceId = "some id";
@@ -303,6 +304,11 @@ export const PlacesDisplayComponent: React.FC = () => {
     index: null,
   });
   const [showPopup, setShowPopup] = React.useState(false);
+  const [city, setCity] = React.useState("");
+
+  const onCityValueChange = (value: string) => {
+    setCity(value);
+  };
 
   const openPopup = (data: activeMarkerProps) => {
     setActivePlace({ ...data });
@@ -328,6 +334,9 @@ export const PlacesDisplayComponent: React.FC = () => {
 
   return (
     <Grid>
+      <Grid.Col md={12} lg={12}>
+        <CityInput value={city} onValueChange={onCityValueChange} />
+      </Grid.Col>
       <Grid.Col md={6} lg={6}>
         <ListContainer
           locationData={data}

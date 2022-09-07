@@ -3,14 +3,43 @@ import { TextInput, Button } from "@mantine/core";
 import { IconSearch } from "@tabler/icons";
 import { Autocomplete } from "@mantine/core";
 
-import cities from "../cities.json";
+import rawData from "../cities.json";
 
 // https://simplemaps.com/data/us-zips this need to be added to usa zipcode data
+
+// This is for setting filter
 // Chip.Group controlled cip group for multi filter select for search
 // transfer list for a card generation
 
-const SearchInput: React.FC = () => {
-  console.log(cities);
+const zipData = rawData.data.map((item) => ({ ...item, value: item.zip }));
+
+export type CityInputProps = {
+  value: string;
+  onValueChange: (value: string) => void;
+};
+export const CityInput: React.FC<CityInputProps> = ({
+  value,
+  onValueChange,
+}) => {
+  //const [value, setValue] = React.useState("");
+  // const onInput = (event: any) => {
+  //   setValue(event.currentTarget.value);
+  //   console.log(value);
+  // };
+  console.log(value);
+  return (
+    <Autocomplete
+      label="Zip code"
+      placeholder="Start typing (Required field)"
+      value={value}
+      limit={7}
+      onChange={onValueChange}
+      data={zipData}
+    />
+  );
+};
+
+export const SearchInput: React.FC = () => {
   const [value, setValue] = React.useState("");
   const [triggerSearch, setTriggerSearch] = React.useState(false);
 
@@ -48,5 +77,3 @@ const SearchInput: React.FC = () => {
     </React.Fragment>
   );
 };
-
-export default SearchInput;
