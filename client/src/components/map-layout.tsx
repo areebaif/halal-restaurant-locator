@@ -331,7 +331,6 @@ export const PlacesDisplayComponent: React.FC = () => {
   ) => {
     setData(data);
   };
-
   return (
     <Grid>
       <Grid.Col md={12} lg={12}>

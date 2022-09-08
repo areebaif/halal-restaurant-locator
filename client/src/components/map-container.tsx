@@ -2,6 +2,7 @@ import * as React from "react";
 import mapboxgl, { CirclePaint } from "mapbox-gl"; // eslint-disable-line import/no-webpack-loader-syntax
 import { Text, Box } from "@mantine/core";
 import Map, { Source, Layer, Popup, MapLayerMouseEvent } from "react-map-gl";
+import location from "../marker.svg";
 
 import { activeMarkerProps } from "./map-layout";
 import { LocationPropertiesProps } from "./map-layout";
@@ -311,17 +312,25 @@ export const MapContainer: React.FC<MapProps> = ({
   });
 
   // TODO: styling spec should conform to mapbox-layer-styling: We are handling the case in which user hovers over a marker
-  const layerStyle: { id: string; type: string; paint: CirclePaint } = {
-    id: "point",
-    type: "circle",
-    paint: {
-      "circle-radius": [
-        "case",
-        ["boolean", ["feature-state", "hover"], false],
-        10,
-        5,
-      ],
-      "circle-color": "#007cbf",
+  // const layerStyle: { id: string; type: string; paint: CirclePaint } = {
+  //   id: "point",
+  //   type: "circle",
+  //   paint: {
+  //     "circle-radius": [
+  //       "case",
+  //       ["boolean", ["feature-state", "hover"], false],
+  //       10,
+  //       5,
+  //     ],
+  //     "circle-color": "#007cbf",
+  //   },
+  // };
+  const layerStyle = {
+    //id: "point",
+    //type: "symbol",
+    layout: {
+      "icon-image": "marker",
+      "text-field": ["get", "title"],
     },
   };
 
@@ -395,7 +404,12 @@ export const MapContainer: React.FC<MapProps> = ({
         data={locationData}
         generateId={true}
       >
-        <Layer id={layerId} type="circle" paint={layerStyle.paint} />
+        <Layer
+          id={layerId}
+          type="symbol"
+          source={dataSourceId}
+          layout={{ "text-field": ["get", "title"], "text-size": 16 }}
+        />
         {showPopup && (
           <Popup
             longitude={activePlace.longitude}
