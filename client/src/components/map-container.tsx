@@ -6,6 +6,152 @@ import Map, { Source, Layer, Popup, MapLayerMouseEvent } from "react-map-gl";
 import { activeMarkerProps } from "./map-layout";
 import { LocationPropertiesProps } from "./map-layout";
 
+// const testData: GeoJSON.FeatureCollection<
+//   GeoJSON.Geometry,
+//   LocationPropertiesProps
+// > = {
+//   features: [
+//     {
+//       type: "Feature",
+//       properties: {
+//         title: "Lincoln Park",
+//         description: "A northside park that is home to the Lincoln Park Zoo",
+//         index: 0,
+//       },
+//       geometry: {
+//         coordinates: [-87.637596, 41.940403],
+//         type: "Point",
+//       },
+//     },
+//     {
+//       type: "Feature",
+//       properties: {
+//         title: "Burnham Park",
+//         description: "A lakefront park on Chicago's south side",
+//         index: 1,
+//       },
+//       geometry: {
+//         coordinates: [-87.603735, 41.829985],
+//         type: "Point",
+//       },
+//     },
+//     {
+//       type: "Feature",
+//       properties: {
+//         title: "Millennium Park",
+//         description:
+//           "A downtown park known for its art installations and unique architecture",
+//         index: 2,
+//       },
+//       geometry: {
+//         coordinates: [-87.622554, 41.882534],
+//         type: "Point",
+//       },
+//     },
+//     {
+//       type: "Feature",
+//       properties: {
+//         title: "Grant Park",
+//         description:
+//           "A downtown park that is the site of many of Chicago's favorite festivals and events",
+//         index: 3,
+//       },
+//       geometry: {
+//         coordinates: [-87.619185, 41.876367],
+//         type: "Point",
+//       },
+//     },
+//     {
+//       type: "Feature",
+//       properties: {
+//         title: "Humboldt Park",
+//         description: "A large park on Chicago's northwest side",
+//         index: 4,
+//       },
+//       geometry: {
+//         coordinates: [-87.70199, 41.905423],
+//         type: "Point",
+//       },
+//     },
+//     {
+//       type: "Feature",
+//       properties: {
+//         title: "Douglas Park",
+//         description:
+//           "A large park near in Chicago's North Lawndale neighborhood",
+//         index: 5,
+//       },
+//       geometry: {
+//         coordinates: [-87.699329, 41.860092],
+//         type: "Point",
+//       },
+//     },
+//     {
+//       type: "Feature",
+//       properties: {
+//         title: "Calumet Park",
+//         description:
+//           "A park on the Illinois-Indiana border featuring a historic fieldhouse",
+//         index: 6,
+//       },
+//       geometry: {
+//         coordinates: [-87.530221, 41.715515],
+//         type: "Point",
+//       },
+//     },
+//     {
+//       type: "Feature",
+//       properties: {
+//         title: "Jackson Park",
+//         description:
+//           "A lakeside park that was the site of the 1893 World's Fair",
+//         index: 7,
+//       },
+//       geometry: {
+//         coordinates: [-87.580389, 41.783185],
+//         type: "Point",
+//       },
+//     },
+//     {
+//       type: "Feature",
+//       properties: {
+//         title: "Columbus Park",
+//         description: "A large park in Chicago's Austin neighborhood",
+//         index: 8,
+//       },
+//       geometry: {
+//         coordinates: [-87.769775, 41.873683],
+//         type: "Point",
+//       },
+//     },
+//     {
+//       type: "Feature",
+//       properties: {
+//         title: "Limit doneness lolss",
+//         description: "Test coordinate",
+//         index: 9,
+//       },
+//       geometry: {
+//         coordinates: [-0.12894, 51.52167],
+//         type: "Point",
+//       },
+//     },
+//     {
+//       type: "Feature",
+//       properties: {
+//         title: "France lochness",
+//         description: "Test coordinate",
+//         index: 10,
+//       },
+//       geometry: {
+//         coordinates: [2.17967, 46.58635],
+//         type: "Point",
+//       },
+//     },
+//   ],
+//   type: "FeatureCollection",
+// };
+
 mapboxgl.accessToken = `${process.env.REACT_APP_MAPBOX_ACCESS}`;
 
 export type MapProps = {
@@ -17,10 +163,12 @@ export type MapProps = {
   closePopup: () => void;
   showPopup?: boolean;
   activePlace: activeMarkerProps;
-  onLocationHover?: (data: activeMarkerProps) => void;
   mapRef?: any;
   dataSourceId: string;
   layerId: string;
+  onSearch?: (
+    data: GeoJSON.FeatureCollection<GeoJSON.Geometry, LocationPropertiesProps>
+  ) => void;
 };
 
 export const MapContainer: React.FC<MapProps> = ({
@@ -29,10 +177,10 @@ export const MapContainer: React.FC<MapProps> = ({
   closePopup,
   activePlace,
   showPopup,
-  onLocationHover,
   mapRef,
   dataSourceId,
   layerId,
+  onSearch,
 }) => {
   const [viewState, setViewState] = React.useState({
     latitude: 41.45,
@@ -40,7 +188,7 @@ export const MapContainer: React.FC<MapProps> = ({
     zoom: 7.2,
   });
 
-  // TODO: styling spec should conform to mapbox-layer-styling
+  // TODO: styling spec should conform to mapbox-layer-styling: We are handling the case in which user hovers over a marker
   const layerStyle: { id: string; type: string; paint: CirclePaint } = {
     id: "point",
     type: "circle",
@@ -54,12 +202,16 @@ export const MapContainer: React.FC<MapProps> = ({
       "circle-color": "#007cbf",
     },
   };
+  // const layerStyle = {
+  //   //id: "point",
+  //   //type: "symbol",
+  //   layout: {
+  //     "icon-image": "marker",
+  //     "text-field": ["get", "title"],
+  //   },
+  // };
 
   const onMouseEnter = (e: MapLayerMouseEvent) => {
-    mapRef.current.on("mouseenter", "points", () => {
-      // NOTE: This event does fire but e.features is not defined inside this call callback
-    });
-    // NOTE: There is a property e.layers which tells you on which map layer this event was triggered
     if (e.features) {
       const coordinatesObject = e.features[0].geometry as GeoJSON.Point;
       const coordinates = coordinatesObject.coordinates.slice();
@@ -73,19 +225,6 @@ export const MapContainer: React.FC<MapProps> = ({
         coordinates[0] += e.lngLat.lng > coordinates[0] ? 360 : -360;
       }
 
-      onLocationHover?.({
-        latitude: coordinates[1],
-        longitude: coordinates[0],
-        title: description?.title,
-        description: description?.description,
-        index: description?.index,
-      });
-
-      // setting up hover interactivity:
-      mapRef.current.setFeatureState(
-        { source: dataSourceId, id: index },
-        { hover: true }
-      );
       openPopup({
         ...activePlace,
         latitude: coordinates[1],
@@ -94,11 +233,27 @@ export const MapContainer: React.FC<MapProps> = ({
         description: description?.description,
         index: description?.index,
       });
+
+      // setting up hover interactivity inside layer of map:
+      mapRef.current.setFeatureState(
+        { source: dataSourceId, id: index },
+        { hover: true }
+      );
     }
+  };
+  // TODO: searching and filtering will update result instead of onclick handler
+  // Right now this works with onClick
+  const onClick = () => {
+    // SetData in react hook
+    // onSearch?.(testData);
+    // const geoJsonSource = mapRef.current.getSource(dataSourceId);
+    // //console.log(" geojson soiurce", geoJsonSource);
+    // // setData on mapsource: It does not update even if you tell react to update, we have to use map inbuilt methods to update mapdata to limit map renders, inistialising  for billing
+    // geoJsonSource.setData(testData);
   };
 
   const onMouseLeave = () => {
-    // disable hover interactivity on map
+    // disable hover interactivity inside layer of map
     mapRef.current.setFeatureState(
       { source: dataSourceId, id: activePlace.index },
       { hover: false }
@@ -118,6 +273,7 @@ export const MapContainer: React.FC<MapProps> = ({
       mapboxAccessToken={process.env.REACT_APP_MAPBOX_ACCESS}
       interactiveLayerIds={[layerId]}
       onMouseEnter={onMouseEnter}
+      //onClick={onClick}
     >
       <Source
         id={dataSourceId}
@@ -125,7 +281,13 @@ export const MapContainer: React.FC<MapProps> = ({
         data={locationData}
         generateId={true}
       >
-        <Layer id={layerId} type="circle" paint={layerStyle.paint} />
+        <Layer
+          id={layerId}
+          type="circle"
+          source={dataSourceId}
+          //layout={{ "text-field": ["get", "title"], "text-size": 16 }}
+          paint={layerStyle.paint}
+        />
         {showPopup && (
           <Popup
             longitude={activePlace.longitude}

@@ -12,11 +12,11 @@ export const ListContainer: React.FC<MapProps> = ({
   dataSourceId,
 }) => {
   const onMouseEnter = (data: activeMarkerProps) => {
+    openPopup(data);
     mapRef.current.setFeatureState(
       { source: dataSourceId, id: data.index },
       { hover: true }
     );
-    openPopup(data);
   };
 
   const allListMouseLeave = () => {
@@ -44,6 +44,8 @@ export const ListContainer: React.FC<MapProps> = ({
                 { source: dataSourceId, id: activePlace.index },
                 { hover: false }
               );
+
+              closePopup();
             }}
             key={item.properties?.index}
           >
