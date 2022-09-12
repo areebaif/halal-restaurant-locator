@@ -155,7 +155,10 @@ import { LocationPropertiesProps } from "./map-layout";
 mapboxgl.accessToken = `${process.env.REACT_APP_MAPBOX_ACCESS}`;
 
 export type MapProps = {
-  locationData: any;
+  locationData: GeoJSON.FeatureCollection<
+    GeoJSON.Geometry,
+    LocationPropertiesProps
+  >;
   openPopup: (data: activeMarkerProps) => void;
   closePopup: () => void;
   showPopup?: boolean;
