@@ -3,6 +3,7 @@
   "version": "0.1.0",
   "private": true,
   "dependencies": {
+    "@danmarshall/deckgl-typings": "^4.9.26",
     "@emotion/react": "^11.9.3",
     "@mantine/core": "^5.0.0",
     "@mantine/hooks": "^5.0.0",
