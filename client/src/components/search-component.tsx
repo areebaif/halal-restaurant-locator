@@ -2,7 +2,6 @@ import * as React from "react";
 import { TextInput, Button } from "@mantine/core";
 import { IconSearch } from "@tabler/icons";
 import { Autocomplete } from "@mantine/core";
-
 import rawData from "../cities.json";
 
 // https://simplemaps.com/data/us-zips this need to be added to usa zipcode data
@@ -12,6 +11,7 @@ import rawData from "../cities.json";
 // transfer list for a card generation
 
 const zipData = rawData.data.map((item) => ({ ...item, value: item.zip }));
+//const loadData = JSON.parse(JSON.stringify(locationCoordinates));
 
 export type CityInputProps = {
   value: string;
@@ -26,7 +26,7 @@ export const CityInput: React.FC<CityInputProps> = ({
   //   setValue(event.currentTarget.value);
   //   console.log(value);
   // };
-  console.log(value);
+  //console.log(value);
   return (
     <Autocomplete
       label="Zip code"
