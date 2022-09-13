@@ -337,7 +337,7 @@ export const PlacesDisplayComponent: React.FC = () => {
         <CityInput value={city} onValueChange={onCityValueChange} />
       </Grid.Col>
       <Grid.Col md={6} lg={6}>
-        {/* <ListContainer
+        <ListContainer
           locationData={data}
           openPopup={openPopup}
           closePopup={closePopUp}
@@ -345,10 +345,10 @@ export const PlacesDisplayComponent: React.FC = () => {
           mapRef={mapRef}
           dataSourceId={dataSourceId}
           layerId={layerId}
-        /> */}
+        />
       </Grid.Col>
       <Grid.Col md={6} lg={6}>
-        {/* <MapContainer
+        <MapContainer
           locationData={data}
           openPopup={openPopup}
           closePopup={closePopUp}
@@ -358,7 +358,7 @@ export const PlacesDisplayComponent: React.FC = () => {
           dataSourceId={dataSourceId}
           layerId={layerId}
           onSearch={onSeacrhQuery}
-        /> */}
+        />
       </Grid.Col>
     </Grid>
   );
