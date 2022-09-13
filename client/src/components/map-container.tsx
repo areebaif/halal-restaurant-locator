@@ -2,6 +2,7 @@ import * as React from "react";
 import mapboxgl, { CirclePaint } from "mapbox-gl"; // eslint-disable-line import/no-webpack-loader-syntax
 import { Text, Box } from "@mantine/core";
 import Map, { Source, Layer, Popup, MapLayerMouseEvent } from "react-map-gl";
+import redMarker from "./red-marker.png";
 
 import { activeMarkerProps } from "./map-layout";
 import { LocationPropertiesProps } from "./map-layout";
@@ -154,6 +155,8 @@ import { LocationPropertiesProps } from "./map-layout";
 
 mapboxgl.accessToken = `${process.env.REACT_APP_MAPBOX_ACCESS}`;
 
+let hoverId: null | number = null;
+
 export type MapProps = {
   locationData: GeoJSON.FeatureCollection<
     GeoJSON.Geometry,
@@ -211,24 +214,35 @@ export const MapContainer: React.FC<MapProps> = ({
   //   },
   // };
 
-  const onMouseEnter = (e: MapLayerMouseEvent) => {
-    if (e.features) {
+  const onMouseMouse = (e: MapLayerMouseEvent) => {
+    // This is to handle edge case
+    if (hoverId) {
+      mapRef.current.setFeatureState(
+        { source: dataSourceId, id: hoverId },
+        { hover: false }
+      );
+    }
+    hoverId = null;
+    if (e.features?.length) {
       const coordinatesObject = e.features[0].geometry as GeoJSON.Point;
       const coordinates = coordinatesObject.coordinates.slice();
       const description = e.features[0].properties;
       const index: number = description?.index;
 
+      // ***** NOTE: not sure if we want to keep this *****
       // Ensure that if the map is zoomed out such that multiple
       // copies of the feature are visible, the popup appears
       // over the copy being pointed to.
-      while (Math.abs(e.lngLat.lng - coordinates[0]) > 180) {
-        coordinates[0] += e.lngLat.lng > coordinates[0] ? 360 : -360;
-      }
+      // while (Math.abs(e.lngLat.lng - coordinates[0]) > 180) {
+      //   coordinates[0] += e.lngLat.lng > coordinates[0] ? 360 : -360;
+      // }
+
+      hoverId = index;
 
       openPopup({
         ...activePlace,
-        latitude: coordinates[1],
-        longitude: coordinates[0],
+        latitude: e.lngLat.lat,
+        longitude: e.lngLat.lng,
         title: description?.title,
         description: description?.description,
         index: description?.index,
@@ -236,7 +250,7 @@ export const MapContainer: React.FC<MapProps> = ({
 
       // setting up hover interactivity inside layer of map:
       mapRef.current.setFeatureState(
-        { source: dataSourceId, id: index },
+        { source: dataSourceId, id: hoverId },
         { hover: true }
       );
     }
@@ -255,11 +269,30 @@ export const MapContainer: React.FC<MapProps> = ({
   const onMouseLeave = () => {
     // disable hover interactivity inside layer of map
     mapRef.current.setFeatureState(
-      { source: dataSourceId, id: activePlace.index },
+      { source: dataSourceId, id: hoverId },
       { hover: false }
     );
+    hoverId = null;
     // close Popup
     closePopup();
+  };
+
+  const onLoad = () => {
+    mapRef.current.loadImage(redMarker, (error: any, image: any) => {
+      if (error) throw error;
+      mapRef.current.addImage("custom-marker", image);
+    });
+  };
+
+  const onMouseExit = () => {
+    console.log(" I was triggered");
+    if (hoverId && !showPopup) {
+      mapRef.current.setFeatureState(
+        { source: dataSourceId, id: hoverId },
+        { hover: false }
+      );
+      hoverId = null;
+    }
   };
 
   return (
@@ -272,8 +305,9 @@ export const MapContainer: React.FC<MapProps> = ({
       mapStyle="mapbox://styles/mapbox/streets-v9"
       mapboxAccessToken={process.env.REACT_APP_MAPBOX_ACCESS}
       interactiveLayerIds={[layerId]}
-      onMouseEnter={onMouseEnter}
-      //onClick={onClick}
+      onMouseMove={onMouseMouse}
+      onLoad={onLoad}
+      onMouseLeave={onMouseExit}
     >
       <Source
         id={dataSourceId}
@@ -283,10 +317,22 @@ export const MapContainer: React.FC<MapProps> = ({
       >
         <Layer
           id={layerId}
-          type="circle"
+          type="symbol"
           source={dataSourceId}
-          //layout={{ "text-field": ["get", "title"], "text-size": 16 }}
-          paint={layerStyle.paint}
+          layout={{
+            "icon-image": "custom-marker",
+            "icon-allow-overlap": true,
+            "text-field": ["get", "title"],
+            "text-allow-overlap": true,
+          }}
+          paint={{
+            "icon-opacity": [
+              "case",
+              ["boolean", ["feature-state", "hover"], false],
+              2,
+              1,
+            ],
+          }}
         />
         {showPopup && (
           <Popup
