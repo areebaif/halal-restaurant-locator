@@ -304,6 +304,7 @@ export const PlacesDisplayComponent: React.FC = () => {
     index: null,
   });
   const [showPopup, setShowPopup] = React.useState(false);
+  const [showCard, setShowCard] = React.useState(false);
   const [city, setCity] = React.useState("");
 
   const onCityValueChange = (value: string) => {
@@ -317,6 +318,21 @@ export const PlacesDisplayComponent: React.FC = () => {
 
   const closePopUp = () => {
     setShowPopup(false);
+    setActivePlace({
+      latitude: 0,
+      longitude: 0,
+      title: "",
+      description: "",
+      index: null,
+    });
+  };
+
+  const openCard = () => {
+    setShowCard(true);
+  };
+
+  const closeCard = () => {
+    setShowCard(true);
     setActivePlace({
       latitude: 0,
       longitude: 0,
