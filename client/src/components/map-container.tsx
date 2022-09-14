@@ -6,6 +6,7 @@ import redMarker from "./red-marker.png";
 
 import { activeMarkerProps } from "./map-layout";
 import { LocationPropertiesProps } from "./map-layout";
+import { hover } from "@testing-library/user-event/dist/hover";
 
 // const testData: GeoJSON.FeatureCollection<
 //   GeoJSON.Geometry,
@@ -214,8 +215,7 @@ export const MapContainer: React.FC<MapProps> = ({
   //   },
   // };
 
-  const onMouseMouse = (e: MapLayerMouseEvent) => {
-    // This is to handle edge case
+  const onMouseEnter = (e: MapLayerMouseEvent) => {
     if (hoverId) {
       mapRef.current.setFeatureState(
         { source: dataSourceId, id: hoverId },
@@ -224,10 +224,12 @@ export const MapContainer: React.FC<MapProps> = ({
     }
     hoverId = null;
     if (e.features?.length) {
+      console.log("I was triggered", e.lngLat);
       const coordinatesObject = e.features[0].geometry as GeoJSON.Point;
       const coordinates = coordinatesObject.coordinates.slice();
       const description = e.features[0].properties;
       const index: number = description?.index;
+      //console.log(" I am e", coordinatesObject, e.lngLat);
 
       // ***** NOTE: not sure if we want to keep this *****
       // Ensure that if the map is zoomed out such that multiple
@@ -236,6 +238,8 @@ export const MapContainer: React.FC<MapProps> = ({
       // while (Math.abs(e.lngLat.lng - coordinates[0]) > 180) {
       //   coordinates[0] += e.lngLat.lng > coordinates[0] ? 360 : -360;
       // }
+
+      hoverId = index;
 
       hoverId = index;
 
@@ -285,7 +289,6 @@ export const MapContainer: React.FC<MapProps> = ({
   };
 
   const onMouseExit = () => {
-    console.log(" I was triggered");
     if (hoverId && !showPopup) {
       mapRef.current.setFeatureState(
         { source: dataSourceId, id: hoverId },
@@ -305,7 +308,7 @@ export const MapContainer: React.FC<MapProps> = ({
       mapStyle="mapbox://styles/mapbox/streets-v9"
       mapboxAccessToken={process.env.REACT_APP_MAPBOX_ACCESS}
       interactiveLayerIds={[layerId]}
-      onMouseMove={onMouseMouse}
+      onMouseMove={onMouseEnter}
       onLoad={onLoad}
       onMouseLeave={onMouseExit}
     >
