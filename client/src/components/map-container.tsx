@@ -231,12 +231,15 @@ export const MapContainer: React.FC<MapProps> = ({
       const index: number = description?.index;
       //console.log(" I am e", coordinatesObject, e.lngLat);
 
+      // ***** NOTE: not sure if we want to keep this *****
       // Ensure that if the map is zoomed out such that multiple
       // copies of the feature are visible, the popup appears
       // over the copy being pointed to.
-      while (Math.abs(e.lngLat.lng - coordinates[0]) > 180) {
-        coordinates[0] += e.lngLat.lng > coordinates[0] ? 360 : -360;
-      }
+      // while (Math.abs(e.lngLat.lng - coordinates[0]) > 180) {
+      //   coordinates[0] += e.lngLat.lng > coordinates[0] ? 360 : -360;
+      // }
+
+      hoverId = index;
 
       hoverId = index;
 
