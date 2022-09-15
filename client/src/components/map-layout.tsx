@@ -7,6 +7,7 @@ import { CityInput } from "./search-component";
 // Mapbox needs a string as data source Id, layerId
 const dataSourceId = "some id";
 const layerId = "points";
+//
 // We have to explicitly type defination the data source otherwise mapObject.addSource tries to reach out URL by default and throws error
 // Note: We can add any property to properties object. I have added index for easy manupulation in react. The Map object does generate a unique id
 // We cannot use that id in react

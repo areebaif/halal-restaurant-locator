@@ -3,14 +3,7 @@ import { MapProps } from "./map-container";
 import { List, Menu, Popover, Text } from "@mantine/core";
 
 import { activeMarkerProps } from "./map-layout";
-
-export const LocationCard: React.FC<{
-  showCard: boolean;
-  openCard: () => void;
-  closeCard: () => void;
-}> = ({ showCard, openCard, closeCard }) => {
-  return <Menu opened={showCard} onChange={closeCard}></Menu>;
-};
+let hoverId: null | number = null;
 
 export const ListContainer: React.FC<MapProps> = ({
   locationData,
@@ -24,9 +17,17 @@ export const ListContainer: React.FC<MapProps> = ({
   closeCard,
 }) => {
   const onMouseEnter = (data: activeMarkerProps) => {
+    if (hoverId) {
+      mapRef.current.setFeatureState(
+        { source: dataSourceId, id: hoverId },
+        { hover: false }
+      );
+    }
+    hoverId = null;
+    hoverId = data.index;
     openPopup(data);
     mapRef.current.setFeatureState(
-      { source: dataSourceId, id: data.index },
+      { source: dataSourceId, id: hoverId },
       { hover: true }
     );
   };
@@ -34,12 +35,15 @@ export const ListContainer: React.FC<MapProps> = ({
   const allListMouseLeave = () => {
     // disable hover interactivity on map
     mapRef.current.setFeatureState(
-      { source: dataSourceId, id: activePlace.index },
+      { source: dataSourceId, id: hoverId },
       { hover: false }
     );
+    hoverId = null;
+    // close Popup
     closePopup();
   };
-  return (
+
+  const list = (
     <List onMouseLeave={allListMouseLeave} icon={" "}>
       {locationData.features.map((item) => {
         const coordinatesObject = item.geometry as GeoJSON.Point;
@@ -47,43 +51,46 @@ export const ListContainer: React.FC<MapProps> = ({
         const { title, description, index } = item.properties;
 
         return (
-          <Popover
-            opened={showCard}
-            onChange={closeCard}
-            //
-            offset={30}
+          <List.Item
+            onMouseEnter={() =>
+              onMouseEnter({
+                title,
+                description,
+                index,
+                longitude,
+                latitude,
+              })
+            }
+            onMouseLeave={() => {
+              mapRef.current.setFeatureState(
+                { source: dataSourceId, id: hoverId },
+                { hover: false }
+              );
+              hoverId = null;
+              // close Popup
+              closePopup();
+            }}
+            key={item.properties?.index}
           >
-            <Popover.Target>
-              <List.Item
-                onMouseEnter={() =>
-                  onMouseEnter({
-                    title,
-                    description,
-                    index,
-                    longitude,
-                    latitude,
-                  })
-                }
-                onMouseLeave={() => {
-                  mapRef.current.setFeatureState(
-                    { source: dataSourceId, id: activePlace.index },
-                    { hover: false }
-                  );
-
-                  closePopup();
-                }}
-                key={item.properties?.index}
-              >
-                {item.properties?.title}: {item.properties?.description}{" "}
-              </List.Item>
-            </Popover.Target>
-
-            <Popover.Dropdown>
-              <Text>hello</Text>
-            </Popover.Dropdown>
-          </Popover>
+            {item.properties?.title}: {item.properties?.description}{" "}
+          </List.Item>
         );
       })}
     </List>
+  );
+
+  return (
+    <Popover
+      opened={showCard}
+      onChange={closeCard}
+      position={"right"}
+      offset={20}
+      withArrow={true}
+    >
+      <Popover.Target>{list}</Popover.Target>
+      <Popover.Dropdown>
+        <Text>hello</Text>
+      </Popover.Dropdown>
+    </Popover>
   );
 };

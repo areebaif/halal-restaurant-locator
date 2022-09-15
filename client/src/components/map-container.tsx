@@ -6,10 +6,8 @@ import Map, { Source, Layer, Popup, MapLayerMouseEvent } from "react-map-gl";
 import redMarker from "./red-marker.png";
 import { activeMarkerProps } from "./map-layout";
 import { LocationPropertiesProps } from "./map-layout";
-
-mapboxgl.accessToken = `${process.env.REACT_APP_MAPBOX_ACCESS}`;
-
 let hoverId: null | number = null;
+mapboxgl.accessToken = `${process.env.REACT_APP_MAPBOX_ACCESS}`;
 
 export type MapProps = {
   locationData: GeoJSON.FeatureCollection<
@@ -51,30 +49,23 @@ export const MapContainer: React.FC<MapProps> = ({
     zoom: 7.2,
   });
 
-  // TODO: styling spec should conform to mapbox-layer-styling: We are handling the case in which user hovers over a marker
-  const layerStyle: { id: string; type: string; paint: CirclePaint } = {
-    id: "point",
-    type: "circle",
-    paint: {
-      "circle-radius": [
-        "case",
-        ["boolean", ["feature-state", "hover"], false],
-        10,
-        5,
-      ],
-      "circle-color": "#007cbf",
-    },
-  };
-  // const layerStyle = {
-  //   //id: "point",
-  //   //type: "symbol",
-  //   layout: {
-  //     "icon-image": "marker",
-  //     "text-field": ["get", "title"],
+  // Style layer for circle marker
+  // const layerStyle: { id: string; type: string; paint: CirclePaint } = {
+  //   id: "point",
+  //   type: "circle",
+  //   paint: {
+  //     "circle-radius": [
+  //       "case",
+  //       ["boolean", ["feature-state", "hover"], false],
+  //       10,
+  //       5,
+  //     ],
+  //     "circle-color": "#007cbf",
   //   },
   // };
 
   const onMouseEnter = (e: MapLayerMouseEvent) => {
+    console.log("on muse enter");
     if (hoverId) {
       mapRef.current.setFeatureState(
         { source: dataSourceId, id: hoverId },
@@ -87,7 +78,6 @@ export const MapContainer: React.FC<MapProps> = ({
       const coordinates = coordinatesObject.coordinates.slice();
       const description = e.features[0].properties;
       const index: number = description?.index;
-      //console.log(" I am e", coordinatesObject, e.lngLat);
 
       // ***** NOTE: not sure if we want to keep this *****
       // Ensure that if the map is zoomed out such that multiple
@@ -118,6 +108,7 @@ export const MapContainer: React.FC<MapProps> = ({
   // TODO: searching and filtering will update result instead of onclick handler
   // Right now this works with onClick
   const onClick = (e: any) => {
+    console.log(" I was just clicked on layer");
     if (showPopup) {
       console.log("hello card showed");
     }
@@ -130,7 +121,7 @@ export const MapContainer: React.FC<MapProps> = ({
     // geoJsonSource.setData(testData);
   };
 
-  const onMouseLeave = () => {
+  const onMouseLeaveLocationPopup = () => {
     // disable hover interactivity inside layer of map
     mapRef.current.setFeatureState(
       { source: dataSourceId, id: hoverId },
@@ -148,7 +139,8 @@ export const MapContainer: React.FC<MapProps> = ({
     });
   };
 
-  const onMouseExit = () => {
+  const onMouseLeaveMapLapyer = () => {
+    console.log("map leave just triggered");
     // hoverId === 0 results in a falsy statement, hence, checking for type
     if (typeof hoverId === "number" && !showPopup) {
       mapRef.current.setFeatureState(
@@ -171,8 +163,9 @@ export const MapContainer: React.FC<MapProps> = ({
       interactiveLayerIds={[layerId]}
       onMouseEnter={onMouseEnter}
       onLoad={onLoad}
-      onMouseLeave={onMouseExit}
+      onMouseLeave={onMouseLeaveMapLapyer}
       onClick={onClick}
+      //onMouseMove={onTest}
     >
       <Source
         id={dataSourceId}
@@ -202,12 +195,13 @@ export const MapContainer: React.FC<MapProps> = ({
         {showPopup && (
           <Popup
             longitude={activePlace.longitude}
-            offset={-5}
+            offset={-20}
             latitude={activePlace.latitude}
             anchor="top"
             closeButton={false}
-            closeOnClick={true}
+            //closeOnClick={true}
             style={{
+              border: "10px solid rgba(0, 0, 0, 0.8)",
               position: "absolute",
               top: 0,
               left: 0,
@@ -216,9 +210,9 @@ export const MapContainer: React.FC<MapProps> = ({
           >
             <div
               // This div and transparent backgroubnd is added so that popup remains open on hover
-              style={{ border: "10px solid rgba(0, 0, 0, 0)" }}
+              style={{ border: "10px solid rgba(0, 0, 0, 0.4)" }}
               onMouseLeave={() => {
-                onMouseLeave();
+                onMouseLeaveLocationPopup();
               }}
               onClick={onClick}
             >
