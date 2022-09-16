@@ -10,27 +10,38 @@ let hoverId: null | number = null;
 mapboxgl.accessToken = `${process.env.REACT_APP_MAPBOX_ACCESS}`;
 
 export type MapProps = {
-  locationData: GeoJSON.FeatureCollection<
+  // props to render map
+  dataSource: GeoJSON.FeatureCollection<
     GeoJSON.Geometry,
     LocationPropertiesProps
   >;
-  openPopup: (data: activeMarkerProps) => void;
+  dataSourceId: string;
+  mapRef?: any;
+  layerId: string;
+
+  // props to show popup on map
+  openPopup?: () => void;
   closePopup: () => void;
   showPopup?: boolean;
+
+  // props holds info related to active location on map
   activePlace: activeMarkerProps;
+  setActivePlaceData?: (data?: activeMarkerProps) => void;
+
+  // props holds detail data of active location on map
   showCard?: boolean;
-  openCard?: () => void;
+  openCard?: (data: activeMarkerProps) => void;
   closeCard?: () => void;
-  mapRef?: any;
-  dataSourceId: string;
-  layerId: string;
+  showCardData?: activeMarkerProps;
+
+  // Data for when user triggers search
   onSearch?: (
     data: GeoJSON.FeatureCollection<GeoJSON.Geometry, LocationPropertiesProps>
   ) => void;
 };
 
 export const MapContainer: React.FC<MapProps> = ({
-  locationData,
+  dataSource,
   openPopup,
   closePopup,
   activePlace,
@@ -38,10 +49,8 @@ export const MapContainer: React.FC<MapProps> = ({
   mapRef,
   dataSourceId,
   layerId,
-  onSearch,
   openCard,
-  closeCard,
-  showCard,
+  setActivePlaceData,
 }) => {
   const [viewState, setViewState] = React.useState({
     latitude: 41.45,
@@ -89,7 +98,7 @@ export const MapContainer: React.FC<MapProps> = ({
 
       hoverId = index;
 
-      openPopup({
+      setActivePlaceData?.({
         ...activePlace,
         latitude: e.lngLat.lat,
         longitude: e.lngLat.lng,
@@ -97,6 +106,7 @@ export const MapContainer: React.FC<MapProps> = ({
         description: description?.description,
         index: description?.index,
       });
+      openPopup?.();
 
       // setting up hover interactivity inside layer of map:
       mapRef.current.setFeatureState(
@@ -108,9 +118,8 @@ export const MapContainer: React.FC<MapProps> = ({
   // TODO: searching and filtering will update result instead of onclick handler
   // Right now this works with onClick
   const onClick = (e: any) => {
-    console.log(" I was just clicked on layer");
-    if (showPopup) {
-      console.log("hello card showed");
+    if (typeof activePlace.index === "number") {
+      openCard?.(activePlace);
     }
 
     // SetData in react hook
@@ -170,7 +179,7 @@ export const MapContainer: React.FC<MapProps> = ({
       <Source
         id={dataSourceId}
         type="geojson"
-        data={locationData}
+        data={dataSource}
         generateId={true}
       >
         <Layer
@@ -201,7 +210,6 @@ export const MapContainer: React.FC<MapProps> = ({
             closeButton={false}
             //closeOnClick={true}
             style={{
-              border: "10px solid rgba(0, 0, 0, 0.8)",
               position: "absolute",
               top: 0,
               left: 0,
@@ -210,7 +218,7 @@ export const MapContainer: React.FC<MapProps> = ({
           >
             <div
               // This div and transparent backgroubnd is added so that popup remains open on hover
-              style={{ border: "10px solid rgba(0, 0, 0, 0.4)" }}
+              style={{ border: "10px solid rgba(0, 0, 0, 0)" }}
               onMouseLeave={() => {
                 onMouseLeaveLocationPopup();
               }}

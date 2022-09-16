@@ -306,35 +306,51 @@ export const PlacesDisplayComponent: React.FC = () => {
   });
   const [showPopup, setShowPopup] = React.useState(false);
   const [showCard, setShowCard] = React.useState(false);
+  const [showCardData, setShowCardData] = React.useState<activeMarkerProps>({
+    latitude: 0,
+    longitude: 0,
+    title: "",
+    description: "",
+    index: null,
+  });
   const [city, setCity] = React.useState("");
 
   const onCityValueChange = (value: string) => {
     setCity(value);
   };
 
-  const openPopup = (data: activeMarkerProps) => {
-    setActivePlace({ ...data });
+  const setActivePlaceData = (data?: activeMarkerProps) => {
+    if (data) {
+      setActivePlace({ ...data });
+    } else {
+      // defualt case when no location selected
+      setActivePlace({
+        latitude: 0,
+        longitude: 0,
+        title: "",
+        description: "",
+        index: null,
+      });
+    }
+  };
+
+  const openPopup = () => {
     setShowPopup(true);
   };
 
   const closePopUp = () => {
     setShowPopup(false);
-    setActivePlace({
-      latitude: 0,
-      longitude: 0,
-      title: "",
-      description: "",
-      index: null,
-    });
+    setActivePlaceData();
   };
 
-  const openCard = () => {
+  const openCard = (data: activeMarkerProps) => {
+    setShowCardData(data);
     setShowCard(true);
   };
 
   const closeCard = () => {
-    setShowCard(true);
-    setActivePlace({
+    setShowCard(false);
+    setShowCardData({
       latitude: 0,
       longitude: 0,
       title: "",
@@ -348,6 +364,7 @@ export const PlacesDisplayComponent: React.FC = () => {
   ) => {
     setData(data);
   };
+
   return (
     <Grid>
       <Grid.Col md={12} lg={12}>
@@ -355,25 +372,31 @@ export const PlacesDisplayComponent: React.FC = () => {
       </Grid.Col>
       <Grid.Col md={6} lg={6}>
         <ListContainer
-          locationData={data}
-          openPopup={openPopup}
-          closePopup={closePopUp}
-          activePlace={activePlace}
-          mapRef={mapRef}
+          dataSource={data}
           dataSourceId={dataSourceId}
           layerId={layerId}
+          mapRef={mapRef}
+          activePlace={activePlace}
+          setActivePlaceData={setActivePlaceData}
+          closePopup={closePopUp}
+          showCard={showCard}
+          openCard={openCard}
+          showCardData={showCardData}
+          closeCard={closeCard}
         />
       </Grid.Col>
       <Grid.Col md={6} lg={6}>
         <MapContainer
-          locationData={data}
-          openPopup={openPopup}
-          closePopup={closePopUp}
-          showPopup={showPopup}
-          activePlace={activePlace}
-          mapRef={mapRef}
+          dataSource={data}
           dataSourceId={dataSourceId}
           layerId={layerId}
+          mapRef={mapRef}
+          showPopup={showPopup}
+          setActivePlaceData={setActivePlaceData}
+          openPopup={openPopup}
+          closePopup={closePopUp}
+          openCard={openCard}
+          activePlace={activePlace}
           onSearch={onSeacrhQuery}
         />
       </Grid.Col>

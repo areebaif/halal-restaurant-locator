@@ -1,21 +1,22 @@
 import * as React from "react";
 import { MapProps } from "./map-container";
-import { List, Menu, Popover, Text } from "@mantine/core";
+import { List, Popover, Text, CloseButton } from "@mantine/core";
 
 import { activeMarkerProps } from "./map-layout";
 let hoverId: null | number = null;
 
 export const ListContainer: React.FC<MapProps> = ({
-  locationData,
-  openPopup,
-  closePopup,
+  dataSource,
   activePlace,
   mapRef,
   dataSourceId,
   showCard,
   openCard,
   closeCard,
+  showCardData,
+  setActivePlaceData,
 }) => {
+  console.log("hello I am showcard", showCard);
   const onMouseEnter = (data: activeMarkerProps) => {
     if (hoverId) {
       mapRef.current.setFeatureState(
@@ -25,7 +26,7 @@ export const ListContainer: React.FC<MapProps> = ({
     }
     hoverId = null;
     hoverId = data.index;
-    openPopup(data);
+    setActivePlaceData?.(data);
     mapRef.current.setFeatureState(
       { source: dataSourceId, id: hoverId },
       { hover: true }
@@ -40,12 +41,12 @@ export const ListContainer: React.FC<MapProps> = ({
     );
     hoverId = null;
     // close Popup
-    closePopup();
+    setActivePlaceData?.();
   };
 
   const list = (
     <List onMouseLeave={allListMouseLeave} icon={" "}>
-      {locationData.features.map((item) => {
+      {dataSource.features.map((item) => {
         const coordinatesObject = item.geometry as GeoJSON.Point;
         const [longitude, latitude] = coordinatesObject.coordinates;
         const { title, description, index } = item.properties;
@@ -61,6 +62,7 @@ export const ListContainer: React.FC<MapProps> = ({
                 latitude,
               })
             }
+            onClick={() => openCard?.(activePlace)}
             onMouseLeave={() => {
               mapRef.current.setFeatureState(
                 { source: dataSourceId, id: hoverId },
@@ -68,7 +70,7 @@ export const ListContainer: React.FC<MapProps> = ({
               );
               hoverId = null;
               // close Popup
-              closePopup();
+              setActivePlaceData?.();
             }}
             key={item.properties?.index}
           >
@@ -80,16 +82,11 @@ export const ListContainer: React.FC<MapProps> = ({
   );
 
   return (
-    <Popover
-      opened={showCard}
-      onChange={closeCard}
-      position={"right"}
-      offset={20}
-      withArrow={true}
-    >
+    <Popover opened={showCard} position={"right"} offset={20} withArrow={true}>
       <Popover.Target>{list}</Popover.Target>
       <Popover.Dropdown>
-        <Text>hello</Text>
+        <CloseButton onClick={() => closeCard?.()} aria-label="Close modal" />
+        <Text>{showCardData?.index}</Text>
       </Popover.Dropdown>
     </Popover>
   );
