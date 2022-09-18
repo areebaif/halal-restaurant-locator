@@ -9,16 +9,15 @@ let hoverId: null | number = null;
 
 export const ListContainer: React.FC<MapProps> = ({
   dataSource,
-  activePlace,
-  mapRef,
   dataSourceId,
+  mapRef,
+  activePlace,
+  setActivePlaceData,
   locationInfoCard,
   onLocationInfoOpenCard,
   onLocationInfoCloseCard,
   locationInfoCardData,
-  setActivePlaceData,
 }) => {
-  console.log("hello I am locationInfocard", locationInfoCard);
   const onMouseEnter = (data: activeMarkerProps) => {
     if (hoverId) {
       mapRef.current.setFeatureState(

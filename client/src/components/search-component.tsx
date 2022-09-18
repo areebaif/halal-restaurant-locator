@@ -13,29 +13,46 @@ import rawData from "../cities.json";
 const zipData = rawData.data.map((item) => ({ ...item, value: item.zip }));
 //const loadData = JSON.parse(JSON.stringify(locationCoordinates));
 
-export type CityInputProps = {
+export type ZipCodeInputProps = {
   value: string;
   onValueChange: (value: string) => void;
+  errorZipcode: boolean;
 };
-export const CityInput: React.FC<CityInputProps> = ({
+export const ZipCodeInput: React.FC<ZipCodeInputProps> = ({
   value,
   onValueChange,
+  errorZipcode,
 }) => {
-  //const [value, setValue] = React.useState("");
-  // const onInput = (event: any) => {
-  //   setValue(event.currentTarget.value);
-  //   console.log(value);
-  // };
-  //console.log(value);
-  return (
-    <Autocomplete
-      label="Zip code"
-      placeholder="Start typing (Required field)"
-      value={value}
-      limit={7}
-      onChange={onValueChange}
-      data={zipData}
-    />
+  const onSubmit = (event: React.MouseEvent<HTMLButtonElement>) => {
+    // Do type checking for zipcode and length of zipcode
+    if (!errorZipcode && value.length === 5) {
+      // TODO: set Search query for zipcode
+    }
+    console.log("submit valiue", value);
+    // TODO: set trigger search to true, reset the value
+  };
+  return !errorZipcode ? (
+    <React.Fragment>
+      <Autocomplete
+        label="Zip code"
+        placeholder="Start typing (Required field)"
+        value={value}
+        limit={7}
+        onChange={onValueChange}
+        data={zipData}
+      />
+      <Button onClick={onSubmit}>Submit</Button>
+    </React.Fragment>
+  ) : (
+    <React.Fragment>
+      <Autocomplete
+        error="Please provide valid zipcode"
+        onChange={onValueChange}
+        data={zipData}
+        value={value}
+      />
+      <Button onClick={onSubmit}>Submit</Button>
+    </React.Fragment>
   );
 };
 

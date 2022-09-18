@@ -21,11 +21,11 @@ export type MapProps = {
   mapRef?: any;
   layerId: string;
 
-  // props holds info related to active location on map
+  // props related to active location on map
   activePlace: activeMarkerProps;
   setActivePlaceData?: (data: activeMarkerProps | null) => void;
 
-  // props holds detail data of active location on map
+  // props related to detail data of active location on map
   locationInfoCard?: boolean;
   onLocationInfoOpenCard?: (data: activeMarkerProps) => void;
   onLocationInfoCloseCard?: () => void;
@@ -124,7 +124,7 @@ export const MapContainer: React.FC<MapProps> = ({
     // geoJsonSource.setData(testData);
   };
 
-  const onMouseLeaveLocationPopup = () => {
+  const onMouseLeavePopup = () => {
     // disable hover interactivity inside layer of map
     mapRef.current.setFeatureState(
       { source: dataSourceId, id: hoverId },
@@ -143,7 +143,7 @@ export const MapContainer: React.FC<MapProps> = ({
     });
   };
 
-  const onMouseLeaveMapLapyer = () => {
+  const onMouseLeaveMapLayer = () => {
     console.log("map leave just triggered");
     // hoverId === 0 results in a falsy statement, hence, checking for type
     if (typeof hoverId === "number" && !displayPopup) {
@@ -167,9 +167,8 @@ export const MapContainer: React.FC<MapProps> = ({
       interactiveLayerIds={[layerId]}
       onMouseEnter={onMouseEnter}
       onLoad={onLoad}
-      onMouseLeave={onMouseLeaveMapLapyer}
+      onMouseLeave={onMouseLeaveMapLayer}
       onClick={onClick}
-      //onMouseMove={onTest}
     >
       <Source
         id={dataSourceId}
@@ -203,7 +202,6 @@ export const MapContainer: React.FC<MapProps> = ({
             latitude={activePlace.latitude}
             anchor="top"
             closeButton={false}
-            //closeOnClick={true}
             style={{
               position: "absolute",
               top: 0,
@@ -212,10 +210,10 @@ export const MapContainer: React.FC<MapProps> = ({
             }}
           >
             <div
-              // This div and transparent backgroubnd is added so that popup remains open on hover
+              // This div and transparent background is added so that popup remains open on hover
               style={{ border: "10px solid rgba(0, 0, 0, 0)" }}
               onMouseLeave={() => {
-                onMouseLeaveLocationPopup();
+                onMouseLeavePopup();
               }}
               onClick={onClick}
             >

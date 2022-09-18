@@ -2,7 +2,7 @@ import * as React from "react";
 import { Grid } from "@mantine/core";
 import { MapContainer } from "./map-container";
 import { ListContainer } from "./result-list";
-import { CityInput } from "./search-component";
+import { ZipCodeInput } from "./search-component";
 
 // Mapbox needs a string as data source Id, layerId
 const dataSourceId = "some id";
@@ -304,7 +304,6 @@ export const PlacesDisplayComponent: React.FC = () => {
     description: "",
     index: null,
   });
-
   const [locationInfoCard, setLocationInfoCard] = React.useState(false);
   const [locationInfoCardData, setLocationInfoCardData] =
     React.useState<activeMarkerProps>({
@@ -314,10 +313,19 @@ export const PlacesDisplayComponent: React.FC = () => {
       description: "",
       index: null,
     });
-  const [city, setCity] = React.useState("");
+  const [zipcode, setZipcode] = React.useState("");
+  const [errorZipcode, setErrorZipcode] = React.useState(false);
 
-  const onCityValueChange = (value: string) => {
-    setCity(value);
+  const onZipcodeValueChange = (value: string) => {
+    console.log(" I am on zipchange", value);
+    if (!isNaN(Number(value))) {
+      setErrorZipcode(false);
+      setZipcode(value);
+    }
+    if (isNaN(Number(value))) {
+      setErrorZipcode(true);
+      setZipcode(value);
+    }
   };
 
   const setActivePlaceData = (data: activeMarkerProps | null) => {
@@ -360,20 +368,23 @@ export const PlacesDisplayComponent: React.FC = () => {
   return (
     <Grid>
       <Grid.Col md={12} lg={12}>
-        <CityInput value={city} onValueChange={onCityValueChange} />
+        <ZipCodeInput
+          value={zipcode}
+          onValueChange={onZipcodeValueChange}
+          errorZipcode={errorZipcode}
+        />
       </Grid.Col>
       <Grid.Col md={6} lg={6}>
         <ListContainer
           dataSource={data}
           dataSourceId={dataSourceId}
-          layerId={layerId}
           mapRef={mapRef}
+          layerId={layerId}
           activePlace={activePlace}
           setActivePlaceData={setActivePlaceData}
-          //closePopup={closePopUp}
           locationInfoCard={locationInfoCard}
-          onLocationInfoOpenCard={onLocationInfoOpenCard}
           locationInfoCardData={locationInfoCardData}
+          onLocationInfoOpenCard={onLocationInfoOpenCard}
           onLocationInfoCloseCard={onLocationInfoCloseCard}
         />
       </Grid.Col>
@@ -381,11 +392,11 @@ export const PlacesDisplayComponent: React.FC = () => {
         <MapContainer
           dataSource={data}
           dataSourceId={dataSourceId}
-          layerId={layerId}
           mapRef={mapRef}
+          layerId={layerId}
+          activePlace={activePlace}
           setActivePlaceData={setActivePlaceData}
           onLocationInfoOpenCard={onLocationInfoOpenCard}
-          activePlace={activePlace}
           onSearch={onSeacrhQuery}
         />
       </Grid.Col>
