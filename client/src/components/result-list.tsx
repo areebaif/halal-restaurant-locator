@@ -3,6 +3,8 @@ import { MapProps } from "./map-container";
 import { List, Popover, Text, CloseButton } from "@mantine/core";
 
 import { activeMarkerProps } from "./map-layout";
+
+// We need this varibale to sync map id data with react and its local to this file
 let hoverId: null | number = null;
 
 export const ListContainer: React.FC<MapProps> = ({
@@ -10,13 +12,13 @@ export const ListContainer: React.FC<MapProps> = ({
   activePlace,
   mapRef,
   dataSourceId,
-  showCard,
-  openCard,
-  closeCard,
-  showCardData,
+  locationInfoCard,
+  onLocationInfoOpenCard,
+  onLocationInfoCloseCard,
+  locationInfoCardData,
   setActivePlaceData,
 }) => {
-  console.log("hello I am showcard", showCard);
+  console.log("hello I am locationInfocard", locationInfoCard);
   const onMouseEnter = (data: activeMarkerProps) => {
     if (hoverId) {
       mapRef.current.setFeatureState(
@@ -41,7 +43,7 @@ export const ListContainer: React.FC<MapProps> = ({
     );
     hoverId = null;
     // close Popup
-    setActivePlaceData?.();
+    setActivePlaceData?.(null);
   };
 
   const list = (
@@ -62,7 +64,7 @@ export const ListContainer: React.FC<MapProps> = ({
                 latitude,
               })
             }
-            onClick={() => openCard?.(activePlace)}
+            onClick={() => onLocationInfoOpenCard?.(activePlace)}
             onMouseLeave={() => {
               mapRef.current.setFeatureState(
                 { source: dataSourceId, id: hoverId },
@@ -70,7 +72,7 @@ export const ListContainer: React.FC<MapProps> = ({
               );
               hoverId = null;
               // close Popup
-              setActivePlaceData?.();
+              setActivePlaceData?.(null);
             }}
             key={item.properties?.index}
           >
@@ -82,11 +84,19 @@ export const ListContainer: React.FC<MapProps> = ({
   );
 
   return (
-    <Popover opened={showCard} position={"right"} offset={20} withArrow={true}>
+    <Popover
+      opened={locationInfoCard}
+      position={"right"}
+      offset={20}
+      withArrow={true}
+    >
       <Popover.Target>{list}</Popover.Target>
       <Popover.Dropdown>
-        <CloseButton onClick={() => closeCard?.()} aria-label="Close modal" />
-        <Text>{showCardData?.index}</Text>
+        <CloseButton
+          onClick={() => onLocationInfoCloseCard?.()}
+          aria-label="Close modal"
+        />
+        <Text>{locationInfoCardData?.index}</Text>
       </Popover.Dropdown>
     </Popover>
   );

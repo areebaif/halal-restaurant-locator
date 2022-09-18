@@ -6,6 +6,8 @@ import Map, { Source, Layer, Popup, MapLayerMouseEvent } from "react-map-gl";
 import redMarker from "./red-marker.png";
 import { activeMarkerProps } from "./map-layout";
 import { LocationPropertiesProps } from "./map-layout";
+
+// We need this varibale to sync map id data with react and its local to this file
 let hoverId: null | number = null;
 mapboxgl.accessToken = `${process.env.REACT_APP_MAPBOX_ACCESS}`;
 
@@ -19,20 +21,15 @@ export type MapProps = {
   mapRef?: any;
   layerId: string;
 
-  // props to show popup on map
-  openPopup?: () => void;
-  closePopup: () => void;
-  showPopup?: boolean;
-
   // props holds info related to active location on map
   activePlace: activeMarkerProps;
-  setActivePlaceData?: (data?: activeMarkerProps) => void;
+  setActivePlaceData?: (data: activeMarkerProps | null) => void;
 
   // props holds detail data of active location on map
-  showCard?: boolean;
-  openCard?: (data: activeMarkerProps) => void;
-  closeCard?: () => void;
-  showCardData?: activeMarkerProps;
+  locationInfoCard?: boolean;
+  onLocationInfoOpenCard?: (data: activeMarkerProps) => void;
+  onLocationInfoCloseCard?: () => void;
+  locationInfoCardData?: activeMarkerProps;
 
   // Data for when user triggers search
   onSearch?: (
@@ -42,16 +39,14 @@ export type MapProps = {
 
 export const MapContainer: React.FC<MapProps> = ({
   dataSource,
-  openPopup,
-  closePopup,
   activePlace,
-  showPopup,
   mapRef,
   dataSourceId,
   layerId,
-  openCard,
+  onLocationInfoOpenCard,
   setActivePlaceData,
 }) => {
+  const [displayPopup, setDisplayPopup] = React.useState(false);
   const [viewState, setViewState] = React.useState({
     latitude: 41.45,
     longitude: -88.53,
@@ -74,7 +69,6 @@ export const MapContainer: React.FC<MapProps> = ({
   // };
 
   const onMouseEnter = (e: MapLayerMouseEvent) => {
-    console.log("on muse enter");
     if (hoverId) {
       mapRef.current.setFeatureState(
         { source: dataSourceId, id: hoverId },
@@ -106,7 +100,7 @@ export const MapContainer: React.FC<MapProps> = ({
         description: description?.description,
         index: description?.index,
       });
-      openPopup?.();
+      setDisplayPopup(true);
 
       // setting up hover interactivity inside layer of map:
       mapRef.current.setFeatureState(
@@ -119,7 +113,7 @@ export const MapContainer: React.FC<MapProps> = ({
   // Right now this works with onClick
   const onClick = (e: any) => {
     if (typeof activePlace.index === "number") {
-      openCard?.(activePlace);
+      onLocationInfoOpenCard?.(activePlace);
     }
 
     // SetData in react hook
@@ -137,8 +131,9 @@ export const MapContainer: React.FC<MapProps> = ({
       { hover: false }
     );
     hoverId = null;
-    // close Popup
-    closePopup();
+
+    setDisplayPopup(false);
+    setActivePlaceData?.(null);
   };
 
   const onLoad = () => {
@@ -151,7 +146,7 @@ export const MapContainer: React.FC<MapProps> = ({
   const onMouseLeaveMapLapyer = () => {
     console.log("map leave just triggered");
     // hoverId === 0 results in a falsy statement, hence, checking for type
-    if (typeof hoverId === "number" && !showPopup) {
+    if (typeof hoverId === "number" && !displayPopup) {
       mapRef.current.setFeatureState(
         { source: dataSourceId, id: hoverId },
         { hover: false }
@@ -201,7 +196,7 @@ export const MapContainer: React.FC<MapProps> = ({
             ],
           }}
         />
-        {showPopup && (
+        {displayPopup && (
           <Popup
             longitude={activePlace.longitude}
             offset={-20}

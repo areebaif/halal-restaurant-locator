@@ -304,22 +304,23 @@ export const PlacesDisplayComponent: React.FC = () => {
     description: "",
     index: null,
   });
-  const [showPopup, setShowPopup] = React.useState(false);
-  const [showCard, setShowCard] = React.useState(false);
-  const [showCardData, setShowCardData] = React.useState<activeMarkerProps>({
-    latitude: 0,
-    longitude: 0,
-    title: "",
-    description: "",
-    index: null,
-  });
+
+  const [locationInfoCard, setLocationInfoCard] = React.useState(false);
+  const [locationInfoCardData, setLocationInfoCardData] =
+    React.useState<activeMarkerProps>({
+      latitude: 0,
+      longitude: 0,
+      title: "",
+      description: "",
+      index: null,
+    });
   const [city, setCity] = React.useState("");
 
   const onCityValueChange = (value: string) => {
     setCity(value);
   };
 
-  const setActivePlaceData = (data?: activeMarkerProps) => {
+  const setActivePlaceData = (data: activeMarkerProps | null) => {
     if (data) {
       setActivePlace({ ...data });
     } else {
@@ -334,23 +335,14 @@ export const PlacesDisplayComponent: React.FC = () => {
     }
   };
 
-  const openPopup = () => {
-    setShowPopup(true);
+  const onLocationInfoOpenCard = (data: activeMarkerProps) => {
+    setLocationInfoCardData(data);
+    setLocationInfoCard(true);
   };
 
-  const closePopUp = () => {
-    setShowPopup(false);
-    setActivePlaceData();
-  };
-
-  const openCard = (data: activeMarkerProps) => {
-    setShowCardData(data);
-    setShowCard(true);
-  };
-
-  const closeCard = () => {
-    setShowCard(false);
-    setShowCardData({
+  const onLocationInfoCloseCard = () => {
+    setLocationInfoCard(false);
+    setLocationInfoCardData({
       latitude: 0,
       longitude: 0,
       title: "",
@@ -378,11 +370,11 @@ export const PlacesDisplayComponent: React.FC = () => {
           mapRef={mapRef}
           activePlace={activePlace}
           setActivePlaceData={setActivePlaceData}
-          closePopup={closePopUp}
-          showCard={showCard}
-          openCard={openCard}
-          showCardData={showCardData}
-          closeCard={closeCard}
+          //closePopup={closePopUp}
+          locationInfoCard={locationInfoCard}
+          onLocationInfoOpenCard={onLocationInfoOpenCard}
+          locationInfoCardData={locationInfoCardData}
+          onLocationInfoCloseCard={onLocationInfoCloseCard}
         />
       </Grid.Col>
       <Grid.Col md={6} lg={6}>
@@ -391,11 +383,8 @@ export const PlacesDisplayComponent: React.FC = () => {
           dataSourceId={dataSourceId}
           layerId={layerId}
           mapRef={mapRef}
-          showPopup={showPopup}
           setActivePlaceData={setActivePlaceData}
-          openPopup={openPopup}
-          closePopup={closePopUp}
-          openCard={openCard}
+          onLocationInfoOpenCard={onLocationInfoOpenCard}
           activePlace={activePlace}
           onSearch={onSeacrhQuery}
         />
