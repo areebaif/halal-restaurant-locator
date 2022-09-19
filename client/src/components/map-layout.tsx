@@ -321,8 +321,9 @@ export const PlacesDisplayComponent: React.FC = () => {
   const onCityValueChange = (value: string) => {
     console.log(" I am on citychange", value);
     // Check for special characters including numbers (exclude ,)
-    const specialChars = /[`!@#$%^&*()_+\-=\[\]{};':"\\|.<>\/?~]1234567890/;
+    const specialChars = /[`!@#$%^&*()_+\-=\[\]{};':"\\|.<>\/?~0123456789]/;
     const specialCharsTest = specialChars.test(value);
+    console.log(specialCharsTest);
     if (!specialCharsTest) {
       setErrorCity(false);
       setCity(value);
