@@ -1,8 +1,9 @@
 import * as React from "react";
-import { TextInput, Button } from "@mantine/core";
+import { TextInput, Button, Group } from "@mantine/core";
 import { IconSearch } from "@tabler/icons";
 import { Autocomplete } from "@mantine/core";
 import rawData from "../cities.json";
+import rawLocations from "../location.json";
 
 // https://simplemaps.com/data/us-zips this need to be added to usa zipcode data
 
@@ -10,49 +11,78 @@ import rawData from "../cities.json";
 // Chip.Group controlled cip group for multi filter select for search
 // transfer list for a card generation
 
-const zipData = rawData.data.map((item) => ({ ...item, value: item.zip }));
-//const loadData = JSON.parse(JSON.stringify(locationCoordinates));
+// zipcode
+//const zipData = rawData.data.map((item) => ({ ...item, value: item.zip }));
+
+// Raw data for zipcodes city and state, latitude, longitude coordinate locations for each zip
+const allData = JSON.parse(JSON.stringify(rawLocations));
+// city and state
+const cityData = allData.coords.map((item: any) => {
+  const properties = item.properties;
+  return { ...item, value: `${properties.city}, ${properties.state}` };
+});
+// zipcode
+const zipData = allData.coords.map((item: any) => ({
+  ...item,
+  value: item.properties.zip,
+}));
 
 export type ZipCodeInputProps = {
-  value: string;
-  onValueChange: (value: string) => void;
+  zipcodeValue: string;
+  onZipcodeChange: (value: string) => void;
   errorZipcode: boolean;
+  cityValue: string;
+  onCityValueChange: (value: string) => void;
+  errorCity: boolean;
 };
 export const ZipCodeInput: React.FC<ZipCodeInputProps> = ({
-  value,
-  onValueChange,
+  zipcodeValue,
+  onZipcodeChange,
   errorZipcode,
+  cityValue,
+  onCityValueChange,
+  errorCity,
 }) => {
+  console.log(cityData[0]);
   const onSubmit = (event: React.MouseEvent<HTMLButtonElement>) => {
     // Do type checking for zipcode and length of zipcode
-    if (!errorZipcode && value.length === 5) {
+    if (!errorZipcode && zipcodeValue.length === 5) {
       // TODO: set Search query for zipcode
     }
-    console.log("submit valiue", value);
+    console.log("submit valiue", zipcodeValue);
     // TODO: set trigger search to true, reset the value
   };
   return !errorZipcode ? (
-    <React.Fragment>
+    <Group position="center" spacing="xl" grow={true}>
+      <Autocomplete
+        label="zipcode"
+        placeholder="Start typing"
+        value={zipcodeValue}
+        limit={7}
+        onChange={onZipcodeChange}
+        data={zipData}
+      />
+      <Autocomplete
+        label="city"
+        placeholder="start typing"
+        value={cityValue}
+        limit={7}
+        onChange={onCityValueChange}
+        data={cityData}
+      />
+      <Button onClick={onSubmit}>Submit</Button>
+    </Group>
+  ) : (
+    <Group position="center" spacing="xl">
       <Autocomplete
         label="Zip code"
-        placeholder="Start typing (Required field)"
-        value={value}
-        limit={7}
-        onChange={onValueChange}
-        data={zipData}
-      />
-      <Button onClick={onSubmit}>Submit</Button>
-    </React.Fragment>
-  ) : (
-    <React.Fragment>
-      <Autocomplete
         error="Please provide valid zipcode"
-        onChange={onValueChange}
+        onChange={onZipcodeChange}
         data={zipData}
-        value={value}
+        value={zipcodeValue}
       />
       <Button onClick={onSubmit}>Submit</Button>
-    </React.Fragment>
+    </Group>
   );
 };
 

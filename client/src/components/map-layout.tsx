@@ -315,6 +315,23 @@ export const PlacesDisplayComponent: React.FC = () => {
     });
   const [zipcode, setZipcode] = React.useState("");
   const [errorZipcode, setErrorZipcode] = React.useState(false);
+  const [cityValue, setCity] = React.useState("");
+  const [errorCity, setErrorCity] = React.useState(false);
+
+  const onCityValueChange = (value: string) => {
+    console.log(" I am on citychange", value);
+    // Check for special characters including numbers (exclude ,)
+    const specialChars = /[`!@#$%^&*()_+\-=\[\]{};':"\\|.<>\/?~]1234567890/;
+    const specialCharsTest = specialChars.test(value);
+    if (!specialCharsTest) {
+      setErrorCity(false);
+      setCity(value);
+    }
+    if (specialCharsTest) {
+      setErrorCity(true);
+      setCity(value);
+    }
+  };
 
   const onZipcodeValueChange = (value: string) => {
     console.log(" I am on zipchange", value);
@@ -369,9 +386,12 @@ export const PlacesDisplayComponent: React.FC = () => {
     <Grid>
       <Grid.Col md={12} lg={12}>
         <ZipCodeInput
-          value={zipcode}
-          onValueChange={onZipcodeValueChange}
+          zipcodeValue={zipcode}
+          onZipcodeChange={onZipcodeValueChange}
           errorZipcode={errorZipcode}
+          cityValue={cityValue}
+          onCityValueChange={onCityValueChange}
+          errorCity={errorCity}
         />
       </Grid.Col>
       <Grid.Col md={6} lg={6}>
