@@ -2,15 +2,53 @@ import * as React from "react";
 import { Grid } from "@mantine/core";
 import { MapContainer } from "./map-container";
 import { ListContainer } from "./result-list";
-import { ZipCodeInput } from "./search-component";
+import { AutoCompleteInput } from "./search-component";
+
+import rawLocations from "../location.json";
+
+// https://simplemaps.com/data/us-zips this need to be added to usa zipcode data
+
+// This is for setting filter
+// Chip.Group controlled cip group for multi filter select for search
+// transfer list for a card generation
+
+export interface PropertiesProps {
+  title: string;
+  city: string;
+  state_id: string;
+  state: string;
+  zip: string;
+  index: number;
+}
+export interface FeatureDocument {
+  type: string;
+  properties: PropertiesProps;
+  geometry: { coordinates: [number, number]; type: "Point" };
+}
+export interface RawData {
+  features: FeatureDocument[];
+}
+const allRawData: RawData = JSON.parse(JSON.stringify(rawLocations));
+
+// we need to remove duplicate city values
+const citySet: Set<string> = new Set();
+const stateSet: Set<string> = new Set();
+
+// We are combining city,state here and adding entries to set
+const formattedData = allRawData.features.map((item: FeatureDocument) => {
+  const properties = item.properties;
+  citySet.add(properties.city);
+  stateSet.add(properties.state);
+  return { ...item, city_state: `${properties.city}, ${properties.state}` };
+});
 
 // Mapbox needs a string as data source Id, layerId
 const dataSourceId = "some id";
 const layerId = "points";
-//
-// We have to explicitly type defination the data source otherwise mapObject.addSource tries to reach out URL by default and throws error
+
 // Note: We can add any property to properties object. I have added index for easy manupulation in react. The Map object does generate a unique id
 // We cannot use that id in react
+// TODO: These are throw away properties prop
 export interface LocationPropertiesProps {
   title: string;
   description: string;
@@ -286,13 +324,13 @@ const testData: GeoJSON.FeatureCollection<
   type: "FeatureCollection",
 };
 
-export type activeMarkerProps = {
+export interface activeMarkerProps {
   latitude: number;
   longitude: number;
   title: string;
   description: string;
   index: number | null;
-};
+}
 
 export const PlacesDisplayComponent: React.FC = () => {
   const mapRef = React.useRef<any>();
@@ -317,32 +355,63 @@ export const PlacesDisplayComponent: React.FC = () => {
   const [errorZipcode, setErrorZipcode] = React.useState(false);
   const [cityValue, setCity] = React.useState("");
   const [errorCity, setErrorCity] = React.useState(false);
+  const [stateValue, setStateValue] = React.useState("");
+  const [errorState, setErrorState] = React.useState(false);
+  const [searchTerm, setSearchTerm] = React.useState<{
+    zipcode: string | null;
+    cityValue: string | null;
+    stateValue: string | null;
+    name: string | null;
+  }>({
+    zipcode: null,
+    cityValue: null,
+    stateValue: null,
+    name: null,
+  });
+
+  const onStateValueChange = (value: string) => {
+    // Check for special characters including numbers
+    const specialChars = /[`!@#$%^&*()_+\-=\[\]{};',:"\\|.<>\/?~0123456789]/;
+    const specialCharsTest = specialChars.test(value);
+
+    if (!specialCharsTest) {
+      setErrorState(false);
+      setStateValue(value);
+    } else {
+      setErrorState(true);
+      setStateValue(value);
+    }
+  };
 
   const onCityValueChange = (value: string) => {
-    console.log(" I am on citychange", value);
-    // Check for special characters including numbers (exclude ,)
-    const specialChars = /[`!@#$%^&*()_+\-=\[\]{};':"\\|.<>\/?~0123456789]/;
+    // Check for special characters including numbers (dont check for white spaces some cities are two words with whote space in between)
+    const specialChars = /[`!@#$%^&*()_+\-=\[\]{};',:"\\|.<>\/?~0123456789]/;
     const specialCharsTest = specialChars.test(value);
-    console.log(specialCharsTest);
     if (!specialCharsTest) {
       setErrorCity(false);
       setCity(value);
-    }
-    if (specialCharsTest) {
+    } else {
       setErrorCity(true);
       setCity(value);
     }
   };
 
   const onZipcodeValueChange = (value: string) => {
-    console.log(" I am on zipchange", value);
-    if (!isNaN(Number(value))) {
-      setErrorZipcode(false);
-      setZipcode(value);
-    }
-    if (isNaN(Number(value))) {
-      setErrorZipcode(true);
-      setZipcode(value);
+    // check for white spaces in zipcode
+    const specialChars = /[ ]/;
+    const expression = true;
+    switch (expression) {
+      case specialChars.test(value):
+        setErrorZipcode(true);
+        setZipcode(value);
+        break;
+      case isNaN(Number(value)):
+        setErrorZipcode(true);
+        setZipcode(value);
+        break;
+      default:
+        setErrorZipcode(false);
+        setZipcode(value);
     }
   };
 
@@ -386,13 +455,19 @@ export const PlacesDisplayComponent: React.FC = () => {
   return (
     <Grid>
       <Grid.Col md={12} lg={12}>
-        <ZipCodeInput
+        <AutoCompleteInput
           zipcodeValue={zipcode}
           onZipcodeChange={onZipcodeValueChange}
           errorZipcode={errorZipcode}
           cityValue={cityValue}
           onCityValueChange={onCityValueChange}
           errorCity={errorCity}
+          stateValue={stateValue}
+          onStateValueChange={onStateValueChange}
+          errorState={errorState}
+          citySet={citySet}
+          stateSet={stateSet}
+          zipData={formattedData}
         />
       </Grid.Col>
       <Grid.Col md={6} lg={6}>
