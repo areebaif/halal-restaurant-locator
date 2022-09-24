@@ -31,6 +31,7 @@ export const AutoCompleteInput: React.FC<AutoCompleteInputProps> = ({
   citySet,
   zipData,
 }) => {
+  // Data manupulation
   // state data: convert back to array to use with mantine
   const stateData = Array.from(stateSet);
   // city data: convert back to array to use with mantine
@@ -41,11 +42,11 @@ export const AutoCompleteInput: React.FC<AutoCompleteInputProps> = ({
     value: item.properties.zip,
   }));
 
-  // We dont need to do type checking as submit button disables if a user enters in valid input
-  // The only thing we need to check for is white spaces and lowercapslock every thing
   const onSubmit = (event: React.MouseEvent<HTMLButtonElement>) => {
-    // Do checking to remove leading and trailing white spaces from state and city
     // TODO: set Search term for either zipcode, state, or citystate or all
+    // We dont need to do type checking as submit button disables if a user enters invalid input
+    // TODO:
+    // The only thing we need to check for is white spaces and capslock every first letter
     const trimmedCity = cityValue.trim();
     const trimmedState = stateValue.trim();
 
@@ -145,13 +146,10 @@ export const SearchInput: React.FC = () => {
   const onKeyDown = (event: React.KeyboardEvent) => {
     if (event.key === "Enter") {
       //Filter results with value
-      console.log(value);
     }
     //TODO: Reset the value if the search term
   };
-  const onBlur = () => {
-    console.log(value);
-  };
+  const onBlur = () => {};
 
   const onsubmit = (event: React.MouseEvent<HTMLButtonElement>) => {
     // set trigger search to true
