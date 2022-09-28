@@ -54,7 +54,12 @@ export interface LocationPropertiesProps {
   description: string;
   index: number;
 }
-
+export interface SearchTerms {
+  zipcode: string | null;
+  cityValue: string | null;
+  stateValue: string | null;
+  name: string | null;
+}
 const testDataTwo: GeoJSON.FeatureCollection<
   GeoJSON.Geometry,
   LocationPropertiesProps
@@ -445,6 +450,11 @@ export const PlacesDisplayComponent: React.FC = () => {
       index: null,
     });
   };
+
+  const onSearch = (data: SearchTerms) => {
+    const {zipcode, cityValue, stateValue, name} = data
+    // TODO: either trigger search or filter data set??
+  }
 
   const onSeacrhQuery = (
     data: GeoJSON.FeatureCollection<GeoJSON.Geometry, LocationPropertiesProps>

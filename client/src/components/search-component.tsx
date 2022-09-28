@@ -3,7 +3,9 @@ import { TextInput, Button, Group } from "@mantine/core";
 import { IconSearch } from "@tabler/icons";
 import { Autocomplete } from "@mantine/core";
 import { FeatureDocument } from "./map-layout";
-export type AutoCompleteInputProps = {
+
+// TODO: either set data in main component or trigger backend call here for updated search?
+export interface AutoCompleteInputProps {
   zipcodeValue: string;
   onZipcodeChange: (value: string) => void;
   errorZipcode: boolean;
