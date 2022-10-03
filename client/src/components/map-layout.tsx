@@ -1,5 +1,6 @@
 import * as React from "react";
 import { Grid } from "@mantine/core";
+import { QueryClient, QueryClientProvider, useQuery } from "react-query";
 import { MapContainer } from "./map-container";
 import { ListContainer } from "./result-list";
 import { AutoCompleteInput } from "./search-component";
@@ -339,7 +340,7 @@ export interface activeMarkerProps {
 
 export const PlacesDisplayComponent: React.FC = () => {
   const mapRef = React.useRef<any>();
-  const [data, setData] = React.useState(testDataTwo);
+  const [mapData, setMapData] = React.useState(testDataTwo);
   const [activePlace, setActivePlace] = React.useState<activeMarkerProps>({
     latitude: 0,
     longitude: 0,
@@ -373,6 +374,18 @@ export const PlacesDisplayComponent: React.FC = () => {
     stateValue: null,
     name: null,
   });
+
+  const { isLoading, isError, data, error } = useQuery(
+    "todos" /*fetchTodoList*/
+  );
+
+  if (isLoading) {
+    return <span>Loading...</span>;
+  }
+
+  if (isError) {
+    return <span>Error: {error.message}</span>;
+  }
 
   const onStateValueChange = (value: string) => {
     // Check for special characters including numbers
@@ -452,14 +465,14 @@ export const PlacesDisplayComponent: React.FC = () => {
   };
 
   const onSearch = (data: SearchTerms) => {
-    const {zipcode, cityValue, stateValue, name} = data
+    const { zipcode, cityValue, stateValue, name } = data;
     // TODO: either trigger search or filter data set??
-  }
+  };
 
   const onSeacrhQuery = (
     data: GeoJSON.FeatureCollection<GeoJSON.Geometry, LocationPropertiesProps>
   ) => {
-    setData(data);
+    setMapData(data);
   };
 
   return (
@@ -482,7 +495,7 @@ export const PlacesDisplayComponent: React.FC = () => {
       </Grid.Col>
       <Grid.Col md={6} lg={6}>
         <ListContainer
-          dataSource={data}
+          dataSource={mapData}
           dataSourceId={dataSourceId}
           mapRef={mapRef}
           layerId={layerId}
@@ -496,7 +509,7 @@ export const PlacesDisplayComponent: React.FC = () => {
       </Grid.Col>
       <Grid.Col md={6} lg={6}>
         <MapContainer
-          dataSource={data}
+          dataSource={mapData}
           dataSourceId={dataSourceId}
           mapRef={mapRef}
           layerId={layerId}
