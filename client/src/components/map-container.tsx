@@ -4,8 +4,7 @@ import { Text, Box } from "@mantine/core";
 import Map, { Source, Layer, Popup, MapLayerMouseEvent } from "react-map-gl";
 
 import redMarker from "./red-marker.png";
-import { activeMarkerProps } from "./map-layout";
-import { LocationPropertiesProps } from "./map-layout";
+import { activeMarkerProps, PropertiesProps } from "./map-layout";
 
 // We need this varibale to sync map id data with react and its local to this file
 let hoverId: null | number = null;
@@ -13,7 +12,7 @@ mapboxgl.accessToken = `${process.env.REACT_APP_MAPBOX_ACCESS}`;
 
 export type MapProps = {
   // props to render map
-  dataSource: GeoJSON.FeatureCollection<GeoJSON.Geometry, any>;
+  dataSource: GeoJSON.FeatureCollection<GeoJSON.Geometry, PropertiesProps>;
   dataSourceId: string;
   mapRef?: any;
   layerId: string;
@@ -30,7 +29,7 @@ export type MapProps = {
 
   // Data for when user triggers search
   onSearch?: (
-    data: GeoJSON.FeatureCollection<GeoJSON.Geometry, LocationPropertiesProps>
+    data: GeoJSON.FeatureCollection<GeoJSON.Geometry, PropertiesProps>
   ) => void;
 };
 
@@ -49,7 +48,6 @@ export const MapContainer: React.FC<MapProps> = ({
     longitude: -88.53,
     zoom: 7.2,
   });
-  console.log("inside container", dataSource.features[0]);
   // Style layer for circle marker
   // const layerStyle: { id: string; type: string; paint: CirclePaint } = {
   //   id: "point",
@@ -154,7 +152,7 @@ export const MapContainer: React.FC<MapProps> = ({
 
   return (
     <Map
-      //reuseMaps={true}
+      reuseMaps={true}
       ref={mapRef}
       {...viewState}
       onMove={(evt) => setViewState(evt.viewState)}

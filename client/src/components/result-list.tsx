@@ -50,14 +50,14 @@ export const ListContainer: React.FC<MapProps> = ({
       {dataSource.features.map((item) => {
         const coordinatesObject = item.geometry as GeoJSON.Point;
         const [longitude, latitude] = coordinatesObject.coordinates;
-        const { title, description, index } = item.properties;
+        const { title, index } = item.properties;
 
         return (
           <List.Item
             onMouseEnter={() =>
               onMouseEnter({
                 title,
-                description,
+                description: "no description",
                 index,
                 longitude,
                 latitude,
@@ -75,7 +75,7 @@ export const ListContainer: React.FC<MapProps> = ({
             }}
             key={item.properties?.index}
           >
-            {item.properties?.title}: {item.properties?.description}{" "}
+            {item.properties?.title}
           </List.Item>
         );
       })}
