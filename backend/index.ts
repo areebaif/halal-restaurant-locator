@@ -18,8 +18,8 @@ const startServer = async () => {
     async (req: Request, res: Response, next: NextFunction) => {
       try {
         res.header("Content-Type", "application/json");
-        const JSONdata = JSON.stringify(rawLocations);
-        res.status(200).send({ JSONdata });
+
+        res.status(200).send({ data: rawLocations });
       } catch (err) {
         console.log(err);
       }

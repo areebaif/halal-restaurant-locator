@@ -13,10 +13,7 @@ mapboxgl.accessToken = `${process.env.REACT_APP_MAPBOX_ACCESS}`;
 
 export type MapProps = {
   // props to render map
-  dataSource: GeoJSON.FeatureCollection<
-    GeoJSON.Geometry,
-    LocationPropertiesProps
-  >;
+  dataSource: GeoJSON.FeatureCollection<GeoJSON.Geometry, any>;
   dataSourceId: string;
   mapRef?: any;
   layerId: string;
@@ -52,7 +49,7 @@ export const MapContainer: React.FC<MapProps> = ({
     longitude: -88.53,
     zoom: 7.2,
   });
-
+  console.log("inside container", dataSource.features[0]);
   // Style layer for circle marker
   // const layerStyle: { id: string; type: string; paint: CirclePaint } = {
   //   id: "point",
@@ -157,7 +154,7 @@ export const MapContainer: React.FC<MapProps> = ({
 
   return (
     <Map
-      reuseMaps={true}
+      //reuseMaps={true}
       ref={mapRef}
       {...viewState}
       onMove={(evt) => setViewState(evt.viewState)}

@@ -21,22 +21,16 @@ export interface PropertiesProps {
   zip: string;
   index: number;
 }
-export interface FeatureDocument {
-  type: string;
-  properties: PropertiesProps;
-  geometry: { coordinates: [number, number]; type: "Point" };
-}
-export interface RawData {
-  features: FeatureDocument[];
-}
-const allRawData: RawData = JSON.parse(JSON.stringify(rawLocations));
+
+const allRawData: GeoJSON.FeatureCollection<GeoJSON.Geometry, PropertiesProps> =
+  JSON.parse(JSON.stringify(rawLocations));
 
 // we need to remove duplicate city values
 const citySet: Set<string> = new Set();
 const stateSet: Set<string> = new Set();
 
 // We are combining city,state here and adding entries to set
-const formattedData = allRawData.features.map((item: FeatureDocument) => {
+const formattedData = allRawData.features.map((item) => {
   const properties = item.properties;
   citySet.add(properties.city);
   stateSet.add(properties.state);
@@ -340,7 +334,8 @@ export interface activeMarkerProps {
 
 export const PlacesDisplayComponent: React.FC = () => {
   const mapRef = React.useRef<any>();
-  const [mapData, setMapData] = React.useState(testDataTwo);
+  const [mapData, setMapData] =
+    React.useState<GeoJSON.FeatureCollection<GeoJSON.Geometry, any>>();
   const [activePlace, setActivePlace] = React.useState<activeMarkerProps>({
     latitude: 0,
     longitude: 0,
@@ -375,8 +370,38 @@ export const PlacesDisplayComponent: React.FC = () => {
     name: null,
   });
 
+  // Fetching Data
+  const URL = "/api/dev/data";
   const { isLoading, isError, data, error } = useQuery(
-    "todos" /*fetchTodoList*/
+    "todos",
+    async () => {
+      const response = await fetch(URL);
+
+      if (!response.ok) {
+        throw new Error("Network response was not ok");
+      }
+      const data: {
+        data: GeoJSON.FeatureCollection<GeoJSON.Geometry, PropertiesProps>;
+      } = await response.json();
+      return data.data;
+    },
+    {
+      onSuccess: (data) => {
+        //do some data manuplulation to only set Chicago Data. There are too many data points
+        const filteredValues = data?.features?.filter((item: any) => {
+          return item.properties.city === "Chicago";
+        });
+        console.log(filteredValues?.length);
+        const serverData: GeoJSON.FeatureCollection<
+          GeoJSON.Geometry,
+          PropertiesProps
+        > = {
+          type: "FeatureCollection",
+          features: filteredValues?.length ? filteredValues : [],
+        };
+        setMapData(serverData);
+      },
+    }
   );
 
   if (isLoading) {
@@ -384,7 +409,7 @@ export const PlacesDisplayComponent: React.FC = () => {
   }
 
   if (isError) {
-    return <span>Error: {error.message}</span>;
+    return <span>Error: error occured</span>;
   }
 
   const onStateValueChange = (value: string) => {
@@ -475,7 +500,7 @@ export const PlacesDisplayComponent: React.FC = () => {
     setMapData(data);
   };
 
-  return (
+  return mapData ? (
     <Grid>
       <Grid.Col md={12} lg={12}>
         <AutoCompleteInput
@@ -520,5 +545,7 @@ export const PlacesDisplayComponent: React.FC = () => {
         />
       </Grid.Col>
     </Grid>
+  ) : (
+    <div>loading</div>
   );
 };
