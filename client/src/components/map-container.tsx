@@ -139,7 +139,6 @@ export const MapContainer: React.FC<MapProps> = ({
   };
 
   const onMouseLeaveMapLayer = () => {
-    console.log("map leave just triggered");
     // hoverId === 0 results in a falsy statement, hence, checking for type
     if (typeof hoverId === "number" && !displayPopup) {
       mapRef.current.setFeatureState(
