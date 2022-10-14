@@ -2,6 +2,7 @@ import express, { NextFunction, Response, Request } from "express";
 import bodyParser from "body-parser";
 //import fs from "fs/promises"
 import rawLocations from "./location.json";
+import { halalFinderRouter } from "./routes/halal-finder";
 
 // TODO: start script
 // "start": "ts-node-dev src/index.ts"
@@ -13,18 +14,8 @@ const startServer = async () => {
   app.use(bodyParser.json());
 
   // api-documentation
-  app.get(
-    "/api/dev/data",
-    async (req: Request, res: Response, next: NextFunction) => {
-      try {
-        res.header("Content-Type", "application/json");
-
-        res.status(200).send({ data: rawLocations });
-      } catch (err) {
-        console.log(err);
-      }
-    }
-  );
+  // routes
+  app.use(halalFinderRouter);
 
   app.listen(PORT, () => {
     console.log(`dev server running on ${PORT}`);
