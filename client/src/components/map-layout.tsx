@@ -391,6 +391,7 @@ export const PlacesDisplayComponent: React.FC = () => {
           zipData={formattedData}
         />
       </Grid.Col>
+
       <Grid.Col md={6} lg={6}>
         <ListContainer
           dataSource={mapData}
@@ -405,6 +406,7 @@ export const PlacesDisplayComponent: React.FC = () => {
           onLocationInfoCloseCard={onLocationInfoCloseCard}
         />
       </Grid.Col>
+
       <Grid.Col md={6} lg={6}>
         <MapContainer
           dataSource={mapData}

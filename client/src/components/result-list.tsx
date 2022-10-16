@@ -1,6 +1,13 @@
 import * as React from "react";
 import { MapProps } from "./map-container";
-import { List, Popover, Text, CloseButton } from "@mantine/core";
+import {
+  List,
+  Popover,
+  Text,
+  CloseButton,
+  Box,
+  ScrollArea,
+} from "@mantine/core";
 
 import { activeMarkerProps } from "./map-layout";
 
@@ -46,40 +53,44 @@ export const ListContainer: React.FC<MapProps> = ({
   };
 
   const list = (
-    <List onMouseLeave={allListMouseLeave} icon={" "}>
-      {dataSource.features.map((item) => {
-        const coordinatesObject = item.geometry as GeoJSON.Point;
-        const [longitude, latitude] = coordinatesObject.coordinates;
-        const { title, index } = item.properties;
+    <Box>
+      <ScrollArea style={{ height: 600 }} type="auto">
+        <List onMouseLeave={allListMouseLeave} icon={" "}>
+          {dataSource.features.map((item) => {
+            const coordinatesObject = item.geometry as GeoJSON.Point;
+            const [longitude, latitude] = coordinatesObject.coordinates;
+            const { title, index } = item.properties;
 
-        return (
-          <List.Item
-            onMouseEnter={() =>
-              onMouseEnter({
-                title,
-                description: "no description",
-                index,
-                longitude,
-                latitude,
-              })
-            }
-            onClick={() => onLocationInfoOpenCard?.(activePlace)}
-            onMouseLeave={() => {
-              mapRef.current.setFeatureState(
-                { source: dataSourceId, id: hoverId },
-                { hover: false }
-              );
-              hoverId = null;
-              // close Popup
-              setActivePlaceData?.(null);
-            }}
-            key={item.properties?.index}
-          >
-            {item.properties?.title}
-          </List.Item>
-        );
-      })}
-    </List>
+            return (
+              <List.Item
+                onMouseEnter={() =>
+                  onMouseEnter({
+                    title,
+                    description: "no description",
+                    index,
+                    longitude,
+                    latitude,
+                  })
+                }
+                onClick={() => onLocationInfoOpenCard?.(activePlace)}
+                onMouseLeave={() => {
+                  mapRef.current.setFeatureState(
+                    { source: dataSourceId, id: hoverId },
+                    { hover: false }
+                  );
+                  hoverId = null;
+                  // close Popup
+                  setActivePlaceData?.(null);
+                }}
+                key={item.properties?.index}
+              >
+                {item.properties?.title}
+              </List.Item>
+            );
+          })}
+        </List>
+      </ScrollArea>
+    </Box>
   );
 
   return (
