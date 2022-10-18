@@ -1,5 +1,5 @@
 import * as React from "react";
-import mapboxgl, { CirclePaint } from "mapbox-gl"; // eslint-disable-line import/no-webpack-loader-syntax
+import mapboxgl from "mapbox-gl"; // eslint-disable-line import/no-webpack-loader-syntax
 import { Text, Box } from "@mantine/core";
 import Map, { Source, Layer, Popup, MapLayerMouseEvent } from "react-map-gl";
 
@@ -7,8 +7,9 @@ import redMarker from "./red-marker.png";
 import { activeMarkerProps, PropertiesProps } from "./map-layout";
 
 // We need this varibale to sync map id data with react and its local to this file
-let hoverId: null | number = null;
+
 mapboxgl.accessToken = `${process.env.REACT_APP_MAPBOX_ACCESS}`;
+let hoverId: string | undefined | number = undefined;
 
 export type MapProps = {
   // props to render map
@@ -70,12 +71,12 @@ export const MapContainer: React.FC<MapProps> = ({
         { hover: false }
       );
     }
-    hoverId = null;
+    hoverId = undefined;
     if (e.features?.length) {
       const coordinatesObject = e.features[0].geometry as GeoJSON.Point;
       const coordinates = coordinatesObject.coordinates.slice();
       const description = e.features[0].properties;
-      const index: number = description?.index;
+      hoverId = e.features[0].id;
 
       // ***** NOTE: not sure if we want to keep this *****
       // Ensure that if the map is zoomed out such that multiple
@@ -84,9 +85,6 @@ export const MapContainer: React.FC<MapProps> = ({
       // while (Math.abs(e.lngLat.lng - coordinates[0]) > 180) {
       //   coordinates[0] += e.lngLat.lng > coordinates[0] ? 360 : -360;
       // }
-
-      hoverId = index;
-
       setActivePlaceData?.({
         ...activePlace,
         latitude: e.lngLat.lat,
@@ -107,7 +105,10 @@ export const MapContainer: React.FC<MapProps> = ({
   // TODO: searching and filtering will update result instead of onclick handler
   // Right now this works with onClick
   const onClick = (e: any) => {
-    if (typeof activePlace.index === "number") {
+    if (
+      typeof activePlace.index === "number" ||
+      typeof activePlace.index === "string"
+    ) {
       onLocationInfoOpenCard?.(activePlace);
     }
 
@@ -125,7 +126,7 @@ export const MapContainer: React.FC<MapProps> = ({
       { source: dataSourceId, id: hoverId },
       { hover: false }
     );
-    hoverId = null;
+    hoverId = undefined;
 
     setDisplayPopup(false);
     setActivePlaceData?.(null);
@@ -140,12 +141,15 @@ export const MapContainer: React.FC<MapProps> = ({
 
   const onMouseLeaveMapLayer = () => {
     // hoverId === 0 results in a falsy statement, hence, checking for type
-    if (typeof hoverId === "number" && !displayPopup) {
+    if (
+      (typeof hoverId === "number" || typeof hoverId === "string") &&
+      !displayPopup
+    ) {
       mapRef.current.setFeatureState(
         { source: dataSourceId, id: hoverId },
         { hover: false }
       );
-      hoverId = null;
+      hoverId = undefined;
     }
   };
 
@@ -164,12 +168,7 @@ export const MapContainer: React.FC<MapProps> = ({
       onMouseLeave={onMouseLeaveMapLayer}
       onClick={onClick}
     >
-      <Source
-        id={dataSourceId}
-        type="geojson"
-        data={dataSource}
-        generateId={true}
-      >
+      <Source id={dataSourceId} type="geojson" data={dataSource}>
         <Layer
           id={layerId}
           type="symbol"
@@ -184,7 +183,7 @@ export const MapContainer: React.FC<MapProps> = ({
             "icon-opacity": [
               "case",
               ["boolean", ["feature-state", "hover"], false],
-              2,
+              0.5,
               1,
             ],
           }}
@@ -205,7 +204,7 @@ export const MapContainer: React.FC<MapProps> = ({
           >
             <div
               // This div and transparent background is added so that popup remains open on hover
-              style={{ border: "10px solid rgba(0, 0, 0, 0)" }}
+              style={{ border: "10px solid rgba(0, 0, 0, 0.5)" }}
               onMouseLeave={() => {
                 onMouseLeavePopup();
               }}

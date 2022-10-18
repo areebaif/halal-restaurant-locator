@@ -12,7 +12,7 @@ import {
 import { activeMarkerProps } from "./map-layout";
 
 // We need this varibale to sync map id data with react and its local to this file
-let hoverId: null | number = null;
+let hoverId: string | undefined | number = undefined;
 
 export const ListContainer: React.FC<MapProps> = ({
   dataSource,
@@ -32,7 +32,7 @@ export const ListContainer: React.FC<MapProps> = ({
         { hover: false }
       );
     }
-    hoverId = null;
+    hoverId = undefined;
     hoverId = data.index;
     setActivePlaceData?.(data);
     mapRef.current.setFeatureState(
@@ -47,7 +47,7 @@ export const ListContainer: React.FC<MapProps> = ({
       { source: dataSourceId, id: hoverId },
       { hover: false }
     );
-    hoverId = null;
+    hoverId = undefined;
     // close Popup
     setActivePlaceData?.(null);
   };
@@ -60,6 +60,7 @@ export const ListContainer: React.FC<MapProps> = ({
             const coordinatesObject = item.geometry as GeoJSON.Point;
             const [longitude, latitude] = coordinatesObject.coordinates;
             const { title, index } = item.properties;
+            const id = item.id;
 
             return (
               <List.Item
@@ -67,7 +68,7 @@ export const ListContainer: React.FC<MapProps> = ({
                   onMouseEnter({
                     title,
                     description: "no description",
-                    index,
+                    index: id,
                     longitude,
                     latitude,
                   })
@@ -78,7 +79,7 @@ export const ListContainer: React.FC<MapProps> = ({
                     { source: dataSourceId, id: hoverId },
                     { hover: false }
                   );
-                  hoverId = null;
+                  hoverId = undefined;
                   // close Popup
                   setActivePlaceData?.(null);
                 }}
