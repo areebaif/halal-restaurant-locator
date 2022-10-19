@@ -183,8 +183,8 @@ export const MapContainer: React.FC<MapProps> = ({
             "icon-opacity": [
               "case",
               ["boolean", ["feature-state", "hover"], false],
-              0.5,
               1,
+              2,
             ],
           }}
         />
@@ -204,7 +204,7 @@ export const MapContainer: React.FC<MapProps> = ({
           >
             <div
               // This div and transparent background is added so that popup remains open on hover
-              style={{ border: "10px solid rgba(0, 0, 0, 0.5)" }}
+              style={{ border: "10px solid rgba(0, 0, 0, 0)" }}
               onMouseLeave={() => {
                 onMouseLeavePopup();
               }}

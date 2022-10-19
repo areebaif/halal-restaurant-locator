@@ -1,6 +1,6 @@
 import * as React from "react";
 import { Grid } from "@mantine/core";
-import { QueryClient, QueryClientProvider, useQuery } from "react-query";
+import { useQuery } from "react-query";
 import { MapContainer } from "./map-container";
 import { ListContainer } from "./result-list";
 import { AutoCompleteInput } from "./search-component";
@@ -19,7 +19,6 @@ export interface PropertiesProps {
   state_id: string;
   state: string;
   zip: string;
-  index: number;
 }
 
 const allRawData: GeoJSON.FeatureCollection<GeoJSON.Geometry, PropertiesProps> =

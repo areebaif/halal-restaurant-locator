@@ -59,7 +59,7 @@ export const ListContainer: React.FC<MapProps> = ({
           {dataSource.features.map((item) => {
             const coordinatesObject = item.geometry as GeoJSON.Point;
             const [longitude, latitude] = coordinatesObject.coordinates;
-            const { title, index } = item.properties;
+            const { title } = item.properties;
             const id = item.id;
 
             return (
@@ -83,7 +83,7 @@ export const ListContainer: React.FC<MapProps> = ({
                   // close Popup
                   setActivePlaceData?.(null);
                 }}
-                key={item.properties?.index}
+                key={item.id}
               >
                 {item.properties?.title}
               </List.Item>
