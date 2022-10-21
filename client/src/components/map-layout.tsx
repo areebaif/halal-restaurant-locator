@@ -5,10 +5,7 @@ import { MapContainer } from "./map-container";
 import { ListContainer } from "./result-list";
 import { AutoCompleteInput } from "./search-component";
 
-import rawLocations from "../location.json";
-
 // https://simplemaps.com/data/us-zips this need to be added to usa zipcode data
-
 // This is for setting filter
 // Chip.Group controlled cip group for multi filter select for search
 // transfer list for a card generation
@@ -21,28 +18,9 @@ export interface PropertiesProps {
   zip: string;
 }
 
-const allRawData: GeoJSON.FeatureCollection<GeoJSON.Geometry, PropertiesProps> =
-  JSON.parse(JSON.stringify(rawLocations));
-
-// we need to remove duplicate city values
-const citySet: Set<string> = new Set();
-const stateSet: Set<string> = new Set();
-
-// We are combining city,state here and adding entries to set
-// TODO: remove this: do this data manupulation when you call data from api
-const formattedData = allRawData.features.map((item) => {
-  const properties = item.properties;
-  citySet.add(properties.city);
-  stateSet.add(properties.state);
-  return { ...item, city_state: `${properties.city}, ${properties.state}` };
-});
-
 // Mapbox needs a string as data source Id, layerId
 const dataSourceId = "some id";
 const layerId = "points";
-
-// Note: We can add any property to properties object. I have added index for easy manupulation in react. The Map object does generate a unique id
-// We cannot use that id in react
 
 export interface SearchTerms {
   zipcode: string | null;
@@ -225,7 +203,7 @@ export const PlacesDisplayComponent: React.FC = () => {
       description: "",
       index: undefined,
     });
-  const [zipcode, setZipcode] = React.useState("");
+  const [searchZipcode, setSearchZipcode] = React.useState("");
   const [errorZipcode, setErrorZipcode] = React.useState(false);
   const [cityValue, setCity] = React.useState("");
   const [errorCity, setErrorCity] = React.useState(false);
@@ -260,7 +238,8 @@ export const PlacesDisplayComponent: React.FC = () => {
     },
     {
       onSuccess: (data) => {
-        //do some data manuplulation to only set Chicago Data. There are too many data points
+        // TODO: fix this that only search term is sent depending on what the search term is
+        // do some data manuplulation to only set Chicago Data. There are too many data points
         const filteredValues = data?.features?.filter((item: any) => {
           return item.properties.city === "Chicago";
         });
@@ -319,15 +298,15 @@ export const PlacesDisplayComponent: React.FC = () => {
     switch (expression) {
       case specialChars.test(value):
         setErrorZipcode(true);
-        setZipcode(value);
+        setSearchZipcode(value);
         break;
       case isNaN(Number(value)):
         setErrorZipcode(true);
-        setZipcode(value);
+        setSearchZipcode(value);
         break;
       default:
         setErrorZipcode(false);
-        setZipcode(value);
+        setSearchZipcode(value);
     }
   };
 
@@ -377,7 +356,7 @@ export const PlacesDisplayComponent: React.FC = () => {
     <Grid>
       <Grid.Col md={12} lg={12}>
         <AutoCompleteInput
-          zipcodeValue={zipcode}
+          zipcodeValue={searchZipcode}
           onZipcodeChange={onZipcodeValueChange}
           errorZipcode={errorZipcode}
           cityValue={cityValue}
@@ -386,14 +365,11 @@ export const PlacesDisplayComponent: React.FC = () => {
           stateValue={stateValue}
           onStateValueChange={onStateValueChange}
           errorState={errorState}
-          citySet={citySet}
-          stateSet={stateSet}
-          zipData={formattedData}
         />
       </Grid.Col>
       <Grid.Col md={6} lg={6}>
         <ListContainer
-          dataSource={testData}
+          dataSource={mapData}
           dataSourceId={dataSourceId}
           mapRef={mapRef}
           layerId={layerId}
@@ -407,7 +383,7 @@ export const PlacesDisplayComponent: React.FC = () => {
       </Grid.Col>
       <Grid.Col md={6} lg={6}>
         <MapContainer
-          dataSource={testData}
+          dataSource={mapData}
           dataSourceId={dataSourceId}
           mapRef={mapRef}
           layerId={layerId}

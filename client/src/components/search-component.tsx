@@ -1,9 +1,29 @@
 import * as React from "react";
 import { TextInput, Button, Group } from "@mantine/core";
+import { useQuery } from "react-query";
 import { IconSearch } from "@tabler/icons";
 import { Autocomplete } from "@mantine/core";
+import { PropertiesProps } from "./map-layout";
 
-// TODO: either set data in main component or trigger backend call here for updated search?
+// TODO: this component should populate its own data from backend
+
+export interface ZipDocument {
+  city_state: string;
+  type: "Feature";
+  properties: {
+    title: string;
+    city: string;
+    state_id: string;
+    state: string;
+    zip: string;
+  };
+  id: number;
+  geometry: {
+    coordinates: [number, number];
+    type: "Point";
+  };
+}
+
 export interface AutoCompleteInputProps {
   zipcodeValue: string;
   onZipcodeChange: (value: string) => void;
@@ -14,10 +34,10 @@ export interface AutoCompleteInputProps {
   stateValue: string;
   onStateValueChange: (value: string) => void;
   errorState: boolean;
-  citySet: Set<string>;
-  stateSet: Set<string>;
+  //citySet: Set<string>;
+  //stateSet: Set<string>;
   // TODO: fix typing
-  zipData: any[];
+  //zipData: any[];
 }
 export const AutoCompleteInput: React.FC<AutoCompleteInputProps> = ({
   zipcodeValue,
@@ -29,20 +49,52 @@ export const AutoCompleteInput: React.FC<AutoCompleteInputProps> = ({
   stateValue,
   onStateValueChange,
   errorState,
-  stateSet,
-  citySet,
-  zipData,
+  //stateSet,
+  //citySet,
+  //zipData,
 }) => {
-  // Data manupulation
-  // state data: convert back to array to use with mantine
-  const stateData = Array.from(stateSet);
-  // city data: convert back to array to use with mantine
-  const cityData = Array.from(citySet);
-  // zipcode
-  const zipFormattedData = zipData.map((item) => ({
-    ...item,
-    value: item.properties.zip,
-  }));
+  // Fetching Data
+  const [stateData, setStateData] = React.useState<string[]>();
+  const [cityData, setCityData] = React.useState<string[]>();
+  const [zipData, setZipData] = React.useState<any>();
+  const URL = "/api/dev/getGeography";
+  const { isLoading, isError, data, error } = useQuery(
+    "getGeography",
+    async () => {
+      const response = await fetch(URL);
+
+      if (!response.ok) {
+        throw new Error("Network response was not ok");
+      }
+      const data: {
+        data: {
+          citySet: string[];
+          stateSet: string[];
+          zipSet: ZipDocument[];
+        };
+      } = await response.json();
+      return data.data;
+    },
+    {
+      onSuccess: (data) => {
+        setStateData(data.stateSet);
+        setCityData(data.citySet);
+        const zipFormattedData = data.zipSet.map((item: ZipDocument) => ({
+          ...item,
+          value: item.properties.zip,
+        }));
+        setZipData(zipFormattedData);
+      },
+    }
+  );
+
+  if (isLoading) {
+    return <span>Loading...</span>;
+  }
+
+  if (isError) {
+    return <span>Error: error occured</span>;
+  }
 
   const onSubmit = (event: React.MouseEvent<HTMLButtonElement>) => {
     // TODO: set Search term for either zipcode, state, or citystate or all
@@ -71,7 +123,7 @@ export const AutoCompleteInput: React.FC<AutoCompleteInputProps> = ({
           value={zipcodeValue}
           limit={7}
           onChange={onZipcodeChange}
-          data={zipFormattedData}
+          data={zipData ? zipData : []}
         />
       )}
       {errorCity ? (
@@ -90,7 +142,7 @@ export const AutoCompleteInput: React.FC<AutoCompleteInputProps> = ({
           value={cityValue}
           limit={7}
           onChange={onCityValueChange}
-          data={cityData}
+          data={cityData ? cityData : []}
         />
       )}
       {errorState || (cityValue.length > 0 && stateValue.length === 0) ? (
@@ -117,7 +169,7 @@ export const AutoCompleteInput: React.FC<AutoCompleteInputProps> = ({
           value={stateValue}
           limit={7}
           onChange={onStateValueChange}
-          data={stateData}
+          data={stateData ? stateData : []}
           required={cityValue.length > 0}
         />
       )}
