@@ -50,7 +50,6 @@ router.get(
         };
       });
 
-      //console.log(citySet, "lola");
       const arrayCitySet = Array.from(citySet);
       const arrayStateSet = Array.from(stateSet);
       res.header("Content-Type", "application/json");
