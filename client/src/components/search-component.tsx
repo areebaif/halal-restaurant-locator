@@ -1,11 +1,9 @@
 import * as React from "react";
-import { TextInput, Button, Group } from "@mantine/core";
+import { TextInput, Button, Group, AutocompleteItem } from "@mantine/core";
 import { useQuery } from "react-query";
 import { IconSearch } from "@tabler/icons";
 import { Autocomplete } from "@mantine/core";
 import { PropertiesProps } from "./map-layout";
-
-// TODO: this component should populate its own data from backend
 
 export interface ZipDocument {
   city_state: string;
@@ -25,38 +23,33 @@ export interface ZipDocument {
 }
 
 export interface AutoCompleteInputProps {
-  zipcodeValue: string;
-  onZipcodeChange: (value: string) => void;
-  errorZipcode: boolean;
-  cityValue: string;
-  onCityValueChange: (value: string) => void;
-  errorCity: boolean;
-  stateValue: string;
-  onStateValueChange: (value: string) => void;
-  errorState: boolean;
-  //citySet: Set<string>;
-  //stateSet: Set<string>;
-  // TODO: fix typing
-  //zipData: any[];
+  zipcodeUserInput: string;
+  onZipcodeUserInputChange: (value: string) => void;
+  errorZipcodeUserInput: boolean;
+  cityUserInput: string;
+  onCityUserInputChange: (value: string) => void;
+  errorCityUserInput: boolean;
+  stateUserInput: string;
+  onStateUserInputChange: (value: string) => void;
+  errorStateUserInput: boolean;
 }
+
 export const AutoCompleteInput: React.FC<AutoCompleteInputProps> = ({
-  zipcodeValue,
-  onZipcodeChange,
-  errorZipcode,
-  cityValue,
-  onCityValueChange,
-  errorCity,
-  stateValue,
-  onStateValueChange,
-  errorState,
-  //stateSet,
-  //citySet,
-  //zipData,
+  zipcodeUserInput,
+  onZipcodeUserInputChange,
+  errorZipcodeUserInput,
+  cityUserInput,
+  onCityUserInputChange,
+  errorCityUserInput,
+  stateUserInput,
+  onStateUserInputChange,
+  errorStateUserInput,
 }) => {
-  // Fetching Data
   const [stateData, setStateData] = React.useState<string[]>();
   const [cityData, setCityData] = React.useState<string[]>();
-  const [zipData, setZipData] = React.useState<any>();
+  // we are using zipData to populate mantine autocomplete component.This component has typing defined as AutoCompleteItem
+  const [zipData, setZipData] = React.useState<AutocompleteItem[]>();
+
   const URL = "/api/dev/getGeography";
   const { isLoading, isError, data, error } = useQuery(
     "getGeography",
@@ -97,88 +90,90 @@ export const AutoCompleteInput: React.FC<AutoCompleteInputProps> = ({
   }
 
   const onSubmit = (event: React.MouseEvent<HTMLButtonElement>) => {
+    console.log("limit", stateUserInput);
     // TODO: set Search term for either zipcode, state, or citystate or all
     // We dont need to do type checking as submit button disables if a user enters invalid input
     // TODO:
     // The only thing we need to check for is white spaces and capslock every first letter
-    const trimmedCity = cityValue.trim();
-    const trimmedState = stateValue.trim();
+    const trimmedCity = cityUserInput.trim();
+    const trimmedState = stateUserInput.trim();
 
     // TODO: set trigger search to true, reset the value
   };
   return (
     <Group position="center" spacing="xl" grow={true}>
-      {errorZipcode ? (
+      {errorZipcodeUserInput ? (
         <Autocomplete
           label="Zip code"
           error="Please provide valid zipcode"
-          onChange={onZipcodeChange}
+          onChange={onZipcodeUserInputChange}
           data={[]}
-          value={zipcodeValue}
+          value={zipcodeUserInput}
         />
       ) : (
         <Autocomplete
           label="zipcode"
           placeholder="Start typing"
-          value={zipcodeValue}
+          value={zipcodeUserInput}
           limit={7}
-          onChange={onZipcodeChange}
+          onChange={onZipcodeUserInputChange}
           data={zipData ? zipData : []}
         />
       )}
-      {errorCity ? (
+      {errorCityUserInput ? (
         <Autocomplete
           label="city"
           error="Please provide valid city"
           placeholder="start typing"
-          value={cityValue}
-          onChange={onCityValueChange}
+          value={cityUserInput}
+          onChange={onCityUserInputChange}
           data={[]}
         />
       ) : (
         <Autocomplete
           label="city"
           placeholder="start typing"
-          value={cityValue}
+          value={cityUserInput}
           limit={7}
-          onChange={onCityValueChange}
+          onChange={onCityUserInputChange}
           data={cityData ? cityData : []}
         />
       )}
-      {errorState || (cityValue.length > 0 && stateValue.length === 0) ? (
+      {errorStateUserInput ||
+      (cityUserInput.length > 0 && stateUserInput.length === 0) ? (
         <Autocomplete
           label="state"
           error={`${
-            cityValue.length > 0 && stateValue.length === 0
+            cityUserInput.length > 0 && stateUserInput.length === 0
               ? "state required if you are searching by city"
               : "Please provide valid state value"
           }`}
           placeholder={`${
-            cityValue.length > 0 && stateValue.length === 0
+            cityUserInput.length > 0 && stateUserInput.length === 0
               ? ""
               : "start typing"
           }`}
-          value={stateValue}
-          onChange={onStateValueChange}
+          value={stateUserInput}
+          onChange={onStateUserInputChange}
           data={[]}
         />
       ) : (
         <Autocomplete
           label="state"
           placeholder="start typing"
-          value={stateValue}
+          value={stateUserInput}
           limit={7}
-          onChange={onStateValueChange}
+          onChange={onStateUserInputChange}
           data={stateData ? stateData : []}
-          required={cityValue.length > 0}
+          required={cityUserInput.length > 0}
         />
       )}
       <Button
         disabled={
-          errorCity ||
-          errorZipcode ||
-          errorState ||
-          (cityValue.length > 0 && stateValue.length === 0)
+          errorCityUserInput ||
+          errorZipcodeUserInput ||
+          errorStateUserInput ||
+          (cityUserInput.length > 0 && stateUserInput.length === 0)
         }
         onClick={onSubmit}
       >

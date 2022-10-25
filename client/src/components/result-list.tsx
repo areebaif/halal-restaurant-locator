@@ -43,10 +43,12 @@ export const ListContainer: React.FC<MapProps> = ({
 
   const allListMouseLeave = () => {
     // disable hover interactivity on map
-    mapRef.current.setFeatureState(
-      { source: dataSourceId, id: hoverId },
-      { hover: false }
-    );
+    if (hoverId) {
+      mapRef.current.setFeatureState(
+        { source: dataSourceId, id: hoverId },
+        { hover: false }
+      );
+    }
     hoverId = undefined;
     // close Popup
     setActivePlaceData?.(null);

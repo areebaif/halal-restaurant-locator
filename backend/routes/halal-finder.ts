@@ -1,6 +1,5 @@
 import express, { NextFunction, Response, Request } from "express";
 import rawLocations from "../location.json";
-// TODO: separate out routes in this file
 
 interface locationDocument {
   type: "Feature";

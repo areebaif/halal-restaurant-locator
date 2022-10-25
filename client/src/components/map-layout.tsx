@@ -203,12 +203,13 @@ export const PlacesDisplayComponent: React.FC = () => {
       description: "",
       index: undefined,
     });
-  const [searchZipcode, setSearchZipcode] = React.useState("");
-  const [errorZipcode, setErrorZipcode] = React.useState(false);
-  const [cityValue, setCity] = React.useState("");
-  const [errorCity, setErrorCity] = React.useState(false);
-  const [stateValue, setStateValue] = React.useState("");
-  const [errorState, setErrorState] = React.useState(false);
+  const [zipcodeUserInput, setZipcodeUserInput] = React.useState("");
+  const [errorZipcodeUserInput, setErrorZipcodeUserInput] =
+    React.useState(false);
+  const [cityUserInput, setCityUserInput] = React.useState("");
+  const [errorCityUserInput, setErrorCityUserInput] = React.useState(false);
+  const [stateUserInput, setStateUserInput] = React.useState("");
+  const [errorStateUserInput, setErrorStateUserInput] = React.useState(false);
   const [searchTerm, setSearchTerm] = React.useState<{
     zipcode: string | null;
     cityValue: string | null;
@@ -264,49 +265,49 @@ export const PlacesDisplayComponent: React.FC = () => {
     return <span>Error: error occured</span>;
   }
 
-  const onStateValueChange = (value: string) => {
+  const onStateUserInputChange = (value: string) => {
     // Check for special characters including numbers
     const specialChars = /[`!@#$%^&*()_+\-=\[\]{};',:"\\|.<>\/?~0123456789]/;
     const specialCharsTest = specialChars.test(value);
 
     if (!specialCharsTest) {
-      setErrorState(false);
-      setStateValue(value);
+      setErrorStateUserInput(false);
+      setStateUserInput(value);
     } else {
-      setErrorState(true);
-      setStateValue(value);
+      setErrorStateUserInput(true);
+      setStateUserInput(value);
     }
   };
 
-  const onCityValueChange = (value: string) => {
+  const onCityUserInputChange = (value: string) => {
     // Check for special characters including numbers (dont check for white spaces some cities are two words with whote space in between)
     const specialChars = /[`!@#$%^&*()_+\-=\[\]{};',:"\\|.<>\/?~0123456789]/;
     const specialCharsTest = specialChars.test(value);
     if (!specialCharsTest) {
-      setErrorCity(false);
-      setCity(value);
+      setErrorCityUserInput(false);
+      setCityUserInput(value);
     } else {
-      setErrorCity(true);
-      setCity(value);
+      setErrorCityUserInput(true);
+      setCityUserInput(value);
     }
   };
 
-  const onZipcodeValueChange = (value: string) => {
+  const onZipcodeUserInputChange = (value: string) => {
     // check for white spaces in zipcode
     const specialChars = /[ ]/;
     const expression = true;
     switch (expression) {
       case specialChars.test(value):
-        setErrorZipcode(true);
-        setSearchZipcode(value);
+        setErrorZipcodeUserInput(true);
+        setZipcodeUserInput(value);
         break;
       case isNaN(Number(value)):
-        setErrorZipcode(true);
-        setSearchZipcode(value);
+        setErrorZipcodeUserInput(true);
+        setZipcodeUserInput(value);
         break;
       default:
-        setErrorZipcode(false);
-        setSearchZipcode(value);
+        setErrorZipcodeUserInput(false);
+        setZipcodeUserInput(value);
     }
   };
 
@@ -356,15 +357,15 @@ export const PlacesDisplayComponent: React.FC = () => {
     <Grid>
       <Grid.Col md={12} lg={12}>
         <AutoCompleteInput
-          zipcodeValue={searchZipcode}
-          onZipcodeChange={onZipcodeValueChange}
-          errorZipcode={errorZipcode}
-          cityValue={cityValue}
-          onCityValueChange={onCityValueChange}
-          errorCity={errorCity}
-          stateValue={stateValue}
-          onStateValueChange={onStateValueChange}
-          errorState={errorState}
+          zipcodeUserInput={zipcodeUserInput}
+          onZipcodeUserInputChange={onZipcodeUserInputChange}
+          errorZipcodeUserInput={errorZipcodeUserInput}
+          cityUserInput={cityUserInput}
+          onCityUserInputChange={onCityUserInputChange}
+          errorCityUserInput={errorCityUserInput}
+          stateUserInput={stateUserInput}
+          onStateUserInputChange={onStateUserInputChange}
+          errorStateUserInput={errorStateUserInput}
         />
       </Grid.Col>
       <Grid.Col md={6} lg={6}>
