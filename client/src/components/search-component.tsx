@@ -90,7 +90,6 @@ export const AutoCompleteInput: React.FC<AutoCompleteInputProps> = ({
   }
 
   const onSubmit = (event: React.MouseEvent<HTMLButtonElement>) => {
-    console.log("limit", stateUserInput);
     // TODO: set Search term for either zipcode, state, or citystate or all
     // We dont need to do type checking as submit button disables if a user enters invalid input
     // TODO:

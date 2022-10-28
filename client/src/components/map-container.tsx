@@ -115,7 +115,6 @@ export const MapContainer: React.FC<MapProps> = ({
     // SetData in react hook
     // onSearch?.(testData);
     // const geoJsonSource = mapRef.current.getSource(dataSourceId);
-    // //console.log(" geojson soiurce", geoJsonSource);
     // // setData on mapsource: It does not update even if you tell react to update, we have to use map inbuilt methods to update mapdata to limit map renders, inistialising  for billing
     // geoJsonSource.setData(testData);
   };
