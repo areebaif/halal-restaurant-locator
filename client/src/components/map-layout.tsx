@@ -23,10 +23,10 @@ const dataSourceId = "some id";
 const layerId = "points";
 
 export interface SearchTerms {
-  zipcode: string | null;
-  cityValue: string | null;
-  stateValue: string | null;
-  name: string | null;
+  zipcodeUserInput: string | null;
+  cityUserInput: string | null;
+  stateUserInput: string | null;
+  nameUserInput?: string | null;
 }
 
 // This data has london points
@@ -210,16 +210,11 @@ export const PlacesDisplayComponent: React.FC = () => {
   const [errorCityUserInput, setErrorCityUserInput] = React.useState(false);
   const [stateUserInput, setStateUserInput] = React.useState("");
   const [errorStateUserInput, setErrorStateUserInput] = React.useState(false);
-  const [searchTerm, setSearchTerm] = React.useState<{
-    zipcode: string | null;
-    cityValue: string | null;
-    stateValue: string | null;
-    name: string | null;
-  }>({
-    zipcode: null,
-    cityValue: null,
-    stateValue: null,
-    name: null,
+  const [searchTerm, setSearchTerm] = React.useState<SearchTerms>({
+    zipcodeUserInput: null,
+    cityUserInput: null,
+    stateUserInput: null,
+    nameUserInput: null,
   });
 
   // Fetching Data
@@ -343,7 +338,27 @@ export const PlacesDisplayComponent: React.FC = () => {
   };
 
   const onSearch = (data: SearchTerms) => {
-    const { zipcode, cityValue, stateValue, name } = data;
+    // You will either have zipcode, or state or city and state
+    const { zipcodeUserInput, cityUserInput, stateUserInput, nameUserInput } =
+      data;
+    if (zipcodeUserInput?.length) {
+      // trigger search for zipcode and reset all values
+    }
+
+    if (stateUserInput?.length && cityUserInput?.length) {
+      // trigger search for state and city and reset all values
+    }
+
+    if (stateUserInput?.length && !cityUserInput?.length) {
+      // trigger search for state and reset all values
+    }
+
+    if (nameUserInput?.length) {
+      // trigger search for name and reset all values
+    }
+
+    console.log(data);
+    //const { zipcode, cityValue, stateValue, name } = data;
     // TODO: either trigger search or filter data set??
   };
 
@@ -366,6 +381,7 @@ export const PlacesDisplayComponent: React.FC = () => {
           stateUserInput={stateUserInput}
           onStateUserInputChange={onStateUserInputChange}
           errorStateUserInput={errorStateUserInput}
+          onSearch={onSearch}
         />
       </Grid.Col>
       <Grid.Col md={6} lg={6}>

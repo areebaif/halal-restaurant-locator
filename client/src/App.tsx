@@ -1,7 +1,6 @@
 import * as React from "react";
 import { QueryClient, QueryClientProvider, useQuery } from "react-query";
 import { HeaderAction, HeaderActionProps } from "./components/header";
-import { HeroBullets } from "./components/hero-header";
 import { Routes, Route } from "react-router-dom";
 import { Layout } from "./components/Layout";
 import { config } from "dotenv";

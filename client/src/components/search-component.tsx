@@ -32,6 +32,7 @@ export interface AutoCompleteInputProps {
   stateUserInput: string;
   onStateUserInputChange: (value: string) => void;
   errorStateUserInput: boolean;
+  onSearch: (data: any) => void;
 }
 
 export const AutoCompleteInput: React.FC<AutoCompleteInputProps> = ({
@@ -44,6 +45,7 @@ export const AutoCompleteInput: React.FC<AutoCompleteInputProps> = ({
   stateUserInput,
   onStateUserInputChange,
   errorStateUserInput,
+  onSearch,
 }) => {
   const [stateData, setStateData] = React.useState<string[]>();
   const [cityData, setCityData] = React.useState<string[]>();
@@ -96,6 +98,12 @@ export const AutoCompleteInput: React.FC<AutoCompleteInputProps> = ({
     // The only thing we need to check for is white spaces and capslock every first letter
     const trimmedCity = cityUserInput.trim();
     const trimmedState = stateUserInput.trim();
+    onSearch({
+      zipcodeUserInput: zipcodeUserInput,
+      cityUserInput: trimmedCity,
+      stateUserInput: trimmedState,
+      nameUserInput: null,
+    });
 
     // TODO: set trigger search to true, reset the value
   };
@@ -115,6 +123,7 @@ export const AutoCompleteInput: React.FC<AutoCompleteInputProps> = ({
           placeholder="Start typing"
           value={zipcodeUserInput}
           limit={7}
+          disabled={Boolean(cityUserInput.length || stateUserInput.length)}
           onChange={onZipcodeUserInputChange}
           data={zipData ? zipData : []}
         />
@@ -134,6 +143,7 @@ export const AutoCompleteInput: React.FC<AutoCompleteInputProps> = ({
           placeholder="start typing"
           value={cityUserInput}
           limit={7}
+          disabled={Boolean(zipcodeUserInput.length)}
           onChange={onCityUserInputChange}
           data={cityData ? cityData : []}
         />
@@ -162,6 +172,7 @@ export const AutoCompleteInput: React.FC<AutoCompleteInputProps> = ({
           placeholder="start typing"
           value={stateUserInput}
           limit={7}
+          disabled={Boolean(zipcodeUserInput.length)}
           onChange={onStateUserInputChange}
           data={stateData ? stateData : []}
           required={cityUserInput.length > 0}
