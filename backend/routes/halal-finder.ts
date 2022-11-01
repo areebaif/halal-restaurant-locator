@@ -66,4 +66,114 @@ router.get(
   }
 );
 
+// TODO:
+// backend api for zipcode, state, city and state or name
+router.get(
+  "/api/dev/zipcode",
+  async (req: Request, res: Response, next: NextFunction) => {
+    try {
+      // const citySet: Set<string> = new Set();
+      // const stateSet: Set<string> = new Set();
+      // const allRawData: {
+      //   features: locationDocument[];
+      //   type: "FeatureCollection";
+      // } = JSON.parse(JSON.stringify(rawLocations));
+      // Sending zipSet with coordinates so that map can jump to those coordinates
+      // const zipSet = allRawData.features.map((item) => {
+      //   const properties = item.properties;
+      //   citySet.add(properties.city);
+      //   stateSet.add(properties.state);
+      //   return {
+      //     ...item,
+      //     city_state: `${properties.city}, ${properties.state}`,
+      //   };
+      // });
+      // const arrayCitySet = Array.from(citySet);
+      // const arrayStateSet = Array.from(stateSet);
+      // res.header("Content-Type", "application/json");
+      // res.status(200).send({
+      //   data: {
+      //     citySet: arrayCitySet,
+      //     stateSet: arrayStateSet,
+      //     zipSet: zipSet,
+      //   },
+      //});
+    } catch (err) {
+      console.log(err);
+    }
+  }
+);
+
+router.get(
+  "/api/dev/state",
+  async (req: Request, res: Response, next: NextFunction) => {
+    try {
+      // const citySet: Set<string> = new Set();
+      // const stateSet: Set<string> = new Set();
+      // const allRawData: {
+      //   features: locationDocument[];
+      //   type: "FeatureCollection";
+      // } = JSON.parse(JSON.stringify(rawLocations));
+      // Sending zipSet with coordinates so that map can jump to those coordinates
+      // const zipSet = allRawData.features.map((item) => {
+      //   const properties = item.properties;
+      //   citySet.add(properties.city);
+      //   stateSet.add(properties.state);
+      //   return {
+      //     ...item,
+      //     city_state: `${properties.city}, ${properties.state}`,
+      //   };
+      // });
+      // const arrayCitySet = Array.from(citySet);
+      // const arrayStateSet = Array.from(stateSet);
+      // res.header("Content-Type", "application/json");
+      // res.status(200).send({
+      //   data: {
+      //     citySet: arrayCitySet,
+      //     stateSet: arrayStateSet,
+      //     zipSet: zipSet,
+      //   },
+      //});
+    } catch (err) {
+      console.log(err);
+    }
+  }
+);
+
+router.get(
+  "/api/dev/city-state",
+  async (req: Request, res: Response, next: NextFunction) => {
+    try {
+      // const citySet: Set<string> = new Set();
+      // const stateSet: Set<string> = new Set();
+      // const allRawData: {
+      //   features: locationDocument[];
+      //   type: "FeatureCollection";
+      // } = JSON.parse(JSON.stringify(rawLocations));
+      // Sending zipSet with coordinates so that map can jump to those coordinates
+      // const zipSet = allRawData.features.map((item) => {
+      //   const properties = item.properties;
+      //   citySet.add(properties.city);
+      //   stateSet.add(properties.state);
+      //   return {
+      //     ...item,
+      //     city_state: `${properties.city}, ${properties.state}`,
+      //   };
+      // });
+      // const arrayCitySet = Array.from(citySet);
+      // const arrayStateSet = Array.from(stateSet);
+      // res.header("Content-Type", "application/json");
+      // res.status(200).send({
+      //   data: {
+      //     citySet: arrayCitySet,
+      //     stateSet: arrayStateSet,
+      //     zipSet: zipSet,
+      //   },
+      //});
+    } catch (err) {
+      console.log(err);
+    }
+  }
+);
+
 export { router as halalFinderRouter };
