@@ -14,7 +14,9 @@ interface locationDocument {
   geometry: { coordinates: [number, number]; type: "Point" };
 }
 const router = express.Router();
-// api-documentation
+
+// TODO: api-documentation
+// TODO: error handling
 router.get(
   "/api/dev/data",
   async (req: Request, res: Response, next: NextFunction) => {
@@ -72,6 +74,21 @@ router.get(
   "/api/dev/zipcode",
   async (req: Request, res: Response, next: NextFunction) => {
     try {
+      const zipCode: string = req.body;
+      const allRawData: {
+        features: locationDocument[];
+        type: "FeatureCollection";
+      } = JSON.parse(JSON.stringify(rawLocations));
+
+      const zipSet = allRawData.features.map((item) => {
+        const properties = item.properties;
+
+        return {
+          ...item,
+          city_state: `${properties.city}, ${properties.state}`,
+        };
+      });
+
       // const citySet: Set<string> = new Set();
       // const stateSet: Set<string> = new Set();
       // const allRawData: {
