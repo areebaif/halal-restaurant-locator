@@ -74,6 +74,7 @@ router.get(
   "/api/dev/zipcode",
   async (req: Request, res: Response, next: NextFunction) => {
     try {
+      console.log("body", req.body);
       const zipCode: string = req.body;
       const allRawData: {
         features: locationDocument[];
@@ -82,39 +83,17 @@ router.get(
 
       const zipSet = allRawData.features.map((item) => {
         const properties = item.properties;
-
-        return {
-          ...item,
-          city_state: `${properties.city}, ${properties.state}`,
-        };
+        if (properties.zip === zipCode) {
+          return {
+            ...item,
+            city_state: `${properties.city}, ${properties.state}`,
+          };
+        }
       });
 
-      // const citySet: Set<string> = new Set();
-      // const stateSet: Set<string> = new Set();
-      // const allRawData: {
-      //   features: locationDocument[];
-      //   type: "FeatureCollection";
-      // } = JSON.parse(JSON.stringify(rawLocations));
-      // Sending zipSet with coordinates so that map can jump to those coordinates
-      // const zipSet = allRawData.features.map((item) => {
-      //   const properties = item.properties;
-      //   citySet.add(properties.city);
-      //   stateSet.add(properties.state);
-      //   return {
-      //     ...item,
-      //     city_state: `${properties.city}, ${properties.state}`,
-      //   };
-      // });
-      // const arrayCitySet = Array.from(citySet);
-      // const arrayStateSet = Array.from(stateSet);
-      // res.header("Content-Type", "application/json");
-      // res.status(200).send({
-      //   data: {
-      //     citySet: arrayCitySet,
-      //     stateSet: arrayStateSet,
-      //     zipSet: zipSet,
-      //   },
-      //});
+      res.status(200).send({
+        data: zipSet,
+      });
     } catch (err) {
       console.log(err);
     }

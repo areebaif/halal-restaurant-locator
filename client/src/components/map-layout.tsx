@@ -4,6 +4,7 @@ import { useQuery } from "react-query";
 import { MapContainer } from "./map-container";
 import { ListContainer } from "./result-list";
 import { AutoCompleteInput } from "./search-component";
+import { fetchZipSearch } from "../backendFunctions";
 
 // https://simplemaps.com/data/us-zips this need to be added to usa zipcode data
 // This is for setting filter
@@ -182,6 +183,7 @@ export interface activeMarkerProps {
 }
 
 export const PlacesDisplayComponent: React.FC = () => {
+  // Map Variables
   const mapRef = React.useRef<any>();
   const [mapData, setMapData] =
     React.useState<
@@ -203,6 +205,8 @@ export const PlacesDisplayComponent: React.FC = () => {
       description: "",
       index: undefined,
     });
+
+  // UserInput Variables
   const [zipcodeUserInput, setZipcodeUserInput] = React.useState("");
   const [errorZipcodeUserInput, setErrorZipcodeUserInput] =
     React.useState(false);
@@ -210,6 +214,8 @@ export const PlacesDisplayComponent: React.FC = () => {
   const [errorCityUserInput, setErrorCityUserInput] = React.useState(false);
   const [stateUserInput, setStateUserInput] = React.useState("");
   const [errorStateUserInput, setErrorStateUserInput] = React.useState(false);
+
+  // TODO: not sure if i need this
   const [searchTerm, setSearchTerm] = React.useState<SearchTerms>({
     zipcodeUserInput: null,
     cityUserInput: null,
@@ -217,7 +223,10 @@ export const PlacesDisplayComponent: React.FC = () => {
     nameUserInput: null,
   });
 
-  // Fetching Data
+  const [callZipBackendApi, setZipCallBackendApi] = React.useState(false);
+
+  //TODO: extract out data fetching functions put them in a separate file
+  // Data fetching
   const URL = "/api/dev/data";
   const { isLoading, isError, data, error } = useQuery(
     "getAllLocations",
@@ -248,6 +257,40 @@ export const PlacesDisplayComponent: React.FC = () => {
           features: filteredValues?.length ? filteredValues : [],
         };
         setMapData(mapLocations);
+      },
+    }
+  );
+
+  if (isLoading) {
+    return <span>Loading...</span>;
+  }
+
+  if (isError) {
+    return <span>Error: error occured</span>;
+  }
+
+  const { isLoading, isError, data, error } = useQuery(
+    ["getZipCodeLocations", zipcodeUserInput],
+    () => fetchZipSearch(zipcodeUserInput),
+    {
+      enabled: callZipBackendApi,
+      onSuccess: (data) => {
+        console.log("data", data);
+        setZipCallBackendApi(false);
+        // // TODO: fix this that only search term is sent depending on what the search term is
+        // // do some data manuplulation to only set Chicago Data. There are too many data points
+        // const filteredValues = data?.features?.filter((item: any) => {
+        //   return item.properties.city === "Chicago";
+        // });
+
+        // const mapLocations: GeoJSON.FeatureCollection<
+        //   GeoJSON.Geometry,
+        //   PropertiesProps
+        // > = {
+        //   type: "FeatureCollection",
+        //   features: filteredValues?.length ? filteredValues : [],
+        // };
+        // setMapData(mapLocations);
       },
     }
   );
@@ -338,10 +381,15 @@ export const PlacesDisplayComponent: React.FC = () => {
   };
 
   const onSearch = (data: SearchTerms) => {
+    // we are using input give to this function as that input has been sanitized(whiote spaces removed etc)
+
+    // ideally this function should not be doing 2 things, but we will set it to true so that react query can trigger
+
     // You will either have zipcode, or state or city and state
     const { zipcodeUserInput, cityUserInput, stateUserInput, nameUserInput } =
       data;
     if (zipcodeUserInput?.length) {
+      setZipCallBackendApi(true);
       // trigger search for zipcode and reset all values
     }
 
@@ -358,8 +406,6 @@ export const PlacesDisplayComponent: React.FC = () => {
     }
 
     console.log(data);
-    //const { zipcode, cityValue, stateValue, name } = data;
-    // TODO: either trigger search or filter data set??
   };
 
   const onSeacrhQuery = (
