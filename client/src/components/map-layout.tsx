@@ -189,6 +189,7 @@ export const PlacesDisplayComponent: React.FC = () => {
     React.useState<
       GeoJSON.FeatureCollection<GeoJSON.Geometry, PropertiesProps>
     >();
+  const [refreshMapData, setRefreshMapData] = React.useState(false);
   const [activePlace, setActivePlace] = React.useState<activeMarkerProps>({
     latitude: 0,
     longitude: 0,
@@ -284,6 +285,7 @@ export const PlacesDisplayComponent: React.FC = () => {
         };
         console.log(mapLocations);
         setMapData(mapLocations);
+        setRefreshMapData(true);
       },
     }
   );
@@ -373,6 +375,10 @@ export const PlacesDisplayComponent: React.FC = () => {
     });
   };
 
+  const refreshDataMap = () => {
+    setRefreshMapData(false);
+  };
+
   const onSearch = (data: SearchTerms) => {
     // we are using input give to this function as that input has been sanitized(whiote spaces removed etc)
 
@@ -446,6 +452,8 @@ export const PlacesDisplayComponent: React.FC = () => {
           activePlace={activePlace}
           setActivePlaceData={setActivePlaceData}
           onLocationInfoOpenCard={onLocationInfoOpenCard}
+          RefreshMapData={refreshMapData}
+          setRefreshMapData={refreshDataMap}
           //onSearch={onSeacrhQuery}
         />
       </Grid.Col>

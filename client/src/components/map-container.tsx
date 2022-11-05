@@ -28,6 +28,10 @@ export type MapProps = {
   onLocationInfoCloseCard?: () => void;
   locationInfoCardData?: activeMarkerProps;
 
+  //
+  RefreshMapData?: boolean;
+  setRefreshMapData?: () => void;
+
   // Data for when user triggers search
   // onSearch?: (
   //   data: GeoJSON.FeatureCollection<GeoJSON.Geometry, PropertiesProps>
@@ -42,13 +46,44 @@ export const MapContainer: React.FC<MapProps> = ({
   layerId,
   onLocationInfoOpenCard,
   setActivePlaceData,
+  RefreshMapData,
+  setRefreshMapData,
 }) => {
+  //TODO: Latitude, Longitude and Zoom will come from top component
   const [displayPopup, setDisplayPopup] = React.useState(false);
   const [viewState, setViewState] = React.useState({
     latitude: 41.45,
     longitude: -88.53,
     zoom: 7.2,
   });
+
+  React.useEffect(() => {
+    if (RefreshMapData) {
+      const geoJsonSource = mapRef.current.getSource(dataSourceId);
+      //  setData on mapsource: It does not update even if you tell react to update, we have to use map inbuilt methods to update mapdata to limit map renders, inistialising  for billing
+      geoJsonSource.setData(dataSource);
+      const coordinatesObject = dataSource.features[0]
+        .geometry as GeoJSON.Point;
+      const coordinates = coordinatesObject.coordinates;
+      const longitude = coordinates[0];
+      const latitude = coordinates[1];
+
+      // const viewState = {
+      //   latitude: longitude,
+      //   longitude: latitude,
+      //   zoom: 7.2,
+      // };
+      console.log(" I am coordinates", coordinates);
+      setViewState({ latitude: latitude, longitude: longitude, zoom: 5 });
+      mapRef.current.flyTo({
+        centre: { lng: longitude, lat: latitude },
+        zoom: 5,
+      });
+      setRefreshMapData?.();
+      console.log("I am centre", mapRef.current.getCenter());
+    }
+  }, [RefreshMapData]);
+
   // Style layer for circle marker
   // const layerStyle: { id: string; type: string; paint: CirclePaint } = {
   //   id: "point",
@@ -114,12 +149,6 @@ export const MapContainer: React.FC<MapProps> = ({
     ) {
       onLocationInfoOpenCard?.(activePlace);
     }
-
-    // SetData in react hook
-    // onSearch?.(testData);
-    // const geoJsonSource = mapRef.current.getSource(dataSourceId);
-    // // setData on mapsource: It does not update even if you tell react to update, we have to use map inbuilt methods to update mapdata to limit map renders, inistialising  for billing
-    // geoJsonSource.setData(testData);
   };
 
   const onMouseLeavePopup = () => {
