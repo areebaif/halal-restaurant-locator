@@ -1,19 +1,22 @@
 import { PropertiesProps } from "./components/map-layout";
 const zipURL = "/api/dev/zipcode";
+
 export const fetchZipSearch = async (zipcodeUserInput: string) => {
-  const response = await fetch(zipURL, {
+  const response = await fetch(`/api/dev/${zipcodeUserInput}`, {
     method: "GET",
     headers: {
       "Content-Type": "application/json",
     },
-    body: JSON.stringify(zipcodeUserInput),
   });
 
   if (!response.ok) {
     throw new Error("Network response was not ok");
   }
   const data: {
-    data: GeoJSON.FeatureCollection<GeoJSON.Geometry, PropertiesProps>;
+    data: GeoJSON.FeatureCollection<
+      GeoJSON.Geometry,
+      PropertiesProps
+    >["features"];
   } = await response.json();
   return data.data;
 };

@@ -261,15 +261,7 @@ export const PlacesDisplayComponent: React.FC = () => {
     }
   );
 
-  if (isLoading) {
-    return <span>Loading...</span>;
-  }
-
-  if (isError) {
-    return <span>Error: error occured</span>;
-  }
-
-  const { isLoading, isError, data, error } = useQuery(
+  const zipCodeSearch = useQuery(
     ["getZipCodeLocations", zipcodeUserInput],
     () => fetchZipSearch(zipcodeUserInput),
     {
@@ -283,14 +275,15 @@ export const PlacesDisplayComponent: React.FC = () => {
         //   return item.properties.city === "Chicago";
         // });
 
-        // const mapLocations: GeoJSON.FeatureCollection<
-        //   GeoJSON.Geometry,
-        //   PropertiesProps
-        // > = {
-        //   type: "FeatureCollection",
-        //   features: filteredValues?.length ? filteredValues : [],
-        // };
-        // setMapData(mapLocations);
+        const mapLocations: GeoJSON.FeatureCollection<
+          GeoJSON.Geometry,
+          PropertiesProps
+        > = {
+          type: "FeatureCollection",
+          features: data.length ? data : [],
+        };
+        console.log(mapLocations);
+        setMapData(mapLocations);
       },
     }
   );
@@ -299,7 +292,7 @@ export const PlacesDisplayComponent: React.FC = () => {
     return <span>Loading...</span>;
   }
 
-  if (isError) {
+  if (isError || zipCodeSearch.isError) {
     return <span>Error: error occured</span>;
   }
 
@@ -383,12 +376,12 @@ export const PlacesDisplayComponent: React.FC = () => {
   const onSearch = (data: SearchTerms) => {
     // we are using input give to this function as that input has been sanitized(whiote spaces removed etc)
 
-    // ideally this function should not be doing 2 things, but we will set it to true so that react query can trigger
-
     // You will either have zipcode, or state or city and state
     const { zipcodeUserInput, cityUserInput, stateUserInput, nameUserInput } =
       data;
     if (zipcodeUserInput?.length) {
+      // we are sanitised value as input
+      setZipcodeUserInput(zipcodeUserInput);
       setZipCallBackendApi(true);
       // trigger search for zipcode and reset all values
     }
@@ -408,11 +401,11 @@ export const PlacesDisplayComponent: React.FC = () => {
     console.log(data);
   };
 
-  const onSeacrhQuery = (
-    data: GeoJSON.FeatureCollection<GeoJSON.Geometry, any>
-  ) => {
-    setMapData(data);
-  };
+  // const onSeacrhQuery = (
+  //   data: GeoJSON.FeatureCollection<GeoJSON.Geometry, any>
+  // ) => {
+  //   setMapData(data);
+  // };
 
   return mapData ? (
     <Grid>
@@ -453,7 +446,7 @@ export const PlacesDisplayComponent: React.FC = () => {
           activePlace={activePlace}
           setActivePlaceData={setActivePlaceData}
           onLocationInfoOpenCard={onLocationInfoOpenCard}
-          onSearch={onSeacrhQuery}
+          //onSearch={onSeacrhQuery}
         />
       </Grid.Col>
     </Grid>

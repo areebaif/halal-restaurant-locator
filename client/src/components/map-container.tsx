@@ -29,9 +29,9 @@ export type MapProps = {
   locationInfoCardData?: activeMarkerProps;
 
   // Data for when user triggers search
-  onSearch?: (
-    data: GeoJSON.FeatureCollection<GeoJSON.Geometry, PropertiesProps>
-  ) => void;
+  // onSearch?: (
+  //   data: GeoJSON.FeatureCollection<GeoJSON.Geometry, PropertiesProps>
+  // ) => void;
 };
 
 export const MapContainer: React.FC<MapProps> = ({
@@ -104,6 +104,9 @@ export const MapContainer: React.FC<MapProps> = ({
   };
   // TODO: searching and filtering will update result instead of onclick handler
   // Right now this works with onClick
+
+  // TODO: try using useEffect to update map markers
+  // You need a flag like refreshMapData which will tell use effect to render component.
   const onClick = (e: any) => {
     if (
       typeof activePlace.index === "number" ||

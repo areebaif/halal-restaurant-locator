@@ -71,19 +71,20 @@ router.get(
 // TODO:
 // backend api for zipcode, state, city and state or name
 router.get(
-  "/api/dev/zipcode",
+  "/api/dev/:zipcode",
   async (req: Request, res: Response, next: NextFunction) => {
     try {
-      console.log("body", req.body);
-      const zipCode: string = req.body;
+      const { zipcode } = req.params;
+      console.log(zipcode, req.params);
+      //const zipCode: string = req.body;
       const allRawData: {
         features: locationDocument[];
         type: "FeatureCollection";
       } = JSON.parse(JSON.stringify(rawLocations));
 
-      const zipSet = allRawData.features.map((item) => {
+      const zipSet = allRawData.features.filter((item) => {
         const properties = item.properties;
-        if (properties.zip === zipCode) {
+        if (properties.zip === zipcode) {
           return {
             ...item,
             city_state: `${properties.city}, ${properties.state}`,
