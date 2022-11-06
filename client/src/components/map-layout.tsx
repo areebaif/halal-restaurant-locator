@@ -19,6 +19,12 @@ export interface PropertiesProps {
   zip: string;
 }
 
+export interface CameraViewState {
+  latitude: number;
+  longitude: number;
+  zoom?: number;
+}
+
 // Mapbox needs a string as data source Id, layerId
 const dataSourceId = "some id";
 const layerId = "points";
@@ -183,13 +189,16 @@ export interface activeMarkerProps {
 }
 
 export const PlacesDisplayComponent: React.FC = () => {
-  // Map Variables
+  // Map Props
   const mapRef = React.useRef<any>();
   const [mapData, setMapData] =
     React.useState<
       GeoJSON.FeatureCollection<GeoJSON.Geometry, PropertiesProps>
     >();
+  const [cameraViewState, setCameraViewState] =
+    React.useState<CameraViewState>();
   const [refreshMapData, setRefreshMapData] = React.useState(false);
+  // Map Marker Information Props
   const [activePlace, setActivePlace] = React.useState<activeMarkerProps>({
     latitude: 0,
     longitude: 0,
@@ -206,8 +215,7 @@ export const PlacesDisplayComponent: React.FC = () => {
       description: "",
       index: undefined,
     });
-
-  // UserInput Variables
+  // User Input Props
   const [zipcodeUserInput, setZipcodeUserInput] = React.useState("");
   const [errorZipcodeUserInput, setErrorZipcodeUserInput] =
     React.useState(false);
@@ -223,7 +231,7 @@ export const PlacesDisplayComponent: React.FC = () => {
     stateUserInput: null,
     nameUserInput: null,
   });
-
+  // Backend Api Props
   const [callZipBackendApi, setZipCallBackendApi] = React.useState(false);
 
   //TODO: extract out data fetching functions put them in a separate file
@@ -245,6 +253,8 @@ export const PlacesDisplayComponent: React.FC = () => {
     {
       onSuccess: (data) => {
         // TODO: fix this that only search term is sent depending on what the search term is
+        // TODO: You have to also set camera angle depending on what the user has searched, right now we are hardcoding
+        setCameraViewState({ latitude: 41.45, longitude: -88.53, zoom: 7.2 });
         // do some data manuplulation to only set Chicago Data. There are too many data points
         const filteredValues = data?.features?.filter((item: any) => {
           return item.properties.city === "Chicago";
@@ -261,7 +271,7 @@ export const PlacesDisplayComponent: React.FC = () => {
       },
     }
   );
-
+  console.log("lol", cameraViewState);
   const zipCodeSearch = useQuery(
     ["getZipCodeLocations", zipcodeUserInput],
     () => fetchZipSearch(zipcodeUserInput),
@@ -283,7 +293,6 @@ export const PlacesDisplayComponent: React.FC = () => {
           type: "FeatureCollection",
           features: data.length ? data : [],
         };
-        console.log(mapLocations);
         setMapData(mapLocations);
         setRefreshMapData(true);
       },
@@ -297,6 +306,10 @@ export const PlacesDisplayComponent: React.FC = () => {
   if (isError || zipCodeSearch.isError) {
     return <span>Error: error occured</span>;
   }
+
+  const onCameraViewStateChange = (data: CameraViewState) => {
+    setCameraViewState(data);
+  };
 
   const onStateUserInputChange = (value: string) => {
     // Check for special characters including numbers
@@ -454,6 +467,8 @@ export const PlacesDisplayComponent: React.FC = () => {
           onLocationInfoOpenCard={onLocationInfoOpenCard}
           RefreshMapData={refreshMapData}
           setRefreshMapData={refreshDataMap}
+          cameraViewState={cameraViewState}
+          onViewStateChange={onCameraViewStateChange}
           //onSearch={onSeacrhQuery}
         />
       </Grid.Col>

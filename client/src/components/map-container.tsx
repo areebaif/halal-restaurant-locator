@@ -4,7 +4,11 @@ import { Text, Box } from "@mantine/core";
 import Map, { Source, Layer, Popup, MapLayerMouseEvent } from "react-map-gl";
 
 import redMarker from "./red-marker.png";
-import { activeMarkerProps, PropertiesProps } from "./map-layout";
+import {
+  activeMarkerProps,
+  PropertiesProps,
+  CameraViewState,
+} from "./map-layout";
 
 // We need this varibale to sync map id data with react and its local to this file
 
@@ -17,8 +21,8 @@ export type MapProps = {
   dataSourceId: string;
   mapRef?: any;
   layerId: string;
-  latitude?: number;
-  longitude?: number;
+  cameraViewState?: CameraViewState;
+  onViewStateChange?: (data: CameraViewState) => void;
 
   // props related to active location on map
   activePlace: activeMarkerProps;
@@ -50,14 +54,10 @@ export const MapContainer: React.FC<MapProps> = ({
   setActivePlaceData,
   RefreshMapData,
   setRefreshMapData,
+  cameraViewState,
+  onViewStateChange,
 }) => {
-  //TODO: Latitude, Longitude and Zoom will come from top component
   const [displayPopup, setDisplayPopup] = React.useState(false);
-  const [viewState, setViewState] = React.useState({
-    latitude: 41.45,
-    longitude: -88.53,
-    zoom: 7.2,
-  });
 
   React.useEffect(() => {
     if (RefreshMapData) {
@@ -69,20 +69,13 @@ export const MapContainer: React.FC<MapProps> = ({
       const coordinates = coordinatesObject.coordinates;
       const longitude = coordinates[0];
       const latitude = coordinates[1];
-
-      // const viewState = {
-      //   latitude: longitude,
-      //   longitude: latitude,
-      //   zoom: 7.2,
-      // };
-      console.log(" I am coordinates", coordinates);
-      setViewState({ latitude: latitude, longitude: longitude, zoom: 5 });
-      mapRef.current.flyTo({
-        centre: { lng: longitude, lat: latitude },
-        zoom: 5,
-      });
+      console.log("limit", mapRef.current.setCenter([longitude, latitude]));
       setRefreshMapData?.();
-      console.log("I am centre", mapRef.current.getCenter());
+      onViewStateChange?.({
+        latitude: latitude,
+        longitude: longitude,
+      });
+      console.log("zoom", mapRef.current.getZoom());
     }
   }, [RefreshMapData]);
 
@@ -139,11 +132,7 @@ export const MapContainer: React.FC<MapProps> = ({
       );
     }
   };
-  // TODO: searching and filtering will update result instead of onclick handler
-  // Right now this works with onClick
 
-  // TODO: try using useEffect to update map markers
-  // You need a flag like refreshMapData which will tell use effect to render component.
   const onClick = (e: any) => {
     if (
       typeof activePlace.index === "number" ||
@@ -190,8 +179,8 @@ export const MapContainer: React.FC<MapProps> = ({
     <Map
       reuseMaps={true}
       ref={mapRef}
-      {...viewState}
-      onMove={(evt) => setViewState(evt.viewState)}
+      initialViewState={cameraViewState}
+      onMove={(evt) => onViewStateChange?.(evt.viewState)}
       style={{ width: "100%", maxHeight: 600, minHeight: 600, height: 600 }}
       mapStyle="mapbox://styles/mapbox/streets-v9"
       mapboxAccessToken={process.env.REACT_APP_MAPBOX_ACCESS}
