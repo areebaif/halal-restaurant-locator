@@ -17,6 +17,8 @@ export type MapProps = {
   dataSourceId: string;
   mapRef?: any;
   layerId: string;
+  latitude?: number;
+  longitude?: number;
 
   // props related to active location on map
   activePlace: activeMarkerProps;

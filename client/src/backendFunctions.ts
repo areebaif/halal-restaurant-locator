@@ -1,5 +1,4 @@
 import { PropertiesProps } from "./components/map-layout";
-const zipURL = "/api/dev/zipcode";
 
 export const fetchZipSearch = async (zipcodeUserInput: string) => {
   const response = await fetch(`/api/dev/${zipcodeUserInput}`, {
