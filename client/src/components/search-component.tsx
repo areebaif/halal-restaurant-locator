@@ -52,44 +52,44 @@ export const AutoCompleteInput: React.FC<AutoCompleteInputProps> = ({
   // we are using zipData to populate mantine autocomplete component.This component has typing defined as AutoCompleteItem
   const [zipData, setZipData] = React.useState<AutocompleteItem[]>();
 
-  // const URL = "/api/dev/getGeography";
-  // const { isLoading, isError, data, error } = useQuery(
-  //   "getGeography",
-  //   async () => {
-  //     const response = await fetch(URL);
+  const URL = "/api/dev/getGeography";
+  const geoLocationData = useQuery(
+    "getGeography",
+    async () => {
+      const response = await fetch(URL);
 
-  //     if (!response.ok) {
-  //       throw new Error("Network response was not ok");
-  //     }
-  //     const data: {
-  //       data: {
-  //         citySet: string[];
-  //         stateSet: string[];
-  //         zipSet: ZipDocument[];
-  //       };
-  //     } = await response.json();
-  //     return data.data;
-  //   },
-  //   {
-  //     onSuccess: (data) => {
-  //       setStateData(data.stateSet);
-  //       setCityData(data.citySet);
-  //       const zipFormattedData = data.zipSet.map((item: ZipDocument) => ({
-  //         ...item,
-  //         value: item.properties.zip,
-  //       }));
-  //       setZipData(zipFormattedData);
-  //     },
-  //   }
-  // );
+      if (!response.ok) {
+        throw new Error("Network response was not ok");
+      }
+      const data: {
+        data: {
+          citySet: string[];
+          stateSet: string[];
+          zipSet: ZipDocument[];
+        };
+      } = await response.json();
+      return data.data;
+    },
+    {
+      onSuccess: (data) => {
+        setStateData(data.stateSet);
+        setCityData(data.citySet);
+        const zipFormattedData = data.zipSet.map((item: ZipDocument) => ({
+          ...item,
+          value: item.properties.zip,
+        }));
+        setZipData(zipFormattedData);
+      },
+    }
+  );
 
-  // if (isLoading) {
-  //   return <span>Loading...</span>;
-  // }
+  if (geoLocationData.isLoading) {
+    return <span>Loading...</span>;
+  }
 
-  // if (isError) {
-  //   return <span>Error: error occured</span>;
-  // }
+  if (geoLocationData.isError) {
+    return <span>Error: error occured</span>;
+  }
 
   const onSubmit = (event: React.MouseEvent<HTMLButtonElement>) => {
     // TODO: set Search term for either zipcode, state, or citystate or all
