@@ -68,8 +68,6 @@ router.get(
   }
 );
 
-// TODO:
-// backend api for zipcode, state, city and state or name
 router.get(
   "/api/dev/:zipcode",
   async (req: Request, res: Response, next: NextFunction) => {
@@ -102,35 +100,30 @@ router.get(
 );
 
 router.get(
-  "/api/dev/state",
+  "/api/dev/:state",
   async (req: Request, res: Response, next: NextFunction) => {
     try {
-      // const citySet: Set<string> = new Set();
-      // const stateSet: Set<string> = new Set();
-      // const allRawData: {
-      //   features: locationDocument[];
-      //   type: "FeatureCollection";
-      // } = JSON.parse(JSON.stringify(rawLocations));
-      // Sending zipSet with coordinates so that map can jump to those coordinates
-      // const zipSet = allRawData.features.map((item) => {
-      //   const properties = item.properties;
-      //   citySet.add(properties.city);
-      //   stateSet.add(properties.state);
-      //   return {
-      //     ...item,
-      //     city_state: `${properties.city}, ${properties.state}`,
-      //   };
-      // });
-      // const arrayCitySet = Array.from(citySet);
-      // const arrayStateSet = Array.from(stateSet);
-      // res.header("Content-Type", "application/json");
-      // res.status(200).send({
-      //   data: {
-      //     citySet: arrayCitySet,
-      //     stateSet: arrayStateSet,
-      //     zipSet: zipSet,
-      //   },
-      //});
+      const { state } = req.params;
+      console.log(state, req.params);
+      //const zipCode: string = req.body;
+      const allRawData: {
+        features: locationDocument[];
+        type: "FeatureCollection";
+      } = JSON.parse(JSON.stringify(rawLocations));
+
+      const stateSet = allRawData.features.filter((item) => {
+        const properties = item.properties;
+        if (properties.state === state) {
+          return {
+            ...item,
+            city_state: `${properties.city}, ${properties.state}`,
+          };
+        }
+      });
+
+      res.status(200).send({
+        data: stateSet,
+      });
     } catch (err) {
       console.log(err);
     }
@@ -138,35 +131,61 @@ router.get(
 );
 
 router.get(
-  "/api/dev/city-state",
+  "/api/dev/:state/:city",
   async (req: Request, res: Response, next: NextFunction) => {
     try {
-      // const citySet: Set<string> = new Set();
-      // const stateSet: Set<string> = new Set();
-      // const allRawData: {
-      //   features: locationDocument[];
-      //   type: "FeatureCollection";
-      // } = JSON.parse(JSON.stringify(rawLocations));
-      // Sending zipSet with coordinates so that map can jump to those coordinates
-      // const zipSet = allRawData.features.map((item) => {
-      //   const properties = item.properties;
-      //   citySet.add(properties.city);
-      //   stateSet.add(properties.state);
-      //   return {
-      //     ...item,
-      //     city_state: `${properties.city}, ${properties.state}`,
-      //   };
-      // });
-      // const arrayCitySet = Array.from(citySet);
-      // const arrayStateSet = Array.from(stateSet);
-      // res.header("Content-Type", "application/json");
-      // res.status(200).send({
-      //   data: {
-      //     citySet: arrayCitySet,
-      //     stateSet: arrayStateSet,
-      //     zipSet: zipSet,
-      //   },
-      //});
+      const { city, state } = req.params;
+      console.log(city, state, req.params);
+      //const zipCode: string = req.body;
+      const allRawData: {
+        features: locationDocument[];
+        type: "FeatureCollection";
+      } = JSON.parse(JSON.stringify(rawLocations));
+
+      const cityState = allRawData.features.filter((item) => {
+        const properties = item.properties;
+        if (properties.state === state && properties.city === city) {
+          return {
+            ...item,
+            city_state: `${properties.city}, ${properties.state}`,
+          };
+        }
+      });
+
+      res.status(200).send({
+        data: cityState,
+      });
+    } catch (err) {
+      console.log(err);
+    }
+  }
+);
+
+router.get(
+  "/api/dev/:restaurantname",
+  async (req: Request, res: Response, next: NextFunction) => {
+    try {
+      const { restaurantname } = req.params;
+      console.log(restaurantname, req.params);
+      //const zipCode: string = req.body;
+      const allRawData: {
+        features: locationDocument[];
+        type: "FeatureCollection";
+      } = JSON.parse(JSON.stringify(rawLocations));
+
+      const titleSet = allRawData.features.filter((item) => {
+        const properties = item.properties;
+        if (properties.title === restaurantname) {
+          return {
+            ...item,
+            city_state: `${properties.city}, ${properties.state}`,
+          };
+        }
+      });
+
+      res.status(200).send({
+        data: titleSet,
+      });
     } catch (err) {
       console.log(err);
     }
