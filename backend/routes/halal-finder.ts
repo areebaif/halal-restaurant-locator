@@ -73,7 +73,6 @@ router.get(
   async (req: Request, res: Response, next: NextFunction) => {
     try {
       const { zipcode } = req.params;
-      console.log(zipcode, req.params);
       //const zipCode: string = req.body;
       const allRawData: {
         features: locationDocument[];
@@ -104,7 +103,6 @@ router.get(
   async (req: Request, res: Response, next: NextFunction) => {
     try {
       const { state } = req.params;
-      console.log(state, req.params);
       //const zipCode: string = req.body;
       const allRawData: {
         features: locationDocument[];
@@ -135,7 +133,6 @@ router.get(
   async (req: Request, res: Response, next: NextFunction) => {
     try {
       const { city, state } = req.params;
-      console.log(city, state, req.params);
       //const zipCode: string = req.body;
       const allRawData: {
         features: locationDocument[];
@@ -166,7 +163,6 @@ router.get(
   async (req: Request, res: Response, next: NextFunction) => {
     try {
       const { restaurantname } = req.params;
-      console.log(restaurantname, req.params);
       //const zipCode: string = req.body;
       const allRawData: {
         features: locationDocument[];
