@@ -69,13 +69,11 @@ export const MapContainer: React.FC<MapProps> = ({
       const coordinates = coordinatesObject.coordinates;
       const longitude = coordinates[0];
       const latitude = coordinates[1];
-      console.log("limit", mapRef.current.setCenter([longitude, latitude]));
       setRefreshMapData?.();
       onViewStateChange?.({
         latitude: latitude,
         longitude: longitude,
       });
-      console.log("zoom", mapRef.current.getZoom());
     }
   }, [RefreshMapData]);
 

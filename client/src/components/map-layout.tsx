@@ -271,14 +271,12 @@ export const PlacesDisplayComponent: React.FC = () => {
       },
     }
   );
-  console.log("lol", cameraViewState);
   const zipCodeSearch = useQuery(
     ["getZipCodeLocations", zipcodeUserInput],
     () => fetchZipSearch(zipcodeUserInput),
     {
       enabled: callZipBackendApi,
       onSuccess: (data) => {
-        console.log("data", data);
         setZipCallBackendApi(false);
         // // TODO: fix this that only search term is sent depending on what the search term is
         // // do some data manuplulation to only set Chicago Data. There are too many data points
@@ -416,8 +414,6 @@ export const PlacesDisplayComponent: React.FC = () => {
     if (nameUserInput?.length) {
       // trigger search for name and reset all values
     }
-
-    console.log(data);
   };
 
   // const onSeacrhQuery = (
