@@ -3,7 +3,6 @@ import { TextInput, Button, Group, AutocompleteItem } from "@mantine/core";
 import { useQuery } from "react-query";
 import { IconSearch } from "@tabler/icons";
 import { Autocomplete } from "@mantine/core";
-import { PropertiesProps } from "./map-layout";
 
 export interface ZipDocument {
   city_state: string;

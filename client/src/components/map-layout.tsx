@@ -188,7 +188,7 @@ export interface activeMarkerProps {
   index: number | undefined | string;
 }
 
-export const PlacesDisplayComponent: React.FC = () => {
+export const SearchAndMapDisplayComponent: React.FC = () => {
   // Map Props
   const mapRef = React.useRef<any>();
   const [mapData, setMapData] =
@@ -237,7 +237,8 @@ export const PlacesDisplayComponent: React.FC = () => {
   //TODO: extract out data fetching functions put them in a separate file
   // Data fetching
   const URL = "/api/dev/data";
-  const { isLoading, isError, data, error } = useQuery(
+  // TODO: name his query and extract isLoading functions etc
+  const { isLoading, isError } = useQuery(
     "getAllLocations",
     async () => {
       const response = await fetch(URL);
