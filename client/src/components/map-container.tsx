@@ -8,7 +8,7 @@ import {
   activeMarkerProps,
   PropertiesProps,
   CameraViewState,
-} from "./map-layout";
+} from "./search-mapdisplay";
 
 // We need this varibale to sync map id data with react and its local to this file
 
