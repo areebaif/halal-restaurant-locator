@@ -39,3 +39,26 @@ export const fetchStateSearch = async (stateUserInput: string) => {
   } = await response.json();
   return data.data;
 };
+
+export const fetchStateAndCitySearch = async (
+  stateUserInput: string,
+  cityUserInput: string
+) => {
+  const response = await fetch(`/api/dev/${stateUserInput}/${cityUserInput}`, {
+    method: "GET",
+    headers: {
+      "Content-Type": "application/json",
+    },
+  });
+
+  if (!response.ok) {
+    throw new Error("Network response was not ok");
+  }
+  const data: {
+    data: GeoJSON.FeatureCollection<
+      GeoJSON.Geometry,
+      PropertiesProps
+    >["features"];
+  } = await response.json();
+  return data.data;
+};
