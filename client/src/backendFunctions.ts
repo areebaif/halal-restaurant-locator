@@ -62,3 +62,23 @@ export const fetchStateAndCitySearch = async (
   } = await response.json();
   return data.data;
 };
+
+export const fetchRestaurantNameSearch = async (name: string) => {
+  const response = await fetch(`/api/dev/${name}`, {
+    method: "GET",
+    headers: {
+      "Content-Type": "application/json",
+    },
+  });
+
+  if (!response.ok) {
+    throw new Error("Network response was not ok");
+  }
+  const data: {
+    data: GeoJSON.FeatureCollection<
+      GeoJSON.Geometry,
+      PropertiesProps
+    >["features"];
+  } = await response.json();
+  return data.data;
+};
