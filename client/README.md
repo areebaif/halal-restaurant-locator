@@ -1,12 +1,14 @@
-# Getting Started with Create React App
+# Getting Started with Client App
 
-This project was bootstrapped with [Create React App](https://github.com/facebook/create-react-app).
-
-## Onse Time Setup to Run in Development Mode:
+## One Time Setup to Run in Development Mode:
 
 Create an .env file in the root of the project and set the following environment varibale
 
 REACT_APP_MAPBOX_ACCESS={Your Map Token Value}
+
+- Run the following command to install all the dependencies in the root of the backend folder:
+
+`npm install`
 
 ## Available Scripts
 

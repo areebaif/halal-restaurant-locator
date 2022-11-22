@@ -8,7 +8,7 @@ import {
   activeMarkerProps,
   PropertiesProps,
   CameraViewState,
-} from "./map-layout";
+} from "./search-mapdisplay";
 
 // We need this varibale to sync map id data with react and its local to this file
 
@@ -69,13 +69,11 @@ export const MapContainer: React.FC<MapProps> = ({
       const coordinates = coordinatesObject.coordinates;
       const longitude = coordinates[0];
       const latitude = coordinates[1];
-      console.log("limit", mapRef.current.setCenter([longitude, latitude]));
       setRefreshMapData?.();
       onViewStateChange?.({
         latitude: latitude,
         longitude: longitude,
       });
-      console.log("zoom", mapRef.current.getZoom());
     }
   }, [RefreshMapData]);
 

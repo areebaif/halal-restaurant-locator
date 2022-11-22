@@ -188,7 +188,7 @@ export interface activeMarkerProps {
   index: number | undefined | string;
 }
 
-export const PlacesDisplayComponent: React.FC = () => {
+export const SearchAndMapDisplayComponent: React.FC = () => {
   // Map Props
   const mapRef = React.useRef<any>();
   const [mapData, setMapData] =
@@ -237,7 +237,8 @@ export const PlacesDisplayComponent: React.FC = () => {
   //TODO: extract out data fetching functions put them in a separate file
   // Data fetching
   const URL = "/api/dev/data";
-  const { isLoading, isError, data, error } = useQuery(
+  // TODO: name his query and extract isLoading functions etc
+  const { isLoading, isError } = useQuery(
     "getAllLocations",
     async () => {
       const response = await fetch(URL);
@@ -271,14 +272,12 @@ export const PlacesDisplayComponent: React.FC = () => {
       },
     }
   );
-  console.log("lol", cameraViewState);
   const zipCodeSearch = useQuery(
     ["getZipCodeLocations", zipcodeUserInput],
     () => fetchZipSearch(zipcodeUserInput),
     {
       enabled: callZipBackendApi,
       onSuccess: (data) => {
-        console.log("data", data);
         setZipCallBackendApi(false);
         // // TODO: fix this that only search term is sent depending on what the search term is
         // // do some data manuplulation to only set Chicago Data. There are too many data points
@@ -416,8 +415,6 @@ export const PlacesDisplayComponent: React.FC = () => {
     if (nameUserInput?.length) {
       // trigger search for name and reset all values
     }
-
-    console.log(data);
   };
 
   // const onSeacrhQuery = (
