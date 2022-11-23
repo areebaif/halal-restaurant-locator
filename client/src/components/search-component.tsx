@@ -3,6 +3,9 @@ import { TextInput, Button, Group, AutocompleteItem } from "@mantine/core";
 import { useQuery } from "react-query";
 import { IconSearch } from "@tabler/icons";
 import { Autocomplete } from "@mantine/core";
+import { SearchTerms } from "./search-mapdisplay";
+
+// TODO: Restaurant document interface, data modelling and hook it up to backend
 
 export interface ZipDocument {
   city_state: string;
@@ -21,6 +24,10 @@ export interface ZipDocument {
   };
 }
 
+export interface restaurantDocument {
+
+}
+
 export interface AutoCompleteInputProps {
   zipcodeUserInput: string;
   onZipcodeUserInputChange: (value: string) => void;
@@ -31,7 +38,9 @@ export interface AutoCompleteInputProps {
   stateUserInput: string;
   onStateUserInputChange: (value: string) => void;
   errorStateUserInput: boolean;
-  onSearch: (data: any) => void;
+  onSearch: (data: SearchTerms) => void;
+  restaurantNameUserInput: string;
+  onRestaurantNameUserInputChange: (value:string) => void
 }
 
 export const AutoCompleteInput: React.FC<AutoCompleteInputProps> = ({
@@ -45,12 +54,19 @@ export const AutoCompleteInput: React.FC<AutoCompleteInputProps> = ({
   onStateUserInputChange,
   errorStateUserInput,
   onSearch,
+  restaurantNameUserInput,
+  onRestaurantNameUserInputChange
 }) => {
   const [stateData, setStateData] = React.useState<string[]>();
   const [cityData, setCityData] = React.useState<string[]>();
   // we are using zipData to populate mantine autocomplete component.This component has typing defined as AutoCompleteItem
   const [zipData, setZipData] = React.useState<AutocompleteItem[]>();
+  // TODO: fix any after i know what value is being supplied 
+  const [restaurantData, setRestaurantData] = React.useState<any>()
 
+  // This function has to run regardless of any user input to populate auto-complete inputs of state, city, zipcode and restaurant
+  
+  // TODO: add name functionality to this 
   const URL = "/api/dev/getGeography";
   const geoLocationData = useQuery(
     "getGeography",
@@ -91,23 +107,32 @@ export const AutoCompleteInput: React.FC<AutoCompleteInputProps> = ({
   }
 
   const onSubmit = (event: React.MouseEvent<HTMLButtonElement>) => {
-    // TODO: set Search term for either zipcode, state, or citystate or all
     // We dont need to do type checking as submit button disables if a user enters invalid input
-    // TODO:
-    // The only thing we need to check for is white spaces and capslock every first letter
     const trimZipCode = zipcodeUserInput.trim();
     const trimmedCity = cityUserInput.trim();
     const trimmedState = stateUserInput.trim();
+    const trimmedRestaurantNameUserInput = restaurantNameUserInput.trim()
+    
     onSearch({
       zipcodeUserInput: trimZipCode,
       cityUserInput: trimmedCity,
       stateUserInput: trimmedState,
-      nameUserInput: null,
+      restaurantNameUserInput: trimmedRestaurantNameUserInput,
     });
 
     // TODO: set trigger search to true, reset the value
   };
   return (
+    <React.Fragment>
+      <Autocomplete
+          label="name"
+          placeholder="Start typing"
+          value={restaurantNameUserInput}
+          limit={7}
+          onChange={onRestaurantNameUserInputChange}
+          // TODO: fix data to show restaurant data
+          data={zipData ? zipData : []}
+        />
     <Group position="center" spacing="xl" grow={true}>
       {errorZipcodeUserInput ? (
         <Autocomplete
@@ -190,6 +215,7 @@ export const AutoCompleteInput: React.FC<AutoCompleteInputProps> = ({
         Submit
       </Button>
     </Group>
+    </React.Fragment>
   );
 };
 
@@ -217,15 +243,6 @@ export const SearchInput: React.FC = () => {
 
   return (
     <React.Fragment>
-      <TextInput
-        value={value}
-        onChange={onSearchTermChange}
-        onBlur={onBlur}
-        onKeyDown={onKeyDown}
-        icon={<IconSearch size={16} stroke={1.5} />}
-        placeholder="Search by name"
-      />
-      <Button onSubmit={onsubmit}>Submit</Button>
-    </React.Fragment>
+      </React.Fragment>
   );
 };

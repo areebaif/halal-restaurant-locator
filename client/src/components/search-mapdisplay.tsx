@@ -33,7 +33,7 @@ export interface SearchTerms {
   zipcodeUserInput: string | null;
   cityUserInput: string | null;
   stateUserInput: string | null;
-  nameUserInput?: string | null;
+  restaurantNameUserInput?: string | null;
 }
 
 // This data has london points
@@ -223,13 +223,14 @@ export const SearchAndMapDisplayComponent: React.FC = () => {
   const [errorCityUserInput, setErrorCityUserInput] = React.useState(false);
   const [stateUserInput, setStateUserInput] = React.useState("");
   const [errorStateUserInput, setErrorStateUserInput] = React.useState(false);
+  const [restaurantNameUserInput, setRestaurantNameUserInput] = React.useState("");
 
   // TODO: not sure if i need this
   const [searchTerm, setSearchTerm] = React.useState<SearchTerms>({
     zipcodeUserInput: null,
     cityUserInput: null,
     stateUserInput: null,
-    nameUserInput: null,
+    restaurantNameUserInput: null,
   });
   // Backend Api Props
   const [callZipBackendApi, setZipCallBackendApi] = React.useState(false);
@@ -237,7 +238,7 @@ export const SearchAndMapDisplayComponent: React.FC = () => {
   //TODO: extract out data fetching functions put them in a separate file
   // Data fetching
   const URL = "/api/dev/data";
-  // TODO: name his query and extract isLoading functions etc
+  // TODO: name this query and extract isLoading functions etc
   const { isLoading, isError } = useQuery(
     "getAllLocations",
     async () => {
@@ -309,6 +310,10 @@ export const SearchAndMapDisplayComponent: React.FC = () => {
   const onCameraViewStateChange = (data: CameraViewState) => {
     setCameraViewState(data);
   };
+
+  const onRestaurantNameInputChange = (value:string) => {
+    setRestaurantNameUserInput(value)
+  }
 
   const onStateUserInputChange = (value: string) => {
     // Check for special characters including numbers
@@ -395,7 +400,7 @@ export const SearchAndMapDisplayComponent: React.FC = () => {
     // we are using input give to this function as that input has been sanitized(whiote spaces removed etc)
 
     // You will either have zipcode, or state or city and state
-    const { zipcodeUserInput, cityUserInput, stateUserInput, nameUserInput } =
+    const { zipcodeUserInput, cityUserInput, stateUserInput, restaurantNameUserInput } =
       data;
     if (zipcodeUserInput?.length) {
       // we are sanitised value as input
@@ -412,16 +417,10 @@ export const SearchAndMapDisplayComponent: React.FC = () => {
       // trigger search for state and reset all values
     }
 
-    if (nameUserInput?.length) {
+    if (restaurantNameUserInput?.length) {
       // trigger search for name and reset all values
     }
   };
-
-  // const onSeacrhQuery = (
-  //   data: GeoJSON.FeatureCollection<GeoJSON.Geometry, any>
-  // ) => {
-  //   setMapData(data);
-  // };
 
   return mapData ? (
     <Grid>
@@ -437,7 +436,9 @@ export const SearchAndMapDisplayComponent: React.FC = () => {
           onStateUserInputChange={onStateUserInputChange}
           errorStateUserInput={errorStateUserInput}
           onSearch={onSearch}
-        />
+          restaurantNameUserInput={restaurantNameUserInput}
+          onRestaurantNameUserInputChange={onRestaurantNameInputChange}
+          />
       </Grid.Col>
       <Grid.Col md={6} lg={6}>
         <ListContainer
