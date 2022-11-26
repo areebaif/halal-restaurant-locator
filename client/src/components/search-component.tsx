@@ -3,7 +3,7 @@ import { TextInput, Button, Group, AutocompleteItem } from "@mantine/core";
 import { useQuery } from "react-query";
 import { IconSearch } from "@tabler/icons";
 import { Autocomplete } from "@mantine/core";
-import { SearchTerms } from "./search-mapdisplay";
+import { SearchTerms } from "./search-map-display";
 
 // TODO: Restaurant document interface, data modelling and hook it up to backend
 

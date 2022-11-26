@@ -1,5 +1,6 @@
-import { PropertiesProps } from "./components/search-mapdisplay";
+import { PropertiesProps } from "./components/search-map-display"
 // TODO: extratc out main function put it here
+
 export const fetchZipSearch = async (zipcodeUserInput: string) => {
   const response = await fetch(`/api/dev/${zipcodeUserInput}`, {
     method: "GET",

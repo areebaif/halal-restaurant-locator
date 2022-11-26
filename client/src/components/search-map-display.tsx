@@ -239,7 +239,7 @@ export const SearchAndMapDisplayComponent: React.FC = () => {
   // Data fetching
   const URL = "/api/dev/data";
   // TODO: name this query and extract isLoading functions etc
-  const { isLoading, isError } = useQuery(
+  const chicagoLocations = useQuery(
     "getAllLocations",
     async () => {
       const response = await fetch(URL);
@@ -258,6 +258,7 @@ export const SearchAndMapDisplayComponent: React.FC = () => {
         // TODO: You have to also set camera angle depending on what the user has searched, right now we are hardcoding
         setCameraViewState({ latitude: 41.45, longitude: -88.53, zoom: 7.2 });
         // do some data manuplulation to only set Chicago Data. There are too many data points
+        
         const filteredValues = data?.features?.filter((item: any) => {
           return item.properties.city === "Chicago";
         });
@@ -273,19 +274,14 @@ export const SearchAndMapDisplayComponent: React.FC = () => {
       },
     }
   );
-  const zipCodeSearch = useQuery(
+  // Depending on what the user is searching, these functions trigger a backedn API call and set map data and map camera according to search results
+  const zipCodeSearchResult = useQuery(
     ["getZipCodeLocations", zipcodeUserInput],
     () => fetchZipSearch(zipcodeUserInput),
     {
       enabled: callZipBackendApi,
       onSuccess: (data) => {
         setZipCallBackendApi(false);
-        // // TODO: fix this that only search term is sent depending on what the search term is
-        // // do some data manuplulation to only set Chicago Data. There are too many data points
-        // const filteredValues = data?.features?.filter((item: any) => {
-        //   return item.properties.city === "Chicago";
-        // });
-
         const mapLocations: GeoJSON.FeatureCollection<
           GeoJSON.Geometry,
           PropertiesProps
@@ -299,11 +295,11 @@ export const SearchAndMapDisplayComponent: React.FC = () => {
     }
   );
 
-  if (isLoading) {
+  if (chicagoLocations.isLoading) {
     return <span>Loading...</span>;
   }
 
-  if (isError || zipCodeSearch.isError) {
+  if (chicagoLocations.isError || zipCodeSearchResult.isError) {
     return <span>Error: error occured</span>;
   }
 

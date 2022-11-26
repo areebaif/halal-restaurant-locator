@@ -21,7 +21,6 @@ router.get(
   "/api/dev/data",
   async (req: Request, res: Response, next: NextFunction) => {
     try {
-      console.log(" I just ran")
       res.header("Content-Type", "application/json");
 
       res.status(200).send({ data: rawLocations });
