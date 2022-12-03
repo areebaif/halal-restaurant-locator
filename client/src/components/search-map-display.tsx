@@ -291,6 +291,7 @@ export const SearchAndMapDisplayComponent: React.FC = () => {
         };
         setMapData(mapLocations);
         setRefreshMapData(true);
+        setZipcodeUserInput("")
       },
     }
   );
@@ -393,27 +394,31 @@ export const SearchAndMapDisplayComponent: React.FC = () => {
   };
 
   const onSearch = (data: SearchTerms) => {
-    // we are using input give to this function as that input has been sanitized(whiote spaces removed etc)
-
-    // You will either have zipcode, or state or city and state
+    // You will either have zipcode, or state or city and state or name
     const { zipcodeUserInput, cityUserInput, stateUserInput, restaurantNameUserInput } =
       data;
-    if (zipcodeUserInput?.length) {
-      // we are sanitised value as input
-      setZipcodeUserInput(zipcodeUserInput);
+    // we are sanitising input before sending it to backend
+    const trimZipCode = zipcodeUserInput?.trim();
+    const trimmedCity = cityUserInput?.trim();
+    const trimmedState = stateUserInput?.trim();
+    const trimmedRestaurantNameUserInput = restaurantNameUserInput?.trim()
+
+    // update react state of each inout since we have sanitised it
+    if (trimZipCode?.length) {
+      // we hare passing sanitised values to this function hence, update react state of this value before triggering search 
+      setZipcodeUserInput(trimZipCode);
       setZipCallBackendApi(true);
-      // trigger search for zipcode and reset all values
     }
 
-    if (stateUserInput?.length && cityUserInput?.length) {
+    if (trimmedState?.length && trimmedCity?.length) {
       // trigger search for state and city and reset all values
     }
 
-    if (stateUserInput?.length && !cityUserInput?.length) {
+    if (trimmedState?.length && !trimmedCity?.length) {
       // trigger search for state and reset all values
     }
 
-    if (restaurantNameUserInput?.length) {
+    if (trimmedRestaurantNameUserInput?.length) {
       // trigger search for name and reset all values
     }
   };

@@ -57,6 +57,7 @@ export const AutoCompleteInput: React.FC<AutoCompleteInputProps> = ({
   restaurantNameUserInput,
   onRestaurantNameUserInputChange
 }) => {
+
   const [stateData, setStateData] = React.useState<string[]>();
   const [cityData, setCityData] = React.useState<string[]>();
   // we are using zipData to populate mantine autocomplete component.This component has typing defined as AutoCompleteItem
@@ -65,7 +66,6 @@ export const AutoCompleteInput: React.FC<AutoCompleteInputProps> = ({
   const [restaurantData, setRestaurantData] = React.useState<any>()
 
   // This function has to run regardless of any user input to populate auto-complete inputs of state, city, zipcode and restaurant
-  
   // TODO: add name functionality to this 
   const URL = "/api/dev/getGeography";
   const geoLocationData = useQuery(
@@ -108,19 +108,13 @@ export const AutoCompleteInput: React.FC<AutoCompleteInputProps> = ({
 
   const onSubmit = (event: React.MouseEvent<HTMLButtonElement>) => {
     // We dont need to do type checking as submit button disables if a user enters invalid input
-    const trimZipCode = zipcodeUserInput.trim();
-    const trimmedCity = cityUserInput.trim();
-    const trimmedState = stateUserInput.trim();
-    const trimmedRestaurantNameUserInput = restaurantNameUserInput.trim()
-    
     onSearch({
-      zipcodeUserInput: trimZipCode,
-      cityUserInput: trimmedCity,
-      stateUserInput: trimmedState,
-      restaurantNameUserInput: trimmedRestaurantNameUserInput,
+      zipcodeUserInput: zipcodeUserInput,
+      cityUserInput: cityUserInput,
+      stateUserInput: stateUserInput,
+      restaurantNameUserInput: restaurantNameUserInput
     });
 
-    // TODO: set trigger search to true, reset the value
   };
   return (
     <React.Fragment>
@@ -220,29 +214,29 @@ export const AutoCompleteInput: React.FC<AutoCompleteInputProps> = ({
 };
 
 // This is anoher search input
-export const SearchInput: React.FC = () => {
-  const [value, setValue] = React.useState("");
-  const [triggerSearch, setTriggerSearch] = React.useState(false);
+// export const SearchInput: React.FC = () => {
+//   const [value, setValue] = React.useState("");
+//   const [triggerSearch, setTriggerSearch] = React.useState(false);
 
-  const onSearchTermChange = (event: React.ChangeEvent<HTMLInputElement>) => {
-    setValue(event.currentTarget.value);
-  };
+//   const onSearchTermChange = (event: React.ChangeEvent<HTMLInputElement>) => {
+//     setValue(event.currentTarget.value);
+//   };
 
-  const onKeyDown = (event: React.KeyboardEvent) => {
-    if (event.key === "Enter") {
-      //Filter results with value
-    }
-    //TODO: Reset the value if the search term
-  };
-  const onBlur = () => {};
+//   const onKeyDown = (event: React.KeyboardEvent) => {
+//     if (event.key === "Enter") {
+//       //Filter results with value
+//     }
+//     //TODO: Reset the value if the search term
+//   };
+//   const onBlur = () => {};
 
-  const onsubmit = (event: React.MouseEvent<HTMLButtonElement>) => {
-    // set trigger search to true
-    // reset the value
-  };
+//   const onsubmit = (event: React.MouseEvent<HTMLButtonElement>) => {
+//     // set trigger search to true
+//     // reset the value
+//   };
 
-  return (
-    <React.Fragment>
-      </React.Fragment>
-  );
-};
+//   return (
+//     <React.Fragment>
+//       </React.Fragment>
+//   );
+// };
