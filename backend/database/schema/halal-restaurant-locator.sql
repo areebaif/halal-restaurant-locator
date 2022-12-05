@@ -43,6 +43,27 @@ CREATE TABLE "restaurant" (
   "created_at" timestamptz NOT NULL DEFAULT (now())
 );
 
+CREATE TABLE "user" (
+  "id" serial PRIMARY KEY,
+  "email" varchar NOT NULL,
+  "password" varchar NOT NULL,
+  "username" varchar NOT NULL
+);
+
+CREATE TABLE "comment" (
+  "id" serial PRIMARY KEY,
+  "restaurant" integer NOT NULL,
+  "user" intger NOT NULL,
+  "comment" varchar
+);
+
+CREATE TABLE "rating" (
+  "id" serial PRIMARY KEY,
+  "restaurant" integer NOT NULL,
+  "user" intger NOT NULL,
+  "rating" varchar
+);
+
 ALTER TABLE "city" ADD FOREIGN KEY ("country") REFERENCES "country" ("id");
 
 ALTER TABLE "state" ADD FOREIGN KEY ("country") REFERENCES "country" ("id");
@@ -58,3 +79,11 @@ ALTER TABLE "restaurant" ADD FOREIGN KEY ("city") REFERENCES "city" ("id");
 ALTER TABLE "restaurant" ADD FOREIGN KEY ("state") REFERENCES "state" ("id");
 
 ALTER TABLE "restaurant" ADD FOREIGN KEY ("country") REFERENCES "country" ("id");
+
+ALTER TABLE "comment" ADD FOREIGN KEY ("user") REFERENCES "user" ("id");
+
+ALTER TABLE "rating" ADD FOREIGN KEY ("user") REFERENCES "user" ("id");
+
+ALTER TABLE "comment" ADD FOREIGN KEY ("restaurant") REFERENCES "restaurant" ("id");
+
+ALTER TABLE "rating" ADD FOREIGN KEY ("restaurant") REFERENCES "restaurant" ("id");
