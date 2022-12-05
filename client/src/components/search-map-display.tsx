@@ -309,6 +309,7 @@ export const SearchAndMapDisplayComponent: React.FC = () => {
   };
 
   const onRestaurantNameInputChange = (value:string) => {
+    console.log("restaurantVqaluex",value)
     setRestaurantNameUserInput(value)
   }
 
@@ -402,27 +403,62 @@ export const SearchAndMapDisplayComponent: React.FC = () => {
     const trimmedCity = cityUserInput?.trim();
     const trimmedState = stateUserInput?.trim();
     const trimmedRestaurantNameUserInput = restaurantNameUserInput?.trim()
+    // using switch to break the program execution when a usecase is hit otherwise I have to write all possible combinations/permutaions in if statements
+    // as if statements do not break program execution for exaple: restaurant, city and state input will also trigger state and city input in if statements.
+    switch (true) {
+      case (Boolean(trimmedRestaurantNameUserInput?.length) && Boolean(trimZipCode?.length) && Boolean(trimmedState?.length) && Boolean(trimmedCity?.length)) : console.log("restaurant,state,city,zipcode");
+      break;
+      case ((Boolean(trimmedRestaurantNameUserInput?.length) && Boolean(trimZipCode?.length)) && Boolean(trimmedState?.length)) : console.log("res, state,zip");
+      break;
+      case (Boolean(trimmedRestaurantNameUserInput?.length) && Boolean(trimZipCode?.length) && Boolean(!trimmedState?.length)) : console.log(" at restaurant zipcode no state");
+      break;
+      case (Boolean(trimmedRestaurantNameUserInput?.length) && Boolean(trimmedState?.length) && Boolean(!trimZipCode?.length) && Boolean(!trimmedCity?.length)) : console.log("restaurant, state, nop zip");
+      break; 
+      case (Boolean(trimmedRestaurantNameUserInput?.length) && Boolean(trimmedState?.length) && Boolean(trimmedCity?.length) && Boolean(!trimZipCode?.length)): console.log("restaurant,state,city,nozip")
+      break;
+      case (Boolean(trimmedRestaurantNameUserInput?.length) && Boolean(!trimmedState?.length) && Boolean(!trimmedCity?.length) && Boolean(!trimZipCode?.length)): console.log("only restaurant")
+      break;
+      case ( Boolean(trimZipCode?.length) && Boolean(trimmedState?.length) && Boolean(trimmedCity?.length)) : console.log("zip, state city")
+      break;
+      case (Boolean(trimZipCode?.length)): console.log(" zipcode and state, city"); setZipcodeUserInput(trimZipCode!);
+      break;
+      case (Boolean(trimmedState?.length) && Boolean(!trimmedCity?.length)) : console.log("zipcode state no city"); break;
+      // only zipcode
+      case (Boolean(trimmedState?.length) && Boolean(trimmedCity?.length) && Boolean(!trimZipCode?.length)) : console.log("state and city no zipcode")
+      break;
+      case (Boolean(trimmedState?.length) && Boolean(!trimmedCity?.length) && Boolean(!trimZipCode?.length)) : console.log("only state no city no zipcode") // no zipcode
+      break
+      // TODO: error handling this means user didnt enter anything and sublitted
+      default: console.log("error")
+
+
+
+
+    }
 
     // update react state of each inout since we have sanitised it
-    if (trimZipCode?.length) {
-      // we hare passing sanitised values to this function hence, update react state of this value before triggering search 
-      setZipcodeUserInput(trimZipCode);
-      setZipCallBackendApi(true);
-    }
+  //   if (trimmedRestaurantNameUserInput?.length && trimZipCode?.length) {}
+  //   if (Boolean(trimmedRestaurantNameUserInput?.length) && Boolean(trimmedState?.length) && Boolean(!trimmedCity?.length)) {}
+  //   if (Boolean(trimmedRestaurantNameUserInput?.length) && Boolean(trimmedState?.length) && Boolean(trimmedCity?.length)) {}
+  //   if (Boolean(trimmedRestaurantNameUserInput?.length) && Boolean(!trimmedState?.length) && Boolean(!trimmedCity?.length) && Boolean(!trimZipCode?.length)) {
+  //   }
 
-    if (trimmedState?.length && trimmedCity?.length) {
-      // trigger search for state and city and reset all values
-    }
+  //   if (trimZipCode?.length) {
+  //     // we hare passing sanitised values to this function hence, update react state of this value before triggering search 
+  //     setZipcodeUserInput(trimZipCode);
+  //     setZipCallBackendApi(true);
+  //   }
+  //   if (trimmedState?.length && trimmedCity?.length) {
+  //     // trigger search for state and city and reset all values
+  //   }
+  //   if (trimmedState?.length && !trimmedCity?.length) {
+  //     // trigger search for state and reset all values
+  //   }
 
-    if (trimmedState?.length && !trimmedCity?.length) {
-      // trigger search for state and reset all values
-    }
-
-    if (trimmedRestaurantNameUserInput?.length) {
-      // trigger search for name and reset all values
-    }
-  };
-
+  //   // defualt case no data user tries to submit at that point what do you do?
+  //   // you throw a general error and say you have to submit a search result
+  // };
+  }
   return mapData ? (
     <Grid>
       <Grid.Col md={12} lg={12}>

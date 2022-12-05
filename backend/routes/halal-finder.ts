@@ -11,6 +11,7 @@ interface locationDocument {
     zip: string;
   };
   id: number;
+  // coordinates: [longitude, latitude] is the order in which values are inserted in the tuple
   geometry: { coordinates: [number, number]; type: "Point" };
 }
 const router = express.Router();
@@ -34,6 +35,7 @@ router.get(
   "/api/dev/getGeography",
   async (req: Request, res: Response, next: NextFunction) => {
     try {
+      // TODO: add restaurantName functionality to this
       const citySet: Set<string> = new Set();
       const stateSet: Set<string> = new Set();
       const allRawData: {
@@ -60,6 +62,8 @@ router.get(
           citySet: arrayCitySet,
           stateSet: arrayStateSet,
           zipSet: zipSet,
+          // TODO: fix empty object to actually sending data
+          restaurantSet: []
         },
       });
     } catch (err) {
