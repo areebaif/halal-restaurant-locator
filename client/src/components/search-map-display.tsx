@@ -333,7 +333,8 @@ export const SearchAndMapDisplayComponent: React.FC = () => {
     const specialCharsTest = specialChars.test(value);
     if (!specialCharsTest) {
       setErrorCityUserInput(false);
-      setCityUserInput(value);
+       setCityUserInput(value);
+      
     } else {
       setErrorCityUserInput(true);
       setCityUserInput(value);
@@ -398,66 +399,43 @@ export const SearchAndMapDisplayComponent: React.FC = () => {
     // You will either have zipcode, or state or city and state or name
     const { zipcodeUserInput, cityUserInput, stateUserInput, restaurantNameUserInput } =
       data;
+      // TODO: remove these sanitisations we have already checked 
     // we are sanitising input before sending it to backend
     const trimZipCode = zipcodeUserInput?.trim();
     const trimmedCity = cityUserInput?.trim();
     const trimmedState = stateUserInput?.trim();
     const trimmedRestaurantNameUserInput = restaurantNameUserInput?.trim()
+
+     
     // using switch to break the program execution when a usecase is hit otherwise I have to write all possible combinations/permutaions in if statements
-    // as if statements do not break program execution for exaple: restaurant, city and state input will also trigger state and city input in if statements.
+    // as if statements do not break program execution for example: restaurant, city and state input will also trigger state and city input in if statements.
+    
+    // TODO: capitalise first letter of each word, check if id exists and then send to backend, we dont want to make unnecessary calls to bckend, check if user is enering valid stuff
     switch (true) {
-      case (Boolean(trimmedRestaurantNameUserInput?.length) && Boolean(trimZipCode?.length) && Boolean(trimmedState?.length) && Boolean(trimmedCity?.length)) : console.log("restaurant,state,city,zipcode");
+      // restaurantName, zipcode
+      case (Boolean(trimmedRestaurantNameUserInput?.length) && Boolean(trimZipCode?.length) && Boolean(!trimmedState?.length) && Boolean(!trimmedCity?.length)) : console.log(" at restaurant zipcode no state");
       break;
-      case ((Boolean(trimmedRestaurantNameUserInput?.length) && Boolean(trimZipCode?.length)) && Boolean(trimmedState?.length)) : console.log("res, state,zip");
-      break;
-      case (Boolean(trimmedRestaurantNameUserInput?.length) && Boolean(trimZipCode?.length) && Boolean(!trimmedState?.length)) : console.log(" at restaurant zipcode no state");
-      break;
+      //restaurantName, state
       case (Boolean(trimmedRestaurantNameUserInput?.length) && Boolean(trimmedState?.length) && Boolean(!trimZipCode?.length) && Boolean(!trimmedCity?.length)) : console.log("restaurant, state, nop zip");
       break; 
+      //restaurantName, state, city
       case (Boolean(trimmedRestaurantNameUserInput?.length) && Boolean(trimmedState?.length) && Boolean(trimmedCity?.length) && Boolean(!trimZipCode?.length)): console.log("restaurant,state,city,nozip")
       break;
+      //restaurantName
       case (Boolean(trimmedRestaurantNameUserInput?.length) && Boolean(!trimmedState?.length) && Boolean(!trimmedCity?.length) && Boolean(!trimZipCode?.length)): console.log("only restaurant")
       break;
-      case ( Boolean(trimZipCode?.length) && Boolean(trimmedState?.length) && Boolean(trimmedCity?.length)) : console.log("zip, state city")
+      // zipcode
+      case (Boolean(trimZipCode?.length) && Boolean(!trimmedState?.length) && Boolean(!trimmedCity?.length) && Boolean(!trimmedRestaurantNameUserInput) ): console.log(" only zipcode"); setZipcodeUserInput(trimZipCode!);
+      break; 
+      // state,city
+      case (Boolean(trimmedState?.length) && Boolean(trimmedCity?.length) && Boolean(!trimZipCode?.length) && Boolean(!trimmedRestaurantNameUserInput)) : console.log("state and city no zipcode")
       break;
-      case (Boolean(trimZipCode?.length)): console.log(" zipcode and state, city"); setZipcodeUserInput(trimZipCode!);
-      break;
-      case (Boolean(trimmedState?.length) && Boolean(!trimmedCity?.length)) : console.log("zipcode state no city"); break;
-      // only zipcode
-      case (Boolean(trimmedState?.length) && Boolean(trimmedCity?.length) && Boolean(!trimZipCode?.length)) : console.log("state and city no zipcode")
-      break;
-      case (Boolean(trimmedState?.length) && Boolean(!trimmedCity?.length) && Boolean(!trimZipCode?.length)) : console.log("only state no city no zipcode") // no zipcode
+      // state
+      case (Boolean(trimmedState?.length) && Boolean(!trimmedCity?.length) && Boolean(!trimZipCode?.length) && Boolean(!trimmedRestaurantNameUserInput)) : console.log("only state no city no zipcode") // no zipcode
       break
-      // TODO: error handling this means user didnt enter anything and sublitted
+      // TODO: error handling this means user didnt enter anything and submitted
       default: console.log("error")
-
-
-
-
     }
-
-    // update react state of each inout since we have sanitised it
-  //   if (trimmedRestaurantNameUserInput?.length && trimZipCode?.length) {}
-  //   if (Boolean(trimmedRestaurantNameUserInput?.length) && Boolean(trimmedState?.length) && Boolean(!trimmedCity?.length)) {}
-  //   if (Boolean(trimmedRestaurantNameUserInput?.length) && Boolean(trimmedState?.length) && Boolean(trimmedCity?.length)) {}
-  //   if (Boolean(trimmedRestaurantNameUserInput?.length) && Boolean(!trimmedState?.length) && Boolean(!trimmedCity?.length) && Boolean(!trimZipCode?.length)) {
-  //   }
-
-  //   if (trimZipCode?.length) {
-  //     // we hare passing sanitised values to this function hence, update react state of this value before triggering search 
-  //     setZipcodeUserInput(trimZipCode);
-  //     setZipCallBackendApi(true);
-  //   }
-  //   if (trimmedState?.length && trimmedCity?.length) {
-  //     // trigger search for state and city and reset all values
-  //   }
-  //   if (trimmedState?.length && !trimmedCity?.length) {
-  //     // trigger search for state and reset all values
-  //   }
-
-  //   // defualt case no data user tries to submit at that point what do you do?
-  //   // you throw a general error and say you have to submit a search result
-  // };
   }
   return mapData ? (
     <Grid>

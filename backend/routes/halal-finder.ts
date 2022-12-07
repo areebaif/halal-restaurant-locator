@@ -55,15 +55,23 @@ router.get(
 
       const arrayCitySet = Array.from(citySet);
       const arrayStateSet = Array.from(stateSet);
+      const mappedCitySet = arrayCitySet.map((item, index) => {
+        return { id: index, name: item };
+      });
+      const mappedStateSet = arrayStateSet.map((item, index) => {
+        return { id: index, name: item };
+      });
+
+      console.log(stateSet);
       res.header("Content-Type", "application/json");
 
       res.status(200).send({
         data: {
-          citySet: arrayCitySet,
-          stateSet: arrayStateSet,
+          citySet: mappedCitySet,
+          stateSet: mappedStateSet,
           zipSet: zipSet,
           // TODO: fix empty object to actually sending data
-          restaurantSet: []
+          restaurantSet: [],
         },
       });
     } catch (err) {
