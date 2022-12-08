@@ -3,7 +3,7 @@ import { TextInput, Button, Group, AutocompleteItem } from "@mantine/core";
 import { useQuery } from "react-query";
 import { IconSearch } from "@tabler/icons";
 import { Autocomplete } from "@mantine/core";
-import { SearchTerms } from "./search-map-display";
+import { BackendSearchTerms, UserSearchTerms } from "./search-map-display";
 import { isTemplateExpression } from "typescript";
 import { StringifyOptions } from "querystring";
 
@@ -57,9 +57,11 @@ export interface AutoCompleteInputProps {
   stateUserInput: string;
   onStateUserInputChange: (value: string) => void;
   errorStateUserInput: boolean;
-  onSearch: (data: SearchTerms) => void;
+  onSearch: (data: UserSearchTerms) => void;
   restaurantNameUserInput: string;
   onRestaurantNameUserInputChange: (value: string) => void;
+  backendSearchTerms: BackendSearchTerms;
+  onBackendSearchTermChange: (data: { [key: string]: any }) => void;
 }
 
 export const AutoCompleteInput: React.FC<AutoCompleteInputProps> = ({
@@ -75,6 +77,8 @@ export const AutoCompleteInput: React.FC<AutoCompleteInputProps> = ({
   onSearch,
   restaurantNameUserInput,
   onRestaurantNameUserInputChange,
+  backendSearchTerms,
+  onBackendSearchTermChange,
 }) => {
   const [stateData, setStateData] = React.useState<AutocompleteItem[]>();
   const [cityData, setCityData] = React.useState<AutocompleteItem[]>();
@@ -141,13 +145,23 @@ export const AutoCompleteInput: React.FC<AutoCompleteInputProps> = ({
   }
 
   const onSubmit = (event: React.MouseEvent<HTMLButtonElement>) => {
-    // TODO: before triggering a backend api call, we have to sanitize input and check whether the user has entered a valid stateName, cityName e.t.c
+    // before triggering a backend api call, we have to:
+    // sanitize input and check whether the user has entered a valid stateName, cityName, zipCode e.t.c
+
+    // reset the backendSearchTerms
+    onBackendSearchTermChange({
+      zipcode: undefined,
+      city: undefined,
+      state: undefined,
+      restaurantName: undefined,
+    });
 
     let trimmedZipCode = zipcodeUserInput?.trim();
     let trimmedCity = cityUserInput?.trim();
     let trimmedState = stateUserInput?.trim();
     let trimmedRestaurantNameUserInput = restaurantNameUserInput?.trim();
 
+    // validCity
     if (trimmedCity.length) {
       const cityArray = trimmedCity?.split(" ");
       const cityUpperCase = cityArray?.map(
@@ -162,8 +176,15 @@ export const AutoCompleteInput: React.FC<AutoCompleteInputProps> = ({
         console.log("error: you have entered an incorrect city value");
       }
       onCityUserInputChange(trimmedCity);
+      const object = validCity?.[0];
+      const id = object?.id;
+      const name = object?.name;
+      console.log(" city change triggered trigger");
+      onBackendSearchTermChange({
+        city: { id: id, name: name },
+      });
     }
-
+    // validState
     if (trimmedState.length) {
       const stateArray = trimmedState?.split(" ");
       const stateUpperCase = stateArray?.map(
@@ -180,8 +201,15 @@ export const AutoCompleteInput: React.FC<AutoCompleteInputProps> = ({
         console.log("error: you have entered an incorrect state value");
       }
       onStateUserInputChange(trimmedState);
+      const object = validState?.[0];
+      const id = object?.id;
+      const name = object?.name;
+      console.log("state change baouit to trigger");
+      onBackendSearchTermChange({
+        state: { id: id, name: name },
+      });
     }
-
+    // valid restaurantName
     if (trimmedRestaurantNameUserInput.length) {
       const restaurantNameArray = trimmedRestaurantNameUserInput?.split(" ");
       const restaurantNameUpperCase = restaurantNameArray?.map(
@@ -199,13 +227,33 @@ export const AutoCompleteInput: React.FC<AutoCompleteInputProps> = ({
       }
 
       onRestaurantNameUserInputChange(trimmedRestaurantNameUserInput);
+      const object = validRestaurantName?.[0];
+      const id = object?.id;
+      const name = object?.name;
+      onBackendSearchTermChange({
+        restaurantName: { id: id, name: name },
+      });
     }
+    // valid zipCode
     if (trimmedZipCode.length) {
       //TODO: check valid zipcode
-      onZipcodeUserInputChange(trimmedZipCode);
-    }
+      const validZip = zipData?.filter((item) => {
+        return item.value === trimmedZipCode;
+      });
+      if (!validZip?.length) {
+        //TODO: error handling
+        console.log("no valid zip");
+      }
 
-    // TODO: check if it is a valid entry using state, city, zipcode data
+      onZipcodeUserInputChange(trimmedZipCode);
+      const object = validZip?.[0];
+      const id = object?.id as BigInteger;
+      const name = object?.value as string;
+
+      onBackendSearchTermChange({
+        zipcode: { id: id, name: name },
+      });
+    }
 
     onSearch({
       zipcodeUserInput: trimmedZipCode,
@@ -236,7 +284,11 @@ export const AutoCompleteInput: React.FC<AutoCompleteInputProps> = ({
         ) : (
           <Autocomplete
             label="zipcode"
-            placeholder="Start typing to see options"
+            placeholder={`${
+              cityUserInput.length || stateUserInput.length
+                ? "state & city must be empty to search"
+                : "Start typing to see options"
+            } `}
             value={zipcodeUserInput}
             limit={7}
             disabled={Boolean(cityUserInput.length || stateUserInput.length)}
@@ -256,7 +308,11 @@ export const AutoCompleteInput: React.FC<AutoCompleteInputProps> = ({
         ) : (
           <Autocomplete
             label="city"
-            placeholder="Start typing to see options"
+            placeholder={`${
+              zipcodeUserInput.length
+                ? "zipcode must be empty to search"
+                : "Start typing to see options"
+            } `}
             value={cityUserInput}
             limit={7}
             disabled={Boolean(zipcodeUserInput.length)}
@@ -285,7 +341,11 @@ export const AutoCompleteInput: React.FC<AutoCompleteInputProps> = ({
         ) : (
           <Autocomplete
             label="state"
-            placeholder="Start typing to see options"
+            placeholder={`${
+              zipcodeUserInput.length
+                ? "zipcode must be empty to search"
+                : "Start typing to see options"
+            } `}
             value={stateUserInput}
             limit={7}
             disabled={Boolean(zipcodeUserInput.length)}

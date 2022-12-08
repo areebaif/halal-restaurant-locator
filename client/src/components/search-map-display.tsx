@@ -29,11 +29,18 @@ export interface CameraViewState {
 const dataSourceId = "some id";
 const layerId = "points";
 
-export interface SearchTerms {
+export interface UserSearchTerms {
   zipcodeUserInput: string | null;
   cityUserInput: string | null;
   stateUserInput: string | null;
-  restaurantNameUserInput?: string | null;
+  restaurantNameUserInput: string | null;
+}
+// this is used to send searchterms with specified data to backend
+export interface BackendSearchTerms {
+  zipcode: { id: BigInteger; name: string } | undefined;
+  city: { id: BigInteger; name: string } | undefined;
+  state: { id: BigInteger; name: string } | undefined;
+  restaurantName: { id: BigInteger; name: string } | undefined;
 }
 
 // This data has london points
@@ -223,15 +230,17 @@ export const SearchAndMapDisplayComponent: React.FC = () => {
   const [errorCityUserInput, setErrorCityUserInput] = React.useState(false);
   const [stateUserInput, setStateUserInput] = React.useState("");
   const [errorStateUserInput, setErrorStateUserInput] = React.useState(false);
-  const [restaurantNameUserInput, setRestaurantNameUserInput] = React.useState("");
+  const [restaurantNameUserInput, setRestaurantNameUserInput] =
+    React.useState("");
 
-  // TODO: not sure if i need this
-  const [searchTerm, setSearchTerm] = React.useState<SearchTerms>({
-    zipcodeUserInput: null,
-    cityUserInput: null,
-    stateUserInput: null,
-    restaurantNameUserInput: null,
-  });
+  // backend api props based on user input
+  const [backendSearchTerms, setBackendSearchTerms] =
+    React.useState<BackendSearchTerms>({
+      zipcode: undefined,
+      city: undefined,
+      state: undefined,
+      restaurantName: undefined,
+    });
   // Backend Api Props
   const [callZipBackendApi, setZipCallBackendApi] = React.useState(false);
 
@@ -258,7 +267,7 @@ export const SearchAndMapDisplayComponent: React.FC = () => {
         // TODO: You have to also set camera angle depending on what the user has searched, right now we are hardcoding
         setCameraViewState({ latitude: 41.45, longitude: -88.53, zoom: 7.2 });
         // do some data manuplulation to only set Chicago Data. There are too many data points
-        
+
         const filteredValues = data?.features?.filter((item: any) => {
           return item.properties.city === "Chicago";
         });
@@ -291,7 +300,7 @@ export const SearchAndMapDisplayComponent: React.FC = () => {
         };
         setMapData(mapLocations);
         setRefreshMapData(true);
-        setZipcodeUserInput("")
+        setZipcodeUserInput("");
       },
     }
   );
@@ -308,10 +317,10 @@ export const SearchAndMapDisplayComponent: React.FC = () => {
     setCameraViewState(data);
   };
 
-  const onRestaurantNameInputChange = (value:string) => {
-    console.log("restaurantVqaluex",value)
-    setRestaurantNameUserInput(value)
-  }
+  const onRestaurantNameInputChange = (value: string) => {
+    console.log("restaurantVqaluex", value);
+    setRestaurantNameUserInput(value);
+  };
 
   const onStateUserInputChange = (value: string) => {
     // Check for special characters including numbers
@@ -333,8 +342,7 @@ export const SearchAndMapDisplayComponent: React.FC = () => {
     const specialCharsTest = specialChars.test(value);
     if (!specialCharsTest) {
       setErrorCityUserInput(false);
-       setCityUserInput(value);
-      
+      setCityUserInput(value);
     } else {
       setErrorCityUserInput(true);
       setCityUserInput(value);
@@ -394,49 +402,89 @@ export const SearchAndMapDisplayComponent: React.FC = () => {
   const refreshDataMap = () => {
     setRefreshMapData(false);
   };
+  console.log(backendSearchTerms, "in funct");
+  const onBackendSearchTermChange = (data: { [key: string]: any }) => {
+    console.log("dim,", data);
+    setBackendSearchTerms((previosState) => {
+      return { ...previosState, ...data };
+    });
+  };
 
-  const onSearch = (data: SearchTerms) => {
+  const onSearch = (data: UserSearchTerms) => {
     // You will either have zipcode, or state or city and state or name
-    const { zipcodeUserInput, cityUserInput, stateUserInput, restaurantNameUserInput } =
-      data;
-      // TODO: remove these sanitisations we have already checked 
+    const {
+      zipcodeUserInput,
+      cityUserInput,
+      stateUserInput,
+      restaurantNameUserInput,
+    } = data;
+    // TODO: remove these sanitisations we have already checked
     // we are sanitising input before sending it to backend
     const trimZipCode = zipcodeUserInput?.trim();
     const trimmedCity = cityUserInput?.trim();
     const trimmedState = stateUserInput?.trim();
-    const trimmedRestaurantNameUserInput = restaurantNameUserInput?.trim()
+    const trimmedRestaurantNameUserInput = restaurantNameUserInput?.trim();
 
-     
     // using switch to break the program execution when a usecase is hit otherwise I have to write all possible combinations/permutaions in if statements
     // as if statements do not break program execution for example: restaurant, city and state input will also trigger state and city input in if statements.
-    
+
     // TODO: capitalise first letter of each word, check if id exists and then send to backend, we dont want to make unnecessary calls to bckend, check if user is enering valid stuff
     switch (true) {
       // restaurantName, zipcode
-      case (Boolean(trimmedRestaurantNameUserInput?.length) && Boolean(trimZipCode?.length) && Boolean(!trimmedState?.length) && Boolean(!trimmedCity?.length)) : console.log(" at restaurant zipcode no state");
-      break;
+      case Boolean(trimmedRestaurantNameUserInput?.length) &&
+        Boolean(trimZipCode?.length) &&
+        Boolean(!trimmedState?.length) &&
+        Boolean(!trimmedCity?.length):
+        console.log(" at restaurant zipcode no state");
+        break;
       //restaurantName, state
-      case (Boolean(trimmedRestaurantNameUserInput?.length) && Boolean(trimmedState?.length) && Boolean(!trimZipCode?.length) && Boolean(!trimmedCity?.length)) : console.log("restaurant, state, nop zip");
-      break; 
+      case Boolean(trimmedRestaurantNameUserInput?.length) &&
+        Boolean(trimmedState?.length) &&
+        Boolean(!trimZipCode?.length) &&
+        Boolean(!trimmedCity?.length):
+        console.log("restaurant, state, nop zip");
+        break;
       //restaurantName, state, city
-      case (Boolean(trimmedRestaurantNameUserInput?.length) && Boolean(trimmedState?.length) && Boolean(trimmedCity?.length) && Boolean(!trimZipCode?.length)): console.log("restaurant,state,city,nozip")
-      break;
+      case Boolean(trimmedRestaurantNameUserInput?.length) &&
+        Boolean(trimmedState?.length) &&
+        Boolean(trimmedCity?.length) &&
+        Boolean(!trimZipCode?.length):
+        console.log("restaurant,state,city,nozip");
+        break;
       //restaurantName
-      case (Boolean(trimmedRestaurantNameUserInput?.length) && Boolean(!trimmedState?.length) && Boolean(!trimmedCity?.length) && Boolean(!trimZipCode?.length)): console.log("only restaurant")
-      break;
+      case Boolean(trimmedRestaurantNameUserInput?.length) &&
+        Boolean(!trimmedState?.length) &&
+        Boolean(!trimmedCity?.length) &&
+        Boolean(!trimZipCode?.length):
+        console.log("only restaurant");
+        break;
       // zipcode
-      case (Boolean(trimZipCode?.length) && Boolean(!trimmedState?.length) && Boolean(!trimmedCity?.length) && Boolean(!trimmedRestaurantNameUserInput) ): console.log(" only zipcode"); setZipcodeUserInput(trimZipCode!);
-      break; 
+      case Boolean(trimZipCode?.length) &&
+        Boolean(!trimmedState?.length) &&
+        Boolean(!trimmedCity?.length) &&
+        Boolean(!trimmedRestaurantNameUserInput):
+        console.log(" only zipcode");
+        setZipcodeUserInput(trimZipCode!);
+        break;
       // state,city
-      case (Boolean(trimmedState?.length) && Boolean(trimmedCity?.length) && Boolean(!trimZipCode?.length) && Boolean(!trimmedRestaurantNameUserInput)) : console.log("state and city no zipcode")
-      break;
+      case Boolean(trimmedState?.length) &&
+        Boolean(trimmedCity?.length) &&
+        Boolean(!trimZipCode?.length) &&
+        Boolean(!trimmedRestaurantNameUserInput):
+        console.log("state and city no zipcode");
+        break;
       // state
-      case (Boolean(trimmedState?.length) && Boolean(!trimmedCity?.length) && Boolean(!trimZipCode?.length) && Boolean(!trimmedRestaurantNameUserInput)) : console.log("only state no city no zipcode") // no zipcode
-      break
+      case Boolean(trimmedState?.length) &&
+        Boolean(!trimmedCity?.length) &&
+        Boolean(!trimZipCode?.length) &&
+        Boolean(!trimmedRestaurantNameUserInput):
+        console.log("only state no city no zipcode"); // no zipcode
+        break;
       // TODO: error handling this means user didnt enter anything and submitted
-      default: console.log("error")
+      default:
+        console.log("error");
     }
-  }
+  };
   return mapData ? (
     <Grid>
       <Grid.Col md={12} lg={12}>
@@ -453,7 +501,9 @@ export const SearchAndMapDisplayComponent: React.FC = () => {
           onSearch={onSearch}
           restaurantNameUserInput={restaurantNameUserInput}
           onRestaurantNameUserInputChange={onRestaurantNameInputChange}
-          />
+          backendSearchTerms={backendSearchTerms}
+          onBackendSearchTermChange={onBackendSearchTermChange}
+        />
       </Grid.Col>
       <Grid.Col md={6} lg={6}>
         <ListContainer
