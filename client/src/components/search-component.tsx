@@ -57,11 +57,15 @@ export interface AutoCompleteInputProps {
   stateUserInput: string;
   onStateUserInputChange: (value: string) => void;
   errorStateUserInput: boolean;
-  onSearch: (data: UserSearchTerms) => void;
+  onSearch: (data?: BackendSearchTerms) => void;
   restaurantNameUserInput: string;
   onRestaurantNameUserInputChange: (value: string) => void;
   backendSearchTerms: BackendSearchTerms;
   onBackendSearchTermChange: (data: { [key: string]: any }) => void;
+  callZipBackendApi: () => void;
+  callStateBackendApi: () => void;
+  callCityBackendApi: () => void;
+  callRestaurantBackendApi: () => void;
 }
 
 export const AutoCompleteInput: React.FC<AutoCompleteInputProps> = ({
@@ -79,6 +83,10 @@ export const AutoCompleteInput: React.FC<AutoCompleteInputProps> = ({
   onRestaurantNameUserInputChange,
   backendSearchTerms,
   onBackendSearchTermChange,
+  callZipBackendApi,
+  callStateBackendApi,
+  callCityBackendApi,
+  callRestaurantBackendApi,
 }) => {
   const [stateData, setStateData] = React.useState<AutocompleteItem[]>();
   const [cityData, setCityData] = React.useState<AutocompleteItem[]>();
@@ -183,6 +191,7 @@ export const AutoCompleteInput: React.FC<AutoCompleteInputProps> = ({
       onBackendSearchTermChange({
         city: { id: id, name: name },
       });
+      callCityBackendApi();
     }
     // validState
     if (trimmedState.length) {
@@ -205,9 +214,11 @@ export const AutoCompleteInput: React.FC<AutoCompleteInputProps> = ({
       const id = object?.id;
       const name = object?.name;
       console.log("state change baouit to trigger");
+
       onBackendSearchTermChange({
         state: { id: id, name: name },
       });
+      callStateBackendApi();
     }
     // valid restaurantName
     if (trimmedRestaurantNameUserInput.length) {
@@ -233,6 +244,7 @@ export const AutoCompleteInput: React.FC<AutoCompleteInputProps> = ({
       onBackendSearchTermChange({
         restaurantName: { id: id, name: name },
       });
+      callRestaurantBackendApi();
     }
     // valid zipCode
     if (trimmedZipCode.length) {
@@ -253,14 +265,12 @@ export const AutoCompleteInput: React.FC<AutoCompleteInputProps> = ({
       onBackendSearchTermChange({
         zipcode: { id: id, name: name },
       });
+      callZipBackendApi();
     }
+    // I need onSearch to trigger with updated values
+    // TODO: do feature flagging
 
-    onSearch({
-      zipcodeUserInput: trimmedZipCode,
-      cityUserInput: trimmedCity,
-      stateUserInput: trimmedState,
-      restaurantNameUserInput: trimmedRestaurantNameUserInput,
-    });
+    onSearch(backendSearchTerms);
   };
   return (
     <React.Fragment>

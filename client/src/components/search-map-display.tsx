@@ -241,8 +241,12 @@ export const SearchAndMapDisplayComponent: React.FC = () => {
       state: undefined,
       restaurantName: undefined,
     });
-  // Backend Api Props
-  const [callZipBackendApi, setZipCallBackendApi] = React.useState(false);
+  // flags to call backend api
+  const [zipBackendApiFlag, setZipBackendApiFlag] = React.useState(false);
+  const [stateBackendApiFlag, setStateBackendApiFlag] = React.useState(false);
+  const [cityBackendApiFlag, setCityBackendApiFlag] = React.useState(false);
+  const [restaurantBackendApiFlag, setRestaurantBackendApiFlag] =
+    React.useState(false);
 
   //TODO: extract out data fetching functions put them in a separate file
   // Data fetching
@@ -288,9 +292,9 @@ export const SearchAndMapDisplayComponent: React.FC = () => {
     ["getZipCodeLocations", zipcodeUserInput],
     () => fetchZipSearch(zipcodeUserInput),
     {
-      enabled: callZipBackendApi,
+      enabled: zipBackendApiFlag,
       onSuccess: (data) => {
-        setZipCallBackendApi(false);
+        setZipBackendApiFlag(false);
         const mapLocations: GeoJSON.FeatureCollection<
           GeoJSON.Geometry,
           PropertiesProps
@@ -310,6 +314,7 @@ export const SearchAndMapDisplayComponent: React.FC = () => {
   }
 
   if (chicagoLocations.isError || zipCodeSearchResult.isError) {
+    setZipBackendApiFlag(false);
     return <span>Error: error occured</span>;
   }
 
@@ -402,82 +407,89 @@ export const SearchAndMapDisplayComponent: React.FC = () => {
   const refreshDataMap = () => {
     setRefreshMapData(false);
   };
-  console.log(backendSearchTerms, "in funct");
   const onBackendSearchTermChange = (data: { [key: string]: any }) => {
-    console.log("dim,", data);
-    setBackendSearchTerms((previosState) => {
-      return { ...previosState, ...data };
+    // If you are doing updates in a row on object properties, then you need previous state function
+    setBackendSearchTerms((previousState) => {
+      return { ...previousState, ...data };
     });
   };
 
-  const onSearch = (data: UserSearchTerms) => {
+  const callZipBackendApi = () => {
+    setZipBackendApiFlag(true);
+  };
+
+  const callStateBackendApi = () => {
+    setStateBackendApiFlag(true);
+  };
+
+  const callCityBackendApi = () => {
+    setCityBackendApiFlag(true);
+  };
+
+  const callRestaurantBackendApi = () => {
+    setRestaurantBackendApiFlag(true);
+  };
+
+  const onSearch = (data = backendSearchTerms) => {
     // You will either have zipcode, or state or city and state or name
-    const {
-      zipcodeUserInput,
-      cityUserInput,
-      stateUserInput,
-      restaurantNameUserInput,
-    } = data;
-    // TODO: remove these sanitisations we have already checked
-    // we are sanitising input before sending it to backend
-    const trimZipCode = zipcodeUserInput?.trim();
-    const trimmedCity = cityUserInput?.trim();
-    const trimmedState = stateUserInput?.trim();
-    const trimmedRestaurantNameUserInput = restaurantNameUserInput?.trim();
+    //if (!searchFlag) return;
+
+    const { zipcode, city, state, restaurantName } = data;
+    console.log("onsearch", data);
 
     // using switch to break the program execution when a usecase is hit otherwise I have to write all possible combinations/permutaions in if statements
-    // as if statements do not break program execution for example: restaurant, city and state input will also trigger state and city input in if statements.
+    // if statements do not break program execution for example: restaurant, city and state input will also trigger state and city input in if statements.
 
-    // TODO: capitalise first letter of each word, check if id exists and then send to backend, we dont want to make unnecessary calls to bckend, check if user is enering valid stuff
+    // we have already checked and set the terms we want to send to backend so trigger backend call based on these switch cases
     switch (true) {
       // restaurantName, zipcode
-      case Boolean(trimmedRestaurantNameUserInput?.length) &&
-        Boolean(trimZipCode?.length) &&
-        Boolean(!trimmedState?.length) &&
-        Boolean(!trimmedCity?.length):
+      case Boolean(restaurantName?.id) &&
+        Boolean(zipcode?.id) &&
+        Boolean(!state?.id) &&
+        Boolean(!city?.id):
         console.log(" at restaurant zipcode no state");
         break;
       //restaurantName, state
-      case Boolean(trimmedRestaurantNameUserInput?.length) &&
-        Boolean(trimmedState?.length) &&
-        Boolean(!trimZipCode?.length) &&
-        Boolean(!trimmedCity?.length):
+      case Boolean(restaurantName?.id) &&
+        Boolean(state?.id) &&
+        Boolean(!zipcode?.id) &&
+        Boolean(!city?.id):
         console.log("restaurant, state, nop zip");
         break;
       //restaurantName, state, city
-      case Boolean(trimmedRestaurantNameUserInput?.length) &&
-        Boolean(trimmedState?.length) &&
-        Boolean(trimmedCity?.length) &&
-        Boolean(!trimZipCode?.length):
+      case Boolean(restaurantName?.id) &&
+        Boolean(state?.id) &&
+        Boolean(city?.id) &&
+        Boolean(!zipcode?.id):
         console.log("restaurant,state,city,nozip");
         break;
       //restaurantName
-      case Boolean(trimmedRestaurantNameUserInput?.length) &&
-        Boolean(!trimmedState?.length) &&
-        Boolean(!trimmedCity?.length) &&
-        Boolean(!trimZipCode?.length):
+      case Boolean(restaurantName?.id) &&
+        Boolean(!state?.id) &&
+        Boolean(!city?.id) &&
+        Boolean(!zipcode?.id):
         console.log("only restaurant");
         break;
       // zipcode
-      case Boolean(trimZipCode?.length) &&
-        Boolean(!trimmedState?.length) &&
-        Boolean(!trimmedCity?.length) &&
-        Boolean(!trimmedRestaurantNameUserInput):
+      case Boolean(zipcode?.id) &&
+        Boolean(!state?.id) &&
+        Boolean(!city?.id) &&
+        Boolean(!restaurantNameUserInput):
         console.log(" only zipcode");
-        setZipcodeUserInput(trimZipCode!);
+        setZipcodeUserInput(zipcodeUserInput!);
         break;
       // state,city
-      case Boolean(trimmedState?.length) &&
-        Boolean(trimmedCity?.length) &&
-        Boolean(!trimZipCode?.length) &&
-        Boolean(!trimmedRestaurantNameUserInput):
+      case Boolean(state?.id) &&
+        Boolean(city?.id) &&
+        Boolean(!zipcode?.id) &&
+        Boolean(!restaurantName?.id):
         console.log("state and city no zipcode");
         break;
       // state
-      case Boolean(trimmedState?.length) &&
-        Boolean(!trimmedCity?.length) &&
-        Boolean(!trimZipCode?.length) &&
-        Boolean(!trimmedRestaurantNameUserInput):
+      case Boolean(state?.id) &&
+        Boolean(!city?.id) &&
+        Boolean(!zipcode?.id) &&
+        Boolean(!restaurantName?.id):
         console.log("only state no city no zipcode"); // no zipcode
         break;
       // TODO: error handling this means user didnt enter anything and submitted
@@ -503,6 +515,10 @@ export const SearchAndMapDisplayComponent: React.FC = () => {
           onRestaurantNameUserInputChange={onRestaurantNameInputChange}
           backendSearchTerms={backendSearchTerms}
           onBackendSearchTermChange={onBackendSearchTermChange}
+          callZipBackendApi={callZipBackendApi}
+          callStateBackendApi={callStateBackendApi}
+          callCityBackendApi={callCityBackendApi}
+          callRestaurantBackendApi={callRestaurantBackendApi}
         />
       </Grid.Col>
       <Grid.Col md={6} lg={6}>
