@@ -289,8 +289,8 @@ export const SearchAndMapDisplayComponent: React.FC = () => {
   );
   // Depending on what the user is searching, these functions trigger a backedn API call and set map data and map camera according to search results
   const zipCodeSearchResult = useQuery(
-    ["getZipCodeLocations", zipcodeUserInput],
-    () => fetchZipSearch(zipcodeUserInput),
+    ["getZipCodeLocations", backendSearchTerms.zipcode?.name],
+    () => fetchZipSearch(backendSearchTerms.zipcode?.name),
     {
       enabled: zipBackendApiFlag,
       onSuccess: (data) => {
@@ -305,6 +305,9 @@ export const SearchAndMapDisplayComponent: React.FC = () => {
         setMapData(mapLocations);
         setRefreshMapData(true);
         setZipcodeUserInput("");
+        onBackendSearchTermChange({
+          zipcode: undefined,
+        });
       },
     }
   );
@@ -429,7 +432,7 @@ export const SearchAndMapDisplayComponent: React.FC = () => {
   const callRestaurantBackendApi = () => {
     setRestaurantBackendApiFlag(true);
   };
-
+  console.log(zipcodeUserInput, zipBackendApiFlag, backendSearchTerms);
   const onSearch = (data = backendSearchTerms) => {
     // You will either have zipcode, or state or city and state or name
     //if (!searchFlag) return;
