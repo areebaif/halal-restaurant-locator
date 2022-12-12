@@ -14,6 +14,10 @@ interface locationDocument {
   // coordinates: [longitude, latitude] is the order in which values are inserted in the tuple
   geometry: { coordinates: [number, number]; type: "Point" };
 }
+
+let citySet: Set<{ id: number; name: string }>;
+let stateSet: Set<{ id: number; name: string }>;
+
 const router = express.Router();
 
 // TODO: api-documentation
@@ -36,8 +40,8 @@ router.get(
   async (req: Request, res: Response, next: NextFunction) => {
     try {
       // TODO: add restaurantName functionality to this
-      const citySet: Set<string> = new Set();
-      const stateSet: Set<string> = new Set();
+      const citySetTemp: Set<string> = new Set();
+      const stateSetTemp: Set<string> = new Set();
       const allRawData: {
         features: locationDocument[];
         type: "FeatureCollection";
@@ -45,16 +49,16 @@ router.get(
       // Sending zipSet with coordinates so that map can jump to those coordinates
       const zipSet = allRawData.features.map((item) => {
         const properties = item.properties;
-        citySet.add(properties.city);
-        stateSet.add(properties.state);
+        citySetTemp.add(properties.city);
+        stateSetTemp.add(properties.state);
         return {
           ...item,
           city_state: `${properties.city}, ${properties.state}`,
         };
       });
 
-      const arrayCitySet = Array.from(citySet);
-      const arrayStateSet = Array.from(stateSet);
+      const arrayCitySet = Array.from(citySetTemp);
+      const arrayStateSet = Array.from(stateSetTemp);
       const mappedCitySet = arrayCitySet.map((item, index) => {
         return { id: index, name: item };
       });
@@ -62,7 +66,12 @@ router.get(
         return { id: index, name: item };
       });
 
+      citySet = new Set(mappedCitySet);
+      stateSet = new Set(mappedStateSet);
+      console.log(citySet);
       console.log(stateSet);
+
+      //console.log(stateSet);
       res.header("Content-Type", "application/json");
 
       res.status(200).send({
@@ -85,6 +94,7 @@ router.get(
   async (req: Request, res: Response, next: NextFunction) => {
     try {
       const { zipcode } = req.params;
+      console.log(zipcode);
       //const zipCode: string = req.body;
       const allRawData: {
         features: locationDocument[];
@@ -114,6 +124,7 @@ router.get(
   "/api/dev/:state",
   async (req: Request, res: Response, next: NextFunction) => {
     try {
+      // TODO: fix this to be state id
       const { state } = req.params;
       //const zipCode: string = req.body;
       const allRawData: {
@@ -144,6 +155,7 @@ router.get(
   "/api/dev/:state/:city",
   async (req: Request, res: Response, next: NextFunction) => {
     try {
+      // TODO: fix this to be stat/ city id
       const { city, state } = req.params;
       //const zipCode: string = req.body;
       const allRawData: {
@@ -174,6 +186,7 @@ router.get(
   "/api/dev/:restaurantname",
   async (req: Request, res: Response, next: NextFunction) => {
     try {
+      // TODO: fix this to be restaurant id
       const { restaurantname } = req.params;
       //const zipCode: string = req.body;
       const allRawData: {

@@ -118,7 +118,6 @@ export const AutoCompleteInput: React.FC<AutoCompleteInputProps> = ({
     },
     {
       onSuccess: (data) => {
-        console.log("data", data);
         const stateFormattedData = data.stateSet.map((item) => {
           return { ...item, value: item.name };
         });
@@ -213,7 +212,6 @@ export const AutoCompleteInput: React.FC<AutoCompleteInputProps> = ({
       const object = validState?.[0];
       const id = object?.id;
       const name = object?.name;
-      console.log("state change baouit to trigger");
 
       onBackendSearchTermChange({
         state: { id: id, name: name },
