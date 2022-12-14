@@ -22,6 +22,22 @@ const router = express.Router();
 
 // TODO: api-documentation
 // TODO: error handling
+
+router.get("/api/dev/client-keys", async (req, res, next) => {
+  try {
+    const keys = `${process.env.MAPBOX_ACCESS_TOKEN}`;
+    console.log(keys);
+    res.status(200).send({
+      data: {
+        keys: keys,
+      },
+    });
+  } catch (err) {
+    //TODO: error handling
+    console.log(err);
+  }
+});
+
 router.get(
   "/api/dev/data",
   async (req: Request, res: Response, next: NextFunction) => {
@@ -68,10 +84,7 @@ router.get(
 
       citySet = new Set(mappedCitySet);
       stateSet = new Set(mappedStateSet);
-      console.log(citySet);
-      console.log(stateSet);
 
-      //console.log(stateSet);
       res.header("Content-Type", "application/json");
 
       res.status(200).send({
@@ -94,7 +107,7 @@ router.get(
   async (req: Request, res: Response, next: NextFunction) => {
     try {
       const { zipcode } = req.params;
-      console.log(zipcode);
+      //console.log(zipcode);
       //const zipCode: string = req.body;
       const allRawData: {
         features: locationDocument[];

@@ -29,12 +29,6 @@ export interface CameraViewState {
 const dataSourceId = "some id";
 const layerId = "points";
 
-export interface UserSearchTerms {
-  zipcodeUserInput: string | null;
-  cityUserInput: string | null;
-  stateUserInput: string | null;
-  restaurantNameUserInput: string | null;
-}
 // this is used to send searchterms with specified data to backend
 export interface BackendSearchTerms {
   zipcode: { id: BigInteger; name: string } | undefined;
@@ -247,7 +241,7 @@ export const SearchAndMapDisplayComponent: React.FC = () => {
   const [cityBackendApiFlag, setCityBackendApiFlag] = React.useState(false);
   const [restaurantBackendApiFlag, setRestaurantBackendApiFlag] =
     React.useState(false);
-
+  //clientKeys =
   //TODO: extract out data fetching functions put them in a separate file
   // Data fetching
   const URL = "/api/dev/data";
@@ -270,6 +264,7 @@ export const SearchAndMapDisplayComponent: React.FC = () => {
         // TODO: fix this that only search term is sent depending on what the search term is
         // TODO: You have to also set camera angle depending on what the user has searched, right now we are hardcoding
         setCameraViewState({ latitude: 41.45, longitude: -88.53, zoom: 7.2 });
+        console.log("I was ran on sucess");
         // do some data manuplulation to only set Chicago Data. There are too many data points
 
         const filteredValues = data?.features?.filter((item: any) => {
@@ -289,10 +284,14 @@ export const SearchAndMapDisplayComponent: React.FC = () => {
   );
   // Depending on what the user is searching, these functions trigger a backedn API call and set map data and map camera according to search results
   const zipCodeSearchResult = useQuery(
-    ["getZipCodeLocations", backendSearchTerms.zipcode?.name],
+    ["getZipCodeSearch", backendSearchTerms.zipcode?.name],
     () => fetchZipSearch(backendSearchTerms.zipcode?.name),
     {
-      enabled: zipBackendApiFlag,
+      enabled:
+        zipBackendApiFlag &&
+        !stateBackendApiFlag &&
+        !cityBackendApiFlag &&
+        !restaurantBackendApiFlag,
       onSuccess: (data) => {
         setZipBackendApiFlag(false);
         const mapLocations: GeoJSON.FeatureCollection<
@@ -322,7 +321,9 @@ export const SearchAndMapDisplayComponent: React.FC = () => {
   }
 
   const onCameraViewStateChange = (data: CameraViewState) => {
-    setCameraViewState(data);
+    setCameraViewState((previousState) => {
+      return { ...previousState, ...data };
+    });
   };
 
   const onRestaurantNameInputChange = (value: string) => {
