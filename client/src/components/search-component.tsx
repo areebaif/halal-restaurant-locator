@@ -1,11 +1,8 @@
 import * as React from "react";
-import { TextInput, Button, Group, AutocompleteItem } from "@mantine/core";
+import { Button, Group, AutocompleteItem } from "@mantine/core";
 import { useQuery } from "react-query";
-import { IconSearch } from "@tabler/icons";
 import { Autocomplete } from "@mantine/core";
-import { BackendSearchTerms, UserSearchTerms } from "./search-map-display";
-import { isTemplateExpression } from "typescript";
-import { StringifyOptions } from "querystring";
+import { BackendSearchTerms } from "./search-map-display";
 
 // TODO: Restaurant document interface, data modelling and hook it up to backend
 
