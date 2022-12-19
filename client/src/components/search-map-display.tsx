@@ -284,16 +284,11 @@ export const SearchAndMapDisplayComponent: React.FC = () => {
   );
   // Depending on what the user is searching, these functions trigger a backedn API call and set map data and map camera according to search results
   const zipCodeSearchResult = useQuery(
-    ["getZipCodeSearch", backendSearchTerms.zipcode?.name],
-    () => fetchZipSearch(backendSearchTerms.zipcode?.name),
+    ["getZipCodeSearch", zipcodeUserInput],
+    () => fetchZipSearch(zipcodeUserInput),
     {
-      enabled:
-        zipBackendApiFlag &&
-        !stateBackendApiFlag &&
-        !cityBackendApiFlag &&
-        !restaurantBackendApiFlag,
+      enabled: false,
       onSuccess: (data) => {
-        setZipBackendApiFlag(false);
         const mapLocations: GeoJSON.FeatureCollection<
           GeoJSON.Geometry,
           PropertiesProps
@@ -304,19 +299,44 @@ export const SearchAndMapDisplayComponent: React.FC = () => {
         setMapData(mapLocations);
         setRefreshMapData(true);
         setZipcodeUserInput("");
-        onBackendSearchTermChange({
-          zipcode: undefined,
-        });
       },
     }
   );
+
+  // const zipCodeSearchResult = useQuery(
+  //   ["getZipCodeSearchTest", backendSearchTerms.zipcode?.name],
+  //   () => fetchZipSearch(backendSearchTerms.zipcode?.name),
+  //   {
+  //     enabled:
+  //       zipBackendApiFlag &&
+  //       !stateBackendApiFlag &&
+  //       !cityBackendApiFlag &&
+  //       !restaurantBackendApiFlag,
+  //     onSuccess: (data) => {
+  //       setZipBackendApiFlag(false);
+  //       const mapLocations: GeoJSON.FeatureCollection<
+  //         GeoJSON.Geometry,
+  //         PropertiesProps
+  //       > = {
+  //         type: "FeatureCollection",
+  //         features: data.length ? data : [],
+  //       };
+  //       setMapData(mapLocations);
+  //       setRefreshMapData(true);
+  //       setZipcodeUserInput("");
+  //       onBackendSearchTermChange({
+  //         zipcode: undefined,
+  //       });
+  //     },
+  //   }
+  // );
 
   if (chicagoLocations.isLoading) {
     return <span>Loading...</span>;
   }
 
   if (chicagoLocations.isError || zipCodeSearchResult.isError) {
-    setZipBackendApiFlag(false);
+    //setZipBackendApiFlag(false);
     return <span>Error: error occured</span>;
   }
 
@@ -433,7 +453,7 @@ export const SearchAndMapDisplayComponent: React.FC = () => {
   const callRestaurantBackendApi = () => {
     setRestaurantBackendApiFlag(true);
   };
-  console.log(zipcodeUserInput, zipBackendApiFlag, backendSearchTerms);
+  //console.log(zipcodeUserInput, zipBackendApiFlag, backendSearchTerms);
   const onSearch = (data = backendSearchTerms) => {
     // You will either have zipcode, or state or city and state or name
     //if (!searchFlag) return;
