@@ -2,7 +2,13 @@ import * as React from "react";
 import { Autocomplete, Button, Group, AutocompleteItem } from "@mantine/core";
 import { useQuery } from "react-query";
 import * as ReactRouter from "react-router-dom";
+import * as ReactRedux from "react-redux";
 import { fetchZipSearch } from "../backendFunctions";
+//import { useAppDispatch, useAppSelector } from "../redux-store/redux-hooks";
+import { RootState } from "../redux-store/store";
+//import reduxStore from "../redux-store/store"
+import { zipcodeChange } from "../redux-store/search-slice";
+import { SearchTerms } from "../redux-store/search-slice";
 
 export interface restaurantDocument {
   id: BigInteger;
@@ -75,6 +81,12 @@ export const SearchBar: React.FC<{}> = () => {
   const path = location.pathname;
   const navigate = ReactRouter.useNavigate();
 
+  // ReduxToolkit functions
+  const dispatch = ReactRedux.useDispatch();
+  const globalZipcodeValue = ReactRedux.useSelector(
+    (state: RootState) => state.search
+  );
+
   // onChange functions
   const onRestaurantNameUserInputChange = (value: string) => {
     console.log("restaurantVqaluex", value);
@@ -110,6 +122,7 @@ export const SearchBar: React.FC<{}> = () => {
 
   const onZipcodeUserInputChange = (value: string) => {
     // check for white spaces in zipcode
+    console.log(value);
     const specialChars = /[ ]/;
     const expression = true;
     switch (expression) {
@@ -238,6 +251,7 @@ export const SearchBar: React.FC<{}> = () => {
       // TODO: error handling
       console.log("error: user didnt enter anything throw error");
     }
+    dispatch(zipcodeChange(zipcodeUserInput));
     // TODO: set inputs in redux global state
     if (path === "/") {
       // redirect
@@ -313,126 +327,230 @@ export const SearchBar: React.FC<{}> = () => {
     return <span>Error: error occured</span>;
   }
 
-  const AutoComplete: React.FC = () => {
-    return (
-      <React.Fragment>
-        <Autocomplete
-          label="name"
-          placeholder="Start typing to see options"
-          value={restaurantNameUserInput}
-          limit={7}
-          onChange={onRestaurantNameUserInputChange}
-          data={restaurantData ? restaurantData : []}
-        />
-        <Group position="center" spacing="xl" grow={true}>
-          {errorZipcodeUserInput ? (
-            <Autocomplete
-              label="Zip code"
-              error="Please provide valid zipcode"
-              onChange={onZipcodeUserInputChange}
-              data={[]}
-              value={zipcodeUserInput}
-            />
-          ) : (
-            <Autocomplete
-              label="zipcode"
-              placeholder={`${
-                cityUserInput.length || stateUserInput.length
-                  ? "state & city must be empty to search"
-                  : "Start typing to see options"
-              } `}
-              value={zipcodeUserInput}
-              limit={7}
-              disabled={Boolean(cityUserInput.length || stateUserInput.length)}
-              onChange={onZipcodeUserInputChange}
-              data={zipData ? zipData : []}
-            />
-          )}
-          {errorCityUserInput ? (
-            <Autocomplete
-              label="city"
-              error="Please provide valid city"
-              placeholder="start typing"
-              value={cityUserInput}
-              onChange={onCityUserInputChange}
-              data={[]}
-            />
-          ) : (
-            <Autocomplete
-              label="city"
-              placeholder={`${
-                zipcodeUserInput.length
-                  ? "zipcode must be empty to search"
-                  : "Start typing to see options"
-              } `}
-              value={cityUserInput}
-              limit={7}
-              disabled={Boolean(zipcodeUserInput.length)}
-              onChange={onCityUserInputChange}
-              data={cityData ? cityData : []}
-            />
-          )}
-          {errorStateUserInput ||
-          (cityUserInput.length > 0 && stateUserInput.length === 0) ? (
-            <Autocomplete
-              label="state"
-              error={`${
-                cityUserInput.length > 0 && stateUserInput.length === 0
-                  ? "state required if you are searching by city"
-                  : "Please provide valid state value"
-              }`}
-              placeholder={`${
-                cityUserInput.length > 0 && stateUserInput.length === 0
-                  ? ""
-                  : "start typing"
-              }`}
-              value={stateUserInput}
-              onChange={onStateUserInputChange}
-              data={[]}
-            />
-          ) : (
-            <Autocomplete
-              label="state"
-              placeholder={`${
-                zipcodeUserInput.length
-                  ? "zipcode must be empty to search"
-                  : "Start typing to see options"
-              } `}
-              value={stateUserInput}
-              limit={7}
-              disabled={Boolean(zipcodeUserInput.length)}
-              onChange={onStateUserInputChange}
-              data={stateData ? stateData : []}
-              required={cityUserInput.length > 0}
-            />
-          )}
-          <Button
-            disabled={
-              errorCityUserInput ||
-              errorZipcodeUserInput ||
-              errorStateUserInput ||
-              (cityUserInput.length > 0 && stateUserInput.length === 0)
-            }
-            onClick={() => {
-              onSubmit();
-              console.log("clicked");
-            }}
-          >
-            Submit
-          </Button>
-        </Group>
-      </React.Fragment>
-    );
-  };
-
   return (
     <React.Fragment>
       {path === "/" ? (
-        <AutoComplete />
+        <React.Fragment>
+          <Autocomplete
+            label="name"
+            placeholder="Start typing to see options"
+            value={restaurantNameUserInput}
+            limit={7}
+            onChange={onRestaurantNameUserInputChange}
+            data={restaurantData ? restaurantData : []}
+          />
+          <Group position="center" spacing="xl" grow={true}>
+            {errorZipcodeUserInput ? (
+              <Autocomplete
+                label="Zip code"
+                error="Please provide valid zipcode"
+                onChange={onZipcodeUserInputChange}
+                data={[]}
+                value={zipcodeUserInput}
+              />
+            ) : (
+              <Autocomplete
+                label="zipcode"
+                placeholder={`${
+                  cityUserInput.length || stateUserInput.length
+                    ? "state & city must be empty to search"
+                    : "Start typing to see options"
+                } `}
+                value={zipcodeUserInput}
+                limit={7}
+                disabled={Boolean(
+                  cityUserInput.length || stateUserInput.length
+                )}
+                onChange={onZipcodeUserInputChange}
+                data={zipData ? zipData : []}
+              />
+            )}
+            {errorCityUserInput ? (
+              <Autocomplete
+                label="city"
+                error="Please provide valid city"
+                placeholder="start typing"
+                value={cityUserInput}
+                onChange={onCityUserInputChange}
+                data={[]}
+              />
+            ) : (
+              <Autocomplete
+                label="city"
+                placeholder={`${
+                  zipcodeUserInput.length
+                    ? "zipcode must be empty to search"
+                    : "Start typing to see options"
+                } `}
+                value={cityUserInput}
+                limit={7}
+                disabled={Boolean(zipcodeUserInput.length)}
+                onChange={onCityUserInputChange}
+                data={cityData ? cityData : []}
+              />
+            )}
+            {errorStateUserInput ||
+            (cityUserInput.length > 0 && stateUserInput.length === 0) ? (
+              <Autocomplete
+                label="state"
+                error={`${
+                  cityUserInput.length > 0 && stateUserInput.length === 0
+                    ? "state required if you are searching by city"
+                    : "Please provide valid state value"
+                }`}
+                placeholder={`${
+                  cityUserInput.length > 0 && stateUserInput.length === 0
+                    ? ""
+                    : "start typing"
+                }`}
+                value={stateUserInput}
+                onChange={onStateUserInputChange}
+                data={[]}
+              />
+            ) : (
+              <Autocomplete
+                label="state"
+                placeholder={`${
+                  zipcodeUserInput.length
+                    ? "zipcode must be empty to search"
+                    : "Start typing to see options"
+                } `}
+                value={stateUserInput}
+                limit={7}
+                disabled={Boolean(zipcodeUserInput.length)}
+                onChange={onStateUserInputChange}
+                data={stateData ? stateData : []}
+                required={cityUserInput.length > 0}
+              />
+            )}
+            <Button
+              disabled={
+                errorCityUserInput ||
+                errorZipcodeUserInput ||
+                errorStateUserInput ||
+                (cityUserInput.length > 0 && stateUserInput.length === 0)
+              }
+              onClick={() => {
+                onSubmit();
+                console.log("clicked");
+              }}
+            >
+              Submit
+            </Button>
+          </Group>
+        </React.Fragment>
       ) : (
         <div>
-          <AutoComplete />
-          <div>"yolo"</div>
+          <React.Fragment>
+            <Autocomplete
+              label="name"
+              placeholder="Start typing to see options"
+              value={restaurantNameUserInput}
+              limit={7}
+              onChange={onRestaurantNameUserInputChange}
+              data={restaurantData ? restaurantData : []}
+            />
+            <Group position="center" spacing="xl" grow={true}>
+              {errorZipcodeUserInput ? (
+                <Autocomplete
+                  label="Zip code"
+                  error="Please provide valid zipcode"
+                  onChange={onZipcodeUserInputChange}
+                  data={[]}
+                  value={zipcodeUserInput}
+                />
+              ) : (
+                <Autocomplete
+                  label="zipcode"
+                  placeholder={`${
+                    cityUserInput.length || stateUserInput.length
+                      ? "state & city must be empty to search"
+                      : "Start typing to see options"
+                  } `}
+                  value={zipcodeUserInput}
+                  limit={7}
+                  disabled={Boolean(
+                    cityUserInput.length || stateUserInput.length
+                  )}
+                  onChange={onZipcodeUserInputChange}
+                  data={zipData ? zipData : []}
+                />
+              )}
+              {errorCityUserInput ? (
+                <Autocomplete
+                  label="city"
+                  error="Please provide valid city"
+                  placeholder="start typing"
+                  value={cityUserInput}
+                  onChange={onCityUserInputChange}
+                  data={[]}
+                />
+              ) : (
+                <Autocomplete
+                  label="city"
+                  placeholder={`${
+                    zipcodeUserInput.length
+                      ? "zipcode must be empty to search"
+                      : "Start typing to see options"
+                  } `}
+                  value={cityUserInput}
+                  limit={7}
+                  disabled={Boolean(zipcodeUserInput.length)}
+                  onChange={onCityUserInputChange}
+                  data={cityData ? cityData : []}
+                />
+              )}
+              {errorStateUserInput ||
+              (cityUserInput.length > 0 && stateUserInput.length === 0) ? (
+                <Autocomplete
+                  label="state"
+                  error={`${
+                    cityUserInput.length > 0 && stateUserInput.length === 0
+                      ? "state required if you are searching by city"
+                      : "Please provide valid state value"
+                  }`}
+                  placeholder={`${
+                    cityUserInput.length > 0 && stateUserInput.length === 0
+                      ? ""
+                      : "start typing"
+                  }`}
+                  value={stateUserInput}
+                  onChange={onStateUserInputChange}
+                  data={[]}
+                />
+              ) : (
+                <Autocomplete
+                  label="state"
+                  placeholder={`${
+                    zipcodeUserInput.length
+                      ? "zipcode must be empty to search"
+                      : "Start typing to see options"
+                  } `}
+                  value={stateUserInput}
+                  limit={7}
+                  disabled={Boolean(zipcodeUserInput.length)}
+                  onChange={onStateUserInputChange}
+                  data={stateData ? stateData : []}
+                  required={cityUserInput.length > 0}
+                />
+              )}
+              <Button
+                disabled={
+                  errorCityUserInput ||
+                  errorZipcodeUserInput ||
+                  errorStateUserInput ||
+                  (cityUserInput.length > 0 && stateUserInput.length === 0)
+                }
+                onClick={() => {
+                  onSubmit();
+                  console.log("clicked");
+                }}
+              >
+                Submit
+              </Button>
+            </Group>
+          </React.Fragment>
+          <div>` yolo ${globalZipcodeValue.zipcode}</div>
         </div>
       )}
     </React.Fragment>
