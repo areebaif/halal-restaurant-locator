@@ -56,6 +56,7 @@ router.get(
   async (req: Request, res: Response, next: NextFunction) => {
     try {
       // TODO: add restaurantName functionality to this
+      console.log("backedn hit");
       const citySetTemp: Set<string> = new Set();
       const stateSetTemp: Set<string> = new Set();
       const allRawData: {
