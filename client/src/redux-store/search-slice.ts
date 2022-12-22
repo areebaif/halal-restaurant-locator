@@ -49,6 +49,7 @@ export const SearchSlice = createSlice({
   name: "user-search-input",
   initialState,
   reducers: {
+    // userInputs
     onZipcodeUserInputChange: (state, action: PayloadAction<string>) => {
       state.zipcodeUserInput = action.payload;
     },
@@ -61,6 +62,7 @@ export const SearchSlice = createSlice({
     onRestaurantNameUserInputChange: (state, action: PayloadAction<string>) => {
       state.restaurantNameUserInput = action.payload;
     },
+    // backned Inputs
     onZipCodeBackendInputChange: (
       state,
       action: PayloadAction<{
@@ -97,7 +99,7 @@ export const SearchSlice = createSlice({
     ) => {
       state.restaurantBackendInput = action.payload;
     },
-
+    // query flags
     onFetchRestaurantZipcode: (state, action: PayloadAction<boolean>) => {
       state.fetchRestaurantZipcode = action.payload;
     },

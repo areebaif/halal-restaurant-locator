@@ -201,7 +201,6 @@ router.get(
   "/api/dev/state-city/:stateId/:cityId",
   async (req: Request, res: Response, next: NextFunction) => {
     try {
-      console.log("city i was hit");
       const { cityId, stateId } = req.params;
       const allRawData: {
         features: locationDocument[];
