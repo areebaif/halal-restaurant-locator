@@ -2,6 +2,7 @@ import * as React from "react";
 import { QueryClient, QueryClientProvider, useQuery } from "react-query";
 import { HeaderAction, HeaderActionProps } from "./components/header";
 import { Routes, Route } from "react-router-dom";
+import { SearchBar } from "./components/UserInputAutoComplete";
 import { Layout } from "./components/Layout";
 import { config } from "dotenv";
 
@@ -42,6 +43,14 @@ function App() {
         <Routes>
           <Route path="/" element={<Layout />}></Route>
           <Route path="/auth/signup" element={<div>we navigated</div>}></Route>
+          <Route
+            path="/search-display"
+            element={
+              <div>
+                yoho we navigated <SearchBar />
+              </div>
+            }
+          ></Route>
         </Routes>
       </QueryClientProvider>
     </React.Fragment>

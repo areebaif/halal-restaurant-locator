@@ -29,11 +29,12 @@ export interface CameraViewState {
 const dataSourceId = "some id";
 const layerId = "points";
 
-export interface SearchTerms {
-  zipcodeUserInput: string | null;
-  cityUserInput: string | null;
-  stateUserInput: string | null;
-  nameUserInput?: string | null;
+// this is used to send searchterms with specified data to backend
+export interface BackendSearchTerms {
+  zipcode: { id: BigInteger; name: string } | undefined;
+  city: { id: BigInteger; name: string } | undefined;
+  state: { id: BigInteger; name: string } | undefined;
+  restaurantName: { id: BigInteger; name: string } | undefined;
 }
 
 // This data has london points
@@ -223,22 +224,29 @@ export const SearchAndMapDisplayComponent: React.FC = () => {
   const [errorCityUserInput, setErrorCityUserInput] = React.useState(false);
   const [stateUserInput, setStateUserInput] = React.useState("");
   const [errorStateUserInput, setErrorStateUserInput] = React.useState(false);
+  const [restaurantNameUserInput, setRestaurantNameUserInput] =
+    React.useState("");
 
-  // TODO: not sure if i need this
-  const [searchTerm, setSearchTerm] = React.useState<SearchTerms>({
-    zipcodeUserInput: null,
-    cityUserInput: null,
-    stateUserInput: null,
-    nameUserInput: null,
-  });
-  // Backend Api Props
-  const [callZipBackendApi, setZipCallBackendApi] = React.useState(false);
-
+  // backend api props based on user input
+  const [backendSearchTerms, setBackendSearchTerms] =
+    React.useState<BackendSearchTerms>({
+      zipcode: undefined,
+      city: undefined,
+      state: undefined,
+      restaurantName: undefined,
+    });
+  // flags to call backend api
+  const [zipBackendApiFlag, setZipBackendApiFlag] = React.useState(false);
+  const [stateBackendApiFlag, setStateBackendApiFlag] = React.useState(false);
+  const [cityBackendApiFlag, setCityBackendApiFlag] = React.useState(false);
+  const [restaurantBackendApiFlag, setRestaurantBackendApiFlag] =
+    React.useState(false);
+  //clientKeys =
   //TODO: extract out data fetching functions put them in a separate file
   // Data fetching
   const URL = "/api/dev/data";
-  // TODO: name his query and extract isLoading functions etc
-  const { isLoading, isError } = useQuery(
+  // TODO: name this query and extract isLoading functions etc
+  const chicagoLocations = useQuery(
     "getAllLocations",
     async () => {
       const response = await fetch(URL);
@@ -256,7 +264,9 @@ export const SearchAndMapDisplayComponent: React.FC = () => {
         // TODO: fix this that only search term is sent depending on what the search term is
         // TODO: You have to also set camera angle depending on what the user has searched, right now we are hardcoding
         setCameraViewState({ latitude: 41.45, longitude: -88.53, zoom: 7.2 });
+        console.log("I was ran on sucess");
         // do some data manuplulation to only set Chicago Data. There are too many data points
+
         const filteredValues = data?.features?.filter((item: any) => {
           return item.properties.city === "Chicago";
         });
@@ -272,19 +282,13 @@ export const SearchAndMapDisplayComponent: React.FC = () => {
       },
     }
   );
-  const zipCodeSearch = useQuery(
-    ["getZipCodeLocations", zipcodeUserInput],
+  // Depending on what the user is searching, these functions trigger a backedn API call and set map data and map camera according to search results
+  const zipCodeSearchResult = useQuery(
+    ["getZipCodeSearch", zipcodeUserInput],
     () => fetchZipSearch(zipcodeUserInput),
     {
-      enabled: callZipBackendApi,
+      enabled: false,
       onSuccess: (data) => {
-        setZipCallBackendApi(false);
-        // // TODO: fix this that only search term is sent depending on what the search term is
-        // // do some data manuplulation to only set Chicago Data. There are too many data points
-        // const filteredValues = data?.features?.filter((item: any) => {
-        //   return item.properties.city === "Chicago";
-        // });
-
         const mapLocations: GeoJSON.FeatureCollection<
           GeoJSON.Geometry,
           PropertiesProps
@@ -294,20 +298,57 @@ export const SearchAndMapDisplayComponent: React.FC = () => {
         };
         setMapData(mapLocations);
         setRefreshMapData(true);
+        setZipcodeUserInput("");
       },
     }
   );
 
-  if (isLoading) {
+  // const zipCodeSearchResult = useQuery(
+  //   ["getZipCodeSearchTest", backendSearchTerms.zipcode?.name],
+  //   () => fetchZipSearch(backendSearchTerms.zipcode?.name),
+  //   {
+  //     enabled:
+  //       zipBackendApiFlag &&
+  //       !stateBackendApiFlag &&
+  //       !cityBackendApiFlag &&
+  //       !restaurantBackendApiFlag,
+  //     onSuccess: (data) => {
+  //       setZipBackendApiFlag(false);
+  //       const mapLocations: GeoJSON.FeatureCollection<
+  //         GeoJSON.Geometry,
+  //         PropertiesProps
+  //       > = {
+  //         type: "FeatureCollection",
+  //         features: data.length ? data : [],
+  //       };
+  //       setMapData(mapLocations);
+  //       setRefreshMapData(true);
+  //       setZipcodeUserInput("");
+  //       onBackendSearchTermChange({
+  //         zipcode: undefined,
+  //       });
+  //     },
+  //   }
+  // );
+
+  if (chicagoLocations.isLoading) {
     return <span>Loading...</span>;
   }
 
-  if (isError || zipCodeSearch.isError) {
+  if (chicagoLocations.isError || zipCodeSearchResult.isError) {
+    //setZipBackendApiFlag(false);
     return <span>Error: error occured</span>;
   }
 
   const onCameraViewStateChange = (data: CameraViewState) => {
-    setCameraViewState(data);
+    setCameraViewState((previousState) => {
+      return { ...previousState, ...data };
+    });
+  };
+
+  const onRestaurantNameInputChange = (value: string) => {
+    console.log("restaurantVqaluex", value);
+    setRestaurantNameUserInput(value);
   };
 
   const onStateUserInputChange = (value: string) => {
@@ -390,39 +431,96 @@ export const SearchAndMapDisplayComponent: React.FC = () => {
   const refreshDataMap = () => {
     setRefreshMapData(false);
   };
-
-  const onSearch = (data: SearchTerms) => {
-    // we are using input give to this function as that input has been sanitized(whiote spaces removed etc)
-
-    // You will either have zipcode, or state or city and state
-    const { zipcodeUserInput, cityUserInput, stateUserInput, nameUserInput } =
-      data;
-    if (zipcodeUserInput?.length) {
-      // we are sanitised value as input
-      setZipcodeUserInput(zipcodeUserInput);
-      setZipCallBackendApi(true);
-      // trigger search for zipcode and reset all values
-    }
-
-    if (stateUserInput?.length && cityUserInput?.length) {
-      // trigger search for state and city and reset all values
-    }
-
-    if (stateUserInput?.length && !cityUserInput?.length) {
-      // trigger search for state and reset all values
-    }
-
-    if (nameUserInput?.length) {
-      // trigger search for name and reset all values
-    }
+  const onBackendSearchTermChange = (data: { [key: string]: any }) => {
+    // If you are doing updates in a row on object properties, then you need previous state function
+    setBackendSearchTerms((previousState) => {
+      return { ...previousState, ...data };
+    });
   };
 
-  // const onSeacrhQuery = (
-  //   data: GeoJSON.FeatureCollection<GeoJSON.Geometry, any>
-  // ) => {
-  //   setMapData(data);
-  // };
+  const callZipBackendApi = () => {
+    setZipBackendApiFlag(true);
+  };
 
+  const callStateBackendApi = () => {
+    setStateBackendApiFlag(true);
+  };
+
+  const callCityBackendApi = () => {
+    setCityBackendApiFlag(true);
+  };
+
+  const callRestaurantBackendApi = () => {
+    setRestaurantBackendApiFlag(true);
+  };
+  //console.log(zipcodeUserInput, zipBackendApiFlag, backendSearchTerms);
+  const onSearch = (data = backendSearchTerms) => {
+    // You will either have zipcode, or state or city and state or name
+    //if (!searchFlag) return;
+
+    const { zipcode, city, state, restaurantName } = data;
+    console.log("onsearch", data);
+
+    // using switch to break the program execution when a usecase is hit otherwise I have to write all possible combinations/permutaions in if statements
+    // if statements do not break program execution for example: restaurant, city and state input will also trigger state and city input in if statements.
+
+    // we have already checked and set the terms we want to send to backend so trigger backend call based on these switch cases
+    switch (true) {
+      // restaurantName, zipcode
+      case Boolean(restaurantName?.id) &&
+        Boolean(zipcode?.id) &&
+        Boolean(!state?.id) &&
+        Boolean(!city?.id):
+        console.log(" at restaurant zipcode no state");
+        break;
+      //restaurantName, state
+      case Boolean(restaurantName?.id) &&
+        Boolean(state?.id) &&
+        Boolean(!zipcode?.id) &&
+        Boolean(!city?.id):
+        console.log("restaurant, state, nop zip");
+        break;
+      //restaurantName, state, city
+      case Boolean(restaurantName?.id) &&
+        Boolean(state?.id) &&
+        Boolean(city?.id) &&
+        Boolean(!zipcode?.id):
+        console.log("restaurant,state,city,nozip");
+        break;
+      //restaurantName
+      case Boolean(restaurantName?.id) &&
+        Boolean(!state?.id) &&
+        Boolean(!city?.id) &&
+        Boolean(!zipcode?.id):
+        console.log("only restaurant");
+        break;
+      // zipcode
+      case Boolean(zipcode?.id) &&
+        Boolean(!state?.id) &&
+        Boolean(!city?.id) &&
+        Boolean(!restaurantNameUserInput):
+        console.log(" only zipcode");
+        setZipcodeUserInput(zipcodeUserInput!);
+        break;
+      // state,city
+      case Boolean(state?.id) &&
+        Boolean(city?.id) &&
+        Boolean(!zipcode?.id) &&
+        Boolean(!restaurantName?.id):
+        console.log("state and city no zipcode");
+        break;
+      // state
+      case Boolean(state?.id) &&
+        Boolean(!city?.id) &&
+        Boolean(!zipcode?.id) &&
+        Boolean(!restaurantName?.id):
+        console.log("only state no city no zipcode"); // no zipcode
+        break;
+      // TODO: error handling this means user didnt enter anything and submitted
+      default:
+        console.log("error");
+    }
+  };
   return mapData ? (
     <Grid>
       <Grid.Col md={12} lg={12}>
@@ -437,6 +535,14 @@ export const SearchAndMapDisplayComponent: React.FC = () => {
           onStateUserInputChange={onStateUserInputChange}
           errorStateUserInput={errorStateUserInput}
           onSearch={onSearch}
+          restaurantNameUserInput={restaurantNameUserInput}
+          onRestaurantNameUserInputChange={onRestaurantNameInputChange}
+          backendSearchTerms={backendSearchTerms}
+          onBackendSearchTermChange={onBackendSearchTermChange}
+          callZipBackendApi={callZipBackendApi}
+          callStateBackendApi={callStateBackendApi}
+          callCityBackendApi={callCityBackendApi}
+          callRestaurantBackendApi={callRestaurantBackendApi}
         />
       </Grid.Col>
       <Grid.Col md={6} lg={6}>

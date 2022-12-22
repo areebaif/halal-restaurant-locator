@@ -1,4 +1,5 @@
 import express, { NextFunction, Response, Request } from "express";
+import { config } from "dotenv";
 import bodyParser from "body-parser";
 import { halalFinderRouter } from "./routes/halal-finder";
 

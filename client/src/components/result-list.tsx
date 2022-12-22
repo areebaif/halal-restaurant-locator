@@ -9,7 +9,7 @@ import {
   ScrollArea,
 } from "@mantine/core";
 
-import { activeMarkerProps } from "./search-mapdisplay";
+import { activeMarkerProps } from "./search-map-display";
 
 // We need this varibale to sync map id data with react and its local to this file
 let hoverId: string | undefined | number = undefined;

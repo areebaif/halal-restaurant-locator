@@ -4,18 +4,22 @@ import { BrowserRouter } from "react-router-dom";
 import App from "./App";
 import reportWebVitals from "./reportWebVitals";
 import { MantineProvider } from "@mantine/core";
+import * as ReactRedux from "react-redux";
 import { theme } from "./components/theme/theme";
+import { reduxStore } from "./redux-store/store";
 
 const root = ReactDOM.createRoot(
   document.getElementById("root") as HTMLElement
 );
 root.render(
   <React.StrictMode>
-    <BrowserRouter>
-      <MantineProvider withGlobalStyles withNormalizeCSS theme={theme}>
-        <App />
-      </MantineProvider>
-    </BrowserRouter>
+    <ReactRedux.Provider store={reduxStore}>
+      <BrowserRouter>
+        <MantineProvider withGlobalStyles withNormalizeCSS theme={theme}>
+          <App />
+        </MantineProvider>
+      </BrowserRouter>
+    </ReactRedux.Provider>
   </React.StrictMode>
 );
 

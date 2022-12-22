@@ -1,6 +1,66 @@
-import { PropertiesProps } from "./components/search-mapdisplay";
+import { PropertiesProps } from "./components/search-map-display";
 // TODO: extratc out main function put it here
-export const fetchZipSearch = async (zipcodeUserInput: string) => {
+
+export interface restaurantDocument {
+  id: BigInteger;
+  name: string;
+  state: string;
+  city: string;
+  country: string;
+  zipcode: string;
+  longitude: number;
+  latitude: number;
+  // geolocation: [longitude,latitude]
+  geolocation: [number, number];
+}
+
+export interface cityDocument {
+  id: number;
+  name: string;
+}
+
+export interface stateDocument {
+  id: number;
+  name: string;
+}
+export interface ZipDocument {
+  city_state: string;
+  type: "Feature";
+  properties: {
+    title: string;
+    city: string;
+    state_id: string;
+    state: string;
+    zip: string;
+  };
+  id: number;
+  geometry: {
+    coordinates: [number, number];
+    type: "Point";
+  };
+}
+
+export interface FetchAutomplete {
+  citySet: cityDocument[];
+  stateSet: stateDocument[];
+  zipSet: ZipDocument[];
+  restaurantSet: restaurantDocument[];
+}
+
+export const fetchAutoCompleteData = async () => {
+  const response = await fetch("/api/dev/getGeography");
+
+  if (!response.ok) {
+    throw new Error("Network response was not ok");
+  }
+  const responseData: {
+    data: FetchAutomplete;
+  } = await response.json();
+  return responseData.data;
+};
+
+export const fetchZipSearch = async (zipcodeUserInput: string | undefined) => {
+  if (!zipcodeUserInput) throw new Error("provide zipcode value");
   const response = await fetch(`/api/dev/${zipcodeUserInput}`, {
     method: "GET",
     headers: {
@@ -20,8 +80,12 @@ export const fetchZipSearch = async (zipcodeUserInput: string) => {
   return data.data;
 };
 
-export const fetchStateSearch = async (stateUserInput: string) => {
-  const response = await fetch(`/api/dev/${stateUserInput}`, {
+export const fetchStateSearch = async (stateId: number) => {
+  // 0 is a falsy value
+  if (stateId === 0 ? false : !stateId)
+    throw new Error("provide state id to call backend function");
+  const url = `/api/dev/state/${stateId}`;
+  const response = await fetch(url, {
     method: "GET",
     headers: {
       "Content-Type": "application/json",
@@ -37,14 +101,18 @@ export const fetchStateSearch = async (stateUserInput: string) => {
       PropertiesProps
     >["features"];
   } = await response.json();
+  console.log("data", data);
   return data.data;
 };
 
 export const fetchStateAndCitySearch = async (
-  stateUserInput: string,
-  cityUserInput: string
+  stateId: number,
+  cityId: number
 ) => {
-  const response = await fetch(`/api/dev/${stateUserInput}/${cityUserInput}`, {
+  if ((stateId === 0 ? false : !stateId) || (cityId === 0 ? false : !cityId))
+    throw new Error("provide state id to call backend function");
+  const url = `/api/dev/state-city/${stateId}/${cityId}`;
+  const response = await fetch(url, {
     method: "GET",
     headers: {
       "Content-Type": "application/json",
@@ -63,8 +131,10 @@ export const fetchStateAndCitySearch = async (
   return data.data;
 };
 
+// TODO: fix this function
 export const fetchRestaurantNameSearch = async (name: string) => {
-  const response = await fetch(`/api/dev/${name}`, {
+  const url = `/api/dev/restaurant/${name}`;
+  const response = await fetch(`/api/dev/restaurant/${name}`, {
     method: "GET",
     headers: {
       "Content-Type": "application/json",
