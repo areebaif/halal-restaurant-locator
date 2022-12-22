@@ -11,6 +11,8 @@ import {
   cityDocument,
   stateDocument,
   FetchAutomplete,
+  fetchStateSearch,
+  fetchStateAndCitySearch,
 } from "../backendFunctions";
 import { useAppDispatch, useAppSelector } from "../redux-store/redux-hooks";
 import {
@@ -64,32 +66,8 @@ interface AutoCompleteInputProps {
   };
   onSubmit: () => void;
 }
-const transformDataForAutoComplete = (data: FetchAutomplete) => {
-  //console.log("data inside", data);
-  const { stateSet, citySet, zipSet, restaurantSet } = data;
-  const stateFormattedData = stateSet.map((item) => {
-    return { ...item, value: item.name };
-  });
-  const cityFormattedData = citySet.map((item) => {
-    return { ...item, value: item.name };
-  });
-  const zipFormattedData = zipSet.map((item) => ({
-    ...item,
-    value: item.properties.zip,
-  }));
-  // might throw error since we are not sending any data
-  const restaurantFormattedData = restaurantSet.map((item) => ({
-    ...item,
-    value: item.name,
-  }));
-  return {
-    stateFormattedData,
-    cityFormattedData,
-    zipFormattedData,
-    restaurantFormattedData,
-  };
-};
 
+// This component has been extracted to make code easier to parse
 const AutoCompleteInput: React.FC<AutoCompleteInputProps> = ({
   zipcode,
   state,
@@ -246,6 +224,16 @@ export const SearchBar: React.FC<{}> = () => {
     cityUserInput,
     restaurantNameUserInput,
     fetchZipcode,
+    fetchState,
+    fetchStateCity,
+    fetchRestaurant,
+    fetchRestaurantState,
+    fetchRestaurantStateCity,
+    fetchRestaurantZipcode,
+    zipcodeBackendInput,
+    stateBackendInput,
+    cityBackendInput,
+    restaurantBackendInput,
   } = searchUserInputs;
 
   // error props
@@ -334,7 +322,7 @@ export const SearchBar: React.FC<{}> = () => {
       }
       // update state
       const backendTermAutoCompleteItem = validCity?.[0];
-      const backendTerm: { id: BigInteger; name: string } = {
+      const backendTerm: { id: number; name: string } = {
         id: backendTermAutoCompleteItem?.id,
         name: backendTermAutoCompleteItem?.name,
       };
@@ -358,7 +346,7 @@ export const SearchBar: React.FC<{}> = () => {
       }
       // update state
       const backendTermAutoCompleteItem = validState?.[0];
-      const backendTerm: { id: BigInteger; name: string } = {
+      const backendTerm: { id: number; name: string } = {
         id: backendTermAutoCompleteItem?.id,
         name: backendTermAutoCompleteItem?.name,
       };
@@ -383,7 +371,7 @@ export const SearchBar: React.FC<{}> = () => {
       }
       // update state
       const backendTermAutoCompleteItem = validRestaurantName?.[0];
-      const backendTerm: { id: BigInteger; name: string } = {
+      const backendTerm: { id: number; name: string } = {
         id: backendTermAutoCompleteItem?.id,
         name: backendTermAutoCompleteItem?.name,
       };
@@ -402,7 +390,7 @@ export const SearchBar: React.FC<{}> = () => {
       }
       // update state
       const backendTermAutoCompleteItem = validZip?.[0];
-      const backendTerm: { id: BigInteger; name: string } = {
+      const backendTerm: { id: number; name: string } = {
         id: backendTermAutoCompleteItem?.id,
         name: backendTermAutoCompleteItem?.name,
       };
@@ -410,34 +398,15 @@ export const SearchBar: React.FC<{}> = () => {
       dispatch(onZipCodeBackendInputChange(backendTerm));
     }
   };
-  const zipCodeSearchResult = useQuery(
-    ["getZipCodeSearch", zipcodeUserInput],
-    () => fetchZipSearch(zipcodeUserInput),
-    {
-      enabled: false || fetchZipcode,
-      onSuccess: (data) => {
-        //dispatch(onNavigation(false));
-        console.log("dispatched");
-        dispatch(onFetchZipcode(false));
-        // const mapLocations: GeoJSON.FeatureCollection<
-        //   GeoJSON.Geometry,
-        //   PropertiesProps
-        // > = {
-        //   type: "FeatureCollection",
-        //   features: data.length ? data : [],
-        // };
-        //setMapData(mapLocations);
-        //setRefreshMapData(true);
-        // setZipcodeUserInput("");
-      },
-    }
-  );
 
   const onSubmit = () => {
     // before triggering a backend api call check if the user has entered a valid state, city, zipcode or restaurantName values
-    // since we are already checking with backend input terms, we are also updating the values to be sent to backend to fetch data
+    // since we are already validating user input by comparing it to the values recieved from backend, so in this function we are also updating global state for data to be sent to backend
+    // Yes this is not a pure function and does twpo things
+    // TODO: might separate the above two functionalities out in the future.
     validateUserInputUpdateBackendInput();
-    // update backednSearch terms
+
+    // sanity check: throw error if the user hasnt entered anything but still has clicked submit
     if (
       !zipcodeUserInput.length &&
       !stateUserInput.length &&
@@ -448,7 +417,7 @@ export const SearchBar: React.FC<{}> = () => {
       console.log("error: user didnt enter anything throw error");
     }
 
-    // check which combination of inputs the user has entered to trigger reactqueries
+    // check which combination of inputs the user has entered to trigger backend calls to get data.
     if (path === "/") {
       switch (true) {
         case Boolean(restaurantNameUserInput) &&
@@ -518,19 +487,69 @@ export const SearchBar: React.FC<{}> = () => {
   };
 
   // This function has to run regardless of any user input to populate auto-complete inputs of state, city, zipcode and restaurantName
-  // cacheTime is infinite because autocomplete props are read only even for user so this data will not change in a user session.
-  // Additionally SearchBar component used on multiple routes hence it makes sense to cache data and not hit your backend api again and again.
+  // cacheTime is set to infinite because autocomplete props are read only even for user so this data will not change in a user session.
+  // Additionally SearchBar component is used in multiple routes, hence, it makes sense to cache data and not hit your backend api again and again.
   const geoLocationData = useQuery("getGeography", fetchAutoCompleteData, {
     staleTime: Infinity,
     cacheTime: Infinity,
   });
+  const zipCodeSearchResult = useQuery(
+    ["fetchZipCodeSearch", zipcodeUserInput],
+    () => fetchZipSearch(zipcodeUserInput),
+    {
+      enabled: false || fetchZipcode,
+      onSuccess: (data) => {
+        console.log("dispatched");
+        dispatch(onFetchZipcode(false));
+        dispatch(
+          onZipCodeBackendInputChange({ id: undefined, name: undefined })
+        );
+        // const mapLocations: GeoJSON.FeatureCollection<
+        //   GeoJSON.Geometry,
+        //   PropertiesProps
+        // > = {
+        //   type: "FeatureCollection",
+        //   features: data.length ? data : [],
+        // };
+        //setMapData(mapLocations);
+        //setRefreshMapData(true);
+        // setZipcodeUserInput("");
+      },
+    }
+  );
+  const stateSearchResult = useQuery(
+    ["fetchStateSearch", stateBackendInput.id],
+    () => fetchStateSearch(stateBackendInput.id!),
+    {
+      enabled: false || fetchState,
+      onSuccess: (data) => {
+        console.log("state Data", data);
+        dispatch(onFetchState(false));
+        dispatch(onStateBackendInputChange({ id: undefined, name: undefined }));
+      },
+    }
+  );
+
+  const StateCitySearchResult = useQuery(
+    ["fetchStateCity", stateBackendInput.id, cityBackendInput.id],
+    () => fetchStateAndCitySearch(stateBackendInput.id!, cityBackendInput.id!),
+    {
+      enabled: false || fetchStateCity,
+      onSuccess: (data) => {
+        dispatch(onFetchStateCity(false));
+        dispatch(onStateBackendInputChange({ id: undefined, name: undefined }));
+        dispatch(onCityBackendInputChange({ id: undefined, name: undefined }));
+      },
+    }
+  );
+
   if (geoLocationData.isLoading) {
     console.log("loading");
     return <span>Loading...</span>;
   }
 
   if (geoLocationData.isError) {
-    //dispatch(onNavigation(false));
+    // TODO: in errors turn search query flags to false bakcned terms also need to update to {id:undefined, name:undefined}
     return <span>Error: error occured</span>;
   }
   // Set local state

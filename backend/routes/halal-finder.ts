@@ -18,6 +18,36 @@ interface locationDocument {
 let citySet: Set<{ id: number; name: string }>;
 let stateSet: Set<{ id: number; name: string }>;
 
+const citySetTemp: Set<string> = new Set();
+const stateSetTemp: Set<string> = new Set();
+
+const allRawData: {
+  features: locationDocument[];
+  type: "FeatureCollection";
+} = JSON.parse(JSON.stringify(rawLocations));
+// Sending zipSet with coordinates so that map can jump to those coordinates
+const zipSet = allRawData.features.map((item) => {
+  const properties = item.properties;
+  citySetTemp.add(properties.city);
+  stateSetTemp.add(properties.state);
+  return {
+    ...item,
+    city_state: `${properties.city}, ${properties.state}`,
+  };
+});
+
+const arrayCitySet = Array.from(citySetTemp);
+const arrayStateSet = Array.from(stateSetTemp);
+const mappedCitySet = arrayCitySet.map((item, index) => {
+  return { id: index, name: item };
+});
+const mappedStateSet = arrayStateSet.map((item, index) => {
+  return { id: index, name: item };
+});
+
+citySet = new Set(mappedCitySet);
+stateSet = new Set(mappedStateSet);
+
 const router = express.Router();
 
 // TODO: api-documentation
@@ -25,6 +55,7 @@ const router = express.Router();
 
 router.get("/api/dev/client-keys", async (req, res, next) => {
   try {
+    console.log("lolz");
     const keys = `${process.env.MAPBOX_ACCESS_TOKEN}`;
     console.log(keys);
     res.status(200).send({
@@ -52,11 +83,42 @@ router.get(
 );
 
 router.get(
+  "/api/dev/state/:stateId",
+  async (req: Request, res: Response, next: NextFunction) => {
+    try {
+      const { stateId } = req.params;
+      const allRawData: {
+        features: locationDocument[];
+        type: "FeatureCollection";
+      } = JSON.parse(JSON.stringify(rawLocations));
+      const arrayState = Array.from(stateSet);
+      const stateName = arrayState.filter((item) => {
+        return item.id === (stateId === "0" ? 0 : parseInt(stateId));
+      });
+      const state = stateName[0];
+      const stateSetLocal = allRawData.features.filter((item) => {
+        const properties = item.properties;
+        if (properties.state === state.name) {
+          return {
+            ...item,
+            city_state: `${properties.city}, ${properties.state}`,
+          };
+        }
+      });
+      res.status(200).send({
+        data: stateSetLocal,
+      });
+    } catch (err) {
+      console.log(err);
+    }
+  }
+);
+
+router.get(
   "/api/dev/getGeography",
   async (req: Request, res: Response, next: NextFunction) => {
     try {
       // TODO: add restaurantName functionality to this
-      console.log("backedn hit");
       const citySetTemp: Set<string> = new Set();
       const stateSetTemp: Set<string> = new Set();
       const allRawData: {
@@ -107,6 +169,7 @@ router.get(
   "/api/dev/:zipcode",
   async (req: Request, res: Response, next: NextFunction) => {
     try {
+      console.log("I am hitting wring endpoint");
       const { zipcode } = req.params;
       //console.log(zipcode);
       //const zipCode: string = req.body;
@@ -135,58 +198,38 @@ router.get(
 );
 
 router.get(
-  "/api/dev/:state",
+  "/api/dev/state-city/:stateId/:cityId",
   async (req: Request, res: Response, next: NextFunction) => {
     try {
-      // TODO: fix this to be state id
-      const { state } = req.params;
-      //const zipCode: string = req.body;
+      console.log("city i was hit");
+      const { cityId, stateId } = req.params;
       const allRawData: {
         features: locationDocument[];
         type: "FeatureCollection";
       } = JSON.parse(JSON.stringify(rawLocations));
 
-      const stateSet = allRawData.features.filter((item) => {
-        const properties = item.properties;
-        if (properties.state === state) {
-          return {
-            ...item,
-            city_state: `${properties.city}, ${properties.state}`,
-          };
-        }
+      const arrayState = Array.from(stateSet);
+      const stateName = arrayState.filter((item) => {
+        return item.id === (stateId === "0" ? 0 : parseInt(stateId));
       });
+      const state = stateName[0];
 
-      res.status(200).send({
-        data: stateSet,
+      const arrayCity = Array.from(citySet);
+      const cityName = arrayCity.filter((item) => {
+        return item.id === (cityId === "0" ? 0 : parseInt(cityId));
       });
-    } catch (err) {
-      console.log(err);
-    }
-  }
-);
-
-router.get(
-  "/api/dev/:state/:city",
-  async (req: Request, res: Response, next: NextFunction) => {
-    try {
-      // TODO: fix this to be stat/ city id
-      const { city, state } = req.params;
-      //const zipCode: string = req.body;
-      const allRawData: {
-        features: locationDocument[];
-        type: "FeatureCollection";
-      } = JSON.parse(JSON.stringify(rawLocations));
+      const city = cityName[0];
 
       const cityState = allRawData.features.filter((item) => {
         const properties = item.properties;
-        if (properties.state === state && properties.city === city) {
+        if (properties.state === state.name && properties.city === city.name) {
           return {
             ...item,
             city_state: `${properties.city}, ${properties.state}`,
           };
         }
       });
-
+      console.log(cityState, "citystate");
       res.status(200).send({
         data: cityState,
       });
@@ -200,6 +243,7 @@ router.get(
   "/api/dev/:restaurantname",
   async (req: Request, res: Response, next: NextFunction) => {
     try {
+      console.log("restaurantname");
       // TODO: fix this to be restaurant id
       const { restaurantname } = req.params;
       //const zipCode: string = req.body;

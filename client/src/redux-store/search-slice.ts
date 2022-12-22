@@ -9,11 +9,11 @@ export interface SearchUserInput {
   stateUserInput: string;
   restaurantNameUserInput: string;
   // backend input based on userInput
-  zipcodeBackendInput: { id: BigInteger | undefined; name: string | undefined };
-  cityBackendInput: { id: BigInteger | undefined; name: string | undefined };
-  stateBackendInput: { id: BigInteger | undefined; name: string | undefined };
+  zipcodeBackendInput: { id: number | undefined; name: string | undefined };
+  cityBackendInput: { id: number | undefined; name: string | undefined };
+  stateBackendInput: { id: number | undefined; name: string | undefined };
   restaurantBackendInput: {
-    id: BigInteger | undefined;
+    id: number | undefined;
     name: string | undefined;
   };
   // Fetch flags based on userInput
@@ -64,7 +64,7 @@ export const SearchSlice = createSlice({
     onZipCodeBackendInputChange: (
       state,
       action: PayloadAction<{
-        id: BigInteger | undefined;
+        id: number | undefined;
         name: string | undefined;
       }>
     ) => {
@@ -73,7 +73,7 @@ export const SearchSlice = createSlice({
     onStateBackendInputChange: (
       state,
       action: PayloadAction<{
-        id: BigInteger | undefined;
+        id: number | undefined;
         name: string | undefined;
       }>
     ) => {
@@ -82,7 +82,7 @@ export const SearchSlice = createSlice({
     onCityBackendInputChange: (
       state,
       action: PayloadAction<{
-        id: BigInteger | undefined;
+        id: number | undefined;
         name: string | undefined;
       }>
     ) => {
@@ -91,7 +91,7 @@ export const SearchSlice = createSlice({
     onRestaurantdeBackendInputChange: (
       state,
       action: PayloadAction<{
-        id: BigInteger | undefined;
+        id: number | undefined;
         name: string | undefined;
       }>
     ) => {
@@ -138,7 +138,6 @@ export const {
   onFetchState,
   onFetchStateCity,
   onFetchZipcode,
-  //onNavigation,
 } = SearchSlice.actions;
 
 export default SearchSlice.reducer;
