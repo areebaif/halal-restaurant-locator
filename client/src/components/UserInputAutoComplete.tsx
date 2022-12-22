@@ -1,9 +1,17 @@
 import * as React from "react";
 import { Autocomplete, Button, Group, AutocompleteItem } from "@mantine/core";
 import { useQuery } from "react-query";
-import { useDispatch } from "react-redux";
 import * as ReactRouter from "react-router-dom";
-import { fetchZipSearch } from "../backendFunctions";
+
+import {
+  fetchZipSearch,
+  fetchAutoCompleteData,
+  ZipDocument,
+  restaurantDocument,
+  cityDocument,
+  stateDocument,
+  FetchAutomplete,
+} from "../backendFunctions";
 import { useAppDispatch, useAppSelector } from "../redux-store/redux-hooks";
 import {
   onZipcodeUserInputChange,
@@ -22,52 +30,12 @@ import {
   onFetchStateCity,
   onFetchZipcode,
 } from "../redux-store/search-slice";
-
-export interface restaurantDocument {
-  id: BigInteger;
-  name: string;
-  state: string;
-  city: string;
-  country: string;
-  zipcode: string;
-  longitude: number;
-  latitude: number;
-  // geolocation: [longitude,latitude]
-  geolocation: [number, number];
-}
-
 export interface PropertiesProps {
   title: string;
   city: string;
   state_id: string;
   state: string;
   zip: string;
-}
-
-export interface cityDocument {
-  id: number;
-  name: string;
-}
-
-export interface stateDocument {
-  id: number;
-  name: string;
-}
-export interface ZipDocument {
-  city_state: string;
-  type: "Feature";
-  properties: {
-    title: string;
-    city: string;
-    state_id: string;
-    state: string;
-    zip: string;
-  };
-  id: number;
-  geometry: {
-    coordinates: [number, number];
-    type: "Point";
-  };
 }
 
 interface AutoCompleteInputProps {
@@ -96,6 +64,31 @@ interface AutoCompleteInputProps {
   };
   onSubmit: () => void;
 }
+const transformDataForAutoComplete = (data: FetchAutomplete) => {
+  //console.log("data inside", data);
+  const { stateSet, citySet, zipSet, restaurantSet } = data;
+  const stateFormattedData = stateSet.map((item) => {
+    return { ...item, value: item.name };
+  });
+  const cityFormattedData = citySet.map((item) => {
+    return { ...item, value: item.name };
+  });
+  const zipFormattedData = zipSet.map((item) => ({
+    ...item,
+    value: item.properties.zip,
+  }));
+  // might throw error since we are not sending any data
+  const restaurantFormattedData = restaurantSet.map((item) => ({
+    ...item,
+    value: item.name,
+  }));
+  return {
+    stateFormattedData,
+    cityFormattedData,
+    zipFormattedData,
+    restaurantFormattedData,
+  };
+};
 
 const AutoCompleteInput: React.FC<AutoCompleteInputProps> = ({
   zipcode,
@@ -252,13 +245,8 @@ export const SearchBar: React.FC<{}> = () => {
     stateUserInput,
     cityUserInput,
     restaurantNameUserInput,
-    zipcodeBackendInput,
-    stateBackendInput,
-    cityBackendInput,
-    restaurantBackendInput,
     fetchZipcode,
   } = searchUserInputs;
-  //const hasNavigated = useAppSelector((state) => state.search.hasNavigated);
 
   // error props
   const [errorZipcodeUserInput, setErrorZipcodeUserInput] =
@@ -422,16 +410,12 @@ export const SearchBar: React.FC<{}> = () => {
       dispatch(onZipCodeBackendInputChange(backendTerm));
     }
   };
-  console.log(fetchZipcode, "flag");
   const zipCodeSearchResult = useQuery(
     ["getZipCodeSearch", zipcodeUserInput],
     () => fetchZipSearch(zipcodeUserInput),
     {
       enabled: false || fetchZipcode,
       onSuccess: (data) => {
-        console.log("success case");
-        console.log(data);
-
         //dispatch(onNavigation(false));
         console.log("dispatched");
         dispatch(onFetchZipcode(false));
@@ -449,8 +433,6 @@ export const SearchBar: React.FC<{}> = () => {
     }
   );
 
-  //console.log(zipcodeBackendInput);
-
   const onSubmit = () => {
     // before triggering a backend api call check if the user has entered a valid state, city, zipcode or restaurantName values
     // since we are already checking with backend input terms, we are also updating the values to be sent to backend to fetch data
@@ -466,7 +448,7 @@ export const SearchBar: React.FC<{}> = () => {
       console.log("error: user didnt enter anything throw error");
     }
 
-    // check which combination of inputs the user has entered to update reactQueryflags for those functions to trigger backend api call
+    // check which combination of inputs the user has entered to trigger reactqueries
     if (path === "/") {
       switch (true) {
         case Boolean(restaurantNameUserInput) &&
@@ -529,87 +511,55 @@ export const SearchBar: React.FC<{}> = () => {
         default:
           console.log("error");
       }
-
-      // redirect
-      // TODO: we need to check which values the user has entered and manually trigger hasNavigated store it in reduz so that reactQuery can work with it.
-      //dispatch(onNavigation(true));
       navigate("/search-display");
     } else {
       console.log("I am in else case");
-      //TODO: depending on user input trigger backend call
-      // restaurantName, zipcode
-      // switch (true) {
-      //     case
-      // }
-
-      //   if (
-      //     zipcodeUserInput.length &&
-      //     !stateUserInput.length &&
-      //     !cityUserInput.length &&
-      //     !restaurantNameUserInput.length
-      //   ) {
-      //     console.log("hitting the right case");
-      //     zipCodeSearchResult.refetch();
-      //     // call the zipcode api and setMapData and makezipcodeUserInput null
-      //   }
     }
   };
 
   // This function has to run regardless of any user input to populate auto-complete inputs of state, city, zipcode and restaurantName
-  // TODO: This function should run only once and keep the results cached and not run again
-  const URL = "/api/dev/getGeography";
-  const geoLocationData = useQuery(
-    "getGeography",
-    async () => {
-      const response = await fetch(URL);
-
-      if (!response.ok) {
-        throw new Error("Network response was not ok");
-      }
-      const data: {
-        data: {
-          citySet: cityDocument[];
-          stateSet: stateDocument[];
-          zipSet: ZipDocument[];
-          restaurantSet: restaurantDocument[];
-        };
-      } = await response.json();
-      return data.data;
-    },
-    {
-      onSuccess: (data) => {
-        const stateFormattedData = data.stateSet.map((item) => {
-          return { ...item, value: item.name };
-        });
-        const cityFormattedData = data.citySet.map((item) => {
-          return { ...item, value: item.name };
-        });
-        const zipFormattedData = data.zipSet.map((item: ZipDocument) => ({
-          ...item,
-          value: item.properties.zip,
-        }));
-        // might throw error since we are not sending any data
-        const restaurantFormattedData = data.restaurantSet.map(
-          (item: restaurantDocument) => ({
-            ...item,
-            value: item.name,
-          })
-        );
-        setStateData(stateFormattedData);
-        setCityData(cityFormattedData);
-        setRestaurantData(restaurantFormattedData);
-        setZipData(zipFormattedData);
-      },
-    }
-  );
-
+  // cacheTime is infinite because autocomplete props are read only even for user so this data will not change in a user session.
+  // Additionally SearchBar component used on multiple routes hence it makes sense to cache data and not hit your backend api again and again.
+  const geoLocationData = useQuery("getGeography", fetchAutoCompleteData, {
+    staleTime: Infinity,
+    cacheTime: Infinity,
+  });
   if (geoLocationData.isLoading) {
+    console.log("loading");
     return <span>Loading...</span>;
   }
 
   if (geoLocationData.isError) {
     //dispatch(onNavigation(false));
     return <span>Error: error occured</span>;
+  }
+  // Set local state
+  const data = geoLocationData.data!;
+  if (!stateData) {
+    const stateFormattedData = data.stateSet.map((item) => {
+      return { ...item, value: item.name };
+    });
+    setStateData(stateFormattedData);
+  }
+  if (!cityData) {
+    const cityFormattedData = data.citySet.map((item) => {
+      return { ...item, value: item.name };
+    });
+    setCityData(cityFormattedData);
+  }
+  if (!zipData) {
+    const zipFormattedData = data.zipSet.map((item: ZipDocument) => ({
+      ...item,
+      value: item.properties.zip,
+    }));
+    setZipData(zipFormattedData);
+  }
+  if (!restaurantData) {
+    const restaurantFormattedData = data.restaurantSet.map((item) => ({
+      ...item,
+      value: item.name,
+    }));
+    setRestaurantData(restaurantFormattedData);
   }
 
   return (
