@@ -1,6 +1,6 @@
 import * as React from "react";
 import { HeroBullets } from "./hero-header";
-import { SearchBar } from "./UserInputAutoComplete";
+import { SearchBar } from "./SearchBar";
 import { SearchAndMapDisplayComponent } from "./search-map-display";
 
 export const Layout: React.FC = () => {
@@ -8,7 +8,7 @@ export const Layout: React.FC = () => {
     <React.Fragment>
       <HeroBullets />
       <SearchBar />
-      {/*<SearchAndMapDisplayComponent />*/}
+      {<SearchAndMapDisplayComponent />}
     </React.Fragment>
   );
 };

@@ -2,7 +2,7 @@ import * as React from "react";
 import { QueryClient, QueryClientProvider, useQuery } from "react-query";
 import { HeaderAction, HeaderActionProps } from "./components/header";
 import { Routes, Route } from "react-router-dom";
-import { SearchBar } from "./components/UserInputAutoComplete";
+import { SearchBar } from "./components/SearchBar";
 import { Layout } from "./components/Layout";
 import { config } from "dotenv";
 
