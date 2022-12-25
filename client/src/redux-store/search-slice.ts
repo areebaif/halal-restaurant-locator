@@ -1,7 +1,5 @@
 import { createSlice } from "@reduxjs/toolkit";
 import type { PayloadAction } from "@reduxjs/toolkit";
-import type { RootState } from "./store";
-import { Action } from "history";
 
 export interface SearchUserInput {
   zipcodeUserInput: string;
