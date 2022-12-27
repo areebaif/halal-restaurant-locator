@@ -86,13 +86,15 @@ export const MapBoxMap: React.FC = () => {
         const coordinates = coordinatesObject.coordinates.slice();
         // dispatchMapData to set map values
         dispatch(onGoelocationDataChange(mapLocations));
-        dispatch(
-          onMapCameraViewChange({
-            longitude: coordinates[0],
-            latitude: coordinates[1],
-            zoom: 9.2,
-          })
-        );
+
+        // TODO: I might need to do fitBound and GetBound to programmatically fit all amrkers on map
+        // dispatch(
+        //   onMapCameraViewChange({
+        //     longitude: coordinates[0],
+        //     latitude: coordinates[1],
+        //     zoom: 9.2,
+        //   })
+        // );
       },
     }
   );
@@ -114,10 +116,18 @@ export const MapBoxMap: React.FC = () => {
 
   const onLoad = () => {
     console.log(mapRef.current, "lolzz");
-    mapRef.current.loadImage(redMarker, (error: any, image: any) => {
-      if (error) throw new error("lollz");
-      mapRef.current.addImage("custom-marker", image);
-    });
+    if (mapRef.current) {
+      mapRef.current.loadImage(redMarker, (error: any, image: any) => {
+        if (error) throw new error("lollz");
+        mapRef.current.addImage("custom-marker", image);
+      });
+    }
+  };
+
+  const onIdle = () => {
+    console.log(" I was rendered", mapRef.current);
+    const layer = mapRef.current.getLayer(layerId);
+    console.log(layer, "layer");
   };
 
   return (
@@ -132,6 +142,7 @@ export const MapBoxMap: React.FC = () => {
       interactiveLayerIds={[layerId]}
       //onMouseEnter={onMouseEnter}
       onLoad={onLoad}
+      onIdle={onIdle}
       //onMouseLeave={onMouseLeaveMapLayer}
       //onClick={onClick}
     >
