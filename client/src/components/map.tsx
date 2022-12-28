@@ -19,6 +19,45 @@ export interface CameraViewState {
   zoom?: number;
 }
 
+const getSWCoordinates = (coordinatesCollection: any) => {
+  const lowestLng = Math.min(
+    ...coordinatesCollection.map((coordinates: any) => coordinates[0])
+  );
+  const lowestLat = Math.min(
+    ...coordinatesCollection.map((coordinates: any) => coordinates[1])
+  );
+
+  return [lowestLng, lowestLat];
+};
+
+const getNECoordinates = (coordinatesCollection: any) => {
+  const highestLng = Math.max(
+    ...coordinatesCollection.map((coordinates: any) => coordinates[0])
+  );
+  const highestLat = Math.max(
+    ...coordinatesCollection.map((coordinates: any) => coordinates[1])
+  );
+
+  return [highestLng, highestLat];
+};
+
+const calcBoundsFromCoordinates = (coordinatesCollection: any) => {
+  return [
+    getSWCoordinates(coordinatesCollection),
+    getNECoordinates(coordinatesCollection),
+  ];
+};
+
+const test = calcBoundsFromCoordinates([
+  [8.03287, 46.62789],
+  [7.53077, 46.63439],
+  [7.57724, 46.63914],
+  [7.76408, 46.55193],
+  [7.74324, 46.7384],
+]);
+
+// returns [[7.53077, 46.55193], [8.03287, 46.7384]]
+
 // TODO: programitrcalyy set camera view not set initially
 export interface activeGeolocationProps {
   latitude: number;
@@ -81,11 +120,19 @@ export const MapBoxMap: React.FC = () => {
           type: "FeatureCollection",
           features: filteredValues?.length ? filteredValues : [],
         };
-        const coordinatesObject = mapLocations.features[0]
-          .geometry as GeoJSON.Point;
-        const coordinates = coordinatesObject.coordinates.slice();
+        const coordinatesArray = mapLocations.features.map((item) => {
+          const coordinatesObj = item.geometry as GeoJSON.Point;
+          return coordinatesObj.coordinates;
+        });
+        //console.log(coordinatesArray, "mama");
+        const mapBounds = calcBoundsFromCoordinates(coordinatesArray);
+        console.log(mapBounds, "lolz!");
+        // const coordinatesObject = mapLocations.features[0]
+        //   .geometry as GeoJSON.Point;
+        // const coordinates = coordinatesObject.coordinates.slice();
         // dispatchMapData to set map values
         dispatch(onGoelocationDataChange(mapLocations));
+        //mapRef.current.fitBounds(mapBounds);
 
         // TODO: I might need to do fitBound and GetBound to programmatically fit all amrkers on map
         // dispatch(
@@ -121,6 +168,7 @@ export const MapBoxMap: React.FC = () => {
         if (error) throw new error("lollz");
         mapRef.current.addImage("custom-marker", image);
       });
+      mapRef.current.fitBounds([-87.8209, 41.66315], [-87.55618]);
     }
   };
 
