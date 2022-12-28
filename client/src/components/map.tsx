@@ -168,7 +168,12 @@ export const MapBoxMap: React.FC = () => {
         if (error) throw new error("lollz");
         mapRef.current.addImage("custom-marker", image);
       });
-      mapRef.current.fitBounds([-87.8209, 41.66315], [-87.55618]);
+      // TODO: this is the value that gives correct zoom of coordinates use this
+      // [-87.8209, 41.55315],  [-87.55618, 42.11904]
+      // TODO: fix hard coded values, remove cameraViewState from global satte make it local
+      mapRef.current.fitBounds(
+        new mapboxgl.LngLatBounds([-87.8209, 41.66315], [-87.55618, 42.00904])
+      );
     }
   };
 
