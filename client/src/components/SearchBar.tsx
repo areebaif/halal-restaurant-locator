@@ -314,6 +314,7 @@ export const SearchBar: React.FC<{}> = () => {
           break;
         // TODO: error handling this means user didnt enter anything and submitted
         default:
+          // TODO: setRefreshMapData to true after getting a response from backend not in the backend function after that
           console.log("error");
       }
       navigate("/search-display");

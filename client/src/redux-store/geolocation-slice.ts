@@ -20,7 +20,7 @@ export interface Map {
   layerId: string;
   geolocationData: GeoJSON.FeatureCollection<GeoJSON.Geometry, any> | undefined;
   activeGeolocation: ActiveGeolocation;
-  mapCameraView: MapCameraView | undefined;
+  //mapCameraView: MapCameraView | undefined;
   isOpenActiveGeolocationCard: boolean;
   refreshMapData: boolean;
   hoverId: number | undefined;
@@ -37,7 +37,7 @@ const initialState: Map = {
     description: "",
     index: undefined,
   },
-  mapCameraView: undefined,
+  //mapCameraView: undefined,
   isOpenActiveGeolocationCard: false,
   refreshMapData: false,
   hoverId: undefined,
@@ -71,9 +71,9 @@ export const geolocationSlice = createSlice({
     onHoverIdChange: (state, action: PayloadAction<number>) => {
       state.hoverId = action.payload;
     },
-    onMapCameraViewChange: (state, action: PayloadAction<MapCameraView>) => {
-      state.mapCameraView = action.payload;
-    },
+    // onMapCameraViewChange: (state, action: PayloadAction<MapCameraView>) => {
+    //   state.mapCameraView = action.payload;
+    // },
   },
 });
 
@@ -83,7 +83,7 @@ export const {
   onHoverIdChange,
   onIsOpenActiveGeolocationCardChange,
   onRefreshMapDataChange,
-  onMapCameraViewChange,
+  //onMapCameraViewChange,
 } = geolocationSlice.actions;
 
 export default geolocationSlice.reducer;

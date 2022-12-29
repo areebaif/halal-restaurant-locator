@@ -4,13 +4,14 @@ import mapboxgl from "mapbox-gl";
 import Map, { Source, Layer, Popup } from "react-map-gl";
 import { Text, Box, HoverCard } from "@mantine/core";
 import { useAppDispatch, useAppSelector } from "../redux-store/redux-hooks";
+import calcBoundsFromCoordinates from "../map-calculations";
 import {
   onActiveGeolocationChange,
   onGoelocationDataChange,
   onHoverIdChange,
   onIsOpenActiveGeolocationCardChange,
   onRefreshMapDataChange,
-  onMapCameraViewChange,
+  //onMapCameraViewChange,
 } from "../redux-store/geolocation-slice";
 import redMarker from "./red-marker.png";
 export interface CameraViewState {
@@ -18,45 +19,6 @@ export interface CameraViewState {
   longitude: number;
   zoom?: number;
 }
-
-const getSWCoordinates = (coordinatesCollection: any) => {
-  const lowestLng = Math.min(
-    ...coordinatesCollection.map((coordinates: any) => coordinates[0])
-  );
-  const lowestLat = Math.min(
-    ...coordinatesCollection.map((coordinates: any) => coordinates[1])
-  );
-
-  return [lowestLng, lowestLat];
-};
-
-const getNECoordinates = (coordinatesCollection: any) => {
-  const highestLng = Math.max(
-    ...coordinatesCollection.map((coordinates: any) => coordinates[0])
-  );
-  const highestLat = Math.max(
-    ...coordinatesCollection.map((coordinates: any) => coordinates[1])
-  );
-
-  return [highestLng, highestLat];
-};
-
-const calcBoundsFromCoordinates = (coordinatesCollection: any) => {
-  return [
-    getSWCoordinates(coordinatesCollection),
-    getNECoordinates(coordinatesCollection),
-  ];
-};
-
-const test = calcBoundsFromCoordinates([
-  [8.03287, 46.62789],
-  [7.53077, 46.63439],
-  [7.57724, 46.63914],
-  [7.76408, 46.55193],
-  [7.74324, 46.7384],
-]);
-
-// returns [[7.53077, 46.55193], [8.03287, 46.7384]]
 
 // TODO: programitrcalyy set camera view not set initially
 export interface activeGeolocationProps {
@@ -71,8 +33,8 @@ mapboxgl.accessToken = `${process.env.REACT_APP_MAPBOX_ACCESS}`;
 export const MapBoxMap: React.FC = () => {
   // local state
   const mapRef = React.useRef<any>();
-  //   const [cameraViewState, setCameraViewState] =
-  //     React.useState<CameraViewState>();
+  const [cameraViewState, setCameraViewState] =
+    React.useState<CameraViewState>();
   // global imports
   const mapInputs = useAppSelector((state) => state.geolocation);
   const {
@@ -83,11 +45,12 @@ export const MapBoxMap: React.FC = () => {
     hoverId,
     dataSourceId,
     layerId,
-    mapCameraView,
   } = mapInputs;
 
   // ReduxToolkit functions
   const dispatch = useAppDispatch();
+
+  // TODO: sueReact.useEffect to refresh MapData and setCamera bounds
 
   // Test data
   const URL = "/api/dev/data";
@@ -107,8 +70,6 @@ export const MapBoxMap: React.FC = () => {
     {
       onSuccess: (data) => {
         // TODO: fix this that only search term is sent depending on what the search term is
-        // TODO: You have to also set camera angle depending on what the user has searched, right now we are hardcoding
-        //setCameraViewState({ latitude: 41.45, longitude: -88.53, zoom: 7.2 });
         console.log("I was ran on sucess");
         // do some data manuplulation to only set Chicago Data. There are too many data points
 
@@ -120,28 +81,7 @@ export const MapBoxMap: React.FC = () => {
           type: "FeatureCollection",
           features: filteredValues?.length ? filteredValues : [],
         };
-        const coordinatesArray = mapLocations.features.map((item) => {
-          const coordinatesObj = item.geometry as GeoJSON.Point;
-          return coordinatesObj.coordinates;
-        });
-        //console.log(coordinatesArray, "mama");
-        const mapBounds = calcBoundsFromCoordinates(coordinatesArray);
-        console.log(mapBounds, "lolz!");
-        // const coordinatesObject = mapLocations.features[0]
-        //   .geometry as GeoJSON.Point;
-        // const coordinates = coordinatesObject.coordinates.slice();
-        // dispatchMapData to set map values
         dispatch(onGoelocationDataChange(mapLocations));
-        //mapRef.current.fitBounds(mapBounds);
-
-        // TODO: I might need to do fitBound and GetBound to programmatically fit all amrkers on map
-        // dispatch(
-        //   onMapCameraViewChange({
-        //     longitude: coordinates[0],
-        //     latitude: coordinates[1],
-        //     zoom: 9.2,
-        //   })
-        // );
       },
     }
   );
@@ -155,49 +95,45 @@ export const MapBoxMap: React.FC = () => {
     return <span>Error: error occured</span>;
   }
 
-  //   const onViewStateChange = (data: CameraViewState) => {
-  //     setCameraViewState((previousState) => {
-  //       return { ...previousState, ...data };
-  //     });
-  //   };
+  const onViewStateChange = (data: CameraViewState) => {
+    setCameraViewState((previousState) => {
+      return { ...previousState, ...data };
+    });
+  };
 
   const onLoad = () => {
-    console.log(mapRef.current, "lolzz");
     if (mapRef.current) {
       mapRef.current.loadImage(redMarker, (error: any, image: any) => {
         if (error) throw new error("lollz");
         mapRef.current.addImage("custom-marker", image);
       });
+      const mapLocations = geolocationData;
+      const coordinatesArray = mapLocations.features.map((item) => {
+        const coordinatesObj = item.geometry as GeoJSON.Point;
+        return coordinatesObj.coordinates;
+      });
+      const mapBounds = calcBoundsFromCoordinates(coordinatesArray);
+      mapRef.current.fitBounds(new mapboxgl.LngLatBounds(mapBounds));
+      console.log(mapBounds, "mimz");
+      // You have access to data here just use it to programmatically set fitBounds
       // TODO: this is the value that gives correct zoom of coordinates use this
-      // [-87.8209, 41.55315],  [-87.55618, 42.11904]
-      // TODO: fix hard coded values, remove cameraViewState from global satte make it local
-      mapRef.current.fitBounds(
-        new mapboxgl.LngLatBounds([-87.8209, 41.66315], [-87.55618, 42.00904])
-      );
+      // [-87.82709, 41.66315, -87.55618, 42.00904] data values
+      // [-87.82709, 41.55315],  [-87.55618, 42.11904] converted values
     }
-  };
-
-  const onIdle = () => {
-    console.log(" I was rendered", mapRef.current);
-    const layer = mapRef.current.getLayer(layerId);
-    console.log(layer, "layer");
   };
 
   return (
     <Map
       reuseMaps={true}
       ref={mapRef}
-      initialViewState={mapCameraView}
-      onMove={(evt) => dispatch(onMapCameraViewChange(evt.viewState))}
+      initialViewState={cameraViewState}
+      onMove={(evt) => onViewStateChange(evt.viewState)}
       style={{ width: "100%", maxHeight: 600, minHeight: 600, height: 600 }}
       mapStyle="mapbox://styles/mapbox/streets-v9"
       mapboxAccessToken={process.env.REACT_APP_MAPBOX_ACCESS}
       interactiveLayerIds={[layerId]}
       //onMouseEnter={onMouseEnter}
       onLoad={onLoad}
-      onIdle={onIdle}
-      //onMouseLeave={onMouseLeaveMapLayer}
-      //onClick={onClick}
     >
       <Source id={dataSourceId} type="geojson" data={geolocationData}>
         <Layer
