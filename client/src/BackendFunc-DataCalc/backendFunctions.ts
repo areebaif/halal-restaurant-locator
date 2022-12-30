@@ -1,4 +1,4 @@
-import { PropertiesProps } from "./components/search-map-display";
+import { PropertiesProps } from "../components/search-map-display";
 // TODO: extratc out main function put it here
 
 export interface restaurantDocument {

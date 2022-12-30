@@ -18,7 +18,7 @@ export interface MapCameraView {
 export interface Map {
   dataSourceId: string;
   layerId: string;
-  geolocationData: GeoJSON.FeatureCollection<GeoJSON.Geometry, any> | undefined;
+  geolocationData: GeoJSON.FeatureCollection<GeoJSON.Geometry, any>;
   activeGeolocation: ActiveGeolocation;
   //mapCameraView: MapCameraView | undefined;
   isOpenActiveGeolocationCard: boolean;
@@ -29,7 +29,10 @@ export interface Map {
 const initialState: Map = {
   dataSourceId: "restaurant locations",
   layerId: "points",
-  geolocationData: undefined,
+  geolocationData: {
+    type: "FeatureCollection",
+    features: [],
+  },
   activeGeolocation: {
     latitude: 0,
     longitude: 0,

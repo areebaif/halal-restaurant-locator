@@ -4,6 +4,7 @@ import { useQuery } from "react-query";
 import * as ReactRouter from "react-router-dom";
 
 import AutoCompleteInput from "./autocomplete";
+import { MapBoxMap } from "./map";
 
 import {
   fetchZipSearch,
@@ -15,7 +16,7 @@ import {
   FetchAutomplete,
   fetchStateSearch,
   fetchStateAndCitySearch,
-} from "../backendFunctions";
+} from "../BackendFunc-DataCalc/backendFunctions";
 import { useAppDispatch, useAppSelector } from "../redux-store/redux-hooks";
 import {
   onZipcodeUserInputChange,
@@ -34,6 +35,11 @@ import {
   onFetchStateCity,
   onFetchZipcode,
 } from "../redux-store/search-slice";
+
+import {
+  onGoelocationDataChange,
+  onRefreshMapDataChange,
+} from "../redux-store/geolocation-slice";
 
 export interface PropertiesProps {
   title: string;
@@ -312,14 +318,75 @@ export const SearchBar: React.FC<{}> = () => {
           console.log("only state no city no zipcode"); // no zipcode
           dispatch(onFetchState(true));
           break;
-        // TODO: error handling this means user didnt enter anything and submitted
         default:
-          // TODO: setRefreshMapData to true after getting a response from backend not in the backend function after that
+          // TODO: error handling this means user didnt enter anything and submitted
           console.log("error");
       }
       navigate("/search-display");
     } else {
-      console.log("I am in else case");
+      // TODO: setRefreshMapData to true after getting a response from backend not in the backend function after that
+      switch (true) {
+        case Boolean(restaurantNameUserInput) &&
+          Boolean(zipcodeUserInput) &&
+          Boolean(!stateUserInput) &&
+          Boolean(!cityUserInput):
+          console.log(" at restaurant zipcode no state");
+          dispatch(onFetchRestaurantZipcode(true));
+          break;
+        //restaurantName, state
+        case Boolean(restaurantNameUserInput) &&
+          Boolean(stateUserInput) &&
+          Boolean(!zipcodeUserInput) &&
+          Boolean(!cityUserInput):
+          console.log("restaurant, state, no zip");
+          dispatch(onFetchRestaurantState(true));
+          break;
+        //restaurantName, state, city
+        case Boolean(restaurantNameUserInput) &&
+          Boolean(stateUserInput) &&
+          Boolean(cityUserInput) &&
+          Boolean(!zipcodeUserInput):
+          console.log("restaurant,state,city,nozip");
+          dispatch(onFetchRestaurantStateCity(true));
+          break;
+        //restaurantName
+        case Boolean(restaurantNameUserInput) &&
+          Boolean(!stateUserInput) &&
+          Boolean(!cityUserInput) &&
+          Boolean(!zipcodeUserInput):
+          console.log("only restaurant");
+          dispatch(onFetchRestaurant(true));
+          break;
+        // zipcode
+        case Boolean(zipcodeUserInput) &&
+          Boolean(!stateUserInput) &&
+          Boolean(!cityUserInput) &&
+          Boolean(!restaurantNameUserInput):
+          console.log(" only zipcode yes");
+          dispatch(onFetchZipcode(true));
+          //setZipcodeUserInput(zipcodeUserInput!);
+          break;
+        // state,city
+        case Boolean(stateUserInput) &&
+          Boolean(cityUserInput) &&
+          Boolean(!zipcodeUserInput) &&
+          Boolean(!restaurantNameUserInput):
+          console.log("state and city no zipcode");
+          dispatch(onFetchStateCity(true));
+          break;
+        // state
+        case Boolean(stateUserInput) &&
+          Boolean(!cityUserInput) &&
+          Boolean(!zipcodeUserInput) &&
+          Boolean(!restaurantNameUserInput):
+          console.log("only state no city no zipcode"); // no zipcode
+          dispatch(onFetchState(true));
+          break;
+        // TODO: error handling this means user didnt enter anything and submitted
+        default:
+          console.log("error");
+      }
+      dispatch(onRefreshMapDataChange(true));
     }
   };
 
@@ -336,20 +403,16 @@ export const SearchBar: React.FC<{}> = () => {
     {
       enabled: false || fetchZipcode,
       onSuccess: (data) => {
+        console.log(data, "I just ran");
+        const mapLocations: GeoJSON.FeatureCollection<GeoJSON.Geometry, any> = {
+          type: "FeatureCollection",
+          features: data?.length ? data : [],
+        };
+        dispatch(onGoelocationDataChange(mapLocations));
         dispatch(onFetchZipcode(false));
         dispatch(
           onZipCodeBackendInputChange({ id: undefined, name: undefined })
         );
-        // const mapLocations: GeoJSON.FeatureCollection<
-        //   GeoJSON.Geometry,
-        //   PropertiesProps
-        // > = {
-        //   type: "FeatureCollection",
-        //   features: data.length ? data : [],
-        // };
-        //setMapData(mapLocations);
-        //setRefreshMapData(true);
-        // setZipcodeUserInput("");
       },
     }
   );
@@ -359,7 +422,7 @@ export const SearchBar: React.FC<{}> = () => {
     {
       enabled: false || fetchState,
       onSuccess: (data) => {
-        console.log("state Data", data);
+        // TODO: set Map data
         dispatch(onFetchState(false));
         dispatch(onStateBackendInputChange({ id: undefined, name: undefined }));
       },
@@ -372,6 +435,7 @@ export const SearchBar: React.FC<{}> = () => {
     {
       enabled: false || fetchStateCity,
       onSuccess: (data) => {
+        // TODO: setMap Data
         dispatch(onFetchStateCity(false));
         dispatch(onStateBackendInputChange({ id: undefined, name: undefined }));
         dispatch(onCityBackendInputChange({ id: undefined, name: undefined }));
@@ -388,7 +452,7 @@ export const SearchBar: React.FC<{}> = () => {
     // TODO: in errors turn search query flags to false bakcned terms also need to update to {id:undefined, name:undefined}
     return <span>Error: error occured</span>;
   }
-  // Set local state
+  // Set SearchBar auto complete data
   const data = geoLocationData.data!;
   if (!stateData) {
     const stateFormattedData = data.stateSet.map((item) => {
@@ -448,33 +512,36 @@ export const SearchBar: React.FC<{}> = () => {
           }}
         />
       ) : (
-        <AutoCompleteInput
-          onSubmit={onSubmit}
-          zipcode={{
-            zipData: zipcodeUserInput.length > 0 ? zipData : [],
-            errorZipcodeUserInput: errorZipcodeUserInput,
-            onZipcodeUserInputChange: onZipcodeUserChange,
-            zipcodeUserInput: zipcodeUserInput,
-          }}
-          state={{
-            stateData: stateUserInput.length > 0 ? stateData : [],
-            onStateUserInputChange: onStateUserChange,
-            errorStateUserInput: errorStateUserInput,
-            stateUserInput: stateUserInput,
-          }}
-          city={{
-            cityData: cityUserInput.length > 0 ? cityData : [],
-            onCityUserInputChange: onCityUserChange,
-            errorCityUserInput: errorCityUserInput,
-            cityUserInput: cityUserInput,
-          }}
-          restaurant={{
-            restaurantNameUserInput: restaurantNameUserInput,
-            onRestaurantNameUserInputChange: onRestaurantNameUserChange,
-            restaurantData:
-              restaurantNameUserInput.length > 0 ? restaurantData : [],
-          }}
-        />
+        <React.Fragment>
+          <AutoCompleteInput
+            onSubmit={onSubmit}
+            zipcode={{
+              zipData: zipcodeUserInput.length > 0 ? zipData : [],
+              errorZipcodeUserInput: errorZipcodeUserInput,
+              onZipcodeUserInputChange: onZipcodeUserChange,
+              zipcodeUserInput: zipcodeUserInput,
+            }}
+            state={{
+              stateData: stateUserInput.length > 0 ? stateData : [],
+              onStateUserInputChange: onStateUserChange,
+              errorStateUserInput: errorStateUserInput,
+              stateUserInput: stateUserInput,
+            }}
+            city={{
+              cityData: cityUserInput.length > 0 ? cityData : [],
+              onCityUserInputChange: onCityUserChange,
+              errorCityUserInput: errorCityUserInput,
+              cityUserInput: cityUserInput,
+            }}
+            restaurant={{
+              restaurantNameUserInput: restaurantNameUserInput,
+              onRestaurantNameUserInputChange: onRestaurantNameUserChange,
+              restaurantData:
+                restaurantNameUserInput.length > 0 ? restaurantData : [],
+            }}
+          />
+          <MapBoxMap />
+        </React.Fragment>
       )}
     </React.Fragment>
   );

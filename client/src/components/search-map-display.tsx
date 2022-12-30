@@ -4,7 +4,7 @@ import { useQuery } from "react-query";
 import { MapContainer } from "./map-container";
 import { ListContainer } from "./result-list";
 import { AutoCompleteInput } from "./search-component";
-import { fetchZipSearch } from "../backendFunctions";
+import { fetchZipSearch } from "../BackendFunc-DataCalc/backendFunctions";
 
 // https://simplemaps.com/data/us-zips this need to be added to usa zipcode data
 // This is for setting filter

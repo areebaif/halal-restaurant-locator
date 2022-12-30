@@ -9,7 +9,6 @@ export const Layout: React.FC = () => {
     <React.Fragment>
       <HeroBullets />
       <SearchBar />
-      {<MapBoxMap />}
     </React.Fragment>
   );
 };
