@@ -2,7 +2,6 @@ import * as React from "react";
 import { AutocompleteItem } from "@mantine/core";
 import { useQuery } from "react-query";
 import * as ReactRouter from "react-router-dom";
-
 import AutoCompleteInput from "./autocomplete";
 import { MapBoxMap } from "./map";
 
@@ -39,6 +38,7 @@ import {
 import {
   onGoelocationDataChange,
   onRefreshMapDataChange,
+  //onRefreshMapDataChange,
 } from "../redux-store/geolocation-slice";
 
 export interface PropertiesProps {
@@ -332,6 +332,7 @@ export const SearchBar: React.FC<{}> = () => {
           Boolean(!cityUserInput):
           console.log(" at restaurant zipcode no state");
           dispatch(onFetchRestaurantZipcode(true));
+
           break;
         //restaurantName, state
         case Boolean(restaurantNameUserInput) &&
@@ -386,7 +387,7 @@ export const SearchBar: React.FC<{}> = () => {
         default:
           console.log("error");
       }
-      dispatch(onRefreshMapDataChange(true));
+      //dispatch(onRefreshMapDataChange(true));
     }
   };
 
@@ -413,9 +414,12 @@ export const SearchBar: React.FC<{}> = () => {
         dispatch(
           onZipCodeBackendInputChange({ id: undefined, name: undefined })
         );
+        // dispatch this to signal to mapbox data has changed
+        dispatch(onRefreshMapDataChange(true));
       },
     }
   );
+
   const stateSearchResult = useQuery(
     ["fetchStateSearch", stateBackendInput.id],
     () => fetchStateSearch(stateBackendInput.id!),

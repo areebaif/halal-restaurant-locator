@@ -5,13 +5,19 @@ import Map, { Source, Layer, Popup } from "react-map-gl";
 import { Text, Box, HoverCard } from "@mantine/core";
 import { useAppDispatch, useAppSelector } from "../redux-store/redux-hooks";
 import { calcBoundsFromCoordinates } from "../BackendFunc-DataCalc/mapBound-calculations";
+
+import { fetchZipSearch } from "../BackendFunc-DataCalc/backendFunctions";
+
+import {
+  onFetchZipcode,
+  onZipCodeBackendInputChange,
+} from "../redux-store/search-slice";
 import {
   onActiveGeolocationChange,
   onGoelocationDataChange,
   onHoverIdChange,
   onIsOpenActiveGeolocationCardChange,
   onRefreshMapDataChange,
-  //onMapCameraViewChange,
 } from "../redux-store/geolocation-slice";
 import redMarker from "./red-marker.png";
 export interface CameraViewState {
@@ -49,71 +55,52 @@ export const MapBoxMap: React.FC = () => {
 
   // ReduxToolkit functions
   const dispatch = useAppDispatch();
+  const searchUserInputs = useAppSelector((state) => state.search);
 
-  // TODO: sueReact.useEffect to refresh MapData and setCamera bounds
+  const {
+    zipcodeUserInput,
+    stateUserInput,
+    cityUserInput,
+    restaurantNameUserInput,
+    fetchZipcode,
+    fetchState,
+    fetchStateCity,
+    fetchRestaurant,
+    fetchRestaurantState,
+    fetchRestaurantStateCity,
+    fetchRestaurantZipcode,
+    zipcodeBackendInput,
+    stateBackendInput,
+    cityBackendInput,
+    restaurantBackendInput,
+  } = searchUserInputs;
+
   React.useEffect(() => {
-    console.log(mapRef.current, "yatzu", refreshMapData);
-    // TODO: we need to transition camera to new search location figure that out
-    // lng: -93.31637999999998, lat: 45.161407759439214} 'centre' 55433
-    if (mapRef.current) {
-      const centre = mapRef.current.getMap();
-
-      console.log(centre, "centre");
+    if (mapRef.current && refreshMapData) {
+      const map = mapRef.current;
       const geoJsonSource = mapRef.current.getSource(dataSourceId);
-      console.log(geoJsonSource, "mimtz");
       geoJsonSource.setData(geolocationData);
       const mapLocations = geolocationData;
       const coordinatesArray = mapLocations?.features.map((item) => {
         const coordinatesObj = item.geometry as GeoJSON.Point;
         return coordinatesObj.coordinates;
       });
-      //const mapBounds = calcBoundsFromCoordinates(coordinatesArray);
-      //mapRef.current.easeTo([-93.31637999999998, 45.161407759439214]);
+      const mapBounds = calcBoundsFromCoordinates(coordinatesArray);
+      mapRef.current.fitBounds(new mapboxgl.LngLatBounds(mapBounds));
+      //   const lngLatObj = new mapboxgl.LngLatBounds(mapBounds);
+      //   const newMapCentre = lngLatObj.getCenter().toArray();
+      //   const exisitingMapCentre = map.getCenter().toArray();
+
+      //   if (
+      //     exisitingMapCentre[0] === newMapCentre[0] &&
+      //     exisitingMapCentre[1] === newMapCentre[1]
+      //   ) {
+      //     const centre: [number, number] = [newMapCentre[0], newMapCentre[1]];
+      //     map.setCenter(centre);
+      //   }
+      dispatch(onRefreshMapDataChange(false));
     }
   }, [refreshMapData]);
-
-  // Test data
-  //   const URL = "/api/dev/data";
-  //   const chicagoLocations = useQuery(
-  //     "getAllLocations",
-  //     async () => {
-  //       const response = await fetch(URL);
-
-  //       if (!response.ok) {
-  //         throw new Error("Network response was not ok");
-  //       }
-  //       const data: {
-  //         data: GeoJSON.FeatureCollection<GeoJSON.Geometry, any>;
-  //       } = await response.json();
-  //       return data.data;
-  //     },
-  //     {
-  //       onSuccess: (data) => {
-  //         // TODO: fix this that only search term is sent depending on what the search term is
-  //         console.log("I was ran on sucess");
-  //         // do some data manuplulation to only set Chicago Data. There are too many data points
-
-  //         const filteredValues = data?.features?.filter((item: any) => {
-  //           return item.properties.city === "Chicago";
-  //         });
-
-  //         const mapLocations: GeoJSON.FeatureCollection<GeoJSON.Geometry, any> = {
-  //           type: "FeatureCollection",
-  //           features: filteredValues?.length ? filteredValues : [],
-  //         };
-  //         dispatch(onGoelocationDataChange(mapLocations));
-  //       },
-  //     }
-  //   );
-
-  //   if (chicagoLocations.isLoading || !geolocationData) {
-  //     return <span>Loading...</span>;
-  //   }
-
-  //   if (chicagoLocations.isError) {
-  //     //setZipBackendApiFlag(false);
-  //     return <span>Error: error occured</span>;
-  //   }
 
   const onViewStateChange = (data: CameraViewState) => {
     setCameraViewState((previousState) => {

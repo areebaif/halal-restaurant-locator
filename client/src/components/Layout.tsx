@@ -8,7 +8,8 @@ export const Layout: React.FC = () => {
   return (
     <React.Fragment>
       <HeroBullets />
-      <SearchBar />
+      {<SearchBar />}
+      {/*<SearchAndMapDisplayComponent />*/}
     </React.Fragment>
   );
 };

@@ -1,15 +1,3 @@
-import { useAppDispatch } from "../redux-store/redux-hooks";
-
-import {
-  onFetchRestaurant,
-  onFetchRestaurantState,
-  onFetchRestaurantStateCity,
-  onFetchRestaurantZipcode,
-  onFetchState,
-  onFetchStateCity,
-  onFetchZipcode,
-} from "../redux-store/search-slice";
-
 const getSWCoordinates = (coordinatesCollection: any) => {
   const lowestLng = Math.min(
     ...coordinatesCollection.map((coordinates: any) => coordinates[0])
