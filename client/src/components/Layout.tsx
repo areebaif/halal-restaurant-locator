@@ -3,6 +3,7 @@ import { HeroBullets } from "./hero-header";
 import { SearchBar } from "./SearchBar";
 import { SearchAndMapDisplayComponent } from "./search-map-display";
 import { MapBoxMap } from "./map";
+import { PinIcon } from "../components/icons/pin";
 
 export const Layout: React.FC = () => {
   return (
@@ -10,6 +11,7 @@ export const Layout: React.FC = () => {
       <HeroBullets />
       {<SearchBar />}
       {/*<SearchAndMapDisplayComponent />*/}
+      <PinIcon />
     </React.Fragment>
   );
 };

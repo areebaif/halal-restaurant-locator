@@ -398,27 +398,6 @@ export const SearchBar: React.FC<{}> = () => {
     staleTime: Infinity,
     cacheTime: Infinity,
   });
-  const zipCodeSearchResult = useQuery(
-    ["fetchZipCodeSearch", zipcodeUserInput],
-    () => fetchZipSearch(zipcodeUserInput),
-    {
-      enabled: false || fetchZipcode,
-      onSuccess: (data) => {
-        console.log(data, "I just ran");
-        const mapLocations: GeoJSON.FeatureCollection<GeoJSON.Geometry, any> = {
-          type: "FeatureCollection",
-          features: data?.length ? data : [],
-        };
-        dispatch(onGoelocationDataChange(mapLocations));
-        dispatch(onFetchZipcode(false));
-        dispatch(
-          onZipCodeBackendInputChange({ id: undefined, name: undefined })
-        );
-        // dispatch this to signal to mapbox data has changed
-        dispatch(onRefreshMapDataChange(true));
-      },
-    }
-  );
 
   const stateSearchResult = useQuery(
     ["fetchStateSearch", stateBackendInput.id],

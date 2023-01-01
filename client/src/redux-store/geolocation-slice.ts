@@ -71,7 +71,7 @@ export const geolocationSlice = createSlice({
     onRefreshMapDataChange: (state, action: PayloadAction<boolean>) => {
       state.refreshMapData = action.payload;
     },
-    onHoverIdChange: (state, action: PayloadAction<number>) => {
+    onHoverIdChange: (state, action: PayloadAction<number | undefined>) => {
       state.hoverId = action.payload;
     },
     // onMapCameraViewChange: (state, action: PayloadAction<MapCameraView>) => {

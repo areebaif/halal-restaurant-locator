@@ -96,6 +96,7 @@ router.get(
         return item.id === (stateId === "0" ? 0 : parseInt(stateId));
       });
       const state = stateName[0];
+      console.log("stateName", stateName);
       const stateSetLocal = allRawData.features.filter((item) => {
         const properties = item.properties;
         if (properties.state === state.name) {
@@ -105,6 +106,7 @@ router.get(
           };
         }
       });
+
       res.status(200).send({
         data: stateSetLocal,
       });
@@ -169,7 +171,7 @@ router.get(
   "/api/dev/:zipcode",
   async (req: Request, res: Response, next: NextFunction) => {
     try {
-      console.log("I am hitting wring endpoint");
+      //console.log("I am hitting wring endpoint");
       const { zipcode } = req.params;
       //console.log(zipcode);
       //const zipCode: string = req.body;

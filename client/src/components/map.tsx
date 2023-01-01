@@ -1,17 +1,33 @@
 import * as React from "react";
 import { useQuery } from "react-query";
-import mapboxgl from "mapbox-gl";
+import mapboxgl, { CirclePaint, MapLayerMouseEvent } from "mapbox-gl";
 import Map, { Source, Layer, Popup } from "react-map-gl";
 import { Text, Box, HoverCard } from "@mantine/core";
 import { useAppDispatch, useAppSelector } from "../redux-store/redux-hooks";
 import { calcBoundsFromCoordinates } from "../BackendFunc-DataCalc/mapBound-calculations";
-
-import { fetchZipSearch } from "../BackendFunc-DataCalc/backendFunctions";
+import {
+  fetchStateSearch,
+  fetchStateAndCitySearch,
+} from "../BackendFunc-DataCalc/backendFunctions";
 
 import {
-  onFetchZipcode,
+  onZipcodeUserInputChange,
+  onStateUserInputChange,
+  onCityUserInputChange,
+  onRestaurantNameUserInputChange,
+  onCityBackendInputChange,
+  onRestaurantdeBackendInputChange,
+  onStateBackendInputChange,
   onZipCodeBackendInputChange,
+  onFetchRestaurant,
+  onFetchRestaurantState,
+  onFetchRestaurantStateCity,
+  onFetchRestaurantZipcode,
+  onFetchState,
+  onFetchStateCity,
+  onFetchZipcode,
 } from "../redux-store/search-slice";
+
 import {
   onActiveGeolocationChange,
   onGoelocationDataChange,
@@ -19,14 +35,15 @@ import {
   onIsOpenActiveGeolocationCardChange,
   onRefreshMapDataChange,
 } from "../redux-store/geolocation-slice";
-import redMarker from "./red-marker.png";
+
+import { fetchZipSearch } from "../BackendFunc-DataCalc/backendFunctions";
+
 export interface CameraViewState {
   latitude: number;
   longitude: number;
   zoom?: number;
 }
 
-// TODO: programitrcalyy set camera view not set initially
 export interface activeGeolocationProps {
   latitude: number;
   longitude: number;
@@ -42,21 +59,8 @@ export const MapBoxMap: React.FC = () => {
   const [cameraViewState, setCameraViewState] =
     React.useState<CameraViewState>();
   // global imports
-  const mapInputs = useAppSelector((state) => state.geolocation);
-  const {
-    geolocationData,
-    activeGeolocation,
-    isOpenActiveGeolocationCard,
-    refreshMapData,
-    hoverId,
-    dataSourceId,
-    layerId,
-  } = mapInputs;
 
-  // ReduxToolkit functions
-  const dispatch = useAppDispatch();
   const searchUserInputs = useAppSelector((state) => state.search);
-
   const {
     zipcodeUserInput,
     stateUserInput,
@@ -74,30 +78,106 @@ export const MapBoxMap: React.FC = () => {
     cityBackendInput,
     restaurantBackendInput,
   } = searchUserInputs;
+  const mapInputs = useAppSelector((state) => state.geolocation);
+  const {
+    geolocationData,
+    activeGeolocation,
+    isOpenActiveGeolocationCard,
+    refreshMapData,
+    hoverId,
+    dataSourceId,
+    layerId,
+  } = mapInputs;
+
+  // ReduxToolkit functions
+  const dispatch = useAppDispatch();
+
+  const zipCodeSearchResult = useQuery(
+    ["fetchZipCodeSearch", zipcodeUserInput],
+    () => fetchZipSearch(zipcodeUserInput),
+    {
+      enabled: false || fetchZipcode,
+      onSuccess: (data) => {
+        console.log(data, "I just ran");
+        const mapLocations: GeoJSON.FeatureCollection<GeoJSON.Geometry, any> = {
+          type: "FeatureCollection",
+          features: data?.length ? data : [],
+        };
+        dispatch(onGoelocationDataChange(mapLocations));
+        dispatch(onFetchZipcode(false));
+        dispatch(
+          onZipCodeBackendInputChange({ id: undefined, name: undefined })
+        );
+        dispatch(onRefreshMapDataChange(true));
+      },
+      onError: (error) => {
+        //TODO: error handling
+        console.log("react query data fetching error", error);
+      },
+    }
+  );
+
+  const stateSearchResult = useQuery(
+    ["fetchStateSearch", stateBackendInput.id],
+    () => fetchStateSearch(stateBackendInput.id!),
+    {
+      enabled: false || fetchState,
+      onSuccess: (data) => {
+        // TODO: set Map data
+        const mapLocations: GeoJSON.FeatureCollection<GeoJSON.Geometry, any> = {
+          type: "FeatureCollection",
+          features: data?.length ? data : [],
+        };
+        dispatch(onGoelocationDataChange(mapLocations));
+        dispatch(onFetchState(false));
+        dispatch(onStateBackendInputChange({ id: undefined, name: undefined }));
+        dispatch(onRefreshMapDataChange(true));
+      },
+      onError: (error) => {
+        //TODO: error handling
+        console.log("react query data fetching error", error);
+      },
+    }
+  );
+
+  const StateCitySearchResult = useQuery(
+    ["fetchStateCity", stateBackendInput.id, cityBackendInput.id],
+    () => fetchStateAndCitySearch(stateBackendInput.id!, cityBackendInput.id!),
+    {
+      enabled: false || fetchStateCity,
+      onSuccess: (data) => {
+        // TODO: onGeolocatiobnDatachange
+        const mapLocations: GeoJSON.FeatureCollection<GeoJSON.Geometry, any> = {
+          type: "FeatureCollection",
+          features: data?.length ? data : [],
+        };
+        dispatch(onGoelocationDataChange(mapLocations));
+        dispatch(onFetchStateCity(false));
+        dispatch(onStateBackendInputChange({ id: undefined, name: undefined }));
+        dispatch(onCityBackendInputChange({ id: undefined, name: undefined }));
+        dispatch(onRefreshMapDataChange(true));
+      },
+      onError: (error) => {
+        //TODO: error handling
+        console.log("react query data fetching error", error);
+      },
+    }
+  );
 
   React.useEffect(() => {
-    if (mapRef.current && refreshMapData) {
-      const map = mapRef.current;
-      const geoJsonSource = mapRef.current.getSource(dataSourceId);
-      geoJsonSource.setData(geolocationData);
-      const mapLocations = geolocationData;
-      const coordinatesArray = mapLocations?.features.map((item) => {
-        const coordinatesObj = item.geometry as GeoJSON.Point;
-        return coordinatesObj.coordinates;
-      });
-      const mapBounds = calcBoundsFromCoordinates(coordinatesArray);
-      mapRef.current.fitBounds(new mapboxgl.LngLatBounds(mapBounds));
-      //   const lngLatObj = new mapboxgl.LngLatBounds(mapBounds);
-      //   const newMapCentre = lngLatObj.getCenter().toArray();
-      //   const exisitingMapCentre = map.getCenter().toArray();
-
-      //   if (
-      //     exisitingMapCentre[0] === newMapCentre[0] &&
-      //     exisitingMapCentre[1] === newMapCentre[1]
-      //   ) {
-      //     const centre: [number, number] = [newMapCentre[0], newMapCentre[1]];
-      //     map.setCenter(centre);
-      //   }
+    if (mapRef.current) {
+      console.log("source", mapRef.current?.getSource(dataSourceId));
+      if (mapRef.current.getSource(dataSourceId)) {
+        const geoJsonSource = mapRef.current.getSource(dataSourceId);
+        geoJsonSource.setData(geolocationData);
+        const mapLocations = geolocationData;
+        const coordinatesArray = mapLocations?.features.map((item) => {
+          const coordinatesObj = item.geometry as GeoJSON.Point;
+          return coordinatesObj.coordinates;
+        });
+        const mapBounds = calcBoundsFromCoordinates(coordinatesArray);
+        mapRef.current.fitBounds(new mapboxgl.LngLatBounds(mapBounds));
+      }
       dispatch(onRefreshMapDataChange(false));
     }
   }, [refreshMapData]);
@@ -110,11 +190,14 @@ export const MapBoxMap: React.FC = () => {
 
   const onLoad = () => {
     if (mapRef.current) {
-      mapRef.current.loadImage(redMarker, (error: any, image: any) => {
-        // TODO: error handing
-        if (error) throw new error("map load error occured");
-        mapRef.current.addImage("custom-marker", image);
-      });
+      mapRef.current.loadImage(
+        "/marker-icons/mapbox-marker-icon-20px-red.png",
+        (error: any, image: any) => {
+          // TODO: error handing
+          if (error) throw new error("map load error occured");
+          mapRef.current.addImage("custom-marker", image);
+        }
+      );
       // programmatically calculate mapZoom and mapBOund for initial load of data
       const mapLocations = geolocationData;
       const coordinatesArray = mapLocations?.features.map((item) => {
@@ -125,6 +208,24 @@ export const MapBoxMap: React.FC = () => {
       mapRef.current.fitBounds(new mapboxgl.LngLatBounds(mapBounds));
     }
   };
+
+  //   const onMouseEnter = (e: MapLayerMouseEvent) => {
+  //     if (hoverId) {
+  //       mapRef.current.setFeatureState(
+  //         { source: dataSourceId, id: hoverId },
+  //         { hover: false }
+  //       );
+  //     }
+  //     dispatch(onHoverIdChange(undefined))
+  //     if (e.features?.length) {
+  //         const coordinatesObject = e.features[0].geometry as GeoJSON.Point;
+  //         const coordinates = coordinatesObject.coordinates.slice();
+  //         const description = e.features[0].properties;
+  //         const id = e.features[0].id
+  //     dispatch(onHoverIdChange(e.features[0].id))
+  //     }
+
+  // }
 
   return (
     <Map
@@ -162,7 +263,7 @@ export const MapBoxMap: React.FC = () => {
         {isOpenActiveGeolocationCard && (
           <Popup
             longitude={activeGeolocation.longitude}
-            offset={-10}
+            offset={25}
             latitude={activeGeolocation.latitude}
             anchor="top"
             closeButton={false}
