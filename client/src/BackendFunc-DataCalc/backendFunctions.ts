@@ -44,6 +44,8 @@ export interface FetchAutomplete {
   citySet: cityDocument[];
   stateSet: stateDocument[];
   zipSet: ZipDocument[];
+  city_state: string[];
+  allValues: string[];
   restaurantSet: restaurantDocument[];
 }
 

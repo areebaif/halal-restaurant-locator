@@ -120,9 +120,11 @@ router.get(
   "/api/dev/getGeography",
   async (req: Request, res: Response, next: NextFunction) => {
     try {
+      console.log(" I was just hit");
       // TODO: add restaurantName functionality to this
       const citySetTemp: Set<string> = new Set();
       const stateSetTemp: Set<string> = new Set();
+      const cityStateTemp: Set<string> = new Set();
       const allRawData: {
         features: locationDocument[];
         type: "FeatureCollection";
@@ -132,6 +134,8 @@ router.get(
         const properties = item.properties;
         citySetTemp.add(properties.city);
         stateSetTemp.add(properties.state);
+        const cityState = `${properties.city}, ${properties.state}`;
+        cityStateTemp.add(cityState);
         return {
           ...item,
           city_state: `${properties.city}, ${properties.state}`,
@@ -140,6 +144,17 @@ router.get(
 
       const arrayCitySet = Array.from(citySetTemp);
       const arrayStateSet = Array.from(stateSetTemp);
+      const arrayCityState = Array.from(cityStateTemp);
+      const allValues: string[] = [];
+
+      arrayCityState.forEach((item) => {
+        allValues.push(item);
+      });
+      zipSet.forEach((item) => {
+        const zipValue = `${item.city_state}, ${item.properties.zip}`;
+        allValues.push(zipValue);
+      });
+
       const mappedCitySet = arrayCitySet.map((item, index) => {
         return { id: index, name: item };
       });
@@ -157,6 +172,8 @@ router.get(
           citySet: mappedCitySet,
           stateSet: mappedStateSet,
           zipSet: zipSet,
+          city_state: arrayCityState,
+          allValues: allValues,
           // TODO: fix empty object to actually sending data
           restaurantSet: [],
         },

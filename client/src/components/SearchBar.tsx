@@ -1,5 +1,5 @@
 import * as React from "react";
-import { AutocompleteItem } from "@mantine/core";
+import { Autocomplete, AutocompleteItem } from "@mantine/core";
 import { useQuery } from "react-query";
 import * as ReactRouter from "react-router-dom";
 import AutoCompleteInput from "./autocomplete";
@@ -52,11 +52,15 @@ export interface PropertiesProps {
 export const SearchBar: React.FC<{}> = () => {
   // we are using mantine autocomplete component to populate data. This component has typing defined as AutoCompleteItem
   // data to populate autocomplete component
+  // These inputs help send data back to backend
+  // TODO: how many times is this function hitting my backend? Checked via react query it just updates values from react
   const [stateData, setStateData] = React.useState<AutocompleteItem[]>();
   const [cityData, setCityData] = React.useState<AutocompleteItem[]>();
   const [zipData, setZipData] = React.useState<AutocompleteItem[]>();
   const [restaurantData, setRestaurantData] =
     React.useState<AutocompleteItem[]>();
+  const [autoCompleteData, setAutoCompleteData] = React.useState<string[]>();
+  const [userInput, setUserInput] = React.useState<string>("");
 
   // global state
   const searchUserInputs = useAppSelector((state) => state.search);
@@ -266,6 +270,8 @@ export const SearchBar: React.FC<{}> = () => {
           Boolean(zipcodeUserInput) &&
           Boolean(!stateUserInput) &&
           Boolean(!cityUserInput):
+          // TODO: you should navigate using query strings
+          // Dont yet dispatch any state change
           console.log(" at restaurant zipcode no state");
           dispatch(onFetchRestaurantZipcode(true));
           break;
@@ -399,33 +405,6 @@ export const SearchBar: React.FC<{}> = () => {
     cacheTime: Infinity,
   });
 
-  const stateSearchResult = useQuery(
-    ["fetchStateSearch", stateBackendInput.id],
-    () => fetchStateSearch(stateBackendInput.id!),
-    {
-      enabled: false || fetchState,
-      onSuccess: (data) => {
-        // TODO: set Map data
-        dispatch(onFetchState(false));
-        dispatch(onStateBackendInputChange({ id: undefined, name: undefined }));
-      },
-    }
-  );
-
-  const StateCitySearchResult = useQuery(
-    ["fetchStateCity", stateBackendInput.id, cityBackendInput.id],
-    () => fetchStateAndCitySearch(stateBackendInput.id!, cityBackendInput.id!),
-    {
-      enabled: false || fetchStateCity,
-      onSuccess: (data) => {
-        // TODO: setMap Data
-        dispatch(onFetchStateCity(false));
-        dispatch(onStateBackendInputChange({ id: undefined, name: undefined }));
-        dispatch(onCityBackendInputChange({ id: undefined, name: undefined }));
-      },
-    }
-  );
-
   if (geoLocationData.isLoading) {
     console.log("loading");
     return <span>Loading...</span>;
@@ -437,6 +416,12 @@ export const SearchBar: React.FC<{}> = () => {
   }
   // Set SearchBar auto complete data
   const data = geoLocationData.data!;
+  //console.log(data);
+
+  if (!autoCompleteData) {
+    setAutoCompleteData(data.allValues);
+  }
+
   if (!stateData) {
     const stateFormattedData = data.stateSet.map((item) => {
       return { ...item, value: item.name };
@@ -450,10 +435,12 @@ export const SearchBar: React.FC<{}> = () => {
     setCityData(cityFormattedData);
   }
   if (!zipData) {
-    const zipFormattedData = data.zipSet.map((item: ZipDocument) => ({
-      ...item,
-      value: item.properties.zip,
-    }));
+    const zipFormattedData = data.zipSet.map((item: ZipDocument) => {
+      return {
+        ...item,
+        value: item.properties.zip,
+      };
+    });
     setZipData(zipFormattedData);
   }
   if (!restaurantData) {
@@ -464,39 +451,55 @@ export const SearchBar: React.FC<{}> = () => {
     setRestaurantData(restaurantFormattedData);
   }
 
+  const userInputOnChangeHandler = (value: string) => {
+    // This prop will never hold all the value, I need to read value from DOM I guess
+    console.log("lollz", value);
+    setUserInput(value);
+  };
+
   return (
     <React.Fragment>
       {path === "/" ? (
-        <AutoCompleteInput
-          onSubmit={onSubmit}
-          zipcode={{
-            zipData: zipcodeUserInput.length > 0 ? zipData : [],
-            errorZipcodeUserInput: errorZipcodeUserInput,
-            onZipcodeUserInputChange: onZipcodeUserChange,
-            zipcodeUserInput: zipcodeUserInput,
-          }}
-          state={{
-            stateData: stateUserInput.length > 0 ? stateData : [],
-            onStateUserInputChange: onStateUserChange,
-            errorStateUserInput: errorStateUserInput,
-            stateUserInput: stateUserInput,
-          }}
-          city={{
-            cityData: cityUserInput.length > 0 ? cityData : [],
-            onCityUserInputChange: onCityUserChange,
-            errorCityUserInput: errorCityUserInput,
-            cityUserInput: cityUserInput,
-          }}
-          restaurant={{
-            restaurantNameUserInput: restaurantNameUserInput,
-            onRestaurantNameUserInputChange: onRestaurantNameUserChange,
-            restaurantData:
-              restaurantNameUserInput.length > 0 ? restaurantData : [],
-          }}
+        <Autocomplete
+          placeholder="Start typing to see options"
+          value={userInput}
+          limit={10}
+          onChange={userInputOnChangeHandler}
+          data={
+            userInput.length ? (autoCompleteData ? autoCompleteData : []) : []
+          }
         />
       ) : (
+        // <AutoCompleteInput
+        //   onSubmit={onSubmit}
+        //   zipcode={{
+        //     zipData: zipcodeUserInput.length > 0 ? zipData : [],
+        //     errorZipcodeUserInput: errorZipcodeUserInput,
+        //     onZipcodeUserInputChange: onZipcodeUserChange,
+        //     zipcodeUserInput: zipcodeUserInput,
+        //   }}
+        //   state={{
+        //     stateData: stateUserInput.length > 0 ? stateData : [],
+        //     onStateUserInputChange: onStateUserChange,
+        //     errorStateUserInput: errorStateUserInput,
+        //     stateUserInput: stateUserInput,
+        //   }}
+        //   city={{
+        //     cityData: cityUserInput.length > 0 ? cityData : [],
+        //     onCityUserInputChange: onCityUserChange,
+        //     errorCityUserInput: errorCityUserInput,
+        //     cityUserInput: cityUserInput,
+        //   }}
+        //   restaurant={{
+        //     restaurantNameUserInput: restaurantNameUserInput,
+        //     onRestaurantNameUserInputChange: onRestaurantNameUserChange,
+        //     restaurantData:
+        //       restaurantNameUserInput.length > 0 ? restaurantData : [],
+        //   }}
+        ///>
         <React.Fragment>
-          <AutoCompleteInput
+          <Autocomplete data={autoCompleteData ? autoCompleteData : []} />
+          {/* <AutoCompleteInput
             onSubmit={onSubmit}
             zipcode={{
               zipData: zipcodeUserInput.length > 0 ? zipData : [],
@@ -522,7 +525,7 @@ export const SearchBar: React.FC<{}> = () => {
               restaurantData:
                 restaurantNameUserInput.length > 0 ? restaurantData : [],
             }}
-          />
+          /> */}
           <MapBoxMap />
         </React.Fragment>
       )}

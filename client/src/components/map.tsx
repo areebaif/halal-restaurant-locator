@@ -91,6 +91,8 @@ export const MapBoxMap: React.FC = () => {
 
   // ReduxToolkit functions
   const dispatch = useAppDispatch();
+  // TODO: depending on the route we hit, dispatch state change which will load components
+  // you need local isLoading state that does not display map until loading has complete orglobal satte lets see what reduces mapload
 
   const zipCodeSearchResult = useQuery(
     ["fetchZipCodeSearch", zipcodeUserInput],
@@ -166,7 +168,6 @@ export const MapBoxMap: React.FC = () => {
 
   React.useEffect(() => {
     if (mapRef.current) {
-      console.log("source", mapRef.current?.getSource(dataSourceId));
       if (mapRef.current.getSource(dataSourceId)) {
         const geoJsonSource = mapRef.current.getSource(dataSourceId);
         geoJsonSource.setData(geolocationData);
@@ -198,7 +199,7 @@ export const MapBoxMap: React.FC = () => {
           mapRef.current.addImage("custom-marker", image);
         }
       );
-      // programmatically calculate mapZoom and mapBOund for initial load of data
+      // programmatically calculate mapZoom and mapBound for initial load of data.
       const mapLocations = geolocationData;
       const coordinatesArray = mapLocations?.features.map((item) => {
         const coordinatesObj = item.geometry as GeoJSON.Point;

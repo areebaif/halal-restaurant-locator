@@ -43,14 +43,7 @@ function App() {
         <Routes>
           <Route path="/" element={<Layout />}></Route>
           <Route path="/auth/signup" element={<div>we navigated</div>}></Route>
-          <Route
-            path="/search-display"
-            element={
-              <div>
-                yoho we navigated <SearchBar />
-              </div>
-            }
-          ></Route>
+          <Route path="/search-display" element={<SearchBar />}></Route>
         </Routes>
       </QueryClientProvider>
     </React.Fragment>
