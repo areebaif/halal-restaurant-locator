@@ -1,27 +1,23 @@
 import * as React from "react";
-import { Autocomplete, AutocompleteItem } from "@mantine/core";
+import { Autocomplete, AutocompleteItem, Group, Button } from "@mantine/core";
 import { useQuery } from "react-query";
 import * as ReactRouter from "react-router-dom";
-import AutoCompleteInput from "./autocomplete";
 import { MapBoxMap } from "./map";
 
+import { validateUserInput } from "../BackendFunc-DataCalc/userInput";
 import {
   fetchZipSearch,
   fetchAutoCompleteData,
   ZipDocument,
-  restaurantDocument,
-  cityDocument,
-  stateDocument,
+  RestaurantDocument,
+  CityDocument,
+  StateDocument,
   FetchAutomplete,
   fetchStateSearch,
   fetchStateAndCitySearch,
 } from "../BackendFunc-DataCalc/backendFunctions";
 import { useAppDispatch, useAppSelector } from "../redux-store/redux-hooks";
 import {
-  onZipcodeUserInputChange,
-  onStateUserInputChange,
-  onCityUserInputChange,
-  onRestaurantNameUserInputChange,
   onCityBackendInputChange,
   onRestaurantdeBackendInputChange,
   onStateBackendInputChange,
@@ -40,6 +36,7 @@ import {
   onRefreshMapDataChange,
   //onRefreshMapDataChange,
 } from "../redux-store/geolocation-slice";
+import { stateDocument } from "./search-component";
 
 export interface PropertiesProps {
   title: string;
@@ -50,25 +47,21 @@ export interface PropertiesProps {
 }
 
 export const SearchBar: React.FC<{}> = () => {
-  // we are using mantine autocomplete component to populate data. This component has typing defined as AutoCompleteItem
-  // data to populate autocomplete component
-  // These inputs help send data back to backend
-  // TODO: how many times is this function hitting my backend? Checked via react query it just updates values from react
-  const [stateData, setStateData] = React.useState<AutocompleteItem[]>();
-  const [cityData, setCityData] = React.useState<AutocompleteItem[]>();
-  const [zipData, setZipData] = React.useState<AutocompleteItem[]>();
+  // we are setting state, city, zip and restaurant data to validate user input with backend returned values of state, city, zipcode or restaurantName
+  // We are setting these values to avoid unnecessary calls to backend if user enters an invalid value. Some hosting solutions charges money for api calls
+  // additionally validating user input early reduces latency
+  // We are using front-end and back-end data rules to validate user input.
+  const [stateData, setStateData] = React.useState<StateDocument[]>();
+  const [cityData, setCityData] = React.useState<CityDocument[]>();
+  const [zipData, setZipData] = React.useState<ZipDocument[]>();
   const [restaurantData, setRestaurantData] =
-    React.useState<AutocompleteItem[]>();
+    React.useState<RestaurantDocument[]>();
   const [autoCompleteData, setAutoCompleteData] = React.useState<string[]>();
   const [userInput, setUserInput] = React.useState<string>("");
 
   // global state
   const searchUserInputs = useAppSelector((state) => state.search);
   const {
-    zipcodeUserInput,
-    stateUserInput,
-    cityUserInput,
-    restaurantNameUserInput,
     fetchZipcode,
     fetchState,
     fetchStateCity,
@@ -82,322 +75,116 @@ export const SearchBar: React.FC<{}> = () => {
     restaurantBackendInput,
   } = searchUserInputs;
 
-  // error props
-  const [errorZipcodeUserInput, setErrorZipcodeUserInput] =
-    React.useState(false);
-  const [errorCityUserInput, setErrorCityUserInput] = React.useState(false);
-  const [errorStateUserInput, setErrorStateUserInput] = React.useState(false);
-
   // React Router functions
   const location = ReactRouter.useLocation();
   const path = location.pathname;
   const navigate = ReactRouter.useNavigate();
 
+  const queryParams = new URLSearchParams(location.search);
+  console.log(
+    queryParams,
+    "url search params",
+    queryParams.get("stateId"),
+    queryParams.get("zipcode")
+  );
+
   // ReduxToolkit functions
   const dispatch = useAppDispatch();
-
-  // onChange functions
-  const onRestaurantNameUserChange = (value: string) => {
-    dispatch(onRestaurantNameUserInputChange(value));
-  };
-
-  const onStateUserChange = (value: string) => {
-    // Check for special characters including numbers
-    const specialChars = /[`!@#$%^&*()_+\-=\[\]{};',:"\\|.<>\/?~0123456789]/;
-    const specialCharsTest = specialChars.test(value);
-
-    if (!specialCharsTest) {
-      setErrorStateUserInput(false);
-      dispatch(onStateUserInputChange(value));
-    } else {
-      setErrorStateUserInput(true);
-      dispatch(onStateUserInputChange(value));
-    }
-  };
-
-  const onCityUserChange = (value: string) => {
-    // Check for special characters including numbers (dont check for white spaces some cities are two words with whote space in between)
-    const specialChars = /[`!@#$%^&*()_+\-=\[\]{};',:"\\|.<>\/?~0123456789]/;
-    const specialCharsTest = specialChars.test(value);
-    if (!specialCharsTest) {
-      setErrorCityUserInput(false);
-      dispatch(onCityUserInputChange(value));
-    } else {
-      setErrorCityUserInput(true);
-      dispatch(onCityUserInputChange(value));
-    }
-  };
-
-  const onZipcodeUserChange = (value: string) => {
-    // check for white spaces in zipcode
-    const specialChars = /[ ]/;
-    const expression = true;
-    switch (expression) {
-      case specialChars.test(value):
-        setErrorZipcodeUserInput(true);
-        dispatch(onZipcodeUserInputChange(value));
-        break;
-      case isNaN(Number(value)):
-        setErrorZipcodeUserInput(true);
-        dispatch(onZipcodeUserInputChange(value));
-        break;
-      default:
-        setErrorZipcodeUserInput(false);
-        dispatch(onZipcodeUserInputChange(value));
-    }
-  };
-
-  const validateUserInputUpdateBackendInput = () => {
-    let trimmedZipCode = zipcodeUserInput?.trim();
-    let trimmedCity = cityUserInput?.trim();
-    let trimmedState = stateUserInput?.trim();
-    let trimmedRestaurantNameUserInput = restaurantNameUserInput?.trim();
-
-    // validCity
-    if (trimmedCity.length) {
-      const cityArray = trimmedCity?.split(" ");
-      const cityUpperCase = cityArray?.map(
-        (item) => item[0].toUpperCase() + item.substring(1)
-      );
-      trimmedCity = cityUpperCase?.join(" ");
-      const validCity = cityData?.filter((item) => item.name === trimmedCity);
-      if (!validCity?.length) {
-        //TODO: error handling
-        //throw new Error("lolz");
-        console.log("error: you have entered an incorrect city value");
-      }
-      // update state
-      const backendTermAutoCompleteItem = validCity?.[0];
-      const backendTerm: { id: number; name: string } = {
-        id: backendTermAutoCompleteItem?.id,
-        name: backendTermAutoCompleteItem?.name,
-      };
-      onCityUserInputChange(trimmedCity);
-      dispatch(onCityBackendInputChange(backendTerm));
-    }
-    // validState
-    if (trimmedState.length) {
-      const stateArray = trimmedState?.split(" ");
-      const stateUpperCase = stateArray?.map(
-        (item) => item[0].toUpperCase() + item.substring(1)
-      );
-      trimmedState = stateUpperCase?.join(" ");
-      const validState = stateData?.filter(
-        (item) => item.name === trimmedState
-      );
-
-      if (!validState?.length) {
-        //TODO: error handling
-        console.log("error: you have entered an incorrect state value");
-      }
-      // update state
-      const backendTermAutoCompleteItem = validState?.[0];
-      const backendTerm: { id: number; name: string } = {
-        id: backendTermAutoCompleteItem?.id,
-        name: backendTermAutoCompleteItem?.name,
-      };
-      onStateUserInputChange(trimmedState);
-      dispatch(onStateBackendInputChange(backendTerm));
-    }
-    // valid restaurantName
-    if (trimmedRestaurantNameUserInput.length) {
-      const restaurantNameArray = trimmedRestaurantNameUserInput?.split(" ");
-      const restaurantNameUpperCase = restaurantNameArray?.map(
-        (item) => item[0].toUpperCase() + item.substring(1)
-      );
-      trimmedRestaurantNameUserInput = restaurantNameUpperCase?.join(" ");
-
-      const validRestaurantName = restaurantData?.filter(
-        (item) => item.name === trimmedRestaurantNameUserInput
-      );
-
-      if (!validRestaurantName?.length) {
-        //TODO: error handling
-        console.log("error: you have entered an incorrect state value");
-      }
-      // update state
-      const backendTermAutoCompleteItem = validRestaurantName?.[0];
-      const backendTerm: { id: number; name: string } = {
-        id: backendTermAutoCompleteItem?.id,
-        name: backendTermAutoCompleteItem?.name,
-      };
-      onRestaurantNameUserInputChange(trimmedRestaurantNameUserInput);
-      dispatch(onRestaurantdeBackendInputChange(backendTerm));
-    }
-    // valid zipCode
-    if (trimmedZipCode.length) {
-      //TODO: check valid zipcode
-      const validZip = zipData?.filter((item) => {
-        return item.value === trimmedZipCode;
-      });
-      if (!validZip?.length) {
-        //TODO: error handling
-        console.log("no valid zip");
-      }
-      // update state
-      const backendTermAutoCompleteItem = validZip?.[0];
-      const backendTerm: { id: number; name: string } = {
-        id: backendTermAutoCompleteItem?.id,
-        name: backendTermAutoCompleteItem?.name,
-      };
-      onZipcodeUserInputChange(trimmedZipCode);
-      dispatch(onZipCodeBackendInputChange(backendTerm));
-    }
-  };
-
   const onSubmit = () => {
-    // before triggering a backend api call check if the user has entered a valid state, city, zipcode or restaurantName values
-    // since we are already validating user input by comparing it to the values recieved from backend, so in this function we are also updating global state for data to be sent to backend
-    // Yes this is not a pure function and does twpo things
-    // TODO: might separate the above two functionalities out in the future.
-    validateUserInputUpdateBackendInput();
+    console.log("clicked");
+    const data = {
+      userInput,
+      backendCityData: cityData!,
+      backendStateData: stateData!,
+      backendZipData: zipData!,
+      backendRestaurantData: restaurantData!,
+    };
+    // TODO: properly type validateUserInput with proper arguments to the function
+    const queryStringValues = validateUserInput(data);
+    const { state, city, zipcode, restaurantName } = queryStringValues;
+    console.log(queryStringValues, "values");
 
-    // sanity check: throw error if the user hasnt entered anything but still has clicked submit
-    if (
-      !zipcodeUserInput.length &&
-      !stateUserInput.length &&
-      !cityUserInput.length &&
-      !restaurantNameUserInput.length
-    ) {
+    // sanity check: throw error if the user has not entered anything but still has clicked submit
+    if (!zipcode?.id && !state?.id && !city?.id && !restaurantName?.id) {
       // TODO: error handling
       console.log("error: user didnt enter anything throw error");
     }
 
-    // check which combination of inputs the user has entered to trigger backend calls to get data.
-    if (path === "/") {
-      switch (true) {
-        case Boolean(restaurantNameUserInput) &&
-          Boolean(zipcodeUserInput) &&
-          Boolean(!stateUserInput) &&
-          Boolean(!cityUserInput):
-          // TODO: you should navigate using query strings
-          // Dont yet dispatch any state change
-          console.log(" at restaurant zipcode no state");
-          dispatch(onFetchRestaurantZipcode(true));
-          break;
-        //restaurantName, state
-        case Boolean(restaurantNameUserInput) &&
-          Boolean(stateUserInput) &&
-          Boolean(!zipcodeUserInput) &&
-          Boolean(!cityUserInput):
-          console.log("restaurant, state, no zip");
-          dispatch(onFetchRestaurantState(true));
-          break;
-        //restaurantName, state, city
-        case Boolean(restaurantNameUserInput) &&
-          Boolean(stateUserInput) &&
-          Boolean(cityUserInput) &&
-          Boolean(!zipcodeUserInput):
-          console.log("restaurant,state,city,nozip");
-          dispatch(onFetchRestaurantStateCity(true));
-          break;
-        //restaurantName
-        case Boolean(restaurantNameUserInput) &&
-          Boolean(!stateUserInput) &&
-          Boolean(!cityUserInput) &&
-          Boolean(!zipcodeUserInput):
-          console.log("only restaurant");
-          dispatch(onFetchRestaurant(true));
-          break;
-        // zipcode
-        case Boolean(zipcodeUserInput) &&
-          Boolean(!stateUserInput) &&
-          Boolean(!cityUserInput) &&
-          Boolean(!restaurantNameUserInput):
-          console.log(" only zipcode yes");
-          dispatch(onFetchZipcode(true));
-          //setZipcodeUserInput(zipcodeUserInput!);
-          break;
-        // state,city
-        case Boolean(stateUserInput) &&
-          Boolean(cityUserInput) &&
-          Boolean(!zipcodeUserInput) &&
-          Boolean(!restaurantNameUserInput):
-          console.log("state and city no zipcode");
-          dispatch(onFetchStateCity(true));
-          break;
-        // state
-        case Boolean(stateUserInput) &&
-          Boolean(!cityUserInput) &&
-          Boolean(!zipcodeUserInput) &&
-          Boolean(!restaurantNameUserInput):
-          console.log("only state no city no zipcode"); // no zipcode
-          dispatch(onFetchState(true));
-          break;
-        default:
-          // TODO: error handling this means user didnt enter anything and submitted
-          console.log("error");
-      }
-      navigate("/search-display");
-    } else {
-      // TODO: setRefreshMapData to true after getting a response from backend not in the backend function after that
-      switch (true) {
-        case Boolean(restaurantNameUserInput) &&
-          Boolean(zipcodeUserInput) &&
-          Boolean(!stateUserInput) &&
-          Boolean(!cityUserInput):
-          console.log(" at restaurant zipcode no state");
-          dispatch(onFetchRestaurantZipcode(true));
-
-          break;
-        //restaurantName, state
-        case Boolean(restaurantNameUserInput) &&
-          Boolean(stateUserInput) &&
-          Boolean(!zipcodeUserInput) &&
-          Boolean(!cityUserInput):
-          console.log("restaurant, state, no zip");
-          dispatch(onFetchRestaurantState(true));
-          break;
-        //restaurantName, state, city
-        case Boolean(restaurantNameUserInput) &&
-          Boolean(stateUserInput) &&
-          Boolean(cityUserInput) &&
-          Boolean(!zipcodeUserInput):
-          console.log("restaurant,state,city,nozip");
-          dispatch(onFetchRestaurantStateCity(true));
-          break;
-        //restaurantName
-        case Boolean(restaurantNameUserInput) &&
-          Boolean(!stateUserInput) &&
-          Boolean(!cityUserInput) &&
-          Boolean(!zipcodeUserInput):
-          console.log("only restaurant");
-          dispatch(onFetchRestaurant(true));
-          break;
-        // zipcode
-        case Boolean(zipcodeUserInput) &&
-          Boolean(!stateUserInput) &&
-          Boolean(!cityUserInput) &&
-          Boolean(!restaurantNameUserInput):
-          console.log(" only zipcode yes");
-          dispatch(onFetchZipcode(true));
-          //setZipcodeUserInput(zipcodeUserInput!);
-          break;
-        // state,city
-        case Boolean(stateUserInput) &&
-          Boolean(cityUserInput) &&
-          Boolean(!zipcodeUserInput) &&
-          Boolean(!restaurantNameUserInput):
-          console.log("state and city no zipcode");
-          dispatch(onFetchStateCity(true));
-          break;
-        // state
-        case Boolean(stateUserInput) &&
-          Boolean(!cityUserInput) &&
-          Boolean(!zipcodeUserInput) &&
-          Boolean(!restaurantNameUserInput):
-          console.log("only state no city no zipcode"); // no zipcode
-          dispatch(onFetchState(true));
-          break;
+    // check which combination of inputs the user has entered to set query parameters and navigate
+    switch (true) {
+      case Boolean(restaurantName?.id) &&
+        Boolean(zipcode?.id) &&
+        Boolean(!state?.id) &&
+        Boolean(!city?.id):
+        console.log(" at restaurant zipcode no state");
+        navigate(
+          `/search-display?zipcodeId=${zipcode?.id}&zipcodeName=${zipcode?.name}&restaurantId=${restaurantName?.id}&restaurantName=${restaurantName?.name}`
+        );
+        break;
+      //restaurantName, state
+      case Boolean(restaurantName?.id) &&
+        Boolean(state?.id) &&
+        Boolean(!zipcode?.id) &&
+        Boolean(!city?.id):
+        console.log("restaurant, state, no zip");
+        navigate(
+          `/search-display?stateId=${state?.id}&stateName=${state?.name}&restaurantId=${restaurantName?.id}&restaurantName=${restaurantName?.name}`
+        );
+        break;
+      //restaurantName, state, city
+      case Boolean(restaurantName?.id) &&
+        Boolean(state?.id) &&
+        Boolean(city?.id) &&
+        Boolean(!zipcode?.id):
+        console.log("restaurant,state,city,nozip");
+        navigate(
+          `/search-display?stateId=${state?.id}&stateName=${state?.name}&cityId=${city?.id}&cityName=${city?.name}&restaurantId=${restaurantName?.id}&restaurantName=${restaurantName?.name}`
+        );
+        break;
+      //restaurantName
+      case Boolean(restaurantName?.id) &&
+        Boolean(!state?.id) &&
+        Boolean(!city?.id) &&
+        Boolean(!zipcode?.id):
+        console.log("only restaurant");
+        navigate(
+          `/search-display?stateId=restaurantId=${restaurantName?.id}&restaurantName=${restaurantName?.name}`
+        );
+        break;
+      // zipcode
+      case Boolean(zipcode?.id) &&
+        Boolean(!state?.id) &&
+        Boolean(!city?.id) &&
+        Boolean(!restaurantName?.id):
+        console.log(" only zipcode yes");
+        navigate(
+          `/search-display?zipcodeId=${zipcode?.id}&zipcodeName=${zipcode?.name}`
+        );
+        break;
+      // state,city
+      case Boolean(state?.id) &&
+        Boolean(city?.id) &&
+        Boolean(!zipcode?.id) &&
+        Boolean(!restaurantName?.id):
+        console.log("state and city no zipcode");
+        navigate(
+          `/search-display?cityId=${city?.id}&cityName=${city?.name}&stateId=${state?.id}&stateName=${state?.name}`
+        );
+        break;
+      // state
+      case Boolean(state?.id) &&
+        Boolean(!city?.id) &&
+        Boolean(!zipcode?.id) &&
+        Boolean(!restaurantName?.id):
+        console.log("only state no city no zipcode"); // no zipcode
+        break;
+      default:
         // TODO: error handling this means user didnt enter anything and submitted
-        default:
-          console.log("error");
-      }
-      //dispatch(onRefreshMapDataChange(true));
+        console.log(" error");
     }
   };
 
-  // This function has to run regardless of any user input to populate auto-complete inputs of state, city, zipcode and restaurantName
+  // This function has to run regardless of any user input to populate auto-complete state, city, zipcode and restaurantName
   // cacheTime is set to infinite because autocomplete props are read only even for user so this data will not change in a user session.
   // Additionally SearchBar component is used in multiple routes, hence, it makes sense to cache data and not hit your backend api again and again.
   const geoLocationData = useQuery("getGeography", fetchAutoCompleteData, {
@@ -414,118 +201,75 @@ export const SearchBar: React.FC<{}> = () => {
     // TODO: in errors turn search query flags to false bakcned terms also need to update to {id:undefined, name:undefined}
     return <span>Error: error occured</span>;
   }
-  // Set SearchBar auto complete data
+  // Set local state data if it does not exist
   const data = geoLocationData.data!;
-  //console.log(data);
-
   if (!autoCompleteData) {
     setAutoCompleteData(data.allValues);
   }
-
   if (!stateData) {
-    const stateFormattedData = data.stateSet.map((item) => {
-      return { ...item, value: item.name };
-    });
-    setStateData(stateFormattedData);
+    setStateData(data.stateSet);
   }
   if (!cityData) {
-    const cityFormattedData = data.citySet.map((item) => {
-      return { ...item, value: item.name };
-    });
-    setCityData(cityFormattedData);
+    setCityData(data.citySet);
   }
   if (!zipData) {
-    const zipFormattedData = data.zipSet.map((item: ZipDocument) => {
-      return {
-        ...item,
-        value: item.properties.zip,
-      };
-    });
-    setZipData(zipFormattedData);
+    setZipData(data.zipSet);
   }
   if (!restaurantData) {
-    const restaurantFormattedData = data.restaurantSet.map((item) => ({
-      ...item,
-      value: item.name,
-    }));
-    setRestaurantData(restaurantFormattedData);
+    setRestaurantData(data.restaurantSet);
   }
 
   const userInputOnChangeHandler = (value: string) => {
-    // This prop will never hold all the value, I need to read value from DOM I guess
-    console.log("lollz", value);
     setUserInput(value);
   };
 
   return (
     <React.Fragment>
       {path === "/" ? (
-        <Autocomplete
-          placeholder="Start typing to see options"
-          value={userInput}
-          limit={10}
-          onChange={userInputOnChangeHandler}
-          data={
-            userInput.length ? (autoCompleteData ? autoCompleteData : []) : []
-          }
-        />
+        <Group>
+          <Autocomplete
+            placeholder="Start typing to see options"
+            value={userInput}
+            limit={10}
+            onChange={userInputOnChangeHandler}
+            data={
+              userInput.length ? (autoCompleteData ? autoCompleteData : []) : []
+            }
+          />
+          <Button
+            onClick={() => {
+              console.log(" I was clicled");
+              onSubmit();
+            }}
+          >
+            Submit
+          </Button>
+        </Group>
       ) : (
-        // <AutoCompleteInput
-        //   onSubmit={onSubmit}
-        //   zipcode={{
-        //     zipData: zipcodeUserInput.length > 0 ? zipData : [],
-        //     errorZipcodeUserInput: errorZipcodeUserInput,
-        //     onZipcodeUserInputChange: onZipcodeUserChange,
-        //     zipcodeUserInput: zipcodeUserInput,
-        //   }}
-        //   state={{
-        //     stateData: stateUserInput.length > 0 ? stateData : [],
-        //     onStateUserInputChange: onStateUserChange,
-        //     errorStateUserInput: errorStateUserInput,
-        //     stateUserInput: stateUserInput,
-        //   }}
-        //   city={{
-        //     cityData: cityUserInput.length > 0 ? cityData : [],
-        //     onCityUserInputChange: onCityUserChange,
-        //     errorCityUserInput: errorCityUserInput,
-        //     cityUserInput: cityUserInput,
-        //   }}
-        //   restaurant={{
-        //     restaurantNameUserInput: restaurantNameUserInput,
-        //     onRestaurantNameUserInputChange: onRestaurantNameUserChange,
-        //     restaurantData:
-        //       restaurantNameUserInput.length > 0 ? restaurantData : [],
-        //   }}
-        ///>
         <React.Fragment>
-          <Autocomplete data={autoCompleteData ? autoCompleteData : []} />
-          {/* <AutoCompleteInput
-            onSubmit={onSubmit}
-            zipcode={{
-              zipData: zipcodeUserInput.length > 0 ? zipData : [],
-              errorZipcodeUserInput: errorZipcodeUserInput,
-              onZipcodeUserInputChange: onZipcodeUserChange,
-              zipcodeUserInput: zipcodeUserInput,
-            }}
-            state={{
-              stateData: stateUserInput.length > 0 ? stateData : [],
-              onStateUserInputChange: onStateUserChange,
-              errorStateUserInput: errorStateUserInput,
-              stateUserInput: stateUserInput,
-            }}
-            city={{
-              cityData: cityUserInput.length > 0 ? cityData : [],
-              onCityUserInputChange: onCityUserChange,
-              errorCityUserInput: errorCityUserInput,
-              cityUserInput: cityUserInput,
-            }}
-            restaurant={{
-              restaurantNameUserInput: restaurantNameUserInput,
-              onRestaurantNameUserInputChange: onRestaurantNameUserChange,
-              restaurantData:
-                restaurantNameUserInput.length > 0 ? restaurantData : [],
-            }}
-          /> */}
+          <Group>
+            <Autocomplete
+              placeholder="Start typing to see options"
+              value={userInput}
+              limit={10}
+              onChange={userInputOnChangeHandler}
+              data={
+                userInput.length
+                  ? autoCompleteData
+                    ? autoCompleteData
+                    : []
+                  : []
+              }
+            />
+            <Button
+              onClick={() => {
+                console.log(" I was clicled");
+                onSubmit();
+              }}
+            >
+              Submit
+            </Button>
+          </Group>
           <MapBoxMap />
         </React.Fragment>
       )}

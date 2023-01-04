@@ -1,8 +1,8 @@
 import { PropertiesProps } from "../components/search-map-display";
 // TODO: extratc out main function put it here
 
-export interface restaurantDocument {
-  id: BigInteger;
+export interface RestaurantDocument {
+  id: number;
   name: string;
   state: string;
   city: string;
@@ -14,12 +14,12 @@ export interface restaurantDocument {
   geolocation: [number, number];
 }
 
-export interface cityDocument {
+export interface CityDocument {
   id: number;
   name: string;
 }
 
-export interface stateDocument {
+export interface StateDocument {
   id: number;
   name: string;
 }
@@ -41,12 +41,12 @@ export interface ZipDocument {
 }
 
 export interface FetchAutomplete {
-  citySet: cityDocument[];
-  stateSet: stateDocument[];
+  citySet: CityDocument[];
+  stateSet: StateDocument[];
   zipSet: ZipDocument[];
   city_state: string[];
   allValues: string[];
-  restaurantSet: restaurantDocument[];
+  restaurantSet: RestaurantDocument[];
 }
 
 export const fetchAutoCompleteData = async () => {

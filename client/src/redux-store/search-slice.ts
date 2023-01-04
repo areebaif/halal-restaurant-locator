@@ -2,10 +2,6 @@ import { createSlice } from "@reduxjs/toolkit";
 import type { PayloadAction } from "@reduxjs/toolkit";
 
 export interface SearchUserInput {
-  zipcodeUserInput: string;
-  cityUserInput: string;
-  stateUserInput: string;
-  restaurantNameUserInput: string;
   // backend input based on userInput
   zipcodeBackendInput: { id: number | undefined; name: string | undefined };
   cityBackendInput: { id: number | undefined; name: string | undefined };
@@ -26,10 +22,6 @@ export interface SearchUserInput {
 
 // Define the initial state using that type
 const initialState: SearchUserInput = {
-  zipcodeUserInput: "",
-  cityUserInput: "",
-  stateUserInput: "",
-  restaurantNameUserInput: "",
   zipcodeBackendInput: { id: undefined, name: undefined },
   cityBackendInput: { id: undefined, name: undefined },
   stateBackendInput: { id: undefined, name: undefined },
@@ -47,19 +39,6 @@ export const SearchSlice = createSlice({
   name: "user-search-input",
   initialState,
   reducers: {
-    // userInputs
-    onZipcodeUserInputChange: (state, action: PayloadAction<string>) => {
-      state.zipcodeUserInput = action.payload;
-    },
-    onStateUserInputChange: (state, action: PayloadAction<string>) => {
-      state.stateUserInput = action.payload;
-    },
-    onCityUserInputChange: (state, action: PayloadAction<string>) => {
-      state.cityUserInput = action.payload;
-    },
-    onRestaurantNameUserInputChange: (state, action: PayloadAction<string>) => {
-      state.restaurantNameUserInput = action.payload;
-    },
     // backned Inputs
     onZipCodeBackendInputChange: (
       state,
@@ -123,10 +102,6 @@ export const SearchSlice = createSlice({
 });
 
 export const {
-  onZipcodeUserInputChange,
-  onStateUserInputChange,
-  onCityUserInputChange,
-  onRestaurantNameUserInputChange,
   onCityBackendInputChange,
   onStateBackendInputChange,
   onZipCodeBackendInputChange,

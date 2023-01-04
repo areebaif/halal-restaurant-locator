@@ -11,10 +11,6 @@ import {
 } from "../BackendFunc-DataCalc/backendFunctions";
 
 import {
-  onZipcodeUserInputChange,
-  onStateUserInputChange,
-  onCityUserInputChange,
-  onRestaurantNameUserInputChange,
   onCityBackendInputChange,
   onRestaurantdeBackendInputChange,
   onStateBackendInputChange,
@@ -62,10 +58,7 @@ export const MapBoxMap: React.FC = () => {
 
   const searchUserInputs = useAppSelector((state) => state.search);
   const {
-    zipcodeUserInput,
-    stateUserInput,
-    cityUserInput,
-    restaurantNameUserInput,
+    //zipcodeUserInput,
     fetchZipcode,
     fetchState,
     fetchStateCity,
@@ -94,30 +87,30 @@ export const MapBoxMap: React.FC = () => {
   // TODO: depending on the route we hit, dispatch state change which will load components
   // you need local isLoading state that does not display map until loading has complete orglobal satte lets see what reduces mapload
 
-  const zipCodeSearchResult = useQuery(
-    ["fetchZipCodeSearch", zipcodeUserInput],
-    () => fetchZipSearch(zipcodeUserInput),
-    {
-      enabled: false || fetchZipcode,
-      onSuccess: (data) => {
-        console.log(data, "I just ran");
-        const mapLocations: GeoJSON.FeatureCollection<GeoJSON.Geometry, any> = {
-          type: "FeatureCollection",
-          features: data?.length ? data : [],
-        };
-        dispatch(onGoelocationDataChange(mapLocations));
-        dispatch(onFetchZipcode(false));
-        dispatch(
-          onZipCodeBackendInputChange({ id: undefined, name: undefined })
-        );
-        dispatch(onRefreshMapDataChange(true));
-      },
-      onError: (error) => {
-        //TODO: error handling
-        console.log("react query data fetching error", error);
-      },
-    }
-  );
+  // const zipCodeSearchResult = useQuery(
+  //   ["fetchZipCodeSearch", zipcodeUserInput],
+  //   () => fetchZipSearch(zipcodeUserInput),
+  //   {
+  //     enabled: false || fetchZipcode,
+  //     onSuccess: (data) => {
+  //       console.log(data, "I just ran");
+  //       const mapLocations: GeoJSON.FeatureCollection<GeoJSON.Geometry, any> = {
+  //         type: "FeatureCollection",
+  //         features: data?.length ? data : [],
+  //       };
+  //       dispatch(onGoelocationDataChange(mapLocations));
+  //       dispatch(onFetchZipcode(false));
+  //       dispatch(
+  //         onZipCodeBackendInputChange({ id: undefined, name: undefined })
+  //       );
+  //       dispatch(onRefreshMapDataChange(true));
+  //     },
+  //     onError: (error) => {
+  //       //TODO: error handling
+  //       console.log("react query data fetching error", error);
+  //     },
+  //   }
+  // );
 
   const stateSearchResult = useQuery(
     ["fetchStateSearch", stateBackendInput.id],
