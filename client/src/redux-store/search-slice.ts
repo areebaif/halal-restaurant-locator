@@ -3,12 +3,12 @@ import type { PayloadAction } from "@reduxjs/toolkit";
 
 export interface SearchUserInput {
   // backend input based on userInput
-  zipcodeBackendInput: { id: number | undefined; name: string | undefined };
-  cityBackendInput: { id: number | undefined; name: string | undefined };
-  stateBackendInput: { id: number | undefined; name: string | undefined };
+  zipcodeBackendInput: { id: number | null; name: string | null };
+  cityBackendInput: { id: number | null; name: string | null };
+  stateBackendInput: { id: number | null; name: string | null };
   restaurantBackendInput: {
-    id: number | undefined;
-    name: string | undefined;
+    id: number | null;
+    name: string | null;
   };
   // Fetch flags based on userInput
   fetchRestaurantZipcode: boolean;
@@ -22,10 +22,10 @@ export interface SearchUserInput {
 
 // Define the initial state using that type
 const initialState: SearchUserInput = {
-  zipcodeBackendInput: { id: undefined, name: undefined },
-  cityBackendInput: { id: undefined, name: undefined },
-  stateBackendInput: { id: undefined, name: undefined },
-  restaurantBackendInput: { id: undefined, name: undefined },
+  zipcodeBackendInput: { id: null, name: null },
+  cityBackendInput: { id: null, name: null },
+  stateBackendInput: { id: null, name: null },
+  restaurantBackendInput: { id: null, name: null },
   fetchRestaurantZipcode: false,
   fetchRestaurantState: false,
   fetchRestaurantStateCity: false,
@@ -43,8 +43,8 @@ export const SearchSlice = createSlice({
     onZipCodeBackendInputChange: (
       state,
       action: PayloadAction<{
-        id: number | undefined;
-        name: string | undefined;
+        id: number | null;
+        name: string | null;
       }>
     ) => {
       state.zipcodeBackendInput = action.payload;
@@ -52,8 +52,8 @@ export const SearchSlice = createSlice({
     onStateBackendInputChange: (
       state,
       action: PayloadAction<{
-        id: number | undefined;
-        name: string | undefined;
+        id: number | null;
+        name: string | null;
       }>
     ) => {
       state.stateBackendInput = action.payload;
@@ -61,8 +61,8 @@ export const SearchSlice = createSlice({
     onCityBackendInputChange: (
       state,
       action: PayloadAction<{
-        id: number | undefined;
-        name: string | undefined;
+        id: number | null;
+        name: string | null;
       }>
     ) => {
       state.cityBackendInput = action.payload;
@@ -70,8 +70,8 @@ export const SearchSlice = createSlice({
     onRestaurantdeBackendInputChange: (
       state,
       action: PayloadAction<{
-        id: number | undefined;
-        name: string | undefined;
+        id: number | null;
+        name: string | null;
       }>
     ) => {
       state.restaurantBackendInput = action.payload;

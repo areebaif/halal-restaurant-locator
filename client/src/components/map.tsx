@@ -3,26 +3,14 @@ import { useQuery } from "react-query";
 import mapboxgl, { CirclePaint, MapLayerMouseEvent } from "mapbox-gl";
 import Map, { Source, Layer, Popup } from "react-map-gl";
 import { Text, Box, HoverCard } from "@mantine/core";
+import * as ReactRouter from "react-router-dom";
 import { useAppDispatch, useAppSelector } from "../redux-store/redux-hooks";
 import { calcBoundsFromCoordinates } from "../BackendFunc-DataCalc/mapBound-calculations";
 import {
   fetchStateSearch,
   fetchStateAndCitySearch,
 } from "../BackendFunc-DataCalc/backendFunctions";
-
-import {
-  onCityBackendInputChange,
-  onRestaurantdeBackendInputChange,
-  onStateBackendInputChange,
-  onZipCodeBackendInputChange,
-  onFetchRestaurant,
-  onFetchRestaurantState,
-  onFetchRestaurantStateCity,
-  onFetchRestaurantZipcode,
-  onFetchState,
-  onFetchStateCity,
-  onFetchZipcode,
-} from "../redux-store/search-slice";
+import { stringConstants } from "./SearchBar";
 
 import {
   onActiveGeolocationChange,
@@ -55,22 +43,6 @@ export const MapBoxMap: React.FC = () => {
   const [cameraViewState, setCameraViewState] =
     React.useState<CameraViewState>();
   // global imports
-
-  const searchUserInputs = useAppSelector((state) => state.search);
-  const {
-    //zipcodeUserInput,
-    fetchZipcode,
-    fetchState,
-    fetchStateCity,
-    fetchRestaurant,
-    fetchRestaurantState,
-    fetchRestaurantStateCity,
-    fetchRestaurantZipcode,
-    zipcodeBackendInput,
-    stateBackendInput,
-    cityBackendInput,
-    restaurantBackendInput,
-  } = searchUserInputs;
   const mapInputs = useAppSelector((state) => state.geolocation);
   const {
     geolocationData,
@@ -87,45 +59,73 @@ export const MapBoxMap: React.FC = () => {
   // TODO: depending on the route we hit, dispatch state change which will load components
   // you need local isLoading state that does not display map until loading has complete orglobal satte lets see what reduces mapload
 
-  // const zipCodeSearchResult = useQuery(
-  //   ["fetchZipCodeSearch", zipcodeUserInput],
-  //   () => fetchZipSearch(zipcodeUserInput),
-  //   {
-  //     enabled: false || fetchZipcode,
-  //     onSuccess: (data) => {
-  //       console.log(data, "I just ran");
-  //       const mapLocations: GeoJSON.FeatureCollection<GeoJSON.Geometry, any> = {
-  //         type: "FeatureCollection",
-  //         features: data?.length ? data : [],
-  //       };
-  //       dispatch(onGoelocationDataChange(mapLocations));
-  //       dispatch(onFetchZipcode(false));
-  //       dispatch(
-  //         onZipCodeBackendInputChange({ id: undefined, name: undefined })
-  //       );
-  //       dispatch(onRefreshMapDataChange(true));
-  //     },
-  //     onError: (error) => {
-  //       //TODO: error handling
-  //       console.log("react query data fetching error", error);
-  //     },
-  //   }
-  // );
+  // React Router functions
+  const location = ReactRouter.useLocation();
 
-  const stateSearchResult = useQuery(
-    ["fetchStateSearch", stateBackendInput.id],
-    () => fetchStateSearch(stateBackendInput.id!),
+  // // query string values
+  const queryParams = new URLSearchParams(location.search);
+  const state = {
+    id: queryParams.get(stringConstants.stateId),
+    name: queryParams.get(stringConstants.stateName),
+  };
+  const city = {
+    id: queryParams.get(stringConstants.cityId),
+    name: queryParams.get(stringConstants.cityName),
+  };
+  const zipcode = {
+    id: queryParams.get(stringConstants.zipcodeId),
+    name: queryParams.get(stringConstants.zipcodeName),
+  };
+  const restaurant = {
+    id: queryParams.get(stringConstants.restaurantId),
+    name: queryParams.get(stringConstants.restaurantName),
+  };
+  // set backend inputs to call backend api
+  // if (state?.id) {
+  //   const parsedStateId = parseInt(state.id)
+  //   dispatch(onStateBackendInputChange({id: parsedStateId, name: state.name}))
+  // }
+
+  const zipCodeSearchResult = useQuery(
+    ["fetchZipCodeSearch", zipcode.id],
+    () => fetchZipSearch(zipcode.id),
     {
-      enabled: false || fetchState,
+      enabled:
+        Boolean(zipcode?.id) &&
+        Boolean(state?.id) &&
+        Boolean(city?.id) &&
+        Boolean(!restaurant?.id),
       onSuccess: (data) => {
-        // TODO: set Map data
+        console.log("react query zipcode");
         const mapLocations: GeoJSON.FeatureCollection<GeoJSON.Geometry, any> = {
           type: "FeatureCollection",
           features: data?.length ? data : [],
         };
         dispatch(onGoelocationDataChange(mapLocations));
-        dispatch(onFetchState(false));
-        dispatch(onStateBackendInputChange({ id: undefined, name: undefined }));
+        dispatch(onRefreshMapDataChange(true));
+      },
+      onError: (error) => {
+        //TODO: error handling
+        console.log("react query data fetching error", error);
+      },
+    }
+  );
+
+  const stateSearchResult = useQuery(
+    ["fetchStateSearch", state.id],
+    () => fetchStateSearch(state.id),
+    {
+      enabled:
+        Boolean(state?.id) &&
+        Boolean(!city?.id) &&
+        Boolean(!zipcode?.id) &&
+        Boolean(!restaurant?.id),
+      onSuccess: (data) => {
+        const mapLocations: GeoJSON.FeatureCollection<GeoJSON.Geometry, any> = {
+          type: "FeatureCollection",
+          features: data?.length ? data : [],
+        };
+        dispatch(onGoelocationDataChange(mapLocations));
         dispatch(onRefreshMapDataChange(true));
       },
       onError: (error) => {
@@ -136,20 +136,23 @@ export const MapBoxMap: React.FC = () => {
   );
 
   const StateCitySearchResult = useQuery(
-    ["fetchStateCity", stateBackendInput.id, cityBackendInput.id],
-    () => fetchStateAndCitySearch(stateBackendInput.id!, cityBackendInput.id!),
+    ["fetchStateCity", state.id, city.id],
+    () => {
+      return fetchStateAndCitySearch(state.id, city.id);
+    },
     {
-      enabled: false || fetchStateCity,
+      enabled:
+        Boolean(state?.id) &&
+        Boolean(city?.id) &&
+        Boolean(!zipcode?.id) &&
+        Boolean(!restaurant?.id),
+      // TODO: why is this acting up
       onSuccess: (data) => {
-        // TODO: onGeolocatiobnDatachange
         const mapLocations: GeoJSON.FeatureCollection<GeoJSON.Geometry, any> = {
           type: "FeatureCollection",
           features: data?.length ? data : [],
         };
         dispatch(onGoelocationDataChange(mapLocations));
-        dispatch(onFetchStateCity(false));
-        dispatch(onStateBackendInputChange({ id: undefined, name: undefined }));
-        dispatch(onCityBackendInputChange({ id: undefined, name: undefined }));
         dispatch(onRefreshMapDataChange(true));
       },
       onError: (error) => {
@@ -220,8 +223,13 @@ export const MapBoxMap: React.FC = () => {
   //     }
 
   // }
-
-  return (
+  // TODO: display error message for edge case
+  return city.id && !state.id ? (
+    <div>
+      This is an edge case where user entered city and no state, multiple states
+      have cities with same name
+    </div>
+  ) : (
     <Map
       reuseMaps={true}
       ref={mapRef}

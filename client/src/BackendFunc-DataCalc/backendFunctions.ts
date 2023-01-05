@@ -61,7 +61,7 @@ export const fetchAutoCompleteData = async () => {
   return responseData.data;
 };
 
-export const fetchZipSearch = async (zipcodeUserInput: string | undefined) => {
+export const fetchZipSearch = async (zipcodeUserInput: string | null) => {
   if (!zipcodeUserInput) throw new Error("provide zipcode value");
   const response = await fetch(`/api/dev/${zipcodeUserInput}`, {
     method: "GET",
@@ -82,10 +82,9 @@ export const fetchZipSearch = async (zipcodeUserInput: string | undefined) => {
   return data.data;
 };
 
-export const fetchStateSearch = async (stateId: number) => {
+export const fetchStateSearch = async (stateId: string | null) => {
   // 0 is a falsy value
-  if (stateId === 0 ? false : !stateId)
-    throw new Error("provide state id to call backend function");
+  if (!stateId) throw new Error("provide state id to call backend function");
   const url = `/api/dev/state/${stateId}`;
   const response = await fetch(url, {
     method: "GET",
@@ -103,16 +102,16 @@ export const fetchStateSearch = async (stateId: number) => {
       PropertiesProps
     >["features"];
   } = await response.json();
-  console.log("data", data);
   return data.data;
 };
 
 export const fetchStateAndCitySearch = async (
-  stateId: number,
-  cityId: number
+  stateId: string | null,
+  cityId: string | null
 ) => {
-  if ((stateId === 0 ? false : !stateId) || (cityId === 0 ? false : !cityId))
-    throw new Error("provide state id to call backend function");
+  if (!stateId || !cityId)
+    throw new Error("provide state id and city id to call backend function");
+  console.log(" we cleared if statement");
   const url = `/api/dev/state-city/${stateId}/${cityId}`;
   const response = await fetch(url, {
     method: "GET",
@@ -125,11 +124,9 @@ export const fetchStateAndCitySearch = async (
     throw new Error("Network response was not ok");
   }
   const data: {
-    data: GeoJSON.FeatureCollection<
-      GeoJSON.Geometry,
-      PropertiesProps
-    >["features"];
+    data: GeoJSON.FeatureCollection<GeoJSON.Geometry, any>["features"];
   } = await response.json();
+  console.log("data inside func", data);
   return data.data;
 };
 

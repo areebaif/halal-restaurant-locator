@@ -87,6 +87,7 @@ router.get(
   async (req: Request, res: Response, next: NextFunction) => {
     try {
       const { stateId } = req.params;
+      console.log("stateId was hit");
       const allRawData: {
         features: locationDocument[];
         type: "FeatureCollection";
@@ -120,7 +121,6 @@ router.get(
   "/api/dev/getGeography",
   async (req: Request, res: Response, next: NextFunction) => {
     try {
-      console.log(" I was just hit");
       // TODO: add restaurantName functionality to this
       const citySetTemp: Set<string> = new Set();
       const stateSetTemp: Set<string> = new Set();
@@ -221,6 +221,7 @@ router.get(
   async (req: Request, res: Response, next: NextFunction) => {
     try {
       const { cityId, stateId } = req.params;
+      console.log(stateId, cityId, "stateID");
       const allRawData: {
         features: locationDocument[];
         type: "FeatureCollection";
