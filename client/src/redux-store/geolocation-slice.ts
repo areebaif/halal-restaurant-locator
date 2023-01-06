@@ -6,7 +6,7 @@ interface ActiveGeolocation {
   longitude: number;
   title: string;
   description: string;
-  index: number | undefined;
+  index: number | undefined | string;
 }
 
 export interface MapCameraView {
@@ -23,7 +23,7 @@ export interface Map {
   //mapCameraView: MapCameraView | undefined;
   isOpenActiveGeolocationCard: boolean;
   refreshMapData: boolean;
-  hoverId: number | undefined;
+  hoverId: number | undefined | string;
 }
 
 const initialState: Map = {
@@ -71,7 +71,10 @@ export const geolocationSlice = createSlice({
     onRefreshMapDataChange: (state, action: PayloadAction<boolean>) => {
       state.refreshMapData = action.payload;
     },
-    onHoverIdChange: (state, action: PayloadAction<number | undefined>) => {
+    onHoverIdChange: (
+      state,
+      action: PayloadAction<number | string | undefined>
+    ) => {
       state.hoverId = action.payload;
     },
     // onMapCameraViewChange: (state, action: PayloadAction<MapCameraView>) => {

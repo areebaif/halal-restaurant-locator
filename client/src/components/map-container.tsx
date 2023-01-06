@@ -213,7 +213,7 @@ export const MapContainer: React.FC<MapProps> = ({
         {displayPopup && (
           <Popup
             longitude={activePlace.longitude}
-            offset={-10}
+            //offset={-20}
             latitude={activePlace.latitude}
             anchor="top"
             closeButton={false}
@@ -236,6 +236,7 @@ export const MapContainer: React.FC<MapProps> = ({
                 padding: theme.spacing.xl,
                 borderRadius: theme.radius.md,
                 cursor: "pointer",
+                //offset: "10",
               })}
             >
               {activePlace.title}: {activePlace.description}

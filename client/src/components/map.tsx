@@ -80,12 +80,6 @@ export const MapBoxMap: React.FC = () => {
     id: queryParams.get(stringConstants.restaurantId),
     name: queryParams.get(stringConstants.restaurantName),
   };
-  // set backend inputs to call backend api
-  // if (state?.id) {
-  //   const parsedStateId = parseInt(state.id)
-  //   dispatch(onStateBackendInputChange({id: parsedStateId, name: state.name}))
-  // }
-
   const zipCodeSearchResult = useQuery(
     ["fetchZipCodeSearch", zipcode.id],
     () => fetchZipSearch(zipcode.id),
@@ -164,7 +158,9 @@ export const MapBoxMap: React.FC = () => {
 
   React.useEffect(() => {
     if (mapRef.current) {
+      // TODO:// check for laye too
       if (mapRef.current.getSource(dataSourceId)) {
+        console.log("isnide react useEffect ");
         const geoJsonSource = mapRef.current.getSource(dataSourceId);
         geoJsonSource.setData(geolocationData);
         const mapLocations = geolocationData;
@@ -187,6 +183,7 @@ export const MapBoxMap: React.FC = () => {
 
   const onLoad = () => {
     if (mapRef.current) {
+      console.log("on load ran");
       mapRef.current.loadImage(
         "/marker-icons/mapbox-marker-icon-20px-red.png",
         (error: any, image: any) => {
@@ -206,30 +203,59 @@ export const MapBoxMap: React.FC = () => {
     }
   };
 
-  //   const onMouseEnter = (e: MapLayerMouseEvent) => {
-  //     if (hoverId) {
-  //       mapRef.current.setFeatureState(
-  //         { source: dataSourceId, id: hoverId },
-  //         { hover: false }
-  //       );
-  //     }
-  //     dispatch(onHoverIdChange(undefined))
-  //     if (e.features?.length) {
-  //         const coordinatesObject = e.features[0].geometry as GeoJSON.Point;
-  //         const coordinates = coordinatesObject.coordinates.slice();
-  //         const description = e.features[0].properties;
-  //         const id = e.features[0].id
-  //     dispatch(onHoverIdChange(e.features[0].id))
-  //     }
+  const onMouseEnter = (e: MapLayerMouseEvent) => {
+    console.log(" I am running on layer");
+    if (hoverId) {
+      mapRef.current.setFeatureState(
+        { source: dataSourceId, id: hoverId },
+        { hover: false }
+      );
+    }
+    dispatch(onHoverIdChange(undefined));
+    if (e.features?.length) {
+      const coordinatesObject = e.features[0].geometry as GeoJSON.Point;
+      const coordinates = coordinatesObject.coordinates.slice();
+      const description = e.features[0].properties;
+      const id = e.features[0].id;
+      dispatch(onHoverIdChange(id));
+      mapRef.current.setFeatureState(
+        { source: dataSourceId, id: id },
+        { hover: true }
+      );
+      dispatch(
+        onActiveGeolocationChange({
+          latitude: coordinates[1],
+          longitude: coordinates[0],
+          title: `${description?.state}`,
+          description: `${description?.city}${description?.zip}`,
+          index: id,
+        })
+      );
 
-  // }
-  // TODO: display error message for edge case
-  return city.id && !state.id ? (
-    <div>
-      This is an edge case where user entered city and no state, multiple states
-      have cities with same name
-    </div>
-  ) : (
+      dispatch(onIsOpenActiveGeolocationCardChange(true));
+    }
+  };
+  const onMouseLeavePopup = () => {
+    // disable hover interactivity inside layer of map
+    mapRef.current.setFeatureState(
+      { source: dataSourceId, id: hoverId },
+      { hover: false }
+    );
+    dispatch(onHoverIdChange(undefined));
+
+    dispatch(onIsOpenActiveGeolocationCardChange(false));
+    dispatch(
+      onActiveGeolocationChange({
+        latitude: 0,
+        longitude: 0,
+        title: "",
+        description: "",
+        index: undefined,
+      })
+    );
+  };
+
+  return (
     <Map
       reuseMaps={true}
       ref={mapRef}
@@ -239,7 +265,7 @@ export const MapBoxMap: React.FC = () => {
       mapStyle="mapbox://styles/mapbox/streets-v9"
       mapboxAccessToken={process.env.REACT_APP_MAPBOX_ACCESS}
       interactiveLayerIds={[layerId]}
-      //onMouseEnter={onMouseEnter}
+      onMouseEnter={onMouseEnter}
       onLoad={onLoad}
     >
       <Source id={dataSourceId} type="geojson" data={geolocationData}>
@@ -251,6 +277,7 @@ export const MapBoxMap: React.FC = () => {
             "icon-image": "custom-marker",
             "icon-allow-overlap": true,
             "text-field": ["get", "title"],
+            "text-offset": [0, 0.5],
             "text-allow-overlap": true,
           }}
           paint={{
@@ -265,7 +292,7 @@ export const MapBoxMap: React.FC = () => {
         {isOpenActiveGeolocationCard && (
           <Popup
             longitude={activeGeolocation.longitude}
-            offset={25}
+            offset={-10}
             latitude={activeGeolocation.latitude}
             anchor="top"
             closeButton={false}
@@ -277,9 +304,11 @@ export const MapBoxMap: React.FC = () => {
             }}
           >
             <Box
-              onMouseEnter={() => console.log(" I entered")}
+              onMouseEnter={() => {
+                console.log(" I entered");
+              }}
               onMouseLeave={() => {
-                //onMouseLeavePopup();
+                onMouseLeavePopup();
               }}
               //onClick={onClick}
               sx={(theme) => ({
@@ -290,30 +319,9 @@ export const MapBoxMap: React.FC = () => {
                 cursor: "pointer",
               })}
             >
-              test
+              {activeGeolocation.index} {activeGeolocation.title}
+              {activeGeolocation.description}
             </Box>
-            {/* <div
-            // This div and transparent background is added so that popup remains open on hover
-            style={{ border: "10px solid rgba(0, 0, 0, 0.4)" }}
-            onMouseLeave={() => {
-              onMouseLeavePopup();
-            }}
-            onClick={onClick}
-          >
-            <Box
-              sx={(theme) => ({
-                backgroundColor: "white",
-                textAlign: "center",
-                padding: theme.spacing.xl,
-                borderRadius: theme.radius.md,
-                cursor: "pointer",
-              })}
-            >
-              <Text>
-                {activePlace.title}: {activePlace.description}
-              </Text>
-            </Box>
-          </div> */}
           </Popup>
         )}
       </Source>

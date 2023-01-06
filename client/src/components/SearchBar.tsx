@@ -122,7 +122,7 @@ export const SearchBar: React.FC<{}> = () => {
 
   const onSubmit = () => {
     setIsEdgeCase(false);
-    console.log(" in submit");
+
     const data = {
       userInput,
       backendCityData: cityData!,
@@ -133,10 +133,8 @@ export const SearchBar: React.FC<{}> = () => {
     try {
       const queryStringValues = validateUserInput(data);
       const { state, city, zipcode, restaurant } = queryStringValues;
-      console.log(state, city, zipcode, restaurant, "booiya");
       // sanity check: throw error if the user has not entered anything but still has clicked submit
       if (!zipcode?.id && !state?.id && !city?.id && !restaurant?.id) {
-        console.log(" we are here");
         setIsEdgeCase(true);
       }
 
@@ -214,7 +212,7 @@ export const SearchBar: React.FC<{}> = () => {
         default:
           // Edge Cases
           // TODO: Error handling
-          // This is the case where user entered wrong combination of inputs like only city no state etc
+          // This is the case where user entered wrong combination of inputs like only city no state etc or restaurant and city but no state
           setIsEdgeCase(true);
           throw new Error("user entered wrong combination of input");
       }
@@ -272,7 +270,6 @@ export const SearchBar: React.FC<{}> = () => {
             />
             <Button
               onClick={() => {
-                console.log(" I was clicled");
                 onSubmit();
               }}
             >
