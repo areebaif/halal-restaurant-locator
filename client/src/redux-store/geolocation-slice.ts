@@ -1,7 +1,7 @@
 import { createSlice } from "@reduxjs/toolkit";
 import type { PayloadAction } from "@reduxjs/toolkit";
 
-interface ActiveGeolocation {
+export interface ActiveGeolocation {
   latitude: number;
   longitude: number;
   title: string;

@@ -4,12 +4,12 @@ import mapboxgl, { CirclePaint, MapLayerMouseEvent } from "mapbox-gl";
 import Map, { Source, Layer, Popup } from "react-map-gl";
 import { Text, Box, HoverCard } from "@mantine/core";
 import * as ReactRouter from "react-router-dom";
-import { useAppDispatch, useAppSelector } from "../redux-store/redux-hooks";
-import { calcBoundsFromCoordinates } from "../BackendFunc-DataCalc/mapBound-calculations";
+import { useAppDispatch, useAppSelector } from "../../redux-store/redux-hooks";
+import { calcBoundsFromCoordinates } from "../../BackendFunc-DataCalc/mapBound-calculations";
 import {
   fetchStateSearch,
   fetchStateAndCitySearch,
-} from "../BackendFunc-DataCalc/backendFunctions";
+} from "../../BackendFunc-DataCalc/backendFunctions";
 import { stringConstants } from "./SearchBar";
 
 import {
@@ -18,9 +18,9 @@ import {
   onHoverIdChange,
   onIsOpenActiveGeolocationCardChange,
   onRefreshMapDataChange,
-} from "../redux-store/geolocation-slice";
+} from "../../redux-store/geolocation-slice";
 
-import { fetchZipSearch } from "../BackendFunc-DataCalc/backendFunctions";
+import { fetchZipSearch } from "../../BackendFunc-DataCalc/backendFunctions";
 
 export interface CameraViewState {
   latitude: number;
@@ -159,8 +159,10 @@ export const MapBoxMap: React.FC = () => {
   React.useEffect(() => {
     if (mapRef.current) {
       // TODO:// check for laye too
-      if (mapRef.current.getSource(dataSourceId)) {
-        console.log("isnide react useEffect ");
+      if (
+        mapRef.current.getSource(dataSourceId) &&
+        mapRef.current.getLayer(layerId)
+      ) {
         const geoJsonSource = mapRef.current.getSource(dataSourceId);
         geoJsonSource.setData(geolocationData);
         const mapLocations = geolocationData;
@@ -257,6 +259,7 @@ export const MapBoxMap: React.FC = () => {
 
   return (
     <Map
+      id="MapA"
       reuseMaps={true}
       ref={mapRef}
       initialViewState={cameraViewState}
