@@ -1,17 +1,24 @@
 import * as React from "react";
-import { Autocomplete, AutocompleteItem, Group, Button } from "@mantine/core";
+import { Autocomplete, Group, Button } from "@mantine/core";
 import { useQuery } from "react-query";
 import * as ReactRouter from "react-router-dom";
-import { MapBoxMap } from "./map";
 
-import { validateUserInput } from "../BackendFunc-DataCalc/userInput";
+import { validateUserInput } from "../../BackendFunc-DataCalc/userInput";
 import {
   fetchAutoCompleteData,
   ZipDocument,
   RestaurantDocument,
   CityDocument,
   StateDocument,
-} from "../BackendFunc-DataCalc/backendFunctions";
+} from "../../BackendFunc-DataCalc/backendFunctions";
+import { useAppDispatch, useAppSelector } from "../../redux-store/redux-hooks";
+import {
+  setMapGeolocationCardData,
+  setHoverId,
+  ActiveGeolocation,
+  setIsOpenMapGeolocationCard,
+  setIsOpenListGeolocationCard,
+} from "../../redux-store/geolocation-slice";
 
 export interface PropertiesProps {
   title: string;
@@ -81,6 +88,8 @@ export const SearchBar: React.FC<{}> = () => {
   const [autoCompleteData, setAutoCompleteData] = React.useState<string[]>();
   const [isEdgeCase, setIsEdgeCase] = React.useState(false);
 
+  // ReduxToolkit functions
+  const dispatch = useAppDispatch();
   // This function has to run regardless of any user input to populate auto-complete state, city, zipcode and restaurantName
   // cacheTime is set to infinite because autocomplete props are read only even for user so this data will not change in a user session.
   // Additionally SearchBar component is used in multiple routes, hence, it makes sense to cache data and not hit your backend api again and again.
@@ -121,6 +130,7 @@ export const SearchBar: React.FC<{}> = () => {
   };
 
   const onSubmit = () => {
+    dispatch(setIsOpenListGeolocationCard(false));
     setIsEdgeCase(false);
 
     const data = {
@@ -254,29 +264,57 @@ export const SearchBar: React.FC<{}> = () => {
         </React.Fragment>
       ) : (
         <React.Fragment>
-          <Group>
-            <Autocomplete
-              placeholder="Start typing to see options"
-              value={userInput}
-              limit={10}
-              onChange={userInputOnChangeHandler}
-              data={
-                userInput.length
-                  ? autoCompleteData
+          {isEdgeCase ? (
+            <React.Fragment>
+              <Group>
+                <Autocomplete
+                  placeholder="Start typing to see options"
+                  value={userInput}
+                  limit={10}
+                  onChange={userInputOnChangeHandler}
+                  data={
+                    userInput.length
+                      ? autoCompleteData
+                        ? autoCompleteData
+                        : []
+                      : []
+                  }
+                />
+                <Button
+                  onClick={() => {
+                    onSubmit();
+                  }}
+                >
+                  Submit
+                </Button>
+              </Group>
+              {/*TODO: Error handling*/}
+              <div>Oops we didnt find anything</div>
+            </React.Fragment>
+          ) : (
+            <Group>
+              <Autocomplete
+                placeholder="Start typing to see options"
+                value={userInput}
+                limit={10}
+                onChange={userInputOnChangeHandler}
+                data={
+                  userInput.length
                     ? autoCompleteData
+                      ? autoCompleteData
+                      : []
                     : []
-                  : []
-              }
-            />
-            <Button
-              onClick={() => {
-                onSubmit();
-              }}
-            >
-              Submit
-            </Button>
-          </Group>
-          {isEdgeCase ? <div>Oops we didnt find anything</div> : <MapBoxMap />}
+                }
+              />
+              <Button
+                onClick={() => {
+                  onSubmit();
+                }}
+              >
+                Submit
+              </Button>
+            </Group>
+          )}
         </React.Fragment>
       )}
     </React.Fragment>

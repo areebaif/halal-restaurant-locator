@@ -2,9 +2,10 @@ import * as React from "react";
 import { QueryClient, QueryClientProvider, useQuery } from "react-query";
 import { HeaderAction, HeaderActionProps } from "./components/header";
 import { Routes, Route } from "react-router-dom";
-import { SearchBar } from "./components/SearchBar";
+import { SearchBar } from "./components/refactored-components/SearchBar";
 import { Layout } from "./components/Layout";
 import { config } from "dotenv";
+import { MapListAndSearchBar } from "./components/refactored-components/map-and-list";
 
 const headerLinks = {
   links: [
@@ -43,7 +44,10 @@ function App() {
         <Routes>
           <Route path="/" element={<Layout />}></Route>
           <Route path="/auth/signup" element={<div>we navigated</div>}></Route>
-          <Route path="/search-display" element={<SearchBar />}></Route>
+          <Route
+            path="/search-display"
+            element={<MapListAndSearchBar />}
+          ></Route>
         </Routes>
       </QueryClientProvider>
     </React.Fragment>
