@@ -1,11 +1,11 @@
 import { configureStore } from "@reduxjs/toolkit";
 import searchSliceReducer from "./search-slice";
+import geolocationSliceReducer from "./geolocation-slice";
 
 export const reduxStore = configureStore({
   reducer: {
     search: searchSliceReducer,
-    //comments: commentsReducer,
-    // users: usersReducer,
+    geolocation: geolocationSliceReducer,
   },
 });
 

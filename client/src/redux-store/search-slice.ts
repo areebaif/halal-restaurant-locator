@@ -1,20 +1,14 @@
 import { createSlice } from "@reduxjs/toolkit";
 import type { PayloadAction } from "@reduxjs/toolkit";
-import type { RootState } from "./store";
-import { Action } from "history";
 
 export interface SearchUserInput {
-  zipcodeUserInput: string;
-  cityUserInput: string;
-  stateUserInput: string;
-  restaurantNameUserInput: string;
   // backend input based on userInput
-  zipcodeBackendInput: { id: number | undefined; name: string | undefined };
-  cityBackendInput: { id: number | undefined; name: string | undefined };
-  stateBackendInput: { id: number | undefined; name: string | undefined };
+  zipcodeBackendInput: { id: number | null; name: string | null };
+  cityBackendInput: { id: number | null; name: string | null };
+  stateBackendInput: { id: number | null; name: string | null };
   restaurantBackendInput: {
-    id: number | undefined;
-    name: string | undefined;
+    id: number | null;
+    name: string | null;
   };
   // Fetch flags based on userInput
   fetchRestaurantZipcode: boolean;
@@ -28,14 +22,10 @@ export interface SearchUserInput {
 
 // Define the initial state using that type
 const initialState: SearchUserInput = {
-  zipcodeUserInput: "",
-  cityUserInput: "",
-  stateUserInput: "",
-  restaurantNameUserInput: "",
-  zipcodeBackendInput: { id: undefined, name: undefined },
-  cityBackendInput: { id: undefined, name: undefined },
-  stateBackendInput: { id: undefined, name: undefined },
-  restaurantBackendInput: { id: undefined, name: undefined },
+  zipcodeBackendInput: { id: null, name: null },
+  cityBackendInput: { id: null, name: null },
+  stateBackendInput: { id: null, name: null },
+  restaurantBackendInput: { id: null, name: null },
   fetchRestaurantZipcode: false,
   fetchRestaurantState: false,
   fetchRestaurantStateCity: false,
@@ -49,23 +39,12 @@ export const SearchSlice = createSlice({
   name: "user-search-input",
   initialState,
   reducers: {
-    onZipcodeUserInputChange: (state, action: PayloadAction<string>) => {
-      state.zipcodeUserInput = action.payload;
-    },
-    onStateUserInputChange: (state, action: PayloadAction<string>) => {
-      state.stateUserInput = action.payload;
-    },
-    onCityUserInputChange: (state, action: PayloadAction<string>) => {
-      state.cityUserInput = action.payload;
-    },
-    onRestaurantNameUserInputChange: (state, action: PayloadAction<string>) => {
-      state.restaurantNameUserInput = action.payload;
-    },
+    // backned Inputs
     onZipCodeBackendInputChange: (
       state,
       action: PayloadAction<{
-        id: number | undefined;
-        name: string | undefined;
+        id: number | null;
+        name: string | null;
       }>
     ) => {
       state.zipcodeBackendInput = action.payload;
@@ -73,8 +52,8 @@ export const SearchSlice = createSlice({
     onStateBackendInputChange: (
       state,
       action: PayloadAction<{
-        id: number | undefined;
-        name: string | undefined;
+        id: number | null;
+        name: string | null;
       }>
     ) => {
       state.stateBackendInput = action.payload;
@@ -82,8 +61,8 @@ export const SearchSlice = createSlice({
     onCityBackendInputChange: (
       state,
       action: PayloadAction<{
-        id: number | undefined;
-        name: string | undefined;
+        id: number | null;
+        name: string | null;
       }>
     ) => {
       state.cityBackendInput = action.payload;
@@ -91,13 +70,13 @@ export const SearchSlice = createSlice({
     onRestaurantdeBackendInputChange: (
       state,
       action: PayloadAction<{
-        id: number | undefined;
-        name: string | undefined;
+        id: number | null;
+        name: string | null;
       }>
     ) => {
       state.restaurantBackendInput = action.payload;
     },
-
+    // query flags
     onFetchRestaurantZipcode: (state, action: PayloadAction<boolean>) => {
       state.fetchRestaurantZipcode = action.payload;
     },
@@ -123,10 +102,6 @@ export const SearchSlice = createSlice({
 });
 
 export const {
-  onZipcodeUserInputChange,
-  onStateUserInputChange,
-  onCityUserInputChange,
-  onRestaurantNameUserInputChange,
   onCityBackendInputChange,
   onStateBackendInputChange,
   onZipCodeBackendInputChange,

@@ -4,7 +4,7 @@ import { useQuery } from "react-query";
 import { MapContainer } from "./map-container";
 import { ListContainer } from "./result-list";
 import { AutoCompleteInput } from "./search-component";
-import { fetchZipSearch } from "../backendFunctions";
+import { fetchZipSearch } from "../BackendFunc-DataCalc/backendFunctions";
 
 // https://simplemaps.com/data/us-zips this need to be added to usa zipcode data
 // This is for setting filter
@@ -289,6 +289,7 @@ export const SearchAndMapDisplayComponent: React.FC = () => {
     {
       enabled: false,
       onSuccess: (data) => {
+        console.log("data");
         const mapLocations: GeoJSON.FeatureCollection<
           GeoJSON.Geometry,
           PropertiesProps
@@ -460,6 +461,7 @@ export const SearchAndMapDisplayComponent: React.FC = () => {
 
     const { zipcode, city, state, restaurantName } = data;
     console.log("onsearch", data);
+    setZipcodeUserInput(zipcodeUserInput!);
 
     // using switch to break the program execution when a usecase is hit otherwise I have to write all possible combinations/permutaions in if statements
     // if statements do not break program execution for example: restaurant, city and state input will also trigger state and city input in if statements.

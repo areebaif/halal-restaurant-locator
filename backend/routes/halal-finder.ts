@@ -87,6 +87,7 @@ router.get(
   async (req: Request, res: Response, next: NextFunction) => {
     try {
       const { stateId } = req.params;
+      console.log("stateId was hit");
       const allRawData: {
         features: locationDocument[];
         type: "FeatureCollection";
@@ -96,6 +97,7 @@ router.get(
         return item.id === (stateId === "0" ? 0 : parseInt(stateId));
       });
       const state = stateName[0];
+      console.log("stateName", stateName);
       const stateSetLocal = allRawData.features.filter((item) => {
         const properties = item.properties;
         if (properties.state === state.name) {
@@ -105,6 +107,7 @@ router.get(
           };
         }
       });
+
       res.status(200).send({
         data: stateSetLocal,
       });
@@ -121,6 +124,7 @@ router.get(
       // TODO: add restaurantName functionality to this
       const citySetTemp: Set<string> = new Set();
       const stateSetTemp: Set<string> = new Set();
+      const cityStateTemp: Set<string> = new Set();
       const allRawData: {
         features: locationDocument[];
         type: "FeatureCollection";
@@ -130,6 +134,8 @@ router.get(
         const properties = item.properties;
         citySetTemp.add(properties.city);
         stateSetTemp.add(properties.state);
+        const cityState = `${properties.city}, ${properties.state}`;
+        cityStateTemp.add(cityState);
         return {
           ...item,
           city_state: `${properties.city}, ${properties.state}`,
@@ -138,6 +144,17 @@ router.get(
 
       const arrayCitySet = Array.from(citySetTemp);
       const arrayStateSet = Array.from(stateSetTemp);
+      const arrayCityState = Array.from(cityStateTemp);
+      const allValues: string[] = [];
+
+      arrayCityState.forEach((item) => {
+        allValues.push(item);
+      });
+      zipSet.forEach((item) => {
+        const zipValue = `${item.city_state}, ${item.properties.zip}`;
+        allValues.push(zipValue);
+      });
+
       const mappedCitySet = arrayCitySet.map((item, index) => {
         return { id: index, name: item };
       });
@@ -155,6 +172,8 @@ router.get(
           citySet: mappedCitySet,
           stateSet: mappedStateSet,
           zipSet: zipSet,
+          city_state: arrayCityState,
+          allValues: allValues,
           // TODO: fix empty object to actually sending data
           restaurantSet: [],
         },
@@ -169,7 +188,7 @@ router.get(
   "/api/dev/:zipcode",
   async (req: Request, res: Response, next: NextFunction) => {
     try {
-      console.log("I am hitting wring endpoint");
+      //console.log("I am hitting wring endpoint");
       const { zipcode } = req.params;
       //console.log(zipcode);
       //const zipCode: string = req.body;
@@ -201,8 +220,8 @@ router.get(
   "/api/dev/state-city/:stateId/:cityId",
   async (req: Request, res: Response, next: NextFunction) => {
     try {
-      console.log("city i was hit");
       const { cityId, stateId } = req.params;
+      console.log(stateId, cityId, "stateID");
       const allRawData: {
         features: locationDocument[];
         type: "FeatureCollection";

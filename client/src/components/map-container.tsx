@@ -1,6 +1,6 @@
 import * as React from "react";
 import mapboxgl from "mapbox-gl"; // eslint-disable-line import/no-webpack-loader-syntax
-import { Text, Box } from "@mantine/core";
+import { Text, Box, HoverCard } from "@mantine/core";
 import Map, { Source, Layer, Popup, MapLayerMouseEvent } from "react-map-gl";
 
 import redMarker from "./red-marker.png";
@@ -115,8 +115,8 @@ export const MapContainer: React.FC<MapProps> = ({
       // }
       setActivePlaceData?.({
         ...activePlace,
-        latitude: e.lngLat.lat,
-        longitude: e.lngLat.lng,
+        latitude: coordinates[1], //e.lngLat.lat,
+        longitude: coordinates[0], //e.lngLat.lng,
         title: description?.title,
         description: description?.description,
         index: description?.index,
@@ -151,10 +151,12 @@ export const MapContainer: React.FC<MapProps> = ({
     setDisplayPopup(false);
     setActivePlaceData?.(null);
   };
-
+  console.log(mapRef.current, "lolzz");
   const onLoad = () => {
+    console.log("I was just ran");
+    console.log(mapRef.current, "lolzz");
     mapRef.current.loadImage(redMarker, (error: any, image: any) => {
-      if (error) throw error;
+      if (error) throw new error("lollz");
       mapRef.current.addImage("custom-marker", image);
     });
   };
@@ -211,7 +213,7 @@ export const MapContainer: React.FC<MapProps> = ({
         {displayPopup && (
           <Popup
             longitude={activePlace.longitude}
-            offset={-20}
+            //offset={-20}
             latitude={activePlace.latitude}
             anchor="top"
             closeButton={false}
@@ -222,9 +224,26 @@ export const MapContainer: React.FC<MapProps> = ({
               display: "flex",
             }}
           >
-            <div
+            <Box
+              onMouseEnter={() => console.log(" I entered")}
+              onMouseLeave={() => {
+                onMouseLeavePopup();
+              }}
+              onClick={onClick}
+              sx={(theme) => ({
+                backgroundColor: "white",
+                textAlign: "center",
+                padding: theme.spacing.xl,
+                borderRadius: theme.radius.md,
+                cursor: "pointer",
+                //offset: "10",
+              })}
+            >
+              {activePlace.title}: {activePlace.description}
+            </Box>
+            {/* <div
               // This div and transparent background is added so that popup remains open on hover
-              style={{ border: "10px solid rgba(0, 0, 0, 0)" }}
+              style={{ border: "10px solid rgba(0, 0, 0, 0.4)" }}
               onMouseLeave={() => {
                 onMouseLeavePopup();
               }}
@@ -243,7 +262,7 @@ export const MapContainer: React.FC<MapProps> = ({
                   {activePlace.title}: {activePlace.description}
                 </Text>
               </Box>
-            </div>
+            </div> */}
           </Popup>
         )}
       </Source>
