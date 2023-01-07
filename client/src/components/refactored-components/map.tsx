@@ -2,7 +2,7 @@ import * as React from "react";
 import { useQuery } from "react-query";
 import mapboxgl, { CirclePaint, MapLayerMouseEvent } from "mapbox-gl";
 import Map, { Source, Layer, Popup } from "react-map-gl";
-import { Text, Box, HoverCard } from "@mantine/core";
+import { Text, Box, HoverCard, CloseButton } from "@mantine/core";
 import * as ReactRouter from "react-router-dom";
 import { useAppDispatch, useAppSelector } from "../../redux-store/redux-hooks";
 import { calcBoundsFromCoordinates } from "../../BackendFunc-DataCalc/mapBound-calculations";
@@ -13,11 +13,11 @@ import {
 import { stringConstants } from "./SearchBar";
 
 import {
-  onActiveGeolocationChange,
-  onGoelocationDataChange,
-  onHoverIdChange,
-  onIsOpenActiveGeolocationCardChange,
-  onRefreshMapDataChange,
+  setMapGeolocationCardData,
+  setAllGoelocationData,
+  setHoverId,
+  setIsOpenMapGeolocationCard,
+  setRefreshMapData,
 } from "../../redux-store/geolocation-slice";
 
 import { fetchZipSearch } from "../../BackendFunc-DataCalc/backendFunctions";
@@ -45,9 +45,9 @@ export const MapBoxMap: React.FC = () => {
   // global imports
   const mapInputs = useAppSelector((state) => state.geolocation);
   const {
-    geolocationData,
-    activeGeolocation,
-    isOpenActiveGeolocationCard,
+    allGeolocationsData,
+    mapGeoLocationCardData,
+    isOpenMapGeolocationCard,
     refreshMapData,
     hoverId,
     dataSourceId,
@@ -56,8 +56,6 @@ export const MapBoxMap: React.FC = () => {
 
   // ReduxToolkit functions
   const dispatch = useAppDispatch();
-  // TODO: depending on the route we hit, dispatch state change which will load components
-  // you need local isLoading state that does not display map until loading has complete orglobal satte lets see what reduces mapload
 
   // React Router functions
   const location = ReactRouter.useLocation();
@@ -95,8 +93,8 @@ export const MapBoxMap: React.FC = () => {
           type: "FeatureCollection",
           features: data?.length ? data : [],
         };
-        dispatch(onGoelocationDataChange(mapLocations));
-        dispatch(onRefreshMapDataChange(true));
+        dispatch(setAllGoelocationData(mapLocations));
+        dispatch(setRefreshMapData(true));
       },
       onError: (error) => {
         //TODO: error handling
@@ -119,8 +117,8 @@ export const MapBoxMap: React.FC = () => {
           type: "FeatureCollection",
           features: data?.length ? data : [],
         };
-        dispatch(onGoelocationDataChange(mapLocations));
-        dispatch(onRefreshMapDataChange(true));
+        dispatch(setAllGoelocationData(mapLocations));
+        dispatch(setRefreshMapData(true));
       },
       onError: (error) => {
         //TODO: error handling
@@ -146,8 +144,8 @@ export const MapBoxMap: React.FC = () => {
           type: "FeatureCollection",
           features: data?.length ? data : [],
         };
-        dispatch(onGoelocationDataChange(mapLocations));
-        dispatch(onRefreshMapDataChange(true));
+        dispatch(setAllGoelocationData(mapLocations));
+        dispatch(setRefreshMapData(true));
       },
       onError: (error) => {
         //TODO: error handling
@@ -158,14 +156,13 @@ export const MapBoxMap: React.FC = () => {
 
   React.useEffect(() => {
     if (mapRef.current) {
-      // TODO:// check for laye too
       if (
         mapRef.current.getSource(dataSourceId) &&
         mapRef.current.getLayer(layerId)
       ) {
         const geoJsonSource = mapRef.current.getSource(dataSourceId);
-        geoJsonSource.setData(geolocationData);
-        const mapLocations = geolocationData;
+        geoJsonSource.setData(allGeolocationsData);
+        const mapLocations = allGeolocationsData;
         const coordinatesArray = mapLocations?.features.map((item) => {
           const coordinatesObj = item.geometry as GeoJSON.Point;
           return coordinatesObj.coordinates;
@@ -173,7 +170,7 @@ export const MapBoxMap: React.FC = () => {
         const mapBounds = calcBoundsFromCoordinates(coordinatesArray);
         mapRef.current.fitBounds(new mapboxgl.LngLatBounds(mapBounds));
       }
-      dispatch(onRefreshMapDataChange(false));
+      dispatch(setRefreshMapData(false));
     }
   }, [refreshMapData]);
 
@@ -195,7 +192,7 @@ export const MapBoxMap: React.FC = () => {
         }
       );
       // programmatically calculate mapZoom and mapBound for initial load of data.
-      const mapLocations = geolocationData;
+      const mapLocations = allGeolocationsData;
       const coordinatesArray = mapLocations?.features.map((item) => {
         const coordinatesObj = item.geometry as GeoJSON.Point;
         return coordinatesObj.coordinates;
@@ -213,19 +210,19 @@ export const MapBoxMap: React.FC = () => {
         { hover: false }
       );
     }
-    dispatch(onHoverIdChange(undefined));
+    dispatch(setHoverId(undefined));
     if (e.features?.length) {
       const coordinatesObject = e.features[0].geometry as GeoJSON.Point;
       const coordinates = coordinatesObject.coordinates.slice();
       const description = e.features[0].properties;
       const id = e.features[0].id;
-      dispatch(onHoverIdChange(id));
+      dispatch(setHoverId(id));
       mapRef.current.setFeatureState(
         { source: dataSourceId, id: id },
         { hover: true }
       );
       dispatch(
-        onActiveGeolocationChange({
+        setMapGeolocationCardData({
           latitude: coordinates[1],
           longitude: coordinates[0],
           title: `${description?.state}`,
@@ -234,7 +231,7 @@ export const MapBoxMap: React.FC = () => {
         })
       );
 
-      dispatch(onIsOpenActiveGeolocationCardChange(true));
+      dispatch(setIsOpenMapGeolocationCard(true));
     }
   };
   const onMouseLeavePopup = () => {
@@ -243,11 +240,11 @@ export const MapBoxMap: React.FC = () => {
       { source: dataSourceId, id: hoverId },
       { hover: false }
     );
-    dispatch(onHoverIdChange(undefined));
+    dispatch(setHoverId(undefined));
 
-    dispatch(onIsOpenActiveGeolocationCardChange(false));
+    dispatch(setIsOpenMapGeolocationCard(false));
     dispatch(
-      onActiveGeolocationChange({
+      setMapGeolocationCardData({
         latitude: 0,
         longitude: 0,
         title: "",
@@ -271,7 +268,7 @@ export const MapBoxMap: React.FC = () => {
       onMouseEnter={onMouseEnter}
       onLoad={onLoad}
     >
-      <Source id={dataSourceId} type="geojson" data={geolocationData}>
+      <Source id={dataSourceId} type="geojson" data={allGeolocationsData}>
         <Layer
           id={layerId}
           type="symbol"
@@ -292,11 +289,11 @@ export const MapBoxMap: React.FC = () => {
             ],
           }}
         />
-        {isOpenActiveGeolocationCard && (
+        {isOpenMapGeolocationCard && (
           <Popup
-            longitude={activeGeolocation.longitude}
+            longitude={mapGeoLocationCardData.longitude}
             offset={-10}
-            latitude={activeGeolocation.latitude}
+            latitude={mapGeoLocationCardData.latitude}
             anchor="top"
             closeButton={false}
             style={{
@@ -322,8 +319,12 @@ export const MapBoxMap: React.FC = () => {
                 cursor: "pointer",
               })}
             >
-              {activeGeolocation.index} {activeGeolocation.title}
-              {activeGeolocation.description}
+              <CloseButton
+                onClick={() => onMouseLeavePopup()}
+                aria-label="Close modal"
+              />
+              {mapGeoLocationCardData.index} {mapGeoLocationCardData.title}
+              {mapGeoLocationCardData.description}
             </Box>
           </Popup>
         )}

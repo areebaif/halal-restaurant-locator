@@ -1,4 +1,3 @@
-import { PropertiesProps } from "../components/search-map-display";
 // TODO: extratc out main function put it here
 
 export interface RestaurantDocument {
@@ -74,10 +73,7 @@ export const fetchZipSearch = async (zipcodeUserInput: string | null) => {
     throw new Error("Network response was not ok");
   }
   const data: {
-    data: GeoJSON.FeatureCollection<
-      GeoJSON.Geometry,
-      PropertiesProps
-    >["features"];
+    data: GeoJSON.FeatureCollection<GeoJSON.Geometry, any>["features"];
   } = await response.json();
   return data.data;
 };
@@ -97,10 +93,7 @@ export const fetchStateSearch = async (stateId: string | null) => {
     throw new Error("Network response was not ok");
   }
   const data: {
-    data: GeoJSON.FeatureCollection<
-      GeoJSON.Geometry,
-      PropertiesProps
-    >["features"];
+    data: GeoJSON.FeatureCollection<GeoJSON.Geometry, any>["features"];
   } = await response.json();
   return data.data;
 };
@@ -144,10 +137,7 @@ export const fetchRestaurantNameSearch = async (name: string) => {
     throw new Error("Network response was not ok");
   }
   const data: {
-    data: GeoJSON.FeatureCollection<
-      GeoJSON.Geometry,
-      PropertiesProps
-    >["features"];
+    data: GeoJSON.FeatureCollection<GeoJSON.Geometry, any>["features"];
   } = await response.json();
   return data.data;
 };

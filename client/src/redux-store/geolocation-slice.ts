@@ -18,10 +18,11 @@ export interface MapCameraView {
 export interface Map {
   dataSourceId: string;
   layerId: string;
-  geolocationData: GeoJSON.FeatureCollection<GeoJSON.Geometry, any>;
-  activeGeolocation: ActiveGeolocation;
+  allGeolocationsData: GeoJSON.FeatureCollection<GeoJSON.Geometry, any>;
+  mapGeoLocationCardData: ActiveGeolocation;
   //mapCameraView: MapCameraView | undefined;
-  isOpenActiveGeolocationCard: boolean;
+  isOpenMapGeolocationCard: boolean;
+  isOpenListGeolocationCard: boolean;
   refreshMapData: boolean;
   hoverId: number | undefined | string;
 }
@@ -29,11 +30,12 @@ export interface Map {
 const initialState: Map = {
   dataSourceId: "restaurant locations",
   layerId: "points",
-  geolocationData: {
+  allGeolocationsData: {
     type: "FeatureCollection",
     features: [],
   },
-  activeGeolocation: {
+  isOpenListGeolocationCard: false,
+  mapGeoLocationCardData: {
     latitude: 0,
     longitude: 0,
     title: "",
@@ -41,7 +43,7 @@ const initialState: Map = {
     index: undefined,
   },
   //mapCameraView: undefined,
-  isOpenActiveGeolocationCard: false,
+  isOpenMapGeolocationCard: false,
   refreshMapData: false,
   hoverId: undefined,
 };
@@ -50,46 +52,40 @@ export const geolocationSlice = createSlice({
   name: "geolocation-input",
   initialState,
   reducers: {
-    onGoelocationDataChange: (
+    setAllGoelocationData: (
       state,
       action: PayloadAction<GeoJSON.FeatureCollection<GeoJSON.Geometry, any>>
     ) => {
-      state.geolocationData = action.payload;
+      state.allGeolocationsData = action.payload;
     },
-    onActiveGeolocationChange: (
+    setMapGeolocationCardData: (
       state,
       action: PayloadAction<ActiveGeolocation>
     ) => {
-      state.activeGeolocation = action.payload;
+      state.mapGeoLocationCardData = action.payload;
     },
-    onIsOpenActiveGeolocationCardChange: (
-      state,
-      action: PayloadAction<boolean>
-    ) => {
-      state.isOpenActiveGeolocationCard = action.payload;
+    setIsOpenMapGeolocationCard: (state, action: PayloadAction<boolean>) => {
+      state.isOpenMapGeolocationCard = action.payload;
     },
-    onRefreshMapDataChange: (state, action: PayloadAction<boolean>) => {
+    setIsOpenListGeolocationCard: (state, action: PayloadAction<boolean>) => {
+      state.isOpenListGeolocationCard = action.payload;
+    },
+    setRefreshMapData: (state, action: PayloadAction<boolean>) => {
       state.refreshMapData = action.payload;
     },
-    onHoverIdChange: (
-      state,
-      action: PayloadAction<number | string | undefined>
-    ) => {
+    setHoverId: (state, action: PayloadAction<number | string | undefined>) => {
       state.hoverId = action.payload;
     },
-    // onMapCameraViewChange: (state, action: PayloadAction<MapCameraView>) => {
-    //   state.mapCameraView = action.payload;
-    // },
   },
 });
 
 export const {
-  onActiveGeolocationChange,
-  onGoelocationDataChange,
-  onHoverIdChange,
-  onIsOpenActiveGeolocationCardChange,
-  onRefreshMapDataChange,
-  //onMapCameraViewChange,
+  setMapGeolocationCardData,
+  setAllGoelocationData,
+  setHoverId,
+  setIsOpenMapGeolocationCard,
+  setRefreshMapData,
+  setIsOpenListGeolocationCard,
 } = geolocationSlice.actions;
 
 export default geolocationSlice.reducer;
