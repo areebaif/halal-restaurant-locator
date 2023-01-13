@@ -22,7 +22,7 @@ CREATE TABLE "zipcode" (
   "id" serial PRIMARY KEY,
   "state" integer NOT NULL,
   "city" integer NOT NULL,
-  "zipcode" string NOT NULL,
+  "zipcode" VARCHAR NOT NULL,
   "longitude" float NOT NULL,
   "latitude" float NOT NULL,
   "geolocation" geography(point,4326) NOT NULL,
@@ -36,7 +36,7 @@ CREATE TABLE "restaurant" (
   "state" integer NOT NULL,
   "city" integer NOT NULL,
   "country" integer NOT NULL,
-  "zipcode" string NOT NULL,
+  "zipcode" VARCHAR NOT NULL,
   "longitude" float NOT NULL,
   "latitude" float NOT NULL,
   "geolocation" geography(point,4326) NOT NULL,
@@ -53,14 +53,14 @@ CREATE TABLE "user" (
 CREATE TABLE "comment" (
   "id" serial PRIMARY KEY,
   "restaurant" integer NOT NULL,
-  "user" intger NOT NULL,
+  "user" integer NOT NULL,
   "comment" varchar
 );
 
 CREATE TABLE "rating" (
   "id" serial PRIMARY KEY,
   "restaurant" integer NOT NULL,
-  "user" intger NOT NULL,
+  "user" integer NOT NULL,
   "rating" varchar
 );
 

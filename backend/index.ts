@@ -1,7 +1,7 @@
 import express, { NextFunction, Response, Request } from "express";
 import "dotenv/config.js";
 import bodyParser from "body-parser";
-import { Pool, QueryResult } from "pg";
+import { Pool } from "pg";
 import { dbPool } from "./database/pools";
 import { halalFinderRouter } from "./routes/halal-finder";
 
@@ -15,7 +15,7 @@ const startServer = async () => {
       db = await dbPool.connect();
       return db;
     } catch (err) {
-      throw new Error("Unable to connect to database");
+      throw new Error("Unable to connect to database pool client");
     }
   };
   db = await connectDb();
@@ -24,12 +24,13 @@ const startServer = async () => {
   // middleware
   app.use(bodyParser.json());
   app.use(async (req, res, next) => {
-    // TODO: check each time if i am making a new connection to the pool if i do pool.connect here and send that value
+    // check connection is live before attaching it to request object and sending it.
+    // TODO: try catch and retry if connection drops.
     req._db = await connectDb();
     next();
   });
 
-  // api-documentation
+  // TODO: api-documentation
   // routes
   app.use(halalFinderRouter);
 
