@@ -1,11 +1,11 @@
 import express, { NextFunction, Response, Request } from "express";
-import { config } from "dotenv";
+import "dotenv/config.js";
 import bodyParser from "body-parser";
 import { Pool, QueryResult } from "pg";
 import { dbPool } from "./database/pools";
 import { halalFinderRouter } from "./routes/halal-finder";
 
-const PORT = process.env.PORT || 6000;
+const PORT = 6000;
 
 const startServer = async () => {
   let db: Pool;
@@ -23,10 +23,9 @@ const startServer = async () => {
   const app = express();
   // middleware
   app.use(bodyParser.json());
-  app.use(function (req, res, next) {
-    // TODO extend request object to have custome _db property
+  app.use(async (req, res, next) => {
     // TODO: check each time if i am making a new connection to the pool if i do pool.connect here and send that value
-    //req._db = db
+    req._db = await connectDb();
     next();
   });
 

@@ -122,6 +122,8 @@ router.get(
   async (req: Request, res: Response, next: NextFunction) => {
     try {
       // TODO: add restaurantName functionality to this
+      const db = req._db;
+      console.log(db);
       const citySetTemp: Set<string> = new Set();
       const stateSetTemp: Set<string> = new Set();
       const cityStateTemp: Set<string> = new Set();
