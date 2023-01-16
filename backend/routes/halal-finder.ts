@@ -123,7 +123,6 @@ router.get(
     try {
       // TODO: add restaurantName functionality to this
       const db = req._db;
-      console.log(db);
       const citySetTemp: Set<string> = new Set();
       const stateSetTemp: Set<string> = new Set();
       const cityStateTemp: Set<string> = new Set();
@@ -148,6 +147,7 @@ router.get(
       const arrayStateSet = Array.from(stateSetTemp);
       const arrayCityState = Array.from(cityStateTemp);
       const allValues: string[] = [];
+      console.log(arrayCitySet);
 
       arrayCityState.forEach((item) => {
         allValues.push(item);

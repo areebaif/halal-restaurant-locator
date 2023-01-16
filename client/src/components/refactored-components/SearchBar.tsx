@@ -109,6 +109,7 @@ export const SearchBar: React.FC<{}> = () => {
   }
   // Set local state data if it does not exist
   const data = geoLocationData.data!;
+  console.log(data);
   if (!autoCompleteData) {
     setAutoCompleteData(data.allValues);
   }

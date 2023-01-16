@@ -18,6 +18,7 @@ const startServer = async () => {
       throw new Error("Unable to connect to database pool client");
     }
   };
+  // TODO: error handling
   db = await connectDb();
 
   const app = express();
