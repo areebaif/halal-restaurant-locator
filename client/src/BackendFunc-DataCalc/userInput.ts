@@ -23,7 +23,7 @@ export const validateUserInput = (data: ValidateUserInput) => {
   } = data;
   // return object
   const validateResult: {
-    city?: CityDocument;
+    city?: { id: number; name: string };
     state?: StateDocument;
     zipcode?: { id: string; name: string };
     restaurant?: { id: number; name: string };
@@ -38,8 +38,10 @@ export const validateUserInput = (data: ValidateUserInput) => {
       case 2:
         const cityArray = [userInputArray[0].trim()];
         const stateArray = [userInputArray[1].trim()];
-        const city = validInput(cityArray, backendCityData);
+
         const state = validInput(stateArray, backendStateData);
+        const stateId = state?.id;
+        const city = validInput(cityArray, backendCityData, stateId);
         validateResult.state = state;
         validateResult.city = city;
         break;
@@ -86,13 +88,16 @@ export const validateUserInput = (data: ValidateUserInput) => {
 
 export const validInput = (
   userInput: string[],
-  backendData: { id: number; name: string }[]
+  backendData: { id: number; name: string; state_id?: number }[],
+  state_id?: number
 ) => {
   const valueUpperCase = userInput[0]
     ?.split(" ")
     .map((item) => item[0].toUpperCase() + item.substring(1));
   const value = valueUpperCase.join(" ");
-  const validValue = backendData.filter((item) => item.name === value);
+  const validValue = backendData.filter((item) => {
+    return item.name === value && item.state_id === state_id;
+  });
   // set query string value
   const queryStringValue = validValue.length ? validValue?.[0] : undefined;
   if (queryStringValue) {

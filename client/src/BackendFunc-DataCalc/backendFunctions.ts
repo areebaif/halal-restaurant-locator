@@ -16,11 +16,14 @@ export interface RestaurantDocument {
 export interface CityDocument {
   id: number;
   name: string;
+  state_id: number;
+  country_id?: number;
 }
 
 export interface StateDocument {
   id: number;
   name: string;
+  country_id?: number;
 }
 export interface ZipDocument {
   //city_state: string;

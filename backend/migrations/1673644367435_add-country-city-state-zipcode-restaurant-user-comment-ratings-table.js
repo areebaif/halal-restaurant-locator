@@ -7,13 +7,13 @@ exports.up = (pgm) => {
   CREATE EXTENSION IF NOT EXISTS postgis;
   
   CREATE TABLE "country" (
-    "id" serial PRIMARY KEY,
+    "id" serial PRIMARY KEY ,
     "name" varchar NOT NULL UNIQUE,
     "created_at" timestamptz NOT NULL DEFAULT (now())
   );
   
   CREATE TABLE "city" (
-    "id" serial PRIMARY KEY,
+    "id" serial PRIMARY KEY ,
     "name" varchar NOT NULL,
     "country_id" integer NOT NULL,
     "state_id" integer NOT NULL,
@@ -22,14 +22,14 @@ exports.up = (pgm) => {
   );
   
   CREATE TABLE "state" (
-    "id" serial PRIMARY KEY,
+    "id" serial PRIMARY KEY ,
     "name" varchar NOT NULL,
     "country_id" integer NOT NULL,
     "created_at" timestamptz NOT NULL DEFAULT (now())
   );
   
   CREATE TABLE "zipcode" (
-    "id" serial PRIMARY KEY,
+    "id" serial PRIMARY KEY ,
     "state_id" integer NOT NULL,
     "city_id" integer NOT NULL,
     "zipcode" varchar NOT NULL,
@@ -41,7 +41,7 @@ exports.up = (pgm) => {
   );
   
   CREATE TABLE "restaurant" (
-    "id" serial PRIMARY KEY,
+    "id" serial PRIMARY KEY ,
     "name" varchar NOT NULL,
     "state_id" integer NOT NULL,
     "city_id" integer NOT NULL,

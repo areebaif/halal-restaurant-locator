@@ -97,7 +97,6 @@ export const SearchBar: React.FC<{}> = () => {
     staleTime: Infinity,
     cacheTime: Infinity,
   });
-
   if (geoLocationData.isLoading) {
     // TODO: loading component
     console.log("loading");

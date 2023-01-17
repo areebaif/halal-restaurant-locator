@@ -5,10 +5,16 @@ import { Geolocation } from "../database/sql-queries/geolocation";
 interface locationDocument {
   type: "Feature";
   properties: {
+    // title prop is used by mapbox to populate values on location layer to display title
+    // cityName
     title: string;
+    //cityName
     city: string;
+    //shortform of state
     state_id: string;
+    // statename
     state: string;
+    //zipcode
     zip: string;
   };
   id: number;
@@ -88,7 +94,6 @@ router.get(
   async (req: Request, res: Response, next: NextFunction) => {
     try {
       const { stateId } = req.params;
-      console.log("stateId was hit");
       const allRawData: {
         features: locationDocument[];
         type: "FeatureCollection";
@@ -127,7 +132,7 @@ router.get(
       const state = await Geolocation.getAllStatebyCountryId(db);
 
       const city = await Geolocation.getAllCitybyCountryId(db);
-      const city_state = await Geolocation.getCityAndStatebyCountryId(db);
+      const city_state = await Geolocation.getAllCityAndStatebyCountryId(db);
       const cityAndState = city_state?.map((item) => {
         return `${item.city}, ${item.state}`;
       });
@@ -150,6 +155,7 @@ router.get(
           },
         };
       });
+
       const allValues: string[] = [];
 
       cityAndState?.forEach((item) => {
@@ -216,36 +222,34 @@ router.get(
   async (req: Request, res: Response, next: NextFunction) => {
     try {
       const { cityId, stateId } = req.params;
-      console.log(stateId, cityId, "stateID");
-      const allRawData: {
-        features: locationDocument[];
-        type: "FeatureCollection";
-      } = JSON.parse(JSON.stringify(rawLocations));
-
-      const arrayState = Array.from(stateSet);
-      const stateName = arrayState.filter((item) => {
-        return item.id === (stateId === "0" ? 0 : parseInt(stateId));
+      const db = req._db;
+      const parsedCityId = parseInt(cityId);
+      const parsedStateId = parseInt(stateId);
+      const zipcode = await Geolocation.getZipcodeByStateCityAndCountryId(
+        db,
+        parsedCityId,
+        parsedStateId
+      );
+      const zipcodeGEOJSON = zipcode?.map((item) => {
+        const properties = {
+          title: item.city_id,
+          city: item.city_id,
+          state_id: item.state_id,
+          zipcode: item.zipcode,
+          country_id: item.country_id,
+        };
+        return {
+          type: "Feature",
+          properties: properties,
+          id: item.id,
+          geometry: {
+            coordinates: [item.longitude, item.latitude],
+            type: "Point",
+          },
+        };
       });
-      const state = stateName[0];
-
-      const arrayCity = Array.from(citySet);
-      const cityName = arrayCity.filter((item) => {
-        return item.id === (cityId === "0" ? 0 : parseInt(cityId));
-      });
-      const city = cityName[0];
-
-      const cityState = allRawData.features.filter((item) => {
-        const properties = item.properties;
-        if (properties.state === state.name && properties.city === city.name) {
-          return {
-            ...item,
-            city_state: `${properties.city}, ${properties.state}`,
-          };
-        }
-      });
-      console.log(cityState, "citystate");
       res.status(200).send({
-        data: cityState,
+        data: zipcodeGEOJSON,
       });
     } catch (err) {
       console.log(err);
