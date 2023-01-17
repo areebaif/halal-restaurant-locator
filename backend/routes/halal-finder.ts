@@ -1,5 +1,6 @@
 import express, { NextFunction, Response, Request } from "express";
 import rawLocations from "../location.json";
+import { Geolocation } from "../database/sql-queries/geolocation";
 
 interface locationDocument {
   type: "Feature";
@@ -123,58 +124,50 @@ router.get(
     try {
       // TODO: add restaurantName functionality to this
       const db = req._db;
-      const citySetTemp: Set<string> = new Set();
-      const stateSetTemp: Set<string> = new Set();
-      const cityStateTemp: Set<string> = new Set();
-      const allRawData: {
-        features: locationDocument[];
-        type: "FeatureCollection";
-      } = JSON.parse(JSON.stringify(rawLocations));
-      // Sending zipSet with coordinates so that map can jump to those coordinates
-      const zipSet = allRawData.features.map((item) => {
-        const properties = item.properties;
-        citySetTemp.add(properties.city);
-        stateSetTemp.add(properties.state);
-        const cityState = `${properties.city}, ${properties.state}`;
-        cityStateTemp.add(cityState);
+      const state = await Geolocation.getAllStatebyCountryId(db);
+
+      const city = await Geolocation.getAllCitybyCountryId(db);
+      const city_state = await Geolocation.getCityAndStatebyCountryId(db);
+      const cityAndState = city_state?.map((item) => {
+        return `${item.city}, ${item.state}`;
+      });
+      const zipcode = await Geolocation.getAllZipcodebyCountryId(db);
+
+      const zipcodeGEOJSON = zipcode?.map((item) => {
+        const properties = {
+          city: item.city,
+          state: item.state,
+          zip: item.zipcode,
+          country: item.country,
+        };
         return {
-          ...item,
-          city_state: `${properties.city}, ${properties.state}`,
+          type: "Feature",
+          properties: properties,
+          id: item.id,
+          geometry: {
+            coordinates: [item.longitude, item.latitude],
+            type: "Point",
+          },
         };
       });
-
-      const arrayCitySet = Array.from(citySetTemp);
-      const arrayStateSet = Array.from(stateSetTemp);
-      const arrayCityState = Array.from(cityStateTemp);
       const allValues: string[] = [];
-      console.log(arrayCitySet);
 
-      arrayCityState.forEach((item) => {
+      cityAndState?.forEach((item) => {
         allValues.push(item);
       });
-      zipSet.forEach((item) => {
-        const zipValue = `${item.city_state}, ${item.properties.zip}`;
-        allValues.push(zipValue);
+      zipcodeGEOJSON?.forEach((item) => {
+        const string_value = `${item.properties.city}, ${item.properties.state}, ${item.properties.zip}`;
+        allValues.push(string_value);
       });
-
-      const mappedCitySet = arrayCitySet.map((item, index) => {
-        return { id: index, name: item };
-      });
-      const mappedStateSet = arrayStateSet.map((item, index) => {
-        return { id: index, name: item };
-      });
-
-      citySet = new Set(mappedCitySet);
-      stateSet = new Set(mappedStateSet);
 
       res.header("Content-Type", "application/json");
 
       res.status(200).send({
         data: {
-          citySet: mappedCitySet,
-          stateSet: mappedStateSet,
-          zipSet: zipSet,
-          city_state: arrayCityState,
+          citySet: city,
+          stateSet: state,
+          zipSet: zipcodeGEOJSON,
+          city_state: cityAndState,
           allValues: allValues,
           // TODO: fix empty object to actually sending data
           restaurantSet: [],
