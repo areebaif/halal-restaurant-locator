@@ -25,7 +25,7 @@ export const validateUserInput = (data: ValidateUserInput) => {
   const validateResult: {
     city?: { id: number; name: string };
     state?: StateDocument;
-    zipcode?: { id: string; name: string };
+    zipcode?: { id: number; name: string };
     restaurant?: { id: number; name: string };
   } = {};
 
@@ -47,7 +47,9 @@ export const validateUserInput = (data: ValidateUserInput) => {
         break;
       case 3:
         // state, city and zipcode are defined
+
         const zipcode = userInputArray[2].trim();
+
         const validZip = backendZipData?.filter((item) => {
           return item.properties.zip === zipcode;
         });
@@ -56,11 +58,12 @@ export const validateUserInput = (data: ValidateUserInput) => {
           console.log("no valid zip");
         }
         const cityArr = [userInputArray[0].trim()];
+
         const stateArr = [userInputArray[1].trim()];
         const cityWithZip = validInput(cityArr, backendCityData);
         const stateWithZip = validInput(stateArr, backendStateData);
         const zip = {
-          id: zipcode,
+          id: validZip[0].id,
           name: zipcode,
         };
         validateResult.zipcode = zip;
@@ -95,9 +98,13 @@ export const validInput = (
     ?.split(" ")
     .map((item) => item[0].toUpperCase() + item.substring(1));
   const value = valueUpperCase.join(" ");
-  const validValue = backendData.filter((item) => {
-    return item.name === value && item.state_id === state_id;
-  });
+  const validValue = state_id
+    ? backendData.filter((item) => {
+        return item.name === value && item.state_id === state_id;
+      })
+    : backendData.filter((item) => {
+        return item.name === value;
+      });
   // set query string value
   const queryStringValue = validValue.length ? validValue?.[0] : undefined;
   if (queryStringValue) {

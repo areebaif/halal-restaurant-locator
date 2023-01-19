@@ -76,46 +76,50 @@ router.get("/api/dev/client-keys", async (req, res, next) => {
   }
 });
 
-router.get(
-  "/api/dev/data",
-  async (req: Request, res: Response, next: NextFunction) => {
-    try {
-      res.header("Content-Type", "application/json");
+// router.get(
+//   "/api/dev/data",
+//   async (req: Request, res: Response, next: NextFunction) => {
+//     try {
+//       res.header("Content-Type", "application/json");
 
-      res.status(200).send({ data: rawLocations });
-    } catch (err) {
-      console.log(err);
-    }
-  }
-);
+//       res.status(200).send({ data: rawLocations });
+//     } catch (err) {
+//       console.log(err);
+//     }
+//   }
+// );
 
 router.get(
-  "/api/dev/state/:stateId",
+  "/api/dev/zipcodes/state/:stateId",
   async (req: Request, res: Response, next: NextFunction) => {
     try {
       const { stateId } = req.params;
-      const allRawData: {
-        features: locationDocument[];
-        type: "FeatureCollection";
-      } = JSON.parse(JSON.stringify(rawLocations));
-      const arrayState = Array.from(stateSet);
-      const stateName = arrayState.filter((item) => {
-        return item.id === (stateId === "0" ? 0 : parseInt(stateId));
-      });
-      const state = stateName[0];
-      console.log("stateName", stateName);
-      const stateSetLocal = allRawData.features.filter((item) => {
-        const properties = item.properties;
-        if (properties.state === state.name) {
-          return {
-            ...item,
-            city_state: `${properties.city}, ${properties.state}`,
-          };
-        }
+      const db = req._db;
+      const zipcodesByState = await Geolocation.getZipcodeByStateAndCountryId(
+        db,
+        parseInt(stateId)
+      );
+      const zipcodeGeoJSON = zipcodesByState?.map((item) => {
+        const properties = {
+          title: item.stateName,
+          state: item.stateName,
+          state_id: item.state_id,
+          zip: item.zipcode,
+          country_id: item.country_id,
+        };
+        return {
+          type: "Feature",
+          properties: properties,
+          id: item.id,
+          geometry: {
+            coordinates: [item.longitude, item.latitude],
+            type: "Point",
+          },
+        };
       });
 
       res.status(200).send({
-        data: stateSetLocal,
+        data: zipcodeGeoJSON,
       });
     } catch (err) {
       console.log(err);
@@ -130,7 +134,6 @@ router.get(
       // TODO: add restaurantName functionality to this
       const db = req._db;
       const state = await Geolocation.getAllStatebyCountryId(db);
-
       const city = await Geolocation.getAllCitybyCountryId(db);
       const city_state = await Geolocation.getAllCityAndStatebyCountryId(db);
       const cityAndState = city_state?.map((item) => {
@@ -157,7 +160,6 @@ router.get(
       });
 
       const allValues: string[] = [];
-
       cityAndState?.forEach((item) => {
         allValues.push(item);
       });
@@ -167,7 +169,6 @@ router.get(
       });
 
       res.header("Content-Type", "application/json");
-
       res.status(200).send({
         data: {
           citySet: city,
@@ -186,30 +187,33 @@ router.get(
 );
 
 router.get(
-  "/api/dev/:zipcode",
+  "/api/dev/:zipcodeId",
   async (req: Request, res: Response, next: NextFunction) => {
     try {
-      //console.log("I am hitting wring endpoint");
-      const { zipcode } = req.params;
-      //console.log(zipcode);
-      //const zipCode: string = req.body;
-      const allRawData: {
-        features: locationDocument[];
-        type: "FeatureCollection";
-      } = JSON.parse(JSON.stringify(rawLocations));
-
-      const zipSet = allRawData.features.filter((item) => {
-        const properties = item.properties;
-        if (properties.zip === zipcode) {
-          return {
-            ...item,
-            city_state: `${properties.city}, ${properties.state}`,
-          };
-        }
+      const { zipcodeId } = req.params;
+      const db = req._db;
+      const zipcode = await Geolocation.getZipcodeByIdAndCountryId(
+        db,
+        parseInt(zipcodeId)
+      );
+      const zipcodeGeoJSON = zipcode?.map((item) => {
+        const properties = {
+          tite: item.zipcode,
+          zip: item.zipcode,
+          country: item.country_id,
+        };
+        return {
+          type: "Feature",
+          properties: properties,
+          id: item.id,
+          geometry: {
+            coordinates: [item.longitude, item.latitude],
+            type: "Point",
+          },
+        };
       });
-
       res.status(200).send({
-        data: zipSet,
+        data: zipcodeGeoJSON,
       });
     } catch (err) {
       console.log(err);
@@ -261,6 +265,7 @@ router.get(
   "/api/dev/:restaurantname",
   async (req: Request, res: Response, next: NextFunction) => {
     try {
+      // TODO: do postqres sql function
       console.log("restaurantname");
       // TODO: fix this to be restaurant id
       const { restaurantname } = req.params;

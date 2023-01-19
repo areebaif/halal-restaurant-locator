@@ -30,7 +30,7 @@ export interface cityDbRow {
 
 export class Geolocation {
   //constructor(private data: TaskAttrs) {}
-  // TODO: we need to properly returnb data types
+  // TODO: we need to properly return data types
   static getAllStatebyCountryId = async (
     db: Pool | undefined,
     id: number = 1
@@ -42,7 +42,31 @@ export class Geolocation {
         WHERE country_id=$1;`,
         [id]
       );
-      if (!rows.length) throw new Error("unable to retrive states");
+      if (!rows.length)
+        throw new Error(`
+      no state found with country_id ${id}`);
+      return rows;
+    } catch (err) {
+      // TODO: error handling
+      console.log(err);
+    }
+  };
+
+  static getStatebyIdCountryId = async (
+    db: Pool | undefined,
+    stateId: number,
+    countryId: number = 1
+  ) => {
+    try {
+      db = await dbPool.connect();
+      const { rows }: QueryResult<stateDbRow> = await db.query(
+        `SELECT * FROM state
+        WHERE country_id=$1 AND id=$2;`,
+        [countryId, stateId]
+      );
+      if (!rows.length)
+        throw new Error(`
+      no state found with country_id ${countryId} and state_id ${stateId}`);
       return rows;
     } catch (err) {
       // TODO: error handling
@@ -62,7 +86,7 @@ export class Geolocation {
         WHERE country_id=$1;`,
         [id]
       );
-      if (!rows.length) throw new Error("unable to retrive states");
+      if (!rows.length) throw new Error(`no city found with country_id ${id}`);
       return rows;
     } catch (err) {
       // TODO: error handling
@@ -86,7 +110,8 @@ export class Geolocation {
         where city.country_id=$1;`,
           [id]
         );
-      if (!rows.length) throw new Error("unable to retrive states");
+      if (!rows.length)
+        throw new Error(`no state and city found with country_id ${id}`);
       return rows;
     } catch (err) {
       // TODO: error handling
@@ -116,7 +141,8 @@ export class Geolocation {
         where zipcode.country_id=$1;`,
         [id]
       );
-      if (!rows.length) throw new Error("unable to retrive states");
+      if (!rows.length)
+        throw new Error(`no zipcode found with country_id ${id}`);
       return rows;
     } catch (err) {
       // TODO: error handling
@@ -136,11 +162,88 @@ export class Geolocation {
         `select * from zipcode where state_id=$2 and city_id=$1 and country_id=$3;`,
         [cityId, stateId, countryId]
       );
-      if (!rows.length) throw new Error("unable to retrive states");
+      if (!rows.length)
+        throw new Error(
+          `no zipcode found with country_id ${countryId} state_id ${stateId} city_id ${cityId}`
+        );
       return rows;
     } catch (err) {
       // TODO: error handling
       console.log(err);
     }
+  };
+
+  static getZipcodeByStateAndCountryId = async (
+    db: Pool | undefined,
+    stateId: number,
+    countryId: number = 1
+  ) => {
+    try {
+      db = await dbPool.connect();
+      const { rows }: QueryResult<zipcodeDbRow & { stateName: string }> =
+        await db.query(
+          `select zipcode.id ,zipcode.longitude, zipcode.latitude, zipcode.state_id, zipcode.country_id, state.name as stateName from zipcode
+        inner join state
+        on zipcode.state_id = state.id
+        where zipcode.state_id =$1 
+        and zipcode.country_id = $2`,
+          [stateId, countryId]
+        );
+      if (!rows.length)
+        throw new Error(
+          `no zipcode found with country_id ${countryId} state_id ${stateId} `
+        );
+      return rows;
+    } catch (err) {
+      // TODO: error handling
+      console.log(err);
+    }
+  };
+
+  static getZipcodeByIdAndCountryId = async (
+    db: Pool | undefined,
+    zipcodeId: number,
+    countryId: number = 1
+  ) => {
+    try {
+      db = await dbPool.connect();
+      const { rows }: QueryResult<zipcodeDbRow & { stateName: string }> =
+        await db.query(
+          `select * from zipcode
+          where id=$1
+          and country_id=$2`,
+          [zipcodeId, countryId]
+        );
+      if (!rows.length)
+        throw new Error(
+          `no zipcode found with country_id ${countryId} zipcode_id ${zipcodeId} `
+        );
+      return rows;
+    } catch (err) {
+      // TODO: error handling
+      console.log(err);
+    }
+  };
+
+  static GeoJSONFormat = (data: { [key: string]: string | number }) => {
+    // const obj = Object.entries(data)
+    // console.log(obj), "yes object"
+    // v
+    // const properties = {
+    //   title: item.stateName,
+    //   state: item.stateName,
+    //   state_id: item.state_id,
+    //   zip: item.zipcode,
+    //   country_id: item.country_id,
+    // };
+    // return {
+    //   type: "Feature",
+    //   properties: properties,
+    //   id: item.id,
+    //   geometry: {
+    //     coordinates: [item.longitude, item.latitude],
+    //     type: "Point",
+    //   },
+    // };
   };
 }

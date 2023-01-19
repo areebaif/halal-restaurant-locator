@@ -83,9 +83,8 @@ export const fetchZipSearch = async (zipcodeUserInput: string | null) => {
 };
 
 export const fetchStateSearch = async (stateId: string | null) => {
-  // 0 is a falsy value
   if (!stateId) throw new Error("provide state id to call backend function");
-  const url = `/api/dev/state/${stateId}`;
+  const url = `/api/dev/zipcodes/state/${stateId}`;
   const response = await fetch(url, {
     method: "GET",
     headers: {

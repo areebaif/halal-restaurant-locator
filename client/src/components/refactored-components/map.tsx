@@ -157,8 +157,8 @@ export const MapBoxMap: React.FC = () => {
   React.useEffect(() => {
     if (mapRef.current) {
       if (
-        mapRef.current.getSource(dataSourceId) &&
-        mapRef.current.getLayer(layerId)
+        mapRef.current.getSource(dataSourceId)?.id?.length &&
+        mapRef.current.getLayer(layerId)?.id?.length
       ) {
         const geoJsonSource = mapRef.current.getSource(dataSourceId);
         geoJsonSource.setData(allGeolocationsData);

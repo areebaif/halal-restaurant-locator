@@ -12,13 +12,7 @@ import {
   StateDocument,
 } from "../../BackendFunc-DataCalc/backendFunctions";
 import { useAppDispatch, useAppSelector } from "../../redux-store/redux-hooks";
-import {
-  setMapGeolocationCardData,
-  setHoverId,
-  ActiveGeolocation,
-  setIsOpenMapGeolocationCard,
-  setIsOpenListGeolocationCard,
-} from "../../redux-store/geolocation-slice";
+import { setIsOpenListGeolocationCard } from "../../redux-store/geolocation-slice";
 
 export interface PropertiesProps {
   title: string;
@@ -63,6 +57,7 @@ export const SearchBar: React.FC<{}> = () => {
     id: queryParams.get(stringConstants.restaurantId),
     name: queryParams.get(stringConstants.restaurantName),
   };
+
   // state functions
   const [userInput, setUserInput] = React.useState<string>(
     `${
@@ -70,9 +65,13 @@ export const SearchBar: React.FC<{}> = () => {
         ? `${restaurant.name}${city.name ? `, ${city.name}` : ""}${
             state.name ? `, ${state.name}` : ""
           }${zipcode.name ? `, ${zipcode.name}` : ""}`
-        : `${city.name ? city.name : ""}${state.name ? `, ${state.name}` : ""}${
-            zipcode.name ? `, ${zipcode.name}` : ""
-          }`
+        : `${city.name ? city.name : ""}${
+            state.name && city.name
+              ? `, ${state.name}`
+              : state.name
+              ? state.name
+              : ""
+          }${zipcode.name ? `, ${zipcode.name}` : ""}`
     }`
     //
   );
@@ -97,6 +96,7 @@ export const SearchBar: React.FC<{}> = () => {
     staleTime: Infinity,
     cacheTime: Infinity,
   });
+
   if (geoLocationData.isLoading) {
     // TODO: loading component
     console.log("loading");
@@ -108,7 +108,6 @@ export const SearchBar: React.FC<{}> = () => {
   }
   // Set local state data if it does not exist
   const data = geoLocationData.data!;
-  console.log(data);
   if (!autoCompleteData) {
     setAutoCompleteData(data.allValues);
   }
@@ -143,6 +142,7 @@ export const SearchBar: React.FC<{}> = () => {
     try {
       const queryStringValues = validateUserInput(data);
       const { state, city, zipcode, restaurant } = queryStringValues;
+      console.log(zipcode, "zipcode")
       // sanity check: throw error if the user has not entered anything but still has clicked submit
       if (!zipcode?.id && !state?.id && !city?.id && !restaurant?.id) {
         setIsEdgeCase(true);

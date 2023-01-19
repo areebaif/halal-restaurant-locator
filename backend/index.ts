@@ -19,6 +19,7 @@ const startServer = async () => {
     }
   };
   // TODO: error handling
+  // check: first when app starts we have a connection to the database
   db = await connectDb();
 
   const app = express();
