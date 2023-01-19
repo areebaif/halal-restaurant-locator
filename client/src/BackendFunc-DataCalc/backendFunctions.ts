@@ -34,7 +34,7 @@ export interface ZipDocument {
     //state_id: string;
     state: string;
     country: string;
-    zip: string;
+    zipcode: string;
   };
   id: number;
   geometry: {

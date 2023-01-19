@@ -180,9 +180,10 @@ export class Geolocation {
   ) => {
     try {
       db = await dbPool.connect();
-      const { rows }: QueryResult<zipcodeDbRow & { stateName: string }> =
+      console.log("state", stateId);
+      const { rows }: QueryResult<zipcodeDbRow & { state_name: string }> =
         await db.query(
-          `select zipcode.id ,zipcode.longitude, zipcode.latitude, zipcode.state_id, zipcode.country_id, state.name as stateName from zipcode
+          `select zipcode.id, zipcode.zipcode ,zipcode.longitude, zipcode.latitude, zipcode.state_id, zipcode.country_id, state.name as state_name from zipcode
         inner join state
         on zipcode.state_id = state.id
         where zipcode.state_id =$1 
@@ -225,25 +226,30 @@ export class Geolocation {
     }
   };
 
-  static GeoJSONFormat = (data: { [key: string]: string | number }) => {
-    // const obj = Object.entries(data)
-    // console.log(obj), "yes object"
-    // v
-    // const properties = {
-    //   title: item.stateName,
-    //   state: item.stateName,
-    //   state_id: item.state_id,
-    //   zip: item.zipcode,
-    //   country_id: item.country_id,
-    // };
-    // return {
-    //   type: "Feature",
-    //   properties: properties,
-    //   id: item.id,
-    //   geometry: {
-    //     coordinates: [item.longitude, item.latitude],
-    //     type: "Point",
-    //   },
-    // };
+  static GeoJSONFormat = (
+    latitude: number,
+    longitude: number,
+    id: number,
+    geojsonProperites: { [key: string]: string | number }
+  ) => {
+    const obj = Object.entries(geojsonProperites);
+
+    const properties: { [key: string]: string | number } = {};
+    // do not do direct object assignments since objects are passed by reference
+    obj.forEach((element) => {
+      const prop = element[0];
+      const value = element[1];
+      properties[prop] = value;
+    });
+
+    return {
+      type: "Feature",
+      properties: properties,
+      id: id,
+      geometry: {
+        coordinates: [longitude, latitude],
+        type: "Point",
+      },
+    };
   };
 }

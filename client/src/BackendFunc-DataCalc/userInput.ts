@@ -51,7 +51,7 @@ export const validateUserInput = (data: ValidateUserInput) => {
         const zipcode = userInputArray[2].trim();
 
         const validZip = backendZipData?.filter((item) => {
-          return item.properties.zip === zipcode;
+          return item.properties.zipcode === zipcode;
         });
         if (!validZip?.length) {
           //TODO: error handling

@@ -88,7 +88,6 @@ export const MapBoxMap: React.FC = () => {
         Boolean(city?.id) &&
         Boolean(!restaurant?.id),
       onSuccess: (data) => {
-        console.log("react query zipcode");
         const mapLocations: GeoJSON.FeatureCollection<GeoJSON.Geometry, any> = {
           type: "FeatureCollection",
           features: data?.length ? data : [],
@@ -225,8 +224,8 @@ export const MapBoxMap: React.FC = () => {
         setMapGeolocationCardData({
           latitude: coordinates[1],
           longitude: coordinates[0],
-          title: `${description?.state}`,
-          description: `${description?.city}${description?.zip}`,
+          title: `${description?.state} ${description?.zipcode}`,
+          description: `${description?.city}${description?.zipcode}`,
           index: id,
         })
       );

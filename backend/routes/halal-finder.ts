@@ -22,38 +22,38 @@ interface locationDocument {
   geometry: { coordinates: [number, number]; type: "Point" };
 }
 
-let citySet: Set<{ id: number; name: string }>;
-let stateSet: Set<{ id: number; name: string }>;
+// let citySet: Set<{ id: number; name: string }>;
+// let stateSet: Set<{ id: number; name: string }>;
 
-const citySetTemp: Set<string> = new Set();
-const stateSetTemp: Set<string> = new Set();
+// const citySetTemp: Set<string> = new Set();
+// const stateSetTemp: Set<string> = new Set();
 
-const allRawData: {
-  features: locationDocument[];
-  type: "FeatureCollection";
-} = JSON.parse(JSON.stringify(rawLocations));
-// Sending zipSet with coordinates so that map can jump to those coordinates
-const zipSet = allRawData.features.map((item) => {
-  const properties = item.properties;
-  citySetTemp.add(properties.city);
-  stateSetTemp.add(properties.state);
-  return {
-    ...item,
-    city_state: `${properties.city}, ${properties.state}`,
-  };
-});
+// const allRawData: {
+//   features: locationDocument[];
+//   type: "FeatureCollection";
+// } = JSON.parse(JSON.stringify(rawLocations));
+// // Sending zipSet with coordinates so that map can jump to those coordinates
+// const zipSet = allRawData.features.map((item) => {
+//   const properties = item.properties;
+//   citySetTemp.add(properties.city);
+//   stateSetTemp.add(properties.state);
+//   return {
+//     ...item,
+//     city_state: `${properties.city}, ${properties.state}`,
+//   };
+// });
 
-const arrayCitySet = Array.from(citySetTemp);
-const arrayStateSet = Array.from(stateSetTemp);
-const mappedCitySet = arrayCitySet.map((item, index) => {
-  return { id: index, name: item };
-});
-const mappedStateSet = arrayStateSet.map((item, index) => {
-  return { id: index, name: item };
-});
+// const arrayCitySet = Array.from(citySetTemp);
+// const arrayStateSet = Array.from(stateSetTemp);
+// const mappedCitySet = arrayCitySet.map((item, index) => {
+//   return { id: index, name: item };
+// });
+// const mappedStateSet = arrayStateSet.map((item, index) => {
+//   return { id: index, name: item };
+// });
 
-citySet = new Set(mappedCitySet);
-stateSet = new Set(mappedStateSet);
+// citySet = new Set(mappedCitySet);
+// stateSet = new Set(mappedStateSet);
 
 const router = express.Router();
 
@@ -100,22 +100,20 @@ router.get(
         parseInt(stateId)
       );
       const zipcodeGeoJSON = zipcodesByState?.map((item) => {
-        const properties = {
-          title: item.stateName,
-          state: item.stateName,
-          state_id: item.state_id,
-          zip: item.zipcode,
-          country_id: item.country_id,
-        };
-        return {
-          type: "Feature",
-          properties: properties,
-          id: item.id,
-          geometry: {
-            coordinates: [item.longitude, item.latitude],
-            type: "Point",
-          },
-        };
+        const geojson = Geolocation.GeoJSONFormat(
+          item.latitude,
+          item.longitude,
+          item.id,
+          {
+            title: item.state_name,
+            state: item.state_name,
+            state_id: item.state_id,
+            zipcode: item.zipcode,
+            country_id: item.country_id,
+          }
+        );
+
+        return geojson;
       });
 
       res.status(200).send({
@@ -142,21 +140,19 @@ router.get(
       const zipcode = await Geolocation.getAllZipcodebyCountryId(db);
 
       const zipcodeGEOJSON = zipcode?.map((item) => {
-        const properties = {
-          city: item.city,
-          state: item.state,
-          zip: item.zipcode,
-          country: item.country,
-        };
-        return {
-          type: "Feature",
-          properties: properties,
-          id: item.id,
-          geometry: {
-            coordinates: [item.longitude, item.latitude],
-            type: "Point",
-          },
-        };
+        const geojson = Geolocation.GeoJSONFormat(
+          item.latitude,
+          item.latitude,
+          item.id,
+          {
+            city: item.city,
+            state: item.state,
+            zipcode: item.zipcode,
+            country: item.country,
+          }
+        );
+
+        return geojson;
       });
 
       const allValues: string[] = [];
@@ -164,7 +160,7 @@ router.get(
         allValues.push(item);
       });
       zipcodeGEOJSON?.forEach((item) => {
-        const string_value = `${item.properties.city}, ${item.properties.state}, ${item.properties.zip}`;
+        const string_value = `${item.properties.city}, ${item.properties.state}, ${item.properties.zipcode}`;
         allValues.push(string_value);
       });
 
@@ -197,20 +193,19 @@ router.get(
         parseInt(zipcodeId)
       );
       const zipcodeGeoJSON = zipcode?.map((item) => {
-        const properties = {
-          tite: item.zipcode,
-          zip: item.zipcode,
-          country: item.country_id,
-        };
-        return {
-          type: "Feature",
-          properties: properties,
-          id: item.id,
-          geometry: {
-            coordinates: [item.longitude, item.latitude],
-            type: "Point",
-          },
-        };
+        const geojson = Geolocation.GeoJSONFormat(
+          item.latitude,
+          item.longitude,
+          item.id,
+          {
+            title: item.zipcode,
+            id: item.id,
+            zipcode: item.zipcode,
+            country: item.country_id,
+          }
+        );
+
+        return geojson;
       });
       res.status(200).send({
         data: zipcodeGeoJSON,
@@ -235,22 +230,20 @@ router.get(
         parsedStateId
       );
       const zipcodeGEOJSON = zipcode?.map((item) => {
-        const properties = {
-          title: item.city_id,
-          city: item.city_id,
-          state_id: item.state_id,
-          zipcode: item.zipcode,
-          country_id: item.country_id,
-        };
-        return {
-          type: "Feature",
-          properties: properties,
-          id: item.id,
-          geometry: {
-            coordinates: [item.longitude, item.latitude],
-            type: "Point",
-          },
-        };
+        const geojson = Geolocation.GeoJSONFormat(
+          item.latitude,
+          item.longitude,
+          item.id,
+          {
+            title: item.zipcode,
+            city: item.city_id,
+            state_id: item.state_id,
+            zipcode: item.zipcode,
+            country_id: item.country_id,
+          }
+        );
+
+        return geojson;
       });
       res.status(200).send({
         data: zipcodeGEOJSON,

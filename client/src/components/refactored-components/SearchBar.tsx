@@ -19,7 +19,7 @@ export interface PropertiesProps {
   city: string;
   state_id: string;
   state: string;
-  zip: string;
+  zipcode: string;
 }
 
 export const stringConstants = {
@@ -142,7 +142,7 @@ export const SearchBar: React.FC<{}> = () => {
     try {
       const queryStringValues = validateUserInput(data);
       const { state, city, zipcode, restaurant } = queryStringValues;
-      console.log(zipcode, "zipcode")
+      console.log(zipcode, "zipcode");
       // sanity check: throw error if the user has not entered anything but still has clicked submit
       if (!zipcode?.id && !state?.id && !city?.id && !restaurant?.id) {
         setIsEdgeCase(true);
