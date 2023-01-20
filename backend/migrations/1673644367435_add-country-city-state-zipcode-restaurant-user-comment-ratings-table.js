@@ -29,7 +29,7 @@ exports.up = (pgm) => {
   );
   
   CREATE TABLE "zipcode" (
-    "id" serial PRIMARY KEY ,
+    "id" serial PRIMARY KEY,
     "state_id" integer NOT NULL,
     "city_id" integer NOT NULL,
     "zipcode" varchar NOT NULL,
@@ -41,8 +41,11 @@ exports.up = (pgm) => {
   );
   
   CREATE TABLE "restaurant" (
-    "id" serial PRIMARY KEY ,
+    "id" serial PRIMARY KEY,
     "name" varchar NOT NULL,
+    "description" varchar,
+    "menu_url" varchar,
+    "webiste_url" varchar,
     "state_id" integer NOT NULL,
     "city_id" integer NOT NULL,
     "country_id" integer NOT NULL,
@@ -50,30 +53,72 @@ exports.up = (pgm) => {
     "longitude" double precision NOT NULL,
     "latitude" double precision NOT NULL,
     "geolocation" geography(point,4326),
-    "created_at" timestamptz NOT NULL DEFAULT (now())
+    "created_at" timestamptz NOT NULL DEFAULT (now()),
+    "updated_at" timestamptz NOT NULL DEFAULT (now())
   );
   
   CREATE TABLE "user" (
     "id" serial PRIMARY KEY,
     "email" varchar NOT NULL,
     "password" varchar NOT NULL,
-    "username" varchar NOT NULL
+    "username" varchar NOT NULL,
+    "created_at" timestamptz NOT NULL DEFAULT (now())
   );
   
   CREATE TABLE "comment" (
     "id" serial PRIMARY KEY,
     "restaurant_id" integer NOT NULL,
     "user_id" integer NOT NULL,
-    "comment" varchar
+    "comment" varchar,
+    "created_at" timestamptz NOT NULL DEFAULT (now()),
+    "updated_at" timestamptz NOT NULL DEFAULT (now())
   );
   
   CREATE TABLE "rating" (
     "id" serial PRIMARY KEY,
     "restaurant_id" integer NOT NULL,
     "user_id" integer NOT NULL,
-    "rating" varchar
+    "rating" varchar,
+    "created_at" timestamptz NOT NULL DEFAULT (now()),
+    "updated_at" timestamptz NOT NULL DEFAULT (now())
   );
-  
+
+  CREATE TABLE "foodtag" (
+    "id" serial PRIMARY KEY,
+    "name" varchar NOT NULL,
+    "created_at" timestamptz NOT NULL DEFAULT (now())
+  );
+
+  CREATE TABLE "restaurant_foodtag" (
+    "id" serial PRIMARY KEY,
+    "restaurant_id" integer NOT NULL,
+    "foodtag_id" integer NOT NULL,
+    "created_at" timestamptz NOT NULL DEFAULT (now())
+  );
+
+  CREATE TABLE "image" (
+    "id" serial PRIMARY KEY,
+    "url" varchar NOT NULL,
+    "created_at" timestamptz NOT NULL DEFAULT (now())
+  );
+
+  CREATE TABLE "restaurant_image" (
+    "id" serial PRIMARY KEY,
+    "restaurant_id" integer NOT NULL,
+    "image_id" integer NOT NULL,
+    "created_at" timestamptz NOT NULL DEFAULT (now()),
+    "updated_at" timestamptz NOT NULL DEFAULT (now())
+    
+  );
+
+  ALTER TABLE "restaurant_image" ADD FOREIGN KEY ("restaurant_id") REFERENCES "restaurant" ("id");
+
+  ALTER TABLE "restaurant_image" ADD FOREIGN KEY ("image_id") REFERENCES "image" ("id");
+
+  ALTER TABLE "restaurant_foodtag" ADD FOREIGN KEY ("restaurant_id") REFERENCES "restaurant" ("id");
+
+  ALTER TABLE "restaurant_foodtag" ADD FOREIGN KEY ("foodtag_id") REFERENCES "foodtag" ("id");
+
   ALTER TABLE "city" ADD FOREIGN KEY ("country_id") REFERENCES "country" ("id");
   
   ALTER TABLE "state" ADD FOREIGN KEY ("country_id") REFERENCES "country" ("id");

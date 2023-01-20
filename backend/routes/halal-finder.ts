@@ -22,39 +22,6 @@ interface locationDocument {
   geometry: { coordinates: [number, number]; type: "Point" };
 }
 
-// let citySet: Set<{ id: number; name: string }>;
-// let stateSet: Set<{ id: number; name: string }>;
-
-// const citySetTemp: Set<string> = new Set();
-// const stateSetTemp: Set<string> = new Set();
-
-// const allRawData: {
-//   features: locationDocument[];
-//   type: "FeatureCollection";
-// } = JSON.parse(JSON.stringify(rawLocations));
-// // Sending zipSet with coordinates so that map can jump to those coordinates
-// const zipSet = allRawData.features.map((item) => {
-//   const properties = item.properties;
-//   citySetTemp.add(properties.city);
-//   stateSetTemp.add(properties.state);
-//   return {
-//     ...item,
-//     city_state: `${properties.city}, ${properties.state}`,
-//   };
-// });
-
-// const arrayCitySet = Array.from(citySetTemp);
-// const arrayStateSet = Array.from(stateSetTemp);
-// const mappedCitySet = arrayCitySet.map((item, index) => {
-//   return { id: index, name: item };
-// });
-// const mappedStateSet = arrayStateSet.map((item, index) => {
-//   return { id: index, name: item };
-// });
-
-// citySet = new Set(mappedCitySet);
-// stateSet = new Set(mappedStateSet);
-
 const router = express.Router();
 
 // TODO: api-documentation
@@ -75,19 +42,6 @@ router.get("/api/dev/client-keys", async (req, res, next) => {
     console.log(err);
   }
 });
-
-// router.get(
-//   "/api/dev/data",
-//   async (req: Request, res: Response, next: NextFunction) => {
-//     try {
-//       res.header("Content-Type", "application/json");
-
-//       res.status(200).send({ data: rawLocations });
-//     } catch (err) {
-//       console.log(err);
-//     }
-//   }
-// );
 
 router.get(
   "/api/dev/zipcodes/state/:stateId",
