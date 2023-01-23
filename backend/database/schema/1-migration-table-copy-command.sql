@@ -1,12 +1,15 @@
-/* the order of these commands matter so please do them in order */
+/* The order in which these commands are executed matters
 
-/* 1 migration */
+1 - Copy csv files to your desktop to load data into postqres database
+2 - In the current folder copy city.csv, state.csv, zipcode.csv on your desktop. 
+3 - Change the username in absolute file path below to your username. You should change file path username 3 time in total.
+4 - Open pgAdmin navigate to server -> localhost -> database -> halal-locator -> right click on halal-locator and click query tools.
+5 - Select Query in the new window and copy paste all of the below commands and run them
 
-DATABASE_URL=postgres://areeba-iftikhar@localhost:5432/halal-locator npm run migrate up
+Congratulations your database in populated!!
+*/
 
-/* 2 table value commands */
-
-insert into country (name) values ('USA')
+insert into country (id,name) values (1,'USA');
 
 
 COPY state ( id, name, country_id)
@@ -28,6 +31,23 @@ DELIMITER ',' CSV HEADER;
 
 update zipcode set geolocation=ST_GeographyFromText('POINT('||longitude||' '||latitude||')');
 
+insert into street (id,name, city_id, state_id, zipcode_id, country_id)
+values (1,'2801 Nicollet Ave', 16012,30,19002,1);
+
+insert into street (id,name, city_id, state_id, zipcode_id, country_id)
+values (2,'720 Washington Ave SE', 16012,30,19008,1);
+
+insert into street (id,name, city_id, state_id, zipcode_id, country_id)
+values (3,'1221 W Lake St #106', 16012,30,19002,1);
+
+insert into restaurant (id,name,street_id,state_id,city_id,country_id, zipcode_id,latitude, longitude)
+values (1,'Marhaba Grill',1,30,16012,1,19002 ,44.95195, -93.27738);
+
+insert into restaurant (id,name,street_id,state_id,city_id,country_id, zipcode_id,latitude, longitude)
+values (2,'Afro Deli & Grill',2,30,16012,1,19008 ,44.97368,-93.22749);
+
+insert into restaurant (id,name,street_id,state_id,city_id,country_id, zipcode_id,latitude, longitude)
+values (3,'Darbar India Grill & Bar',3,30,16012,1,19002,44.94831,-93.29501);
 
 /*
 GENERAL COPY COMMAND
