@@ -22,6 +22,7 @@ export const validateUserInput = (data: ValidateUserInput) => {
     backendRestaurantData,
   } = data;
   // return object
+  console.log(data, "insdie validate");
   const validateResult: {
     city?: { id: number; name: string };
     state?: StateDocument;

@@ -142,7 +142,7 @@ export const SearchBar: React.FC<{}> = () => {
     try {
       const queryStringValues = validateUserInput(data);
       const { state, city, zipcode, restaurant } = queryStringValues;
-      console.log(zipcode, "zipcode");
+      console.log(zipcode, city, state, "zipcode");
       // sanity check: throw error if the user has not entered anything but still has clicked submit
       if (!zipcode?.id && !state?.id && !city?.id && !restaurant?.id) {
         setIsEdgeCase(true);

@@ -27,6 +27,16 @@ exports.up = (pgm) => {
     "country_id" integer NOT NULL,
     "created_at" timestamptz NOT NULL DEFAULT (now())
   );
+
+  CREATE TABLE "street" (
+    "id" serial PRIMARY KEY ,
+    "name" varchar NOT NULL,
+    "city_id" integer NOT NULL,
+    "state_id" integer NOT NULL,
+    "zipcode_id" integer NOT NULL,
+    "country_id" integer NOT NULL,
+    "created_at" timestamptz NOT NULL DEFAULT (now())
+  );
   
   CREATE TABLE "zipcode" (
     "id" serial PRIMARY KEY,
@@ -46,10 +56,11 @@ exports.up = (pgm) => {
     "description" varchar,
     "menu_url" varchar,
     "webiste_url" varchar,
+    "street_id" integer NOT NULL,
     "state_id" integer NOT NULL,
     "city_id" integer NOT NULL,
     "country_id" integer NOT NULL,
-    "zipcode" varchar NOT NULL,
+    "zipcode_id" integer NOT NULL,
     "longitude" double precision NOT NULL,
     "latitude" double precision NOT NULL,
     "geolocation" geography(point,4326),
@@ -85,7 +96,7 @@ exports.up = (pgm) => {
 
   CREATE TABLE "foodtag" (
     "id" serial PRIMARY KEY,
-    "name" varchar NOT NULL,
+    "foodtag" varchar NOT NULL,
     "created_at" timestamptz NOT NULL DEFAULT (now())
   );
 
@@ -107,9 +118,18 @@ exports.up = (pgm) => {
     "restaurant_id" integer NOT NULL,
     "image_id" integer NOT NULL,
     "created_at" timestamptz NOT NULL DEFAULT (now()),
-    "updated_at" timestamptz NOT NULL DEFAULT (now())
-    
+    "updated_at" timestamptz NOT NULL DEFAULT (now())   
   );
+
+  ALTER TABLE "street" ADD FOREIGN KEY ("country_id") REFERENCES "country" ("id");
+
+  ALTER TABLE "street" ADD FOREIGN KEY ("city_id") REFERENCES "city" ("id");
+
+  ALTER TABLE "street" ADD FOREIGN KEY ("state_id") REFERENCES "state" ("id");
+
+  ALTER TABLE "street" ADD FOREIGN KEY ("zipcode_id") REFERENCES "zipcode" ("id");
+
+  ALTER TABLE "restaurant" ADD FOREIGN KEY ("street_id") REFERENCES "street" ("id");
 
   ALTER TABLE "restaurant_image" ADD FOREIGN KEY ("restaurant_id") REFERENCES "restaurant" ("id");
 
@@ -132,6 +152,8 @@ exports.up = (pgm) => {
   ALTER TABLE "restaurant" ADD FOREIGN KEY ("city_id") REFERENCES "city" ("id");
   
   ALTER TABLE "restaurant" ADD FOREIGN KEY ("state_id") REFERENCES "state" ("id");
+
+  ALTER TABLE "restaurant" ADD FOREIGN KEY ("zipcode_id") REFERENCES "zipcode" ("id");
   
   ALTER TABLE "restaurant" ADD FOREIGN KEY ("country_id") REFERENCES "country" ("id");
   
@@ -161,5 +183,15 @@ exports.down = (pgm) => {
         DROP TABLE rating CASCADE;
         
         DROP TABLE "user" CASCADE;
+
+        DROP TABLE "image" CASCADE;
+
+        DROP TABLE "foodtag" CASCADE;
+
+        DROP TABLE "restaurant_image" CASCADE;
+
+        DROP TABLE "restaurant_foodtag" CASCADE;
+
+        DROP TABLE "street" CASCADE;
         `);
 };
