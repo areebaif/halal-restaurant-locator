@@ -26,12 +26,9 @@ export interface StateDocument {
   country_id?: number;
 }
 export interface ZipDocument {
-  //city_state: string;
   type: "Feature";
   properties: {
-    //title: string;
     city: string;
-    //state_id: string;
     state: string;
     country: string;
     zipcode: string;
@@ -107,7 +104,6 @@ export const fetchStateAndCitySearch = async (
 ) => {
   if (!stateId || !cityId)
     throw new Error("provide state id and city id to call backend function");
-  console.log(stateId, cityId);
   const url = `/api/dev/state-city/${stateId}/${cityId}`;
   const response = await fetch(url, {
     method: "GET",

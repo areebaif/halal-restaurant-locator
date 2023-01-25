@@ -13,6 +13,23 @@ export interface zipcodeDbRow {
   created_at?: string;
 }
 
+export interface restaurantDbRow {
+  id: number;
+  name: string;
+  description?: string;
+  website_url?: string;
+  menu_url?: string;
+  state_id: number;
+  city_id: number;
+  country_id: number;
+  zipcode_id: string;
+  longitude: number;
+  latitude: number;
+  geography: string /* This is a postqres geography type, not sure how to annotate ot in typescript */;
+  created_at?: string;
+  updated_at?: string;
+}
+
 export interface stateDbRow {
   id: number;
   name: string;
@@ -252,4 +269,54 @@ export class Geolocation {
       },
     };
   };
+
+  // TODO: after getting the restaurant query with image url, you need to do some data manupulateion to store image urls in an array and send to front-end
+  // TODO: for populating data in the search bar just do a slect * from restaurant wiht joins on city, state, geogrpahy and send it to front end
+  // TODO: build functions to send restaurant by state, state and city, by zipcode.
+
+  static getAllRestaurantsbyCountryId = async (
+    db: Pool | undefined,
+    id: number = 1
+  ) => {
+    try {
+      db = await dbPool.connect();
+      const {
+        rows,
+      }: QueryResult<{
+        id: number;
+        name: string;
+        longitude: number;
+        latitude: number;
+        menu_url: string;
+        street: string;
+        city: string;
+        state: string;
+        zipcode: string;
+        country: string;
+      }> = await db.query(
+        `select restaurant.id,restaurant.name,restaurant.longitude, restaurant.latitude ,restaurant.menu_url,street.name as street, city.name as city, state.name as state, zipcode.zipcode as zipcode ,country.name as country
+        from restaurant
+        inner join street
+        on restaurant.street_id=street.id
+        inner join city
+        on restaurant.city_id = city.id
+        inner join state
+        on city.state_id = state.id
+        inner join zipcode
+        on zipcode.id = restaurant.zipcode_id
+        inner join country
+        on state.country_id=country.id
+        where country.id=$1;`,
+        [id]
+      );
+      if (!rows.length)
+        throw new Error(`
+      no state found with country_id ${id}`);
+      return rows;
+    } catch (err) {
+      // TODO: error handling
+      console.log(err);
+    }
+  };
+  // TODO: get url of images aswell fo restaurant
 }

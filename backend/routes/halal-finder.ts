@@ -83,16 +83,34 @@ router.get(
   "/api/dev/getGeography",
   async (req: Request, res: Response, next: NextFunction) => {
     try {
-      // TODO: add restaurantName functionality to this
       const db = req._db;
+      // fetch data from postqres
       const state = await Geolocation.getAllStatebyCountryId(db);
       const city = await Geolocation.getAllCitybyCountryId(db);
       const city_state = await Geolocation.getAllCityAndStatebyCountryId(db);
+      const zipcode = await Geolocation.getAllZipcodebyCountryId(db);
+      const restaurant = await Geolocation.getAllRestaurantsbyCountryId(db);
+
+      // format data to send to front end
       const cityAndState = city_state?.map((item) => {
         return `${item.city}, ${item.state}`;
       });
-      const zipcode = await Geolocation.getAllZipcodebyCountryId(db);
-
+      const restaurantGEOJSON = restaurant?.map((item) => {
+        const geojson = Geolocation.GeoJSONFormat(
+          item.latitude,
+          item.latitude,
+          item.id,
+          {
+            name: item.name,
+            street: item.street,
+            city: item.city,
+            state: item.state,
+            zipcode: item.zipcode,
+            country: item.country,
+          }
+        );
+        return geojson;
+      });
       const zipcodeGEOJSON = zipcode?.map((item) => {
         const geojson = Geolocation.GeoJSONFormat(
           item.latitude,
@@ -105,7 +123,6 @@ router.get(
             country: item.country,
           }
         );
-
         return geojson;
       });
 
@@ -118,6 +135,11 @@ router.get(
         allValues.push(string_value);
       });
 
+      restaurantGEOJSON?.forEach((item) => {
+        const string_value = `${item.properties.name}, ${item.properties.street}, ${item.properties.city}, ${item.properties.state}, ${item.properties.zipcode}`;
+        allValues.push(string_value);
+      });
+
       res.header("Content-Type", "application/json");
       res.status(200).send({
         data: {
@@ -126,8 +148,7 @@ router.get(
           zipSet: zipcodeGEOJSON,
           city_state: cityAndState,
           allValues: allValues,
-          // TODO: fix empty object to actually sending data
-          restaurantSet: [],
+          restaurantSet: restaurantGEOJSON,
         },
       });
     } catch (err) {

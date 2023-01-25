@@ -108,6 +108,7 @@ export const SearchBar: React.FC<{}> = () => {
   }
   // Set local state data if it does not exist
   const data = geoLocationData.data!;
+  console.log(data, "dat");
   if (!autoCompleteData) {
     setAutoCompleteData(data.allValues);
   }
@@ -121,6 +122,7 @@ export const SearchBar: React.FC<{}> = () => {
     setZipData(data.zipSet);
   }
   if (!restaurantData) {
+    //console.log("res", restaurantData);
     setRestaurantData(data.restaurantSet);
   }
 
