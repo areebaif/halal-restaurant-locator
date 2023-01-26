@@ -22,17 +22,25 @@ export const validateUserInput = (data: ValidateUserInput) => {
     backendRestaurantData,
   } = data;
   // return object
-  console.log(data, "insdie validate");
   const validateResult: {
     city?: { id: number; name: string };
     state?: StateDocument;
     zipcode?: { id: number; name: string };
-    restaurant?: { id: number; name: string };
+    restaurant?: {
+      id?: number;
+      name: string;
+      street?: string;
+      city?: string;
+      state?: string;
+      zipcode?: string;
+    };
   } = {};
 
   const trimmedUserInput = userInput?.trim();
   const userInputArray = trimmedUserInput.split(",");
   const userInputArrayLength = userInputArray.length;
+  // TODO: handle restaurant case
+  // it will be either one or 5 length
   try {
     switch (userInputArrayLength) {
       // This is the case when the user is searching by city and state
@@ -72,16 +80,15 @@ export const validateUserInput = (data: ValidateUserInput) => {
         validateResult.city = cityWithZip;
         break;
       case 1:
-        // either state or restaurantName
+        // state
         const value = [userInputArray[0].trim()];
         const onlyState = validInput(value, backendStateData);
-        const restaurant = validInput(value, backendRestaurantData);
         if (onlyState) {
           validateResult.state = onlyState;
         }
-        if (restaurant) {
-          validateResult.restaurant = restaurant;
-        }
+        // if (restaurant) {
+        //   validateResult.restaurant = restaurant;
+        // }
         break;
     }
     return validateResult;

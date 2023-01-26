@@ -285,16 +285,19 @@ export class Geolocation {
       }: QueryResult<{
         id: number;
         name: string;
+        updated_at: string;
+        description: string;
+        menu_url: string;
         longitude: number;
         latitude: number;
-        menu_url: string;
+        website_url: string;
         street: string;
         city: string;
         state: string;
         zipcode: string;
         country: string;
       }> = await db.query(
-        `select restaurant.id,restaurant.name,restaurant.longitude, restaurant.latitude ,restaurant.menu_url,street.name as street, city.name as city, state.name as state, zipcode.zipcode as zipcode ,country.name as country
+        `select restaurant.id,restaurant.name,restaurant.updated_at,restaurant.description, restaurant.menu_url, restaurant.website_url,restaurant.longitude, restaurant.latitude ,restaurant.menu_url,street.name as street, city.name as city, state.name as state, zipcode.zipcode as zipcode ,country.name as country
         from restaurant
         inner join street
         on restaurant.street_id=street.id
@@ -319,4 +322,30 @@ export class Geolocation {
     }
   };
   // TODO: get url of images aswell fo restaurant
+  static getDistinctRestaurantsNamesbyCountryId = async (
+    db: Pool | undefined,
+    id: number = 1
+  ) => {
+    try {
+      db = await dbPool.connect();
+      const {
+        rows,
+      }: QueryResult<{
+        name: string;
+        country_id: number;
+      }> = await db.query(
+        `select distinct name, country_id 
+        from restaurant
+        where country_id=$1`,
+        [id]
+      );
+      if (!rows.length)
+        throw new Error(`
+      no state found with country_id ${id}`);
+      return rows;
+    } catch (err) {
+      // TODO: error handling
+      console.log(err);
+    }
+  };
 }

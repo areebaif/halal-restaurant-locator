@@ -1,5 +1,5 @@
 import * as React from "react";
-import { Autocomplete, Group, Button } from "@mantine/core";
+import { Autocomplete, Group, Button, Text, MantineColor } from "@mantine/core";
 import { useQuery } from "react-query";
 import * as ReactRouter from "react-router-dom";
 
@@ -32,6 +32,29 @@ export const stringConstants = {
   restaurantId: "restaurantId",
   restaurantName: "restaurantName",
 };
+export interface AutoCompleteRefProps {
+  label: string;
+  description?: string;
+  value: string;
+  color: MantineColor;
+}
+
+export interface AutoCompleteData {
+  label: string;
+  description?: string;
+  value: string;
+}
+export const AutoCompleteItem = React.forwardRef<
+  HTMLDivElement,
+  AutoCompleteRefProps
+>(({ description, value, label, ...others }: AutoCompleteRefProps, ref) => (
+  <div ref={ref} {...others}>
+    <Text>{label}</Text>
+    <Text size="xs" color="dimmed">
+      {description}
+    </Text>
+  </div>
+));
 
 export const SearchBar: React.FC<{}> = () => {
   // React Router functions
@@ -84,7 +107,8 @@ export const SearchBar: React.FC<{}> = () => {
   const [zipData, setZipData] = React.useState<ZipDocument[]>();
   const [restaurantData, setRestaurantData] =
     React.useState<RestaurantDocument[]>();
-  const [autoCompleteData, setAutoCompleteData] = React.useState<string[]>();
+  const [autoCompleteData, setAutoCompleteData] =
+    React.useState<AutoCompleteData[]>();
   const [isEdgeCase, setIsEdgeCase] = React.useState(false);
 
   // ReduxToolkit functions
@@ -110,7 +134,9 @@ export const SearchBar: React.FC<{}> = () => {
   const data = geoLocationData.data!;
   console.log(data, "dat");
   if (!autoCompleteData) {
-    setAutoCompleteData(data.allValues);
+    // set value prop for restaurant
+
+    setAutoCompleteData(data.autoCompleteData);
   }
   if (!stateData) {
     setStateData(data.stateSet);
@@ -122,12 +148,12 @@ export const SearchBar: React.FC<{}> = () => {
     setZipData(data.zipSet);
   }
   if (!restaurantData) {
-    //console.log("res", restaurantData);
     setRestaurantData(data.restaurantSet);
   }
 
-  const userInputOnChangeHandler = (value: string) => {
-    setUserInput(value);
+  const userInputOnChangeHandler = (e: any) => {
+    console.log(e, " I am event");
+    setUserInput(e);
   };
 
   const onSubmit = () => {
@@ -243,6 +269,7 @@ export const SearchBar: React.FC<{}> = () => {
           <Group>
             <Autocomplete
               placeholder="Start typing to see options"
+              itemComponent={AutoCompleteItem}
               value={userInput}
               limit={10}
               onChange={userInputOnChangeHandler}
@@ -271,6 +298,7 @@ export const SearchBar: React.FC<{}> = () => {
               <Group>
                 <Autocomplete
                   placeholder="Start typing to see options"
+                  itemComponent={AutoCompleteItem}
                   value={userInput}
                   limit={10}
                   onChange={userInputOnChangeHandler}
@@ -297,6 +325,7 @@ export const SearchBar: React.FC<{}> = () => {
             <Group>
               <Autocomplete
                 placeholder="Start typing to see options"
+                itemComponent={AutoCompleteItem}
                 value={userInput}
                 limit={10}
                 onChange={userInputOnChangeHandler}

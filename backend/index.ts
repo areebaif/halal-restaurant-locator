@@ -28,7 +28,7 @@ const startServer = async () => {
   app.use(async (req, res, next) => {
     // check connection is live before attaching it to request object and sending it.
     // TODO: try catch and retry if connection drops.
-    req._db = await connectDb();
+    req._db = db;
     next();
   });
 

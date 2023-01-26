@@ -1,4 +1,6 @@
 import * as React from "react";
+//import { useState } from 'react';
+import { Select } from "@mantine/core";
 import { QueryClient, QueryClientProvider, useQuery } from "react-query";
 import { HeaderAction, HeaderActionProps } from "./components/header";
 import { Routes, Route } from "react-router-dom";
@@ -35,6 +37,30 @@ const queryClient = new QueryClient({
     },
   },
 });
+
+// export const Test: React.FC<{}> = () => {
+//   const [data, setData] = React.useState([
+//     { value: "react", label: "React" },
+//     { value: "ng", label: "Angular" },
+//   ]);
+
+//   return (
+//     <Select
+//       label="Creatable Select"
+//       data={data}
+//       placeholder="Select items"
+//       nothingFound="Nothing found"
+//       searchable
+//       creatable
+//       getCreateLabel={(query) => `+ Create ${query}`}
+//       onCreate={(query) => {
+//         const item = { value: query, label: query };
+//         setData((current) => [...current, item]);
+//         return item;
+//       }}
+//     />
+//   );
+// };
 
 function App() {
   return (

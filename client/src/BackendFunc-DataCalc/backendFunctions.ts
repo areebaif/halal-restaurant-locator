@@ -1,16 +1,24 @@
 // TODO: extratc out main function put it here
 
 export interface RestaurantDocument {
+  type: "Feature";
+  properties: {
+    name: string;
+    description?: string;
+    menu_url?: string;
+    updated_at: string;
+    website_url?: string;
+    street: string;
+    city: string;
+    state: string;
+    country: string;
+    zipcode: string;
+  };
   id: number;
-  name: string;
-  state: string;
-  city: string;
-  country: string;
-  zipcode: string;
-  longitude: number;
-  latitude: number;
-  // geolocation: [longitude,latitude]
-  geolocation: [number, number];
+  geometry: {
+    coordinates: [number, number];
+    type: "Point";
+  };
 }
 
 export interface CityDocument {
@@ -45,7 +53,7 @@ export interface FetchAutomplete {
   stateSet: StateDocument[];
   zipSet: ZipDocument[];
   city_state: string[];
-  allValues: string[];
+  autoCompleteData: { value: string; label: string; description?: string }[];
   restaurantSet: RestaurantDocument[];
 }
 

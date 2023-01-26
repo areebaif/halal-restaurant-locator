@@ -55,7 +55,7 @@ exports.up = (pgm) => {
     "name" varchar NOT NULL,
     "description" varchar,
     "menu_url" varchar,
-    "webiste_url" varchar,
+    "website_url" varchar,
     "street_id" integer NOT NULL,
     "state_id" integer NOT NULL,
     "city_id" integer NOT NULL,

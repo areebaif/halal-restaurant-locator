@@ -90,25 +90,43 @@ router.get(
       const city_state = await Geolocation.getAllCityAndStatebyCountryId(db);
       const zipcode = await Geolocation.getAllZipcodebyCountryId(db);
       const restaurant = await Geolocation.getAllRestaurantsbyCountryId(db);
+      // distinct restaurant names
+      const distinctRestaurantNames =
+        await Geolocation.getDistinctRestaurantsNamesbyCountryId(db);
 
       // format data to send to front end
+
       const cityAndState = city_state?.map((item) => {
         return `${item.city}, ${item.state}`;
       });
       const restaurantGEOJSON = restaurant?.map((item) => {
-        const geojson = Geolocation.GeoJSONFormat(
-          item.latitude,
-          item.latitude,
-          item.id,
-          {
-            name: item.name,
-            street: item.street,
-            city: item.city,
-            state: item.state,
-            zipcode: item.zipcode,
-            country: item.country,
-          }
-        );
+        const {
+          name,
+          updated_at,
+          description,
+          menu_url,
+          website_url,
+          street,
+          city,
+          state,
+          zipcode,
+          country,
+          latitude,
+          longitude,
+          id,
+        } = item;
+        const geojson = Geolocation.GeoJSONFormat(latitude, longitude, id, {
+          name,
+          updated_at,
+          description,
+          menu_url,
+          website_url,
+          street,
+          city,
+          state,
+          zipcode,
+          country,
+        });
         return geojson;
       });
       const zipcodeGEOJSON = zipcode?.map((item) => {
@@ -126,19 +144,41 @@ router.get(
         return geojson;
       });
 
-      const allValues: string[] = [];
-      cityAndState?.forEach((item) => {
-        allValues.push(item);
+      const allValuesObj: {
+        value: string;
+        label: string;
+        description?: string;
+      }[] = [];
+
+      distinctRestaurantNames?.forEach((item) => {
+        const label = `${item.name}`;
+        const value = `${item.name}`;
+        const description = `see locations`;
+        allValuesObj.push({ value, label, description });
       });
+
+      cityAndState?.forEach((item) => {
+        allValuesObj.push({ value: item, label: item });
+      });
+
       zipcodeGEOJSON?.forEach((item) => {
         const string_value = `${item.properties.city}, ${item.properties.state}, ${item.properties.zipcode}`;
-        allValues.push(string_value);
+        allValuesObj.push({ value: string_value, label: string_value });
       });
 
       restaurantGEOJSON?.forEach((item) => {
-        const string_value = `${item.properties.name}, ${item.properties.street}, ${item.properties.city}, ${item.properties.state}, ${item.properties.zipcode}`;
-        allValues.push(string_value);
+        const string_value = `${item.properties.street}, ${item.properties.city}, ${item.properties.state}, ${item.properties.zipcode}`;
+        allValuesObj.push({
+          value: `${item.properties.name}, ${item.properties.street}, ${item.properties.city}, ${item.properties.state}, ${item.properties.zipcode}`,
+          label: `${item.properties.name}`,
+          description: string_value,
+        });
       });
+
+      const autoCompleteData = allValuesObj.map((item) => ({
+        ...item,
+        value: item.value,
+      }));
 
       res.header("Content-Type", "application/json");
       res.status(200).send({
@@ -147,8 +187,8 @@ router.get(
           stateSet: state,
           zipSet: zipcodeGEOJSON,
           city_state: cityAndState,
-          allValues: allValues,
           restaurantSet: restaurantGEOJSON,
+          autoCompleteData: autoCompleteData,
         },
       });
     } catch (err) {
