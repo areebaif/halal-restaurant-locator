@@ -10,6 +10,8 @@ import {
   RestaurantDocument,
   CityDocument,
   StateDocument,
+  streetDocument,
+  DistinctRestaurantNames,
 } from "../../BackendFunc-DataCalc/backendFunctions";
 import { useAppDispatch, useAppSelector } from "../../redux-store/redux-hooks";
 import { setIsOpenListGeolocationCard } from "../../redux-store/geolocation-slice";
@@ -31,6 +33,8 @@ export const stringConstants = {
   zipcodeName: "zipcodeName",
   restaurantId: "restaurantId",
   restaurantName: "restaurantName",
+  streetId: "streetId",
+  streetName: "streetName",
 };
 export interface AutoCompleteRefProps {
   label: string;
@@ -81,13 +85,20 @@ export const SearchBar: React.FC<{}> = () => {
     name: queryParams.get(stringConstants.restaurantName),
   };
 
+  const street = {
+    id: queryParams.get(stringConstants.streetId),
+    name: queryParams.get(stringConstants.streetName),
+  };
+
   // state functions
   const [userInput, setUserInput] = React.useState<string>(
     `${
       restaurant.name
-        ? `${restaurant.name}${city.name ? `, ${city.name}` : ""}${
-            state.name ? `, ${state.name}` : ""
-          }${zipcode.name ? `, ${zipcode.name}` : ""}`
+        ? `${restaurant.name}${street.name ? `, ${street.name}` : ""}${
+            city.name ? `, ${city.name}` : ""
+          }${state.name ? `, ${state.name}` : ""}${
+            zipcode.name ? `, ${zipcode.name}` : ""
+          }`
         : `${city.name ? city.name : ""}${
             state.name && city.name
               ? `, ${state.name}`
@@ -107,6 +118,9 @@ export const SearchBar: React.FC<{}> = () => {
   const [zipData, setZipData] = React.useState<ZipDocument[]>();
   const [restaurantData, setRestaurantData] =
     React.useState<RestaurantDocument[]>();
+  const [streetData, setStreetData] = React.useState<streetDocument[]>();
+  const [distinctRestaurantNames, setDistinctRestaurantNames] =
+    React.useState<DistinctRestaurantNames[]>();
   const [autoCompleteData, setAutoCompleteData] =
     React.useState<AutoCompleteData[]>();
   const [isEdgeCase, setIsEdgeCase] = React.useState(false);
@@ -132,10 +146,7 @@ export const SearchBar: React.FC<{}> = () => {
   }
   // Set local state data if it does not exist
   const data = geoLocationData.data!;
-  console.log(data, "dat");
   if (!autoCompleteData) {
-    // set value prop for restaurant
-
     setAutoCompleteData(data.autoCompleteData);
   }
   if (!stateData) {
@@ -150,6 +161,12 @@ export const SearchBar: React.FC<{}> = () => {
   if (!restaurantData) {
     setRestaurantData(data.restaurantSet);
   }
+  if (!streetData) {
+    setStreetData(data.street);
+  }
+  if (!distinctRestaurantNames) {
+    setDistinctRestaurantNames(data.distinctRestaurantNames);
+  }
 
   const userInputOnChangeHandler = (e: any) => {
     console.log(e, " I am event");
@@ -159,62 +176,70 @@ export const SearchBar: React.FC<{}> = () => {
   const onSubmit = () => {
     dispatch(setIsOpenListGeolocationCard(false));
     setIsEdgeCase(false);
-
     const data = {
       userInput,
       backendCityData: cityData!,
       backendStateData: stateData!,
       backendZipData: zipData!,
       backendRestaurantData: restaurantData!,
+      streetData: streetData!,
+      distinctRestaurantNames: distinctRestaurantNames!,
     };
     try {
       const queryStringValues = validateUserInput(data);
-      const { state, city, zipcode, restaurant } = queryStringValues;
-      console.log(zipcode, city, state, "zipcode");
+      const { state, city, zipcode, restaurant, street } = queryStringValues;
+      console.log(zipcode, city, state, street, "zipcode", restaurant);
       // sanity check: throw error if the user has not entered anything but still has clicked submit
-      if (!zipcode?.id && !state?.id && !city?.id && !restaurant?.id) {
+      if (
+        !zipcode?.id &&
+        !state?.id &&
+        !city?.id &&
+        !restaurant?.id &&
+        !street?.id
+      ) {
         setIsEdgeCase(true);
       }
-
-      // check which combination of inputs the user has entered to set query parameters and navigate
       switch (true) {
+        // case Boolean(restaurant?.id) &&
+        //   Boolean(zipcode?.id) &&
+        //   Boolean(!state?.id) &&
+        //   Boolean(!city?.id):
+        //   console.log(" at restaurant zipcode no state");
+        //   navigate(
+        //     `/search-display?${stringConstants.zipcodeId}=${zipcode?.id}&${stringConstants.zipcodeName}=${zipcode?.name}&${stringConstants.restaurantId}=${restaurant?.id}&${stringConstants.restaurantName}=${restaurant?.name}`
+        //   );
+        //   break;
+        // //restaurantName, state
+        // case Boolean(restaurant?.id) &&
+        //   Boolean(state?.id) &&
+        //   Boolean(!zipcode?.id) &&
+        //   Boolean(!city?.id):
+        //   console.log("restaurant, state, no zip");
+        //   navigate(
+        //     `/search-display?${stringConstants.stateId}=${state?.id}&${stringConstants.stateName}=${state?.name}&${stringConstants.restaurantId}=${restaurant?.id}&${stringConstants.restaurantName}=${restaurant?.name}`
+        //   );
+        //   break;
+        // //restaurant,street, city, state, zipcode
         case Boolean(restaurant?.id) &&
-          Boolean(zipcode?.id) &&
-          Boolean(!state?.id) &&
-          Boolean(!city?.id):
-          console.log(" at restaurant zipcode no state");
-          navigate(
-            `/search-display?${stringConstants.zipcodeId}=${zipcode?.id}&${stringConstants.zipcodeName}=${zipcode?.name}&${stringConstants.restaurantId}=${restaurant?.id}&${stringConstants.restaurantName}=${restaurant?.name}`
-          );
-          break;
-        //restaurantName, state
-        case Boolean(restaurant?.id) &&
-          Boolean(state?.id) &&
-          Boolean(!zipcode?.id) &&
-          Boolean(!city?.id):
-          console.log("restaurant, state, no zip");
-          navigate(
-            `/search-display?${stringConstants.stateId}=${state?.id}&${stringConstants.stateName}=${state?.name}&${stringConstants.restaurantId}=${restaurant?.id}&${stringConstants.restaurantName}=${restaurant?.name}`
-          );
-          break;
-        //restaurant, state, city
-        case Boolean(restaurant?.id) &&
+          Boolean(street?.id) &&
           Boolean(state?.id) &&
           Boolean(city?.id) &&
-          Boolean(!zipcode?.id):
-          console.log("restaurant,state,city,nozip");
+          Boolean(zipcode?.id):
+          console.log("restaurant,street,state,city,zip");
           navigate(
-            `/search-display?${stringConstants.stateId}=${state?.id}&${stringConstants.stateName}=${state?.name}&${stringConstants.cityId}=${city?.id}&${stringConstants.cityName}=${city?.name}&${stringConstants.restaurantId}=${restaurant?.id}&${stringConstants.restaurantName}=${restaurant?.name}`
+            `/search-display?${stringConstants.restaurantId}=${restaurant?.id}&${stringConstants.restaurantName}=${restaurant?.name}&${stringConstants.streetId}=${street?.id}&${stringConstants.streetName}=${street?.name}&${stringConstants.cityId}=${city?.id}&${stringConstants.cityName}=${city?.name}&${stringConstants.stateId}=${state?.id}&${stringConstants.stateName}=${state?.name}&${stringConstants.zipcodeId}=${zipcode?.id}&${stringConstants.zipcodeName}=${zipcode?.name}`
           );
           break;
-        //restaurantName
-        case Boolean(restaurant?.id) &&
+        // only restaurant
+        // TODO: fix query params
+        case Boolean(restaurant?.name) &&
           Boolean(!state?.id) &&
           Boolean(!city?.id) &&
-          Boolean(!zipcode?.id):
+          Boolean(!zipcode?.id) &&
+          Boolean(!street?.id):
           console.log("only restaurant");
           navigate(
-            `/search-display?${stringConstants.stateId}=${stringConstants.restaurantId}=${restaurant?.id}&${stringConstants.restaurantName}=${restaurant?.name}`
+            `/search-display?${stringConstants.restaurantName}=${restaurant?.name}`
           );
           break;
         // zipcode

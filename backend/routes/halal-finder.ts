@@ -94,6 +94,8 @@ router.get(
       const distinctRestaurantNames =
         await Geolocation.getDistinctRestaurantsNamesbyCountryId(db);
 
+      const street = await Geolocation.getStreetNamesbyCountryId(db);
+
       // format data to send to front end
 
       const cityAndState = city_state?.map((item) => {
@@ -175,10 +177,10 @@ router.get(
         });
       });
 
-      const autoCompleteData = allValuesObj.map((item) => ({
-        ...item,
-        value: item.value,
-      }));
+      // const autoCompleteData = allValuesObj.map((item) => ({
+      //   ...item,
+      //   value: item.value,
+      // }));
 
       res.header("Content-Type", "application/json");
       res.status(200).send({
@@ -188,7 +190,9 @@ router.get(
           zipSet: zipcodeGEOJSON,
           city_state: cityAndState,
           restaurantSet: restaurantGEOJSON,
-          autoCompleteData: autoCompleteData,
+          autoCompleteData: allValuesObj,
+          distinctRestaurantNames,
+          street,
         },
       });
     } catch (err) {

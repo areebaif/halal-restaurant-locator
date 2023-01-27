@@ -48,6 +48,21 @@ export interface ZipDocument {
   };
 }
 
+export interface streetDocument {
+  id: number;
+  state_id: number;
+  city_id: number;
+  zipcode_id: number;
+  country_id: number;
+  name: string;
+  created_at?: string;
+}
+
+export interface DistinctRestaurantNames {
+  name: string;
+  country_id: number;
+}
+
 export interface FetchAutomplete {
   citySet: CityDocument[];
   stateSet: StateDocument[];
@@ -55,6 +70,8 @@ export interface FetchAutomplete {
   city_state: string[];
   autoCompleteData: { value: string; label: string; description?: string }[];
   restaurantSet: RestaurantDocument[];
+  distinctRestaurantNames: DistinctRestaurantNames[];
+  street: streetDocument[];
 }
 
 export const fetchAutoCompleteData = async () => {

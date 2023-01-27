@@ -13,6 +13,16 @@ export interface zipcodeDbRow {
   created_at?: string;
 }
 
+export interface streetDbRow {
+  id: number;
+  state_id: number;
+  city_id: number;
+  zipcode_id: number;
+  country_id: number;
+  name: string;
+  created_at?: string;
+}
+
 export interface restaurantDbRow {
   id: number;
   name: string;
@@ -342,6 +352,26 @@ export class Geolocation {
       if (!rows.length)
         throw new Error(`
       no state found with country_id ${id}`);
+      return rows;
+    } catch (err) {
+      // TODO: error handling
+      console.log(err);
+    }
+  };
+
+  static getStreetNamesbyCountryId = async (
+    db: Pool | undefined,
+    id: number = 1
+  ) => {
+    try {
+      db = await dbPool.connect();
+      const { rows }: QueryResult<streetDbRow> = await db.query(
+        `select * from street where country_id=$1`,
+        [id]
+      );
+      if (!rows.length)
+        throw new Error(`
+      no street found with country_id ${id}`);
       return rows;
     } catch (err) {
       // TODO: error handling

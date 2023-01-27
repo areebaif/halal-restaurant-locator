@@ -78,6 +78,11 @@ export const MapBoxMap: React.FC = () => {
     id: queryParams.get(stringConstants.restaurantId),
     name: queryParams.get(stringConstants.restaurantName),
   };
+  const street = {
+    id: queryParams.get(stringConstants.streetId),
+    name: queryParams.get(stringConstants.streetName),
+  };
+  console.log(street, restaurant);
   const zipCodeSearchResult = useQuery(
     ["fetchZipCodeSearch", zipcode.id],
     () => fetchZipSearch(zipcode.id),
