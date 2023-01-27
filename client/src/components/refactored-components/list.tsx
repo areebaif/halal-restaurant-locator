@@ -34,7 +34,22 @@ export const ResultList: React.FC = () => {
   const { MapA } = useMap();
 
   const onMouseEnter = (data: ActiveGeolocation) => {
-    const { latitude, longitude, title, description, index } = data;
+    const {
+      latitude,
+      longitude,
+      title,
+      description,
+      index,
+      updated_at,
+      image_url,
+      menu_url,
+      website_url,
+      street,
+      city,
+      state,
+      zipcode,
+      country,
+    } = data;
     if (hoverId) {
       MapA?.setFeatureState(
         { source: dataSourceId, id: hoverId },
@@ -51,6 +66,15 @@ export const ResultList: React.FC = () => {
         title: title,
         description: description,
         index: index,
+        updated_at,
+        image_url,
+        menu_url,
+        website_url,
+        street,
+        city,
+        state,
+        zipcode,
+        country,
       })
     );
     // TODO: decide if I want to open this on the map
@@ -71,6 +95,15 @@ export const ResultList: React.FC = () => {
           title: "",
           description: "",
           index: undefined,
+          updated_at: "",
+          image_url: [],
+          menu_url: "",
+          website_url: "",
+          street: "",
+          city: "",
+          state: "",
+          zipcode: "",
+          country: "",
         })
       );
     }
@@ -90,6 +123,15 @@ export const ResultList: React.FC = () => {
         title: "",
         description: "",
         index: undefined,
+        updated_at: "",
+        image_url: [],
+        menu_url: "",
+        website_url: "",
+        street: "",
+        city: "",
+        state: "",
+        zipcode: "",
+        country: "",
       })
     );
   };
@@ -107,7 +149,20 @@ export const ResultList: React.FC = () => {
             const coordinatesObject = item.geometry as GeoJSON.Point;
             const [longitude, latitude] = coordinatesObject.coordinates;
             const { properties } = item;
-            //console.log(properties);
+            const {
+              title,
+              updated_at,
+              description,
+              image_url,
+              menu_url,
+              website_url,
+              street,
+              city,
+              state,
+              zipcode,
+              country,
+            } = properties;
+
             const id = item.id;
 
             return (
@@ -117,8 +172,17 @@ export const ResultList: React.FC = () => {
                     latitude: latitude,
                     longitude: longitude,
                     index: id,
-                    title: "test",
-                    description: "dontknow",
+                    title,
+                    description,
+                    updated_at,
+                    image_url,
+                    menu_url,
+                    website_url,
+                    street,
+                    city,
+                    state,
+                    zipcode,
+                    country,
                   });
                 }}
                 onClick={() => {
@@ -129,7 +193,11 @@ export const ResultList: React.FC = () => {
                 }}
                 key={item.id}
               >
-                {item.properties?.title}
+                <Text>
+                  {title} {street} {city} {state} {zipcode}{" "}
+                </Text>
+                image_url: {image_url}, menu_url: {menu_url}, website_url:{" "}
+                {website_url}{" "}
               </List.Item>
             );
           })}
@@ -148,7 +216,10 @@ export const ResultList: React.FC = () => {
       <Popover.Target>{list}</Popover.Target>
       <Popover.Dropdown>
         <CloseButton onClick={() => onCloseClick()} aria-label="Close modal" />
-        <Text>{mapGeoLocationCardData.index}</Text>
+        <Text>
+          title: {mapGeoLocationCardData.title} {mapGeoLocationCardData.street}{" "}
+          image_url: {mapGeoLocationCardData.image_url}
+        </Text>
       </Popover.Dropdown>
     </Popover>
   );

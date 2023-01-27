@@ -4,6 +4,7 @@ export interface RestaurantDocument {
   type: "Feature";
   properties: {
     name: string;
+    image_url?: string[];
     description?: string;
     menu_url?: string;
     updated_at: string;
@@ -104,6 +105,29 @@ export const fetchZipSearch = async (zipcodeUserInput: string | null) => {
   return data.data;
 };
 
+export const fetchRestaurantNameSearch = async (
+  restaurantName: string | null
+) => {
+  if (!restaurantName) throw new Error("provide zipcode value");
+  const response = await fetch(`/api/restaurant/${restaurantName}`, {
+    method: "GET",
+    headers: {
+      "Content-Type": "application/json",
+    },
+  });
+
+  if (!response.ok) {
+    throw new Error("Network response was not ok");
+  }
+  const data: {
+    data: GeoJSON.FeatureCollection<
+      GeoJSON.Geometry,
+      RestaurantDocument
+    >["features"];
+  } = await response.json();
+  return data.data;
+};
+
 export const fetchStateSearch = async (stateId: string | null) => {
   if (!stateId) throw new Error("provide state id to call backend function");
   const url = `/api/dev/zipcodes/state/${stateId}`;
@@ -144,24 +168,5 @@ export const fetchStateAndCitySearch = async (
     data: GeoJSON.FeatureCollection<GeoJSON.Geometry, any>["features"];
   } = await response.json();
   console.log("data inside func", data);
-  return data.data;
-};
-
-// TODO: fix this function
-export const fetchRestaurantNameSearch = async (name: string) => {
-  const url = `/api/dev/restaurant/${name}`;
-  const response = await fetch(`/api/dev/restaurant/${name}`, {
-    method: "GET",
-    headers: {
-      "Content-Type": "application/json",
-    },
-  });
-
-  if (!response.ok) {
-    throw new Error("Network response was not ok");
-  }
-  const data: {
-    data: GeoJSON.FeatureCollection<GeoJSON.Geometry, any>["features"];
-  } = await response.json();
   return data.data;
 };

@@ -7,6 +7,15 @@ export interface ActiveGeolocation {
   title: string;
   description: string;
   index: number | undefined | string;
+  updated_at: string;
+  image_url: string[];
+  menu_url: string;
+  website_url: string;
+  street: string;
+  city: string;
+  state: string;
+  zipcode: string;
+  country: string;
 }
 
 export interface MapCameraView {
@@ -41,6 +50,15 @@ const initialState: Map = {
     title: "",
     description: "",
     index: undefined,
+    updated_at: "",
+    image_url: [],
+    menu_url: "",
+    website_url: "",
+    street: "",
+    city: "",
+    state: "",
+    zipcode: "",
+    country: "",
   },
   //mapCameraView: undefined,
   isOpenMapGeolocationCard: false,

@@ -22,10 +22,38 @@ interface locationDocument {
   geometry: { coordinates: [number, number]; type: "Point" };
 }
 
+interface FormattedRestaurant {
+  id: number;
+  name: string;
+  updated_at: string;
+  description: string;
+  image_url: string[];
+  menu_url: string;
+  longitude: number;
+  latitude: number;
+  website_url: string;
+  street: string;
+  city: string;
+  state: string;
+  zipcode: string;
+  country: string;
+}
+
 const router = express.Router();
 
 // TODO: api-documentation
 // TODO: error handling
+
+// /***************** */ VERY IMPORTANT TODO: *///////////////////////////
+// Bug or potential bug fixing
+// TODO: if we adding restaurants to the system, then there might be a case where or city is not in database at that point i guess add city street to database
+// coon rapids is not a thing in our database but it exists
+
+// TODO: some wierd format for fdate is coming from sql convert date to proper thing iin sql when querying database
+
+// TODO: improvements
+// 1) Do promise.all in one endpoint
+// 2) make GeoJSOn format function take an array with a certain interface
 
 router.get("/api/dev/client-keys", async (req, res, next) => {
   try {
@@ -66,10 +94,8 @@ router.get(
             country_id: item.country_id,
           }
         );
-
         return geojson;
       });
-
       res.status(200).send({
         data: zipcodeGeoJSON,
       });
@@ -85,6 +111,7 @@ router.get(
     try {
       const db = req._db;
       // fetch data from postqres
+      // TODO: put this in a promise.all
       const state = await Geolocation.getAllStatebyCountryId(db);
       const city = await Geolocation.getAllCitybyCountryId(db);
       const city_state = await Geolocation.getAllCityAndStatebyCountryId(db);
@@ -97,7 +124,6 @@ router.get(
       const street = await Geolocation.getStreetNamesbyCountryId(db);
 
       // format data to send to front end
-
       const cityAndState = city_state?.map((item) => {
         return `${item.city}, ${item.state}`;
       });
@@ -176,11 +202,6 @@ router.get(
           description: string_value,
         });
       });
-
-      // const autoCompleteData = allValuesObj.map((item) => ({
-      //   ...item,
-      //   value: item.value,
-      // }));
 
       res.header("Content-Type", "application/json");
       res.status(200).send({
@@ -274,31 +295,100 @@ router.get(
 );
 
 router.get(
-  "/api/dev/:restaurantname",
+  "/api/restaurant/:restaurantname",
   async (req: Request, res: Response, next: NextFunction) => {
     try {
-      // TODO: do postqres sql function
       console.log("restaurantname");
-      // TODO: fix this to be restaurant id
       const { restaurantname } = req.params;
-      //const zipCode: string = req.body;
-      const allRawData: {
-        features: locationDocument[];
-        type: "FeatureCollection";
-      } = JSON.parse(JSON.stringify(rawLocations));
+      const db = req._db;
+      console.log(" I am here");
+      const restaurant = await Geolocation.getRestaurantsbyNameAndCountryId(
+        db,
+        restaurantname
+      );
 
-      const titleSet = allRawData.features.filter((item) => {
-        const properties = item.properties;
-        if (properties.title === restaurantname) {
-          return {
-            ...item,
-            city_state: `${properties.city}, ${properties.state}`,
-          };
+      const formatRestaurant: FormattedRestaurant[] = [];
+      let lastRestaurantId = 0;
+      restaurant?.forEach((item) => {
+        const {
+          id,
+          name,
+          updated_at,
+          image_url,
+          description,
+          menu_url,
+          website_url,
+          longitude,
+          latitude,
+          street,
+          city,
+          state,
+          zipcode,
+          country,
+        } = item;
+        if (id === lastRestaurantId) {
+          formatRestaurant[formatRestaurant.length - 1].image_url.push(
+            image_url
+          );
+        }
+        if (id !== lastRestaurantId) {
+          lastRestaurantId = id;
+          formatRestaurant.push({
+            id,
+            name,
+            updated_at,
+            image_url: [image_url],
+            description,
+            menu_url,
+            website_url,
+            longitude,
+            latitude,
+            street,
+            city,
+            state,
+            zipcode,
+            country,
+          });
         }
       });
 
+      const geojsonrestaurant = formatRestaurant.map((item) => {
+        const {
+          id,
+          name,
+          updated_at,
+          image_url,
+          description,
+          menu_url,
+          website_url,
+          longitude,
+          latitude,
+          street,
+          city,
+          state,
+          zipcode,
+          country,
+        } = item;
+        const geojson = Geolocation.GeoJSONFormat(latitude, longitude, id, {
+          name,
+          title: name,
+          updated_at,
+          description,
+          image_url,
+          menu_url,
+          website_url,
+          street,
+          city,
+          state,
+          zipcode,
+          country,
+        });
+
+        return geojson;
+      });
+
       res.status(200).send({
-        data: titleSet,
+        data: geojsonrestaurant,
       });
     } catch (err) {
       console.log(err);

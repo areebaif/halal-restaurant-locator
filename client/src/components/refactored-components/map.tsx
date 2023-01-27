@@ -9,6 +9,8 @@ import { calcBoundsFromCoordinates } from "../../BackendFunc-DataCalc/mapBound-c
 import {
   fetchStateSearch,
   fetchStateAndCitySearch,
+  fetchRestaurantNameSearch,
+  RestaurantDocument,
 } from "../../BackendFunc-DataCalc/backendFunctions";
 import { stringConstants } from "./SearchBar";
 
@@ -82,7 +84,36 @@ export const MapBoxMap: React.FC = () => {
     id: queryParams.get(stringConstants.streetId),
     name: queryParams.get(stringConstants.streetName),
   };
-  console.log(street, restaurant);
+
+  // TODO: build functions to fetch restaurants with street and only restaurantsname
+
+  const restaurantNameSearchResult = useQuery(
+    ["fetchRestaurantNameSearch", zipcode.id],
+    () => fetchRestaurantNameSearch(restaurant.name),
+    {
+      enabled:
+        Boolean(restaurant.name) &&
+        Boolean(!zipcode?.id) &&
+        Boolean(!state?.id) &&
+        Boolean(!city?.id) &&
+        Boolean(!restaurant?.id),
+      onSuccess: (data) => {
+        const mapLocations: GeoJSON.FeatureCollection<
+          GeoJSON.Geometry,
+          RestaurantDocument
+        > = {
+          type: "FeatureCollection",
+          features: data?.length ? data : [],
+        };
+        dispatch(setAllGoelocationData(mapLocations));
+        dispatch(setRefreshMapData(true));
+      },
+      onError: (error) => {
+        //TODO: error handling
+        console.log("react query data fetching error", error);
+      },
+    }
+  );
   const zipCodeSearchResult = useQuery(
     ["fetchZipCodeSearch", zipcode.id],
     () => fetchZipSearch(zipcode.id),
@@ -219,6 +250,7 @@ export const MapBoxMap: React.FC = () => {
       const coordinatesObject = e.features[0].geometry as GeoJSON.Point;
       const coordinates = coordinatesObject.coordinates.slice();
       const description = e.features[0].properties;
+      console.log(description, "I am description");
       const id = e.features[0].id;
       dispatch(setHoverId(id));
       mapRef.current.setFeatureState(
@@ -229,9 +261,18 @@ export const MapBoxMap: React.FC = () => {
         setMapGeolocationCardData({
           latitude: coordinates[1],
           longitude: coordinates[0],
-          title: `${description?.state} ${description?.zipcode}`,
-          description: `${description?.city}${description?.zipcode}`,
+          title: `${description?.title}`,
+          description: `${description?.description}`,
           index: id,
+          updated_at: `${description?.updated_at}`,
+          image_url: description?.image_url,
+          menu_url: `${description?.menu_url}`,
+          website_url: `${description?.website_url}`,
+          street: `${description?.street}`,
+          city: `${description?.city}`,
+          state: `${description?.state}`,
+          zipcode: `${description?.zipcode}`,
+          country: `${description?.country}`,
         })
       );
 
@@ -254,6 +295,15 @@ export const MapBoxMap: React.FC = () => {
         title: "",
         description: "",
         index: undefined,
+        updated_at: "",
+        image_url: [],
+        menu_url: "",
+        website_url: "",
+        street: "",
+        city: "",
+        state: "",
+        zipcode: "",
+        country: "",
       })
     );
   };
@@ -327,8 +377,18 @@ export const MapBoxMap: React.FC = () => {
                 onClick={() => onMouseLeavePopup()}
                 aria-label="Close modal"
               />
-              {mapGeoLocationCardData.index} {mapGeoLocationCardData.title}
-              {mapGeoLocationCardData.description}
+              <Text>
+                {mapGeoLocationCardData.title} {mapGeoLocationCardData.street}{" "}
+                {mapGeoLocationCardData.city} {mapGeoLocationCardData.state}{" "}
+                {mapGeoLocationCardData.zipcode}{" "}
+              </Text>
+              <Text>
+                description {mapGeoLocationCardData.description} updated_at:{" "}
+                {mapGeoLocationCardData.updated_at}
+              </Text>
+              image_url: {mapGeoLocationCardData.image_url}, menu_url:{" "}
+              {mapGeoLocationCardData.menu_url}, website_url:{" "}
+              {mapGeoLocationCardData.website_url}{" "}
             </Box>
           </Popup>
         )}
