@@ -396,4 +396,100 @@ router.get(
   }
 );
 
+router.get(
+  "/api/restaurantId/:restaurantId",
+  async (req: Request, res: Response, next: NextFunction) => {
+    try {
+      const { restaurantId } = req.params;
+      const db = req._db;
+      console.log(" I am here");
+      const restaurant = await Geolocation.getRestaurantsbyIdAndCountryId(
+        db,
+        parseInt(restaurantId)
+      );
+
+      const formatRestaurant: FormattedRestaurant[] = [];
+      restaurant?.forEach((item, index) => {
+        const {
+          id,
+          name,
+          updated_at,
+          image_url,
+          description,
+          menu_url,
+          website_url,
+          longitude,
+          latitude,
+          street,
+          city,
+          state,
+          zipcode,
+          country,
+        } = item;
+
+        if (index === 0) {
+          formatRestaurant.push({
+            id,
+            name,
+            updated_at,
+            image_url: [image_url],
+            description,
+            menu_url,
+            website_url,
+            longitude,
+            latitude,
+            street,
+            city,
+            state,
+            zipcode,
+            country,
+          });
+        }
+        formatRestaurant[0].image_url.push(image_url);
+      });
+
+      const geojsonrestaurant = formatRestaurant.map((item) => {
+        const {
+          id,
+          name,
+          updated_at,
+          image_url,
+          description,
+          menu_url,
+          website_url,
+          longitude,
+          latitude,
+          street,
+          city,
+          state,
+          zipcode,
+          country,
+        } = item;
+        const geojson = Geolocation.GeoJSONFormat(latitude, longitude, id, {
+          name,
+          title: name,
+          updated_at,
+          description,
+          image_url,
+          menu_url,
+          website_url,
+          street,
+          city,
+          state,
+          zipcode,
+          country,
+        });
+
+        return geojson;
+      });
+
+      res.status(200).send({
+        data: geojsonrestaurant,
+      });
+    } catch (err) {
+      console.log(err);
+    }
+  }
+);
+
 export { router as halalFinderRouter };

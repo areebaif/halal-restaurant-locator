@@ -18,11 +18,11 @@ export interface ActiveGeolocation {
   country: string;
 }
 
-export interface MapCameraView {
-  latitude: number;
-  longitude: number;
-  zoom?: number;
-}
+// export interface MapCameraView {
+//   latitude: number;
+//   longitude: number;
+//   zoom?: number;
+// }
 
 export interface Map {
   dataSourceId: string;

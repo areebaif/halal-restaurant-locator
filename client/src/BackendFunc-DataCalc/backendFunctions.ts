@@ -128,6 +128,27 @@ export const fetchRestaurantNameSearch = async (
   return data.data;
 };
 
+export const fetchRestaurantIdSearch = async (restaurantId: string | null) => {
+  if (!restaurantId) throw new Error("provide zipcode value");
+  const response = await fetch(`/api/restaurantId/${restaurantId}`, {
+    method: "GET",
+    headers: {
+      "Content-Type": "application/json",
+    },
+  });
+
+  if (!response.ok) {
+    throw new Error("Network response was not ok");
+  }
+  const data: {
+    data: GeoJSON.FeatureCollection<
+      GeoJSON.Geometry,
+      RestaurantDocument
+    >["features"];
+  } = await response.json();
+  return data.data;
+};
+
 export const fetchStateSearch = async (stateId: string | null) => {
   if (!stateId) throw new Error("provide state id to call backend function");
   const url = `/api/dev/zipcodes/state/${stateId}`;

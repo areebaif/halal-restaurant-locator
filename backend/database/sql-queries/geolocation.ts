@@ -432,4 +432,58 @@ export class Geolocation {
       console.log(err);
     }
   };
+
+  static getRestaurantsbyIdAndCountryId = async (
+    db: Pool | undefined,
+    restaurantId: number,
+    id: number = 1
+  ) => {
+    try {
+      db = await dbPool.connect();
+      const {
+        rows,
+      }: QueryResult<{
+        id: number;
+        name: string;
+        updated_at: string;
+        description: string;
+        image_url: string;
+        menu_url: string;
+        longitude: number;
+        latitude: number;
+        website_url: string;
+        street: string;
+        city: string;
+        state: string;
+        zipcode: string;
+        country: string;
+      }> = await db.query(
+        `select p1.id,p1.name,p1.updated_at,image.url as image_url,p1.description, p1.menu_url, p1.website_url,p1.longitude, p1.latitude ,street.name as street, city.name as city, state.name as state, zipcode.zipcode as zipcode ,country.name as country
+        from restaurant as p1
+        inner join street
+        on p1.street_id=street.id
+        inner join city
+        on p1.city_id = city.id
+        inner join state
+        on p1.state_id = state.id
+        inner join zipcode
+        on zipcode.id = p1.zipcode_id
+        inner join country
+        on p1.country_id=country.id
+		    full join restaurant_image
+		    on p1.id = restaurant_image.restaurant_id
+		    full join image
+		    on restaurant_image.image_id = image.id
+        where country.id=$2 and p1.id=$1`,
+        [restaurantId, id]
+      );
+      if (!rows.length)
+        throw new Error(`
+      no restaurant found with name ${name} and country_id ${id}`);
+      return rows;
+    } catch (err) {
+      // TODO: error handling
+      console.log(err);
+    }
+  };
 }

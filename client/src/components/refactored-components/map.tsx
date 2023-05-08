@@ -11,6 +11,7 @@ import {
   fetchStateAndCitySearch,
   fetchRestaurantNameSearch,
   RestaurantDocument,
+  fetchRestaurantIdSearch,
 } from "../../BackendFunc-DataCalc/backendFunctions";
 import { stringConstants } from "./SearchBar";
 
@@ -114,6 +115,34 @@ export const MapBoxMap: React.FC = () => {
       },
     }
   );
+
+  const restaurantIdSearchResult = useQuery(
+    ["fetchRestaurantIdSearch", zipcode.id],
+    () => fetchRestaurantIdSearch(restaurant.id),
+    {
+      enabled:
+        Boolean(restaurant.id) &&
+        Boolean(zipcode?.id) &&
+        Boolean(state?.id) &&
+        Boolean(city?.id),
+      onSuccess: (data) => {
+        const mapLocations: GeoJSON.FeatureCollection<
+          GeoJSON.Geometry,
+          RestaurantDocument
+        > = {
+          type: "FeatureCollection",
+          features: data?.length ? data : [],
+        };
+        dispatch(setAllGoelocationData(mapLocations));
+        dispatch(setRefreshMapData(true));
+      },
+      onError: (error) => {
+        //TODO: error handling
+        console.log("react query data fetching error", error);
+      },
+    }
+  );
+
   const zipCodeSearchResult = useQuery(
     ["fetchZipCodeSearch", zipcode.id],
     () => fetchZipSearch(zipcode.id),
