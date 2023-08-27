@@ -1,3 +1,3 @@
-import { HeroText } from "./index/HeroText";
+import { HeroHeader } from "./index/HeroHeader";
 
-export { HeroText };
+export { HeroHeader };

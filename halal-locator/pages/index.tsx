@@ -2,14 +2,14 @@
 import { AppProps } from "next/app";
 import { Box, BackgroundImage, Flex, Autocomplete } from "@mantine/core";
 
-import { HeroText } from "@/components";
+import { HeroHeader } from "@/components";
 
 const Home = (props: AppProps) => {
-  return <HeroHeader />;
+  return <HeroHeaderSearch />;
 };
 export default Home;
 
-export const HeroHeader: React.FC = () => {
+export const HeroHeaderSearch: React.FC = () => {
   return (
     <Box>
       <BackgroundImage
@@ -28,8 +28,7 @@ export const HeroHeader: React.FC = () => {
             width: "40%",
           })}
         >
-          <HeroText />
-          
+          <HeroHeader />
         </Flex>
       </BackgroundImage>
     </Box>
