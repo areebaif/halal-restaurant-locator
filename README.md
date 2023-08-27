@@ -1,23 +1,38 @@
-# halal-restaurant-locator
+This is a [Next.js](https://nextjs.org/) project bootstrapped with [`create-next-app`](https://github.com/vercel/next.js/tree/canary/packages/create-next-app).
 
-## One Time Setup to Run full stack application in Development Mode:
+## Getting Started
 
-- For the purpose of having one source of truth for documentation, please refer to respective readme links below to run the full stack application.
+First, run the development server:
 
-- **Additionally, it is highly recommended to have a look at [debugging common issues section](#debugging-common-issues) before running your application to avoid common pitfalls in running this application.**
+```bash
+npm run dev
+# or
+yarn dev
+# or
+pnpm dev
+```
 
-# Client
-[client read me](/client/README.md)
+Open [http://localhost:3000](http://localhost:3000) with your browser to see the result.
 
-# Backend
-[backend read me](/backend/Readme.md)
+You can start editing the page by modifying `pages/index.tsx`. The page auto-updates as you edit the file.
 
-## Debugging common issues:
+[API routes](https://nextjs.org/docs/api-routes/introduction) can be accessed on [http://localhost:3000/api/hello](http://localhost:3000/api/hello). This endpoint can be edited in `pages/api/hello.ts`.
 
-One frequent issue you can run into is, if you change the port of your backend server. The client package.json file has been configured to proxy request to `http://localhost:6000` to avoid CORS error. If you are changing your backend server port, then navigate to package.json file in the client folder and do the following:
+The `pages/api` directory is mapped to `/api/*`. Files in this directory are treated as [API routes](https://nextjs.org/docs/api-routes/introduction) instead of React pages.
 
-- Find the `proxy` property in the package.json file and edit it -  "proxy": `http://localhost:{YOUR_BACKEND_PORT}`
+This project uses [`next/font`](https://nextjs.org/docs/basic-features/font-optimization) to automatically optimize and load Inter, a custom Google Font.
 
+## Learn More
 
+To learn more about Next.js, take a look at the following resources:
 
+- [Next.js Documentation](https://nextjs.org/docs) - learn about Next.js features and API.
+- [Learn Next.js](https://nextjs.org/learn) - an interactive Next.js tutorial.
 
+You can check out [the Next.js GitHub repository](https://github.com/vercel/next.js/) - your feedback and contributions are welcome!
+
+## Deploy on Vercel
+
+The easiest way to deploy your Next.js app is to use the [Vercel Platform](https://vercel.com/new?utm_medium=default-template&filter=next.js&utm_source=create-next-app&utm_campaign=create-next-app-readme) from the creators of Next.js.
+
+Check out our [Next.js deployment documentation](https://nextjs.org/docs/deployment) for more details.

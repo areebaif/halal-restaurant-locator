@@ -3,7 +3,7 @@ import {
   RestaurantDocument,
   CityDocument,
   StateDocument,
-} from "../BackendFunc-DataCalc/backendFunctions";
+} from "./backendFunctions";
 
 export interface ValidateUserInput {
   userInput: string;
