@@ -4,8 +4,10 @@ import { Button, Image } from "@mantine/core";
 // Mantine Imports
 import { AppShell, Header, Group, Container, Title } from "@mantine/core";
 import { AdminNavigation } from "..";
+import { useRouter } from "next/router";
 
 export const AppChromeAdmin: React.FC<React.PropsWithChildren> = (props) => {
+  const router = useRouter();
   return (
     <AppShell
       //padding="md"
@@ -18,11 +20,10 @@ export const AppChromeAdmin: React.FC<React.PropsWithChildren> = (props) => {
           //sx={(theme) => ({ backgroundColor: theme.colors.gray[0] })}
         >
           <Group position="apart">
-            <Link href={"/"}>
-              <Title px="sm" order={2}>
-                Is it Halal?
-              </Title>
-            </Link>
+            <Title onClick={() => router.push("/")} px="sm" order={2}>
+              Is it Halal?
+            </Title>
+
             <Link href="/admin">
               <Button
                 px="xl"
