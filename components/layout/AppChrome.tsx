@@ -3,7 +3,9 @@ import Link from "next/link";
 import { Button, Image } from "@mantine/core";
 // Mantine Imports
 import { AppShell, Header, Group, Container, Title, Flex } from "@mantine/core";
+import { useRouter } from "next/router";
 export const AppChrome: React.FC<React.PropsWithChildren> = (props) => {
+  const router = useRouter();
   return (
     <AppShell
       //padding="md"
@@ -18,11 +20,10 @@ export const AppChrome: React.FC<React.PropsWithChildren> = (props) => {
                <Link href={"/"}>
                 <Image src={"/zt-logo3.png"} height={100} width={100}></Image>{" "}
               </Link> */}
-            <Link href={"/"}>
-              <Title py="md" px="sm" order={2}>
-                Is it Halal?
-              </Title>
-            </Link>
+
+            <Title onClick={() => router.push("/")} py="md" px="sm" order={2}>
+              Is it Halal?
+            </Title>
             {/*</Flex>
             // TODO: If admin is signed in then Admin Dashborad otherwose Admin Login
              <Link href={"https://www.facebook.com/zahidtown"}>
