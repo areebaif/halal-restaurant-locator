@@ -1,0 +1,33 @@
+// This is your Prisma schema file,
+// learn more about it in the docs: https://pris.ly/d/prisma-schema
+generator client {
+  provider = "prisma-client-js"
+}
+
+datasource db {
+  provider = "mysql"
+  url      = env("DATABASE_URL")
+  relationMode = "prisma"
+}
+
+model FoodTag {
+    id String @id @default(uuid())
+    name String @unique
+    Restaurant Restaurant_FoodTag[] 
+}
+
+model Restaurant {
+    id String @id @default(uuid())
+    name String
+    FoodTag Restaurant_FoodTag[] 
+}
+
+model Restaurant_FoodTag {
+    id String @id @default(uuid())
+    FoodTagId String
+    RestaurantId String
+    Restaurant Restaurant @relation(fields: [RestaurantId], references: [id])
+    FoodTag FoodTag @relation(fields: [FoodTagId], references: [id])
+    @@index([RestaurantId])
+    @@index([FoodTagId])
+}

@@ -6,7 +6,8 @@
     "dev": "next dev",
     "build": "next build",
     "start": "next start",
-    "lint": "next lint"
+    "lint": "next lint",
+    "postinstall": "npx prisma generate"
   },
   "dependencies": {
     "@emotion/react": "^11.11.1",
@@ -14,14 +15,19 @@
     "@mantine/core": "^6.0.19",
     "@mantine/hooks": "^6.0.19",
     "@mantine/next": "^6.0.19",
+    "@prisma/client": "^5.2.0",
     "@tabler/icons-react": "^2.32.0",
+    "@tanstack/react-query": "^4.33.0",
     "@types/node": "20.5.6",
     "@types/react": "18.2.21",
     "@types/react-dom": "18.2.7",
     "next": "13.4.19",
+    "prisma": "^5.2.0",
     "react": "18.2.0",
     "react-dom": "18.2.0",
     "stylis-plugin-rtl": "^2.1.1",
-    "typescript": "5.2.2"
+    "swr": "^2.2.2",
+    "typescript": "5.2.2",
+    "zod": "^3.22.2"
   }
 }
