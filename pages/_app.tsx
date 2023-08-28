@@ -15,7 +15,9 @@ export default function App({ Component, pageProps, router }: AppProps) {
             <Component {...pageProps} />
           </AppChromeAdmin>
         ) : (
-          <AppChrome></AppChrome>
+          <AppChrome>
+            <Component {...pageProps} />
+          </AppChrome>
         )}
       </QueryClientProvider>
     </MantineProvider>
