@@ -1,3 +1,16 @@
 import { postAddFoodTag } from "./crudFunctions";
-import { PostAddStateZod, PostAddCityZod, PostAddZipCodeZod } from "./zod/zod";
-export { postAddFoodTag, PostAddStateZod, PostAddCityZod, PostAddZipCodeZod };
+import {
+  PostAddStateZod,
+  PostAddCityZod,
+  PostAddZipCodeZod,
+  PostAddRestaurantZod,
+} from "./zod/zod";
+import { capitalizeFirstWord } from "./string-manipulation";
+export {
+  postAddFoodTag,
+  PostAddStateZod,
+  PostAddCityZod,
+  PostAddZipCodeZod,
+  PostAddRestaurantZod,
+  capitalizeFirstWord,
+};

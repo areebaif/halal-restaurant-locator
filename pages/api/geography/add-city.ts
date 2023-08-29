@@ -2,7 +2,7 @@ import { prisma } from "@/db/prisma";
 import { Prisma } from "@prisma/client";
 import type { NextApiRequest, NextApiResponse } from "next";
 // local imports
-import { PostAddCityZod } from "@/utils";
+import { PostAddCityZod, capitalizeFirstWord } from "@/utils";
 import { ResponseAddCity, PostAddCity } from "@/utils/types";
 
 export default async function AddState(
@@ -13,15 +13,16 @@ export default async function AddState(
     const cityData = req.body;
     const isTypeCorrect = PostAddCityZod.safeParse(cityData);
     if (!isTypeCorrect.success) {
+      console.log(isTypeCorrect.error);
       res.json({
         typeError:
-          "type check failed on the server, expected to recieve array of objects with countryId, stateId properties as string and cityName property as array of string",
+          "type check failed on the server, expected to recieve array of objects with countryId, stateName properties as string and cityName property as array of string",
       });
       return;
     }
     const parsedCityData = cityData as PostAddCity;
     const countryId = parsedCityData.countryId;
-    const stateId = parsedCityData.stateId;
+    const stateName = capitalizeFirstWord(parsedCityData.stateName);
     const countryExists = await prisma.country.findUnique({
       where: {
         countryId: countryId,
@@ -33,23 +34,23 @@ export default async function AddState(
       });
       return;
     }
-    const stateExists = await prisma.state.findUnique({
+    const stateExists = await prisma.state.findMany({
       where: {
-        countryId: countryId,
-        stateId: stateId,
+        countryId: countryExists.countryId,
+        stateName: stateName,
       },
     });
-    if (!stateExists?.stateId) {
+    if (!stateExists?.[0].stateId) {
       res.json({
         state:
-          "The provided stateId inreference to countryId doesnot exist in the database",
+          "The provided stateName in reference to countryId doesnot exist in the database",
       });
       return;
     }
     const mapCityData = parsedCityData.cityName.map((city) => ({
-      countryId: parsedCityData.countryId,
-      stateId: parsedCityData.stateId,
-      cityName: city,
+      countryId: countryExists.countryId,
+      stateId: stateExists[0].stateId,
+      cityName: capitalizeFirstWord(city),
     }));
     const createCity = await prisma.city.createMany({
       data: mapCityData,
@@ -58,10 +59,12 @@ export default async function AddState(
   } catch (err) {
     console.log(err);
     if (err instanceof Prisma.PrismaClientKnownRequestError) {
-      res.json({
-        city: "There is a unique constraint violation, the combination of cityName, stateId and countryId already exist in the database or you have provided this combination more than once",
-      });
-      return;
+      if (err.code === "P2002") {
+        res.json({
+          city: "There is a unique constraint violation, the combination of cityName, stateName and countryId already exist in the database or you have provided this combination more than once",
+        });
+        return;
+      }
     }
     res.status(500).json({ country: "something went wrong with the server" });
   }

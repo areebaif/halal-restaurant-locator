@@ -9,6 +9,8 @@ import {
   ResponseAddCityZod,
   PostAddZipCodeZod,
   ResponseAddZipcodeZod,
+  PostAddRestaurantZod,
+  ResponseAddRestaurantZod,
 } from "./zod/zod";
 
 export type ErrorAddFoodTag = z.infer<typeof ErrorAddFoodTagZod>;
@@ -20,3 +22,5 @@ export type ResponseAddZipCode = z.infer<typeof ResponseAddZipcodeZod>;
 export type PostAddState = z.infer<typeof PostAddStateZod>;
 export type PostAddCity = z.infer<typeof PostAddCityZod>;
 export type PostAddZipCode = z.infer<typeof PostAddZipCodeZod>;
+export type PostAddRestaurant = z.infer<typeof PostAddRestaurantZod>;
+export type ResponseAddRestaurant = z.infer<typeof ResponseAddRestaurantZod>;

@@ -2,6 +2,7 @@ import type { NextApiRequest, NextApiResponse } from "next";
 import { prisma } from "@/db/prisma";
 // local imports
 import { ResponseAddCountry } from "@/utils/types";
+import { capitalizeFirstWord } from "@/utils";
 export default async function AddCountry(
   req: NextApiRequest,
   res: NextApiResponse<ResponseAddCountry>
@@ -12,7 +13,8 @@ export default async function AddCountry(
       res.json({ country: "please provide valid value for country" });
       return;
     }
-    const countryName = country as string;
+    const countryString = country as string;
+    const countryName = capitalizeFirstWord(countryString);
     const countryExists = await prisma.country.findUnique({
       where: {
         countryName: countryName,

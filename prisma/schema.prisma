@@ -20,18 +20,22 @@ model FoodTag {
 
 model Restaurant {
     restaurantId String @id @default(uuid())
-    name String
+    restaurantName String
     countryId String
+    street String
     stateId String
     cityId String
     zipcodeId String
+    description String @db.VarChar(1000)
+    latitude  Float
+    longitude Float
     createdAt       DateTime  @default(now())
     updatedAt       DateTime  @updatedAt
     FoodTag Restaurant_FoodTag[] 
     Country Country @relation(fields: [countryId], references: [countryId])
     State State @relation(fields: [stateId], references: [stateId])
     City City @relation(fields: [cityId], references: [cityId])
-    Zipcode Zipcode @relation(fields: [zipcodeId], references: [id])
+    Zipcode Zipcode @relation(fields: [zipcodeId], references: [zipcodeId])
     @@index([countryId])
     @@index([stateId])
     @@index([cityId])
@@ -64,7 +68,7 @@ model Country {
 }
 
 model State {
-  stateId String @id @default(uuid())
+  stateId String @unique @default(uuid())
   countryId String
   stateName String
   createdAt DateTime  @default(now())
@@ -74,12 +78,12 @@ model State {
   City City[]
   Restaurant Restaurant[]
   @@index([countryId])
-  @@unique([stateName, countryId], name: "uniqueState")
+  @@id([countryId,stateName])
    
 }
 
 model City {
-  cityId String @id @default(uuid())
+  cityId String @unique @default(uuid())
   countryId String
   stateId String
   cityName String
@@ -91,11 +95,11 @@ model City {
   Restaurant Restaurant[]
   @@index([countryId])
   @@index([stateId])
-  @@unique([cityName, stateId, countryId], name: "uniqueCity")
+  @@id([ countryId,stateId,cityName])
   }
 
 model Zipcode {
-  id String @id @default(uuid())
+  zipcodeId String @unique @default(uuid())
   zipcode String
   countryId String
   stateId String
@@ -111,6 +115,6 @@ model Zipcode {
   @@index([countryId])
   @@index([stateId])
   @@index([cityId])
-  @@unique([zipcode, countryId], name: "uniqueZipCode")
+  @@id([zipcode, countryId])
 
 }

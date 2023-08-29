@@ -2,6 +2,7 @@ import type { NextApiRequest, NextApiResponse } from "next";
 // local imports
 import { prisma } from "@/db/prisma";
 import { ResponseAddFoodTag } from "@/utils/types";
+import { capitalizeFirstWord } from "@/utils";
 
 export default async function FoodTag(
   req: NextApiRequest,
@@ -15,10 +16,11 @@ export default async function FoodTag(
       return;
     }
     const tag = foodTag as string;
+    const sanitizeTag = capitalizeFirstWord(tag);
 
     const foodTagExists = await prisma.foodTag.findUnique({
       where: {
-        name: tag,
+        name: sanitizeTag,
       },
     });
     if (foodTagExists?.foodTagId) {
@@ -30,7 +32,7 @@ export default async function FoodTag(
 
     const createFoodTag = await prisma.foodTag.create({
       data: {
-        name: foodTag,
+        name: sanitizeTag,
       },
     });
 
