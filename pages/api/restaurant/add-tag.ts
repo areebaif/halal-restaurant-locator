@@ -1,26 +1,29 @@
-import { prisma } from "@/db/prisma";
 import type { NextApiRequest, NextApiResponse } from "next";
+// local imports
+import { prisma } from "@/db/prisma";
+import { ResponseAddFoodTag } from "@/utils/types";
+import { capitalizeFirstWord } from "@/utils";
 
 export default async function FoodTag(
   req: NextApiRequest,
-  res: NextApiResponse<any>
+  res: NextApiResponse<ResponseAddFoodTag>
 ) {
   try {
-    const body = JSON.parse(req.body);
-    const foodTag = body.foodTag;
+    const foodTag = req.body.foodTag;
 
     if (typeof foodTag !== "string" || !foodTag.length) {
       res.json({ foodTag: "please provide valid value for food tag" });
       return;
     }
     const tag = foodTag as string;
+    const sanitizeTag = capitalizeFirstWord(tag);
 
     const foodTagExists = await prisma.foodTag.findUnique({
       where: {
-        name: tag,
+        name: sanitizeTag,
       },
     });
-    if (foodTagExists?.id) {
+    if (foodTagExists?.foodTagId) {
       res.json({
         foodTag: "food tag value already exists, please provide a unique name",
       });
@@ -29,12 +32,13 @@ export default async function FoodTag(
 
     const createFoodTag = await prisma.foodTag.create({
       data: {
-        name: foodTag,
+        name: sanitizeTag,
       },
     });
 
-    res.status(202).json({ name: createFoodTag.id });
+    res.status(202).json({ id: createFoodTag.foodTagId });
   } catch (err) {
+    console.log(err);
     res.status(500).json({ foodTag: "something went wrong with the server" });
   }
 }

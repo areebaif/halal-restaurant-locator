@@ -18,10 +18,7 @@ const AddRestaurant: React.FC = () => {
       <Card.Section withBorder inheritPadding py="xs">
         <Title order={3}>Add Food Tag</Title>
       </Card.Section>
-      <Textarea disabled>
-        Add type of food served by the restaurant, examples include vegetarian,
-        fast food, seafood
-      </Textarea>
+
       <TextInput
         mt="xs"
         withAsterisk

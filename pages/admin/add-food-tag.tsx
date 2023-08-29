@@ -11,8 +11,8 @@ import {
   Loader,
 } from "@mantine/core";
 import { ErrorCard } from "@/components";
-import { ErrorAddFoodTag, responseAddFoodTag } from "@/utils/types";
-import { ErrorAddFoodTagZod, PostAddFoodTagZod } from "@/utils/zod/zod";
+import { ErrorAddFoodTag, ResponseAddFoodTag } from "@/utils/types";
+import { ErrorAddFoodTagZod, ResponseAddFoodTagZod } from "@/utils/zod/zod";
 import { postAddFoodTag } from "@/utils";
 import { useRouter } from "next/router";
 
@@ -22,18 +22,11 @@ export const AddFoodTag: React.FC = () => {
   const [foodTag, setFoodTag] = React.useState("");
   const [error, setError] = React.useState<ErrorAddFoodTag>();
   const [postError, setPostError] = React.useState(false);
-  React.useEffect(() => {
-    if (postError) {
-      setError({
-        ...error,
-        foodTag: "something went wrong with the server, please try again later",
-      });
-    }
-  }, [postError]);
+
   const mutation = useMutation({
     mutationFn: postAddFoodTag,
-    onSuccess: (data: responseAddFoodTag) => {
-      const result = PostAddFoodTagZod.safeParse(data);
+    onSuccess: (data: ResponseAddFoodTag) => {
+      const result = ResponseAddFoodTagZod.safeParse(data);
       if (!result.success) {
         console.log(result.error);
         return (
@@ -47,11 +40,18 @@ export const AddFoodTag: React.FC = () => {
       router.push("/admin");
       queryClient.invalidateQueries();
     },
-    onError: () => {
+    onError: (data) => {
       setPostError(true);
     },
   });
-
+  React.useEffect(() => {
+    if (postError) {
+      setError({
+        ...error,
+        foodTag: "something went wrong with the server, please try again later",
+      });
+    }
+  }, [postError]);
   if (mutation.isLoading) {
     return <Loader />;
   }
