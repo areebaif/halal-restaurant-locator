@@ -1,5 +1,5 @@
 import * as React from "react";
-import { useQuery, useQueryClient, useMutation } from "@tanstack/react-query";
+import { useQueryClient, useMutation } from "@tanstack/react-query";
 import {
   Card,
   Title,
@@ -21,11 +21,9 @@ export const AddFoodTag: React.FC = () => {
   const router = useRouter();
   const [foodTag, setFoodTag] = React.useState("");
   const [error, setError] = React.useState<ErrorAddFoodTag>();
-  const [postError, setPostError] = React.useState(false);
-
   const mutation = useMutation({
     mutationFn: postAddFoodTag,
-    onSuccess: (data: ResponseAddFoodTag) => {
+    onSuccess: (data) => {
       const result = ResponseAddFoodTagZod.safeParse(data);
       if (!result.success) {
         console.log(result.error);
@@ -41,17 +39,9 @@ export const AddFoodTag: React.FC = () => {
       queryClient.invalidateQueries();
     },
     onError: (data) => {
-      setPostError(true);
     },
   });
-  React.useEffect(() => {
-    if (postError) {
-      setError({
-        ...error,
-        foodTag: "something went wrong with the server, please try again later",
-      });
-    }
-  }, [postError]);
+
   if (mutation.isLoading) {
     return <Loader />;
   }

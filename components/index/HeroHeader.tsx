@@ -1,20 +1,13 @@
-import {
-  Text,
-  Center,
-  Title,
-  List,
-  ThemeIcon,
-  Autocomplete,
-  Flex,
-  Button,
-  Group,
-  Grid,
-  Box,
-} from "@mantine/core";
+import { Center, Autocomplete, Button, Grid, Box } from "@mantine/core";
+import * as React from "react";
+import { HeroText } from "./HeroText";
+import { IconSearch } from "@tabler/icons-react";
+import { ResponseGetAllGeog } from "@/utils/types";
+import { useAppSelector } from "@/redux-store/redux-hooks";
+import { ErrorCard } from "..";
+import { useRouter } from "next/router";
 
-import { IconCheck, IconSearch } from "@tabler/icons-react";
-
-export const HeroHeader = () => {
+export const HeroHeader: React.FC = ({}) => {
   return (
     <Center
       px="xl"
@@ -29,80 +22,96 @@ export const HeroHeader = () => {
     >
       <Box>
         <HeroText />
-        <Grid my="xl" py="xl" pl="xl">
-          <Grid.Col span="auto">
-            <Autocomplete
-              placeholder="Search by restaurant name, zipcode or city"
-              data={["React", "Angular", "Svelte", "Vue"]}
-              styles={(theme) => ({
-                input: {
-                  backgroundColor: theme.colors.gray[0],
-                  border: `1px solid`,
-                  "&:hover": {
-                    backgroundColor: theme.colors.gray[1],
-                  },
-                },
-              })}
-            />
-          </Grid.Col>
-          <Grid.Col span="auto">
-            <Button
-              variant="outline"
-              color="dark"
-              styles={(theme) => ({
-                root: {
-                  backgroundColor: theme.colors.gray[0],
-                  border: `1px solid`,
-                  "&:hover": {
-                    backgroundColor: theme.colors.gray[1],
-                  },
-                },
-              })}
-            >
-              Search
-            </Button>
-          </Grid.Col>
-        </Grid>
+        <GeographySearchAutoComplete />
       </Box>
     </Center>
   );
 };
 
-export const HeroText: React.FC = () => {
+export const GeographySearchAutoComplete: React.FC = () => {
+  const router = useRouter();
+  const autoCompleteData = useAppSelector(
+    (state) => state.geolocation.allGeographyData
+  );
+  const [autoCompleteInputValue, setAutoCompleteInputValue] =
+    React.useState("");
+  const [error, setError] = React.useState({ inputData: "" });
+  const mergedData = [...autoCompleteData.zipcode, ...autoCompleteData.city];
+
+  const onSubmit = (val: string) => {
+    // check if zipcode or city
+    const splitValue = val.split(",");
+    // switch based on length
+    const arrayLength = splitValue.length;
+    switch (arrayLength) {
+      // this is zipcode, country
+      case 2: {
+        const zipcode = splitValue[0].trim();
+        const country = splitValue[1].trim();
+        router.push(`/search/zipcode=${zipcode}&country=${country}`);
+        break;
+      }
+      case 3: {
+        const city = splitValue[0].trim();
+        const state = splitValue[1].trim();
+        const country = splitValue[2].trim();
+        router.push(`/search/city=${city}&state=${state}&country=${country}`);
+        break;
+      }
+      default: {
+        setError({
+          ...error,
+          inputData: "please check your input, entered incorrect value",
+        });
+      }
+    }
+  };
   return (
-    <>
-      <Title py="xl">Explore halal food options near you</Title>
-      <Text py="xl" size="xl">
-        Find halal options near you with ease – We update our library every day
-        to include new places near you!
-      </Text>
-      <List
-        sx={(theme) => ({
-          color: theme.white,
-          [theme.fn.smallerThan("sm")]: {
-            color: theme.colors.dark[5],
-          },
-        })}
-        my="xl"
-        spacing="sm"
-        size="sm"
-        icon={
-          <ThemeIcon ml="xs" color="grey" size={13} radius="xl">
-            <IconCheck size={10} stroke={1.5} />
-          </ThemeIcon>
-        }
-      >
-        <List.Item>
-          <b>Save time</b> – Your one stop solution to finding halal food
-        </List.Item>
-        <List.Item>
-          <b>Have guests over?</b> – Find catering options near you
-        </List.Item>
-        <List.Item>
-          <b>Halal raw meat</b> – find supermarkets that sell halal meat near
-          you
-        </List.Item>
-      </List>
-    </>
+    <Grid my="xl" py="xl" pl="xl">
+      <Grid.Col span="auto">
+        <Autocomplete
+          error={autoCompleteData.isError}
+          placeholder={
+            autoCompleteData.isError
+              ? "uanble to load data from the server"
+              : "search restaurants by city, zipcode, neighborhood"
+          }
+          icon={<IconSearch />}
+          data={!autoCompleteData.isError ? mergedData : []}
+          value={autoCompleteInputValue}
+          onChange={setAutoCompleteInputValue}
+          styles={(theme) => ({
+            input: {
+              backgroundColor: theme.colors.gray[0],
+              border: `1px solid`,
+              "&:hover": {
+                backgroundColor: theme.colors.gray[1],
+              },
+            },
+          })}
+        />
+        {error.inputData ? <ErrorCard message={error.inputData} /> : <></>}
+      </Grid.Col>
+      <Grid.Col span="auto">
+        <Button
+          onClick={() => {
+            onSubmit(autoCompleteInputValue);
+          }}
+          variant="outline"
+          color="dark"
+          styles={(theme) => ({
+            root: {
+              backgroundColor: theme.colors.gray[0],
+              border: `1px solid`,
+              "&:hover": {
+                backgroundColor: theme.colors.gray[1],
+              },
+            },
+          })}
+        >
+          Search
+        </Button>
+      </Grid.Col>
+    </Grid>
   );
 };
