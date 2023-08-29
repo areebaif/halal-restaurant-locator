@@ -11,23 +11,106 @@ datasource db {
 }
 
 model FoodTag {
-    id String @id @default(uuid())
+    foodTagId String @id @default(uuid())
     name String @unique
     Restaurant Restaurant_FoodTag[] 
+    createdAt       DateTime  @default(now())
+    updatedAt       DateTime  @updatedAt
 }
 
 model Restaurant {
-    id String @id @default(uuid())
+    restaurantId String @id @default(uuid())
     name String
+    countryId String
+    stateId String
+    cityId String
+    zipcodeId String
+    createdAt       DateTime  @default(now())
+    updatedAt       DateTime  @updatedAt
     FoodTag Restaurant_FoodTag[] 
+    Country Country @relation(fields: [countryId], references: [countryId])
+    State State @relation(fields: [stateId], references: [stateId])
+    City City @relation(fields: [cityId], references: [cityId])
+    Zipcode Zipcode @relation(fields: [zipcodeId], references: [id])
+    @@index([countryId])
+    @@index([stateId])
+    @@index([cityId])
+    @@index([zipcodeId])
+
 }
 
 model Restaurant_FoodTag {
     id String @id @default(uuid())
     FoodTagId String
     RestaurantId String
-    Restaurant Restaurant @relation(fields: [RestaurantId], references: [id])
-    FoodTag FoodTag @relation(fields: [FoodTagId], references: [id])
+    Restaurant Restaurant @relation(fields: [RestaurantId], references: [restaurantId])
+    FoodTag FoodTag @relation(fields: [FoodTagId], references: [foodTagId])
     @@index([RestaurantId])
     @@index([FoodTagId])
+    createdAt       DateTime  @default(now())
+    updatedAt       DateTime  @updatedAt
+}
+
+model Country {
+  countryId String @id @default(uuid())
+  countryName String @unique
+  State State[]
+  City City[]
+  Zipcode Zipcode[]
+  Restaurant Restaurant[]
+  createdAt DateTime  @default(now())
+  updatedAt DateTime  @updatedAt
+  
+}
+
+model State {
+  stateId String @id @default(uuid())
+  countryId String
+  stateName String
+  createdAt DateTime  @default(now())
+  updatedAt DateTime  @updatedAt
+  Country Country @relation(fields: [countryId], references: [countryId])
+  Zipcode Zipcode[]
+  City City[]
+  Restaurant Restaurant[]
+  @@index([countryId])
+  @@unique([stateName, countryId], name: "uniqueState")
+   
+}
+
+model City {
+  cityId String @id @default(uuid())
+  countryId String
+  stateId String
+  cityName String
+  createdAt       DateTime  @default(now())
+  updatedAt       DateTime  @updatedAt
+  Zipcode Zipcode[]
+  Country Country @relation(fields: [countryId], references: [countryId])
+  State State @relation(fields: [stateId], references: [stateId])
+  Restaurant Restaurant[]
+  @@index([countryId])
+  @@index([stateId])
+  @@unique([cityName, stateId, countryId], name: "uniqueCity")
+  }
+
+model Zipcode {
+  id String @id @default(uuid())
+  zipcode String
+  countryId String
+  stateId String
+  cityId String
+  latitude  Float
+  longitude Float
+  createdAt       DateTime  @default(now())
+  updatedAt       DateTime  @updatedAt
+  Country Country @relation(fields: [countryId], references: [countryId])
+  State State @relation(fields: [stateId], references: [stateId])
+  City City @relation(fields: [cityId], references: [cityId])
+  Restaurant Restaurant[]
+  @@index([countryId])
+  @@index([stateId])
+  @@index([cityId])
+  @@unique([zipcode, countryId], name: "uniqueZipCode")
+
 }

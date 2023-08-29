@@ -2,7 +2,10 @@ export const postAddFoodTag = async (data: { foodTag: string }) => {
   const { foodTag } = data;
   const response = await fetch(`/api/restaurant/add-tag`, {
     method: "POST",
-    body: JSON.stringify({ foodTag }),
+    headers: {
+      "Content-Type": "application/json",
+    },
+    body: JSON.stringify({ foodTag: foodTag }),
   });
   if (!response.ok) {
     throw new Error("Network response was not ok");

@@ -2,6 +2,12 @@ This is a [Next.js](https://nextjs.org/) project bootstrapped with [`create-next
 
 ## Getting Started
 
+### Add Environment Variables
+
+create .en.local file and add the following variables
+
+`DATABASE_URL=[contact admin of repo for the value]`
+
 First, run the development server:
 
 ```bash

@@ -1,3 +1,3 @@
 import { postAddFoodTag } from "./crudFunctions";
-
-export { postAddFoodTag };
+import { PostAddStateZod, PostAddCityZod, PostAddZipCodeZod } from "./zod/zod";
+export { postAddFoodTag, PostAddStateZod, PostAddCityZod, PostAddZipCodeZod };
