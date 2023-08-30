@@ -1,7 +1,7 @@
 import {
-  PostSearchInputs,
   ResponseAddFoodTag,
   ResponseGetAllGeog,
+  GeoJsonRestaurant,
 } from "./types";
 
 export const postAddFoodTag = async (data: { foodTag: string }) => {
@@ -17,15 +17,14 @@ export const postAddFoodTag = async (data: { foodTag: string }) => {
   return res;
 };
 
-export const postMapSearchInput = async (data: PostSearchInputs) => {
-  const response = await fetch(`/api/restaurant/restaurant-search`, {
-    method: "POST",
+export const getMapSearchInput = async (data: string) => {
+  const response = await fetch(`/api/restaurant/${data}`, {
+    method: "GET",
     headers: {
       "Content-Type": "application/json",
     },
-    body: JSON.stringify({ ...data }),
   });
-  const res = await response.json();
+  const res: GeoJsonRestaurant = await response.json();
   return res;
 };
 

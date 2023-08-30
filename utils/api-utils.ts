@@ -1,4 +1,5 @@
 import { prisma } from "@/db/prisma";
+import { RestaurantReadDb } from "./types";
 
 type searchCriteria = {
   zipcodeId?: string;
@@ -16,6 +17,7 @@ export const findRestaurant = async (searchCriteria: searchCriteria) => {
       longitude: true,
       restaurantName: true,
       description: true,
+      street: true,
       Country: {
         select: {
           countryName: true,
@@ -49,12 +51,14 @@ export const findRestaurant = async (searchCriteria: searchCriteria) => {
       City,
       Zipcode,
       FoodTag,
+      street,
     } = restaurantItem;
     return {
       latitude,
       longitude,
       restaurantName,
       description,
+      street,
       country: Country.countryName,
       state: State.stateName,
       city: City.cityName,
@@ -62,5 +66,51 @@ export const findRestaurant = async (searchCriteria: searchCriteria) => {
       FoodTag: FoodTag.map((tag) => tag.FoodTag.name),
     };
   });
-  return mappedData;
+  const geoJson = restaurantToGeoJson(mappedData);
+  return geoJson;
 };
+
+export const restaurantToGeoJson = (data: RestaurantReadDb["restaurants"]) => {
+  return data?.map((restaurant) => {
+    const {
+      latitude,
+      longitude,
+      restaurantName,
+      description,
+      street,
+      country,
+      state,
+      city,
+      zipcode,
+      FoodTag,
+    } = restaurant;
+    return {
+      type: "Feature",
+      geometry: {
+        type: "Point",
+        coordinates: [longitude, latitude],
+      },
+      properties: {
+        restaurantName,
+        description,
+        street,
+        country,
+        state,
+        city,
+        zipcode,
+        FoodTag,
+      },
+    };
+  });
+};
+
+// restaurantName: string;
+//         description: string;
+//         latitude: number;
+// street
+//         longitude: number;
+//         FoodTag: string[];
+//         country: string;
+//         state: string;
+//         city: string;
+//         zipcode: string;

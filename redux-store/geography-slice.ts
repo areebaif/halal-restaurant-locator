@@ -1,33 +1,48 @@
-import { ResponseGetAllGeog } from "@/utils/types";
+import { GeoJsonRestaurantProps, ResponseGetAllGeog } from "@/utils/types";
 import { createSlice } from "@reduxjs/toolkit";
 import type { PayloadAction } from "@reduxjs/toolkit";
 
-const initialState = {
-  allGeographyData: {
-    zipcode: [""],
-    city: [""],
-    isError: false,
+// const initialState = {
+//   allGeographyData: {
+//     zipcode: [""],
+//     city: [""],
+//     isError: false,
+//   },
+// };
+
+const initialState: MapProps = {
+  dataSourceId: "restaurant locations",
+  layerId: "points",
+  geolocations: {
+    type: "FeatureCollection",
+    features: [],
   },
+};
+
+export type MapProps = {
+  dataSourceId: string;
+  layerId: string;
+  geolocations: GeoJSON.FeatureCollection<
+    GeoJSON.Geometry,
+    GeoJsonRestaurantProps
+  >;
 };
 
 export const geolocationSlice = createSlice({
   name: "geolocation-input",
   initialState,
   reducers: {
-    setAutoCompleteGeogData: (
+    setGoelocations: (
       state,
-      action: PayloadAction<{ geography: ResponseGetAllGeog; isError: boolean }>
+      action: PayloadAction<
+        GeoJSON.FeatureCollection<GeoJSON.Geometry, GeoJsonRestaurantProps>
+      >
     ) => {
-      const geog = action.payload;
-      state.allGeographyData = {
-        zipcode: geog.geography.zipcode,
-        city: geog.geography.city,
-        isError: geog.isError,
-      };
+      state.geolocations = action.payload;
     },
   },
 });
 
-export const { setAutoCompleteGeogData } = geolocationSlice.actions;
+export const { setGoelocations } = geolocationSlice.actions;
 
 export default geolocationSlice.reducer;

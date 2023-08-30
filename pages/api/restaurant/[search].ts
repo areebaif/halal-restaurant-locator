@@ -1,32 +1,50 @@
 import type { NextApiRequest, NextApiResponse } from "next";
+import { z } from "zod";
 // local imports
 import { prisma } from "@/db/prisma";
-import { PostSearchInputs } from "@/utils/types";
-import { findRestaurant, capitalizeFirstWord } from "@/utils";
-import { PostSearchInputsZod } from "@/utils/zod/zod";
+import {
+  findRestaurant,
+  capitalizeFirstWord,
+  parseQueryVals,
+  GetSearchInputsZod,
+} from "@/utils";
+import {
+  GetSearchInputs,
+
+  ResponseRestaurantGeoJson,
+} from "@/utils/types";
 
 export default async function MapSearch(
   req: NextApiRequest,
-  res: NextApiResponse
+  res: NextApiResponse<ResponseRestaurantGeoJson>
 ) {
   try {
-    const searchData = req.body;
-    const isTypeCorrect = PostSearchInputsZod.safeParse(searchData);
+    const { search } = req.query;
+
+    const isQueryCorrect = z.string().safeParse(search);
+    if (!isQueryCorrect.success) {
+      console.log(isQueryCorrect.error);
+      res.json({ typeError: "expected query param as string" });
+      return;
+    }
+    const searchData = parseQueryVals(search as string);
+    const isTypeCorrect = GetSearchInputsZod.safeParse(searchData);
     if (!isTypeCorrect.success) {
       console.log(isTypeCorrect.error);
       res.json({
         typeError:
-          "type check failed on the server, expected to an objects with countryName as string, and either zipcode as string or restaurant name as string or stateName, cityName, as string",
+          "type check failed on the server, expected to an objects with countryName as string, and either zipcode as string or restaurantName as string or stateName, cityName, as string",
       });
       return;
     }
-    const bodyProps = searchData as PostSearchInputs;
-    const { country, state, city, zipcode, restaurantName } = bodyProps;
+
+    const queryProps = searchData as GetSearchInputs;
+    const { country, state, city, zipcode, restaurantName } = queryProps;
 
     if (!state && !city && !restaurantName && !zipcode) {
       res.json({
         typeError:
-          "type check failed on the server, you need to define either zipcode & country or state, city & country or restaurantName & country",
+          "type check failed on the server, you need to define either zipcode & countryName or stateName, cityName & countryName or restaurantName & country.",
       });
       return;
     }
@@ -64,7 +82,8 @@ export default async function MapSearch(
         zipcodeId: zipcodeExists.zipcodeId,
         countryId: countryExists.countryId,
       });
-      res.status(200).send(restaurants);
+
+      res.status(200).send({ restaurants: restaurants });
       return;
     }
     // search by city
@@ -104,26 +123,28 @@ export default async function MapSearch(
         stateId: stateExists.stateId,
         cityId: cityExists.cityId,
       });
-      res.status(200).send(restaurants);
+      res.status(200).send({ restaurants: restaurants });
       return;
     }
 
     // search by restaurant name
-    if (bodyProps.restaurantName.length > 1) {
+    if (restaurantName.length > 1) {
       const restaurantExists = await findRestaurant({
         restaurantName: restaurantName,
       });
-      if (!restaurantExists.length) {
+      if (!restaurantExists?.length) {
         res.json({
           restaurantError: "no value exists with the restaurant name provided",
         });
         return;
       }
-      res.status(200).send(restaurantExists);
+      res.status(200).send({ restaurants: restaurantExists });
       return;
     }
   } catch (err) {
     console.log(err);
-    res.status(500).json({ foodTag: "something went wrong with the server" });
+    res
+      .status(500)
+      .json({ restaurantError: "something went wrong with the server" });
   }
 }
