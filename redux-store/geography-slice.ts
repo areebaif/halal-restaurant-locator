@@ -17,6 +17,7 @@ const initialState: MapProps = {
     type: "FeatureCollection",
     features: [],
   },
+  //refreshMapData: false,
 };
 
 export type MapProps = {
@@ -26,6 +27,8 @@ export type MapProps = {
     GeoJSON.Geometry,
     GeoJsonRestaurantProps
   >;
+  //refreshMapData: boolean;
+  //hoverId: number | undefined | string;
 };
 
 export const geolocationSlice = createSlice({
@@ -38,8 +41,12 @@ export const geolocationSlice = createSlice({
         GeoJSON.FeatureCollection<GeoJSON.Geometry, GeoJsonRestaurantProps>
       >
     ) => {
+
       state.geolocations = action.payload;
     },
+    // setRefreshMapData: (state, action: PayloadAction<boolean>) => {
+    //   state.refreshMapData = action.payload;
+    // },
   },
 });
 
