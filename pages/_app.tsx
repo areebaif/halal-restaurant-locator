@@ -2,7 +2,6 @@ import * as React from "react";
 import type { AppProps } from "next/app";
 import { MantineProvider } from "@mantine/core";
 import { QueryClient, QueryClientProvider } from "@tanstack/react-query";
-import { Provider } from "react-redux";
 import { ltrCache } from "@/ltr-cache";
 import { AppChrome, AppChromeAdmin } from "@/components";
 
