@@ -14,7 +14,9 @@ import {
   ResponseGetAllGeogZod,
   GetSearchInputsZod,
   ResponseRestaurantGeoJsonZod,
+  GeoJsonRestaurantPropertiesZod,
   RestaurantReadDbZod,
+  RestaurantGeoJsonFeatureZod,
 } from "./zod/zod";
 
 export type ErrorAddFoodTag = z.infer<typeof ErrorAddFoodTagZod>;
@@ -31,36 +33,34 @@ export type ResponseAddRestaurant = z.infer<typeof ResponseAddRestaurantZod>;
 export type ResponseGetAllGeog = z.infer<typeof ResponseGetAllGeogZod>;
 export type GetSearchInputs = z.infer<typeof GetSearchInputsZod>;
 export type RestaurantReadDb = z.infer<typeof RestaurantReadDbZod>;
-export type ResponseRestaurantGeoJson = z.infer<
+export type RestaurantGeoJsonFeature = z.infer<
+  typeof RestaurantGeoJsonFeatureZod
+>;
+export type GeoJsonRestaurantProperties = z.infer<
+  typeof GeoJsonRestaurantPropertiesZod
+>;
+export type ResponseRestaurantGeoJsonFeatureCollection = z.infer<
   typeof ResponseRestaurantGeoJsonZod
 >;
-
-export type GeoJsonRestaurant = {
+// for client
+export type GeoJsonRestaurantFeatureCollection = {
   restaurants: {
-    type: "Feature";
-    geometry: {
-      type: "Point";
-      coordinates: [number, number];
-    };
+    type: "FeatureCollection";
+    features: {
+      id: number;
+      type: "Feature";
+      geometry: {
+        type: "Point";
+        coordinates: [number, number];
+      };
 
-    properties: GeoJsonRestaurantProps;
-  }[];
+      properties: GeoJsonRestaurantProperties;
+    }[];
+  };
   country?: string;
   state?: string;
   city?: string;
   zipcode?: string;
   typeError?: string;
   restaurantError?: string;
-};
-
-export type GeoJsonRestaurantProps = {
-  restaurantId: string;
-  restaurantName: string;
-  description: string;
-  street: string;
-  country: string;
-  state: string;
-  city: string;
-  zipcode: string;
-  FoodTag: string[];
 };

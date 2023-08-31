@@ -13,7 +13,7 @@ import {
   MapContainer,
   SearchResultList,
 } from "@/components";
-import { GeoJsonRestaurantProps } from "@/utils/types";
+import { ResponseRestaurantGeoJsonZod } from "@/utils/zod/zod";
 
 const Mapped: React.FC = () => {
   return (
@@ -28,9 +28,20 @@ export default Mapped;
 const MapSearch: React.FC = () => {
   const { MapA } = useMap();
   const router = useRouter();
-  const [flag, setFlag] = React.useState(false);
   const urlParams = router.query.searchParams as string[];
   const [query, setQuery] = React.useState("");
+  const [flag, setFlag] = React.useState(false);
+  const [hoverId, setHoverId] = React.useState<number | string | undefined>(
+    undefined
+  );
+  const [popupData, setPopupData] = React.useState({
+    restaurantName: "",
+    description: "",
+    address: "",
+    latitude: 0,
+    longitude: 0,
+  });
+  const [showPopup, setShowPopup] = React.useState<boolean>(false);
 
   const mapData = useQuery(
     ["getMapData", query],
@@ -45,8 +56,8 @@ const MapSearch: React.FC = () => {
     if (urlParams) {
       const queryVal = urlParams[0];
       setQuery(queryVal);
-      if (mapData.data?.restaurants.length) {
-        const mapBounds = calcBoundsFromCoordinates(restaurantGeoLocations);
+      if (mapData.data?.restaurants?.features.length) {
+        const mapBounds = calcBoundsFromCoordinates(mapData.data.restaurants);
         MapA?.fitBounds(new mapboxgl.LngLatBounds(mapBounds));
         setFlag(false);
       }
@@ -59,6 +70,12 @@ const MapSearch: React.FC = () => {
 
   if (mapData.isError) {
     return <ErrorCard message="unable to load data from the server" />;
+  }
+
+  const isTypeCorrect = ResponseRestaurantGeoJsonZod.safeParse(mapData.data);
+  if (!isTypeCorrect.success) {
+    console.log(isTypeCorrect.error);
+    return <ErrorCard message="Their is a type mismatch from the server" />;
   }
 
   if (!mapData.data?.restaurants) {
@@ -87,24 +104,26 @@ const MapSearch: React.FC = () => {
     }
     return <ErrorCard message={ErrorMessage} />;
   }
-  const geoLocations = mapData.data?.restaurants;
+  const geolocations = mapData.data?.restaurants;
 
-  const restaurantGeoLocations: GeoJSON.FeatureCollection<
-    GeoJSON.Geometry,
-    GeoJsonRestaurantProps
-  > = {
-    type: "FeatureCollection",
-    features: geoLocations,
+  const mapConatinerInputs = {
+    geolocations,
+    showPopup,
+    setShowPopup,
+    hoverId,
+    setHoverId,
+    popupData,
+    setPopupData,
   };
   return (
     <>
       <SearchInput />
       <Grid>
         <Grid.Col span={4}>
-          <SearchResultList geolocations={restaurantGeoLocations} />
+          <SearchResultList {...mapConatinerInputs} />
         </Grid.Col>
         <Grid.Col span={8}>
-          <MapContainer geolocations={restaurantGeoLocations} />
+          <MapContainer {...mapConatinerInputs} />
         </Grid.Col>
       </Grid>
     </>

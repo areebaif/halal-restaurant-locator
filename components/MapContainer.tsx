@@ -8,11 +8,25 @@ import { ErrorCard } from "@/components";
 import { GeoJsonRestaurantProps } from "@/utils/types";
 import { Card, Title, Text } from "@mantine/core";
 
-type MapContainerProps = {
+export type PopupDataProps = {
+  restaurantName: string;
+  description: string;
+  address: string;
+  latitude: number;
+  longitude: number;
+};
+
+export type MapContainerProps = {
   geolocations: GeoJSON.FeatureCollection<
     GeoJSON.Geometry,
     GeoJsonRestaurantProps
   >;
+  hoverId: string | number | undefined;
+  setHoverId: (val: string | number | undefined) => void;
+  showPopup: boolean;
+  setShowPopup: (val: boolean) => void;
+  popupData: PopupDataProps;
+  setPopupData: (data: PopupDataProps) => void;
 };
 
 type CameraViewState = {
@@ -21,21 +35,19 @@ type CameraViewState = {
   zoom?: number;
 };
 
-export const MapContainer: React.FC<MapContainerProps> = ({ geolocations }) => {
+export const MapContainer: React.FC<MapContainerProps> = ({
+  geolocations,
+  hoverId,
+  setHoverId,
+  setPopupData,
+  popupData,
+  showPopup,
+  setShowPopup,
+}) => {
   const mapRef = React.useRef<any>();
-  const [hoverId, setHoverId] = React.useState<number | string | undefined>(
-    undefined
-  );
-  const [popupData, setPopupData] = React.useState({
-    restaurantName: "",
-    description: "",
-    address: "",
-    latitude: 0,
-    longitude: 0,
-  });
+
   const [cameraViewState, setCameraViewState] =
     React.useState<CameraViewState>();
-  const [showPopup, setShowPopup] = React.useState<boolean>(false);
   const onViewStateChange = (data: CameraViewState) => {
     setCameraViewState((previousState) => {
       return { ...previousState, ...data };
@@ -81,8 +93,8 @@ export const MapContainer: React.FC<MapContainerProps> = ({ geolocations }) => {
       const zip = e.features[0].properties?.zipcode;
       const country = e.features[0].properties?.country;
       const address = `${street}, ${city}, ${state}, ${zip}, ${country}`;
-
       const id = e.features[0].id;
+
       setHoverId(id);
       mapRef.current.setFeatureState(
         { source: "restaurant locations", id: id },
@@ -99,6 +111,8 @@ export const MapContainer: React.FC<MapContainerProps> = ({ geolocations }) => {
     }
   };
 
+  
+
   return (
     <Map
       id="MapA"
@@ -113,12 +127,7 @@ export const MapContainer: React.FC<MapContainerProps> = ({ geolocations }) => {
       onMouseEnter={onMouseEnter}
       onLoad={onLoad}
     >
-      <Source
-        generateId={true}
-        id={"restaurant locations"}
-        type="geojson"
-        data={geolocations}
-      >
+      <Source id={"restaurant locations"} type="geojson" data={geolocations}>
         <Layer
           id={"points"}
           type="symbol"
@@ -143,6 +152,7 @@ export const MapContainer: React.FC<MapContainerProps> = ({ geolocations }) => {
       {/* TODO: do styling */}
       {showPopup && (
         <Popup
+          //closeButton={false}
           longitude={popupData.longitude}
           latitude={popupData.latitude}
           anchor="top"
@@ -151,6 +161,13 @@ export const MapContainer: React.FC<MapContainerProps> = ({ geolocations }) => {
               { source: "restaurant locations", id: hoverId },
               { hover: false }
             );
+            setPopupData({
+              restaurantName: "",
+              description: "",
+              address: "",
+              latitude: 0,
+              longitude: 0,
+            });
             setHoverId(undefined);
             setShowPopup(false);
           }}

@@ -101,44 +101,36 @@ export const GetSearchInputsZod = z.object({
   restaurantName: z.string(),
 });
 
-// type: string;
-//     geometry: {
-//         type: string;
-//         coordinates: number[];
-//         properties: {
-//             restaurantName: string;
-//             description: string;
-//             street: string;
-//             country: string;
-//             state: string;
-//             city: string;
-//             zipcode: string;
-//             FoodTag: string[];
-//         };
-//     };
-// }
+export const GeoJsonRestaurantPropertiesZod = z.object({
+  restaurantId: z.string().uuid(),
+  restaurantName: z.string(),
+  description: z.string(),
+  street: z.string(),
+  country: z.string(),
+  state: z.string(),
+  city: z.string(),
+  zipcode: z.string(),
+  FoodTag: z.string().array(),
+});
+
+export const RestaurantGeoJsonFeatureZod = z
+  .object({
+    id: z.number(),
+    type: z.string().refine((val) => val === "Feature"),
+    geometry: z.object({
+      type: z.string().refine((val) => val === "Point"),
+      coordinates: z.number().gte(-180).lte(180).array().length(2),
+    }),
+    properties: GeoJsonRestaurantPropertiesZod,
+  })
+  .array();
 
 export const ResponseRestaurantGeoJsonZod = z.object({
   restaurants: z
     .object({
-      type: z.string().refine((val) => val === "Feature"),
-      geometry: z.object({
-        type: z.string().refine((val) => val === "Point"),
-        coordinates: z.number().gte(-180).lte(180).array().length(2),
-      }),
-      properties: z.object({
-        restaurantId: z.string().uuid(),
-        restaurantName: z.string(),
-        description: z.string(),
-        street: z.string(),
-        country: z.string(),
-        state: z.string(),
-        city: z.string(),
-        zipcode: z.string(),
-        FoodTag: z.string().array(),
-      }),
+      type: z.string().refine((val) => val === "FeatureCollection"),
+      features: RestaurantGeoJsonFeatureZod,
     })
-    .array()
     .optional(),
   country: z.string().optional(),
   state: z.string().optional(),
@@ -146,6 +138,7 @@ export const ResponseRestaurantGeoJsonZod = z.object({
   zipcode: z.string().optional(),
   typeError: z.string().optional(),
   restaurantError: z.string().optional(),
+  
 });
 
 export const RestaurantReadDbZod = z.object({
@@ -163,6 +156,5 @@ export const RestaurantReadDbZod = z.object({
       street: z.string(),
       FoodTag: z.string().array(),
     })
-    .array()
-    .optional(),
+    .array(),
 });
