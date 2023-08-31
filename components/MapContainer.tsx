@@ -5,8 +5,8 @@ import Map, { Source, Layer, Popup } from "react-map-gl";
 // local imports
 import { calcBoundsFromCoordinates } from "@/utils";
 import { ErrorCard } from "@/components";
-import { GeoJsonRestaurantProps } from "@/utils/types";
 import { Card, Title, Text } from "@mantine/core";
+import { GeoJsonRestaurantProperties } from "@/utils/types";
 
 export type PopupDataProps = {
   restaurantName: string;
@@ -19,7 +19,7 @@ export type PopupDataProps = {
 export type MapContainerProps = {
   geolocations: GeoJSON.FeatureCollection<
     GeoJSON.Geometry,
-    GeoJsonRestaurantProps
+    GeoJsonRestaurantProperties
   >;
   hoverId: string | number | undefined;
   setHoverId: (val: string | number | undefined) => void;
@@ -110,8 +110,6 @@ export const MapContainer: React.FC<MapContainerProps> = ({
       setShowPopup(true);
     }
   };
-
-  
 
   return (
     <Map
