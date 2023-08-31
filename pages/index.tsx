@@ -1,15 +1,15 @@
 //import * as React from "react";
+import * as React from "react";
 import { AppProps } from "next/app";
-import { Box, BackgroundImage, Flex, Autocomplete } from "@mantine/core";
-
-import { HeroHeader } from "@/components";
+import { Box, BackgroundImage, Flex } from "@mantine/core";
+import { HeroHeader, SearchInput } from "@/components";
 
 const Home = (props: AppProps) => {
   return <HeroHeaderSearch />;
 };
 export default Home;
 
-export const HeroHeaderSearch: React.FC = () => {
+export const HeroHeaderSearch: React.FC = ({}) => {
   return (
     <Box>
       <BackgroundImage
@@ -25,10 +25,23 @@ export const HeroHeaderSearch: React.FC = () => {
             [theme.fn.smallerThan("sm")]: {
               width: "100%",
             },
-            width: "40%",
+            width: "50%",
           })}
+          direction="column"
         >
-          <HeroHeader />
+          <Flex
+            sx={(theme) => ({
+              [theme.fn.smallerThan("sm")]: {
+                width: "100%",
+              },
+              width: "80%",
+            })}
+          >
+            <HeroHeader />
+          </Flex>
+          <Box mb="xl" pb="xl" pt="md" pl="xl" ml="md">
+            <SearchInput />
+          </Box>
         </Flex>
       </BackgroundImage>
     </Box>

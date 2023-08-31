@@ -11,6 +11,11 @@ export const ResponseAddFoodTagZod = z.object({
   id: z.string().optional(),
 });
 
+export const ResponseGetAllGeogZod = z.object({
+  zipcode: z.string().array(),
+  city: z.string().array(),
+});
+
 export const ResponseAddCountryZod = z.object({
   country: z.string().optional(),
   id: z.string().optional(),
@@ -86,4 +91,78 @@ export const PostAddRestaurantZod = z.object({
   longitude: z.number().gte(-180).lte(180),
   latitude: z.number().gte(-90).lte(90),
   foodTag: z.string().uuid().array(),
+});
+
+export const GetSearchInputsZod = z.object({
+  state: z.string(),
+  city: z.string(),
+  zipcode: z.string(),
+  country: z.string(),
+  restaurantName: z.string(),
+});
+
+// type: string;
+//     geometry: {
+//         type: string;
+//         coordinates: number[];
+//         properties: {
+//             restaurantName: string;
+//             description: string;
+//             street: string;
+//             country: string;
+//             state: string;
+//             city: string;
+//             zipcode: string;
+//             FoodTag: string[];
+//         };
+//     };
+// }
+
+export const ResponseRestaurantGeoJsonZod = z.object({
+  restaurants: z
+    .object({
+      type: z.string().refine((val) => val === "Feature"),
+      geometry: z.object({
+        type: z.string().refine((val) => val === "Point"),
+        coordinates: z.number().gte(-180).lte(180).array().length(2),
+      }),
+      properties: z.object({
+        restaurantId: z.string().uuid(),
+        restaurantName: z.string(),
+        description: z.string(),
+        street: z.string(),
+        country: z.string(),
+        state: z.string(),
+        city: z.string(),
+        zipcode: z.string(),
+        FoodTag: z.string().array(),
+      }),
+    })
+    .array()
+    .optional(),
+  country: z.string().optional(),
+  state: z.string().optional(),
+  city: z.string().optional(),
+  zipcode: z.string().optional(),
+  typeError: z.string().optional(),
+  restaurantError: z.string().optional(),
+});
+
+export const RestaurantReadDbZod = z.object({
+  restaurants: z
+    .object({
+      restaurantId: z.string().uuid(),
+      latitude: z.number().gte(-90).lte(90),
+      longitude: z.number().gte(-180).lte(180),
+      restaurantName: z.string(),
+      description: z.string(),
+      country: z.string(),
+      state: z.string(),
+      city: z.string(),
+      zipcode: z.string(),
+      street: z.string(),
+      FoodTag: z.string().array(),
+    })
+    .array()
+    .optional(),
 });

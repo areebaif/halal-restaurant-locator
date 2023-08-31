@@ -11,7 +11,6 @@ export default async function AddState(
 ) {
   try {
     const restaurantData = req.body;
-    console.log(restaurantData, "!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!");
     const isTypeCorrect = PostAddRestaurantZod.safeParse(restaurantData);
     if (!isTypeCorrect.success) {
       console.log(isTypeCorrect.error);

@@ -7,6 +7,7 @@ This is a [Next.js](https://nextjs.org/) project bootstrapped with [`create-next
 create .en.local file and add the following variables
 
 `DATABASE_URL=[contact admin of repo for the value]`
+`NEXT_PUBLIC_MAPBOX_ACCESS=["contact admin of repo for the value]`
 
 First, run the development server:
 
