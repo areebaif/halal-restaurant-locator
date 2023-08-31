@@ -1,9 +1,8 @@
 import { Card, Flex, Title, Text, Badge } from "@mantine/core";
 import { useMap } from "react-map-gl";
-import { GeoJsonRestaurantProps } from "@/utils/types";
+import { GeoJsonRestaurantProperties } from "@/utils/types";
 import { ErrorCard } from ".";
 import { MapContainerProps, PopupDataProps } from "./MapContainer";
-
 
 export const SearchResultList: React.FC<MapContainerProps> = ({
   geolocations,
@@ -39,7 +38,7 @@ export const SearchResultList: React.FC<MapContainerProps> = ({
   );
 };
 type GeoLocationCard = {
-  location: GeoJSON.Feature<GeoJSON.Geometry, GeoJsonRestaurantProps>;
+  location: GeoJSON.Feature<GeoJSON.Geometry, GeoJsonRestaurantProperties>;
   hoverId: string | number | undefined;
   setHoverId: (val: string | number | undefined) => void;
   showPopup: boolean;
@@ -103,7 +102,7 @@ const GeoLocationCard: React.FC<GeoLocationCard> = ({
       setShowPopup(true);
     }
   };
-  
+
   const onMouseLeave = () => {
     MapA?.setFeatureState(
       { source: "restaurant locations", id: location.id },
