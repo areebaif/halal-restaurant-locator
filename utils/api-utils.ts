@@ -1,5 +1,9 @@
 import { prisma } from "@/db/prisma";
-import { RestaurantReadDb } from "./types";
+import {
+  RestaurantReadDb,
+  ResponseRestaurantGeoJsonFeatureCollection,
+  RestaurantGeoJsonFeature
+} from "./types";
 
 type searchCriteria = {
   zipcodeId?: string;
@@ -74,28 +78,12 @@ export const findRestaurant = async (searchCriteria: searchCriteria) => {
 };
 
 export const restaurantToGeoJson = (data: RestaurantReadDb["restaurants"]) => {
-  return data?.map((restaurant) => {
-    const {
-      restaurantId,
-      latitude,
-      longitude,
-      restaurantName,
-      description,
-      street,
-      country,
-      state,
-      city,
-      zipcode,
-      FoodTag,
-    } = restaurant;
-    return {
-      type: "Feature",
-      geometry: {
-        type: "Point",
-        coordinates: [longitude, latitude],
-      },
-      properties: {
+  const features: RestaurantGeoJsonFeature = data?.map(
+    (restaurant, index) => {
+      const {
         restaurantId,
+        latitude,
+        longitude,
         restaurantName,
         description,
         street,
@@ -104,18 +92,32 @@ export const restaurantToGeoJson = (data: RestaurantReadDb["restaurants"]) => {
         city,
         zipcode,
         FoodTag,
-      },
-    };
-  });
-};
+      } = restaurant;
+      return {
+        id: index,
+        type: "Feature",
+        geometry: {
+          type: "Point",
+          coordinates: [longitude, latitude],
+        },
+        properties: {
+          restaurantId,
+          restaurantName,
+          description,
+          street,
+          country,
+          state,
+          city,
+          zipcode,
+          FoodTag,
+        },
+      };
+    }
+  );
 
-// restaurantName: string;
-//         description: string;
-//         latitude: number;
-// street
-//         longitude: number;
-//         FoodTag: string[];
-//         country: string;
-//         state: string;
-//         city: string;
-//         zipcode: string;
+  const result: ResponseRestaurantGeoJsonFeatureCollection["restaurants"] = {
+    type: "FeatureCollection",
+    features: features ? features : [],
+  };
+  return result;
+};

@@ -10,17 +10,15 @@ import {
 } from "@/utils";
 import {
   GetSearchInputs,
-
-  ResponseRestaurantGeoJson,
+  ResponseRestaurantGeoJsonFeatureCollection,
 } from "@/utils/types";
 
 export default async function MapSearch(
   req: NextApiRequest,
-  res: NextApiResponse<ResponseRestaurantGeoJson>
+  res: NextApiResponse<ResponseRestaurantGeoJsonFeatureCollection>
 ) {
   try {
     const { search } = req.query;
-
     const isQueryCorrect = z.string().safeParse(search);
     if (!isQueryCorrect.success) {
       console.log(isQueryCorrect.error);
@@ -87,60 +85,43 @@ export default async function MapSearch(
       return;
     }
     // search by city
-    if (city.length > 1) {
-      const stateExists = await prisma.state.findUnique({
-        where: {
-          countryId_stateName: {
-            countryId: countryExists?.countryId,
-            stateName: capitalizeFirstWord(state),
-          },
+    const stateExists = await prisma.state.findUnique({
+      where: {
+        countryId_stateName: {
+          countryId: countryExists?.countryId,
+          stateName: capitalizeFirstWord(state),
         },
+      },
+    });
+    if (!stateExists?.stateId) {
+      res.json({
+        state:
+          "The provided stateName inreference to countryId doesnot exist in the database",
       });
-      if (!stateExists?.stateId) {
-        res.json({
-          state:
-            "The provided stateName inreference to countryId doesnot exist in the database",
-        });
-        return;
-      }
-      const cityExists = await prisma.city.findUnique({
-        where: {
-          countryId_stateId_cityName: {
-            countryId: countryExists.countryId,
-            stateId: stateExists.stateId,
-            cityName: capitalizeFirstWord(city),
-          },
-        },
-      });
-      if (!cityExists?.cityId) {
-        res.json({
-          city: "The provided cityName in reference to countryId and stateName doesnot exist in the database",
-        });
-        return;
-      }
-      const restaurants = await findRestaurant({
-        countryId: countryExists.countryId,
-        stateId: stateExists.stateId,
-        cityId: cityExists.cityId,
-      });
-      res.status(200).send({ restaurants: restaurants });
       return;
     }
-
-    // search by restaurant name
-    if (restaurantName.length > 1) {
-      const restaurantExists = await findRestaurant({
-        restaurantName: restaurantName,
+    const cityExists = await prisma.city.findUnique({
+      where: {
+        countryId_stateId_cityName: {
+          countryId: countryExists.countryId,
+          stateId: stateExists.stateId,
+          cityName: capitalizeFirstWord(city),
+        },
+      },
+    });
+    if (!cityExists?.cityId) {
+      res.json({
+        city: "The provided cityName in reference to countryId and stateName doesnot exist in the database",
       });
-      if (!restaurantExists?.length) {
-        res.json({
-          restaurantError: "no value exists with the restaurant name provided",
-        });
-        return;
-      }
-      res.status(200).send({ restaurants: restaurantExists });
       return;
     }
+    const restaurants = await findRestaurant({
+      countryId: countryExists.countryId,
+      stateId: stateExists.stateId,
+      cityId: cityExists.cityId,
+    });
+    res.status(200).send({ restaurants: restaurants });
+    return;
   } catch (err) {
     console.log(err);
     res

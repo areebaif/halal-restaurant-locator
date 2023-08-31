@@ -1,7 +1,7 @@
 import {
   ResponseAddFoodTag,
   ResponseGetAllGeog,
-  GeoJsonRestaurant,
+  GeoJsonRestaurantFeatureCollection,
 } from "./types";
 
 export const postAddFoodTag = async (data: { foodTag: string }) => {
@@ -24,7 +24,7 @@ export const getMapSearchInput = async (data: string) => {
       "Content-Type": "application/json",
     },
   });
-  const res: GeoJsonRestaurant = await response.json();
+  const res: GeoJsonRestaurantFeatureCollection = await response.json();
   return res;
 };
 
