@@ -127,6 +127,7 @@ export const ResponseRestaurantGeoJsonZod = z.object({
         coordinates: z.number().gte(-180).lte(180).array().length(2),
       }),
       properties: z.object({
+        restaurantId: z.string().uuid(),
         restaurantName: z.string(),
         description: z.string(),
         street: z.string(),
@@ -150,6 +151,7 @@ export const ResponseRestaurantGeoJsonZod = z.object({
 export const RestaurantReadDbZod = z.object({
   restaurants: z
     .object({
+      restaurantId: z.string().uuid(),
       latitude: z.number().gte(-90).lte(90),
       longitude: z.number().gte(-180).lte(180),
       restaurantName: z.string(),

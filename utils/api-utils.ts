@@ -13,6 +13,7 @@ export const findRestaurant = async (searchCriteria: searchCriteria) => {
   const result = await prisma.restaurant.findMany({
     where: searchCriteria,
     select: {
+      restaurantId: true,
       latitude: true,
       longitude: true,
       restaurantName: true,
@@ -42,6 +43,7 @@ export const findRestaurant = async (searchCriteria: searchCriteria) => {
 
   const mappedData = result.map((restaurantItem) => {
     const {
+      restaurantId,
       latitude,
       longitude,
       restaurantName,
@@ -54,6 +56,7 @@ export const findRestaurant = async (searchCriteria: searchCriteria) => {
       street,
     } = restaurantItem;
     return {
+      restaurantId,
       latitude,
       longitude,
       restaurantName,
@@ -73,6 +76,7 @@ export const findRestaurant = async (searchCriteria: searchCriteria) => {
 export const restaurantToGeoJson = (data: RestaurantReadDb["restaurants"]) => {
   return data?.map((restaurant) => {
     const {
+      restaurantId,
       latitude,
       longitude,
       restaurantName,
@@ -91,6 +95,7 @@ export const restaurantToGeoJson = (data: RestaurantReadDb["restaurants"]) => {
         coordinates: [longitude, latitude],
       },
       properties: {
+        restaurantId,
         restaurantName,
         description,
         street,

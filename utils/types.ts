@@ -42,6 +42,7 @@ export type GeoJsonRestaurant = {
       type: "Point";
       coordinates: [number, number];
     };
+
     properties: GeoJsonRestaurantProps;
   }[];
   country?: string;
@@ -53,6 +54,7 @@ export type GeoJsonRestaurant = {
 };
 
 export type GeoJsonRestaurantProps = {
+  restaurantId: string;
   restaurantName: string;
   description: string;
   street: string;

@@ -11,45 +11,24 @@ import type { PayloadAction } from "@reduxjs/toolkit";
 // };
 
 const initialState: MapProps = {
-  dataSourceId: "restaurant locations",
-  layerId: "points",
-  geolocations: {
-    type: "FeatureCollection",
-    features: [],
-  },
+  hoverId: undefined,
   //refreshMapData: false,
 };
 
 export type MapProps = {
-  dataSourceId: string;
-  layerId: string;
-  geolocations: GeoJSON.FeatureCollection<
-    GeoJSON.Geometry,
-    GeoJsonRestaurantProps
-  >;
-  //refreshMapData: boolean;
-  //hoverId: number | undefined | string;
+  hoverId: number | undefined | string;
 };
 
 export const geolocationSlice = createSlice({
   name: "geolocation-input",
   initialState,
   reducers: {
-    setGoelocations: (
-      state,
-      action: PayloadAction<
-        GeoJSON.FeatureCollection<GeoJSON.Geometry, GeoJsonRestaurantProps>
-      >
-    ) => {
-
-      state.geolocations = action.payload;
+    setHoverId: (state, action: PayloadAction<number | undefined | string>) => {
+      state.hoverId = action.payload;
     },
-    // setRefreshMapData: (state, action: PayloadAction<boolean>) => {
-    //   state.refreshMapData = action.payload;
-    // },
   },
 });
 
-export const { setGoelocations } = geolocationSlice.actions;
+export const { setHoverId } = geolocationSlice.actions;
 
 export default geolocationSlice.reducer;

@@ -4,6 +4,8 @@ import { AppChromeAdmin } from "./layout/AdminLayout";
 import { AppChrome } from "./layout/AppChrome";
 import { ErrorCard } from "./ErrorCard";
 import { SearchInput } from "./searchInput";
+import { MapContainer } from "./MapContainer";
+import { SearchResultList } from "./SearchResultList";
 
 export {
   HeroHeader,
@@ -12,4 +14,6 @@ export {
   AppChrome,
   ErrorCard,
   SearchInput,
+  MapContainer,
+  SearchResultList,
 };
