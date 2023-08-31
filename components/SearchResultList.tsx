@@ -1,6 +1,7 @@
 import { Card, Flex, Title, Text, Badge } from "@mantine/core";
 import { useMap } from "react-map-gl";
 import { GeoJsonRestaurantProps } from "@/utils/types";
+import { ErrorCard } from ".";
 type SearchResultListProps = {
   geolocations: GeoJSON.FeatureCollection<
     GeoJSON.Geometry,
@@ -11,12 +12,14 @@ type SearchResultListProps = {
 export const SearchResultList: React.FC<SearchResultListProps> = ({
   geolocations,
 }) => {
-  return (
+  return geolocations.features.length > 0 ? (
     <Flex direction="column">
       {geolocations.features.map((location, index) => {
         return <GeoLocationCard key={index} location={location} />;
       })}
     </Flex>
+  ) : (
+    <ErrorCard message="This location has no data" />
   );
 };
 type GeoLocationCard = {
