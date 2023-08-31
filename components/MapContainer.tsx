@@ -1,16 +1,12 @@
 import * as React from "react";
-import { useRouter } from "next/router";
-import { useQuery } from "@tanstack/react-query";
-import Head from "next/head";
 import "mapbox-gl/dist/mapbox-gl.css";
 import mapboxgl, { MapLayerMouseEvent } from "mapbox-gl";
-import Map, { Source, Layer } from "react-map-gl";
+import Map, { Source, Layer, Popup } from "react-map-gl";
 // local imports
 import { calcBoundsFromCoordinates } from "@/utils";
 import { ErrorCard } from "@/components";
 import { GeoJsonRestaurantProps } from "@/utils/types";
-import { useAppDispatch, useAppSelector } from "@/redux-store/redux-hooks";
-import { setHoverId } from "@/redux-store/geography-slice";
+import { Card, Title, Text } from "@mantine/core";
 
 type MapContainerProps = {
   geolocations: GeoJSON.FeatureCollection<
@@ -27,12 +23,19 @@ type CameraViewState = {
 
 export const MapContainer: React.FC<MapContainerProps> = ({ geolocations }) => {
   const mapRef = React.useRef<any>();
-  const dispatch = useAppDispatch();
-  const mapInputs = useAppSelector((state) => state.geolocation);
-  const { hoverId } = mapInputs;
+  const [hoverId, setHoverId] = React.useState<number | string | undefined>(
+    undefined
+  );
+  const [popupData, setPopupData] = React.useState({
+    restaurantName: "",
+    description: "",
+    address: "",
+    latitude: 0,
+    longitude: 0,
+  });
   const [cameraViewState, setCameraViewState] =
     React.useState<CameraViewState>();
-
+  const [showPopup, setShowPopup] = React.useState<boolean>(false);
   const onViewStateChange = (data: CameraViewState) => {
     setCameraViewState((previousState) => {
       return { ...previousState, ...data };
@@ -67,27 +70,33 @@ export const MapContainer: React.FC<MapContainerProps> = ({ geolocations }) => {
         { hover: false }
       );
     }
-    dispatch(setHoverId(undefined));
     if (e.features?.length) {
       const coordinatesObject = e.features[0].geometry as GeoJSON.Point;
       const coordinates = coordinatesObject.coordinates.slice();
-      const description = e.features[0].properties;
+      const description = e.features[0].properties?.description;
+      const restaurantName = e.features[0].properties?.restaurantName;
+      const street = e.features[0].properties?.street;
+      const city = e.features[0].properties?.city;
+      const state = e.features[0].properties?.state;
+      const zip = e.features[0].properties?.zipcode;
+      const country = e.features[0].properties?.country;
+      const address = `${street}, ${city}, ${state}, ${zip}, ${country}`;
+
       const id = e.features[0].id;
-      dispatch(setHoverId(id));
+      setHoverId(id);
       mapRef.current.setFeatureState(
         { source: "restaurant locations", id: id },
         { hover: true }
       );
+      setPopupData({
+        restaurantName,
+        address,
+        description,
+        latitude: coordinates[1],
+        longitude: coordinates[0],
+      });
+      setShowPopup(true);
     }
-  };
-
-  const onMouseLeavePopup = () => {
-    // disable hover interactivity inside layer of map
-    mapRef.current.setFeatureState(
-      { source: "restaurant locations", id: hoverId },
-      { hover: false }
-    );
-    dispatch(setHoverId(undefined));
   };
 
   return (
@@ -131,6 +140,32 @@ export const MapContainer: React.FC<MapContainerProps> = ({ geolocations }) => {
           }}
         />
       </Source>
+      {/* TODO: do styling */}
+      {showPopup && (
+        <Popup
+          longitude={popupData.longitude}
+          latitude={popupData.latitude}
+          anchor="top"
+          onClose={() => {
+            mapRef.current.setFeatureState(
+              { source: "restaurant locations", id: hoverId },
+              { hover: false }
+            );
+            setHoverId(undefined);
+            setShowPopup(false);
+          }}
+        >
+          <Card shadow="sm" radius="md" withBorder>
+            <Title order={4}>{popupData.restaurantName}</Title>
+            <Text size="xs" color="dimmed">
+              {`${popupData.address}`}
+            </Text>
+            <Text size="xs" color="dimmed">
+              {`${popupData.description}`}
+            </Text>
+          </Card>
+        </Popup>
+      )}
     </Map>
   );
 };
