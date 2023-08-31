@@ -1,4 +1,4 @@
-import { PostSearchInputs } from "./types";
+import { GetSearchInputs } from "./types";
 
 export const capitalizeFirstWord = (val: string) => {
   return val
@@ -7,7 +7,7 @@ export const capitalizeFirstWord = (val: string) => {
     .join(" ");
 };
 
-export const parseQueryVals = (val: string): PostSearchInputs => {
+export const parseQueryVals = (val: string): GetSearchInputs => {
   const queryValue = {
     zipcode: "",
     country: "",
