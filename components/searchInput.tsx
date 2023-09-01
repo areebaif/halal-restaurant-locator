@@ -14,7 +14,7 @@ export const SearchInput: React.FC = () => {
   const [error, setError] = React.useState({ inputData: "" });
   // Queries
   const geogData = useQuery(
-    ["getGeographyAutoCompleteData"],
+        ["getGeographyAutoCompleteData"],
     getGeogAutoComplete,
     {
       staleTime: Infinity,
@@ -26,8 +26,15 @@ export const SearchInput: React.FC = () => {
     console.log(geogData.error);
     return <ErrorCard message="something went wrong with the server" />;
   }
+  const parsedZipcode = geogData.data?.zipcode?.map(
+    (item) => `${item.zipcode}, ${geogData.data.country?.countryName}`
+  );
 
-  const mergedData = [...geogData.data.zipcode, ...geogData.data.city];
+  const parsedCity = geogData.data.city?.map(
+    (city) =>
+      `${city.cityName}, ${city.stateName}, ${geogData.data.country?.countryName}`
+  );
+  const mergedData = [...parsedZipcode!, ...parsedCity!];
 
   const onSubmit = (val: string) => {
     // check if zipcode or city
@@ -58,7 +65,7 @@ export const SearchInput: React.FC = () => {
     }
   };
   return (
-    <Grid >
+    <Grid>
       <Grid.Col md={12} lg={9}>
         <Autocomplete
           error={geogData.isError}

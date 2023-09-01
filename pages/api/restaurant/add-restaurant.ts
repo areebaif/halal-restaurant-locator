@@ -5,6 +5,97 @@ import type { NextApiRequest, NextApiResponse } from "next";
 import { PostAddRestaurantZod, capitalizeFirstWord } from "@/utils";
 import { PostAddRestaurant, ResponseAddRestaurant } from "@/utils/types";
 
+/**
+ *
+ * @swagger
+ * /api/restaurant/add-restaurant:
+ *    post:
+ *      tags:
+ *        - restaurants
+ *      summary: create a new restaurant
+ *      description: add a restaurant to the database.
+ *      operationId: createRestaurant
+ *      requestBody:
+ *        description: add a restaurant in the database.
+ *        content:
+ *          application/json:
+ *            schema:
+ *              type: object
+ *              properties:
+ *                countryId:
+ *                  type: string
+ *                  format: uuid
+ *                  example: "64b31531-28fd-4570-ad64-6aa312e53d69"
+ *                stateName:
+ *                  type: string
+ *                  example: "Minnesota"
+ *                cityName:
+ *                  type: string
+ *                  example: "Minneapolis"
+ *                zipcode:
+ *                  type: string
+ *                  example: "55442"
+ *                latitude:
+ *                  type: number
+ *                  format: float
+ *                  example: 45.04856
+ *                longitude:
+ *                  type: number
+ *                  format: float
+ *                  example: -93.4269,
+ *                foodTag:
+ *                  type: array
+ *                  items:
+ *                    type:
+ *                      string
+ *                    example: "64b31531-28fd-4570-ad64-6aa312e53d69"
+ *                street:
+ *                  type: string
+ *                  example: string
+ *                restaurantName:
+ *                  type: string
+ *                description:
+ *                  type: string
+ *
+ *        required: true
+ *      responses:
+ *        '201':
+ *          description: Successful operation
+ *          content:
+ *            application/json:
+ *              schema:
+ *                type: object
+ *                properties:
+ *                  created:
+ *                    type: string
+ *                    example: "ok"
+ *        '400':
+ *          description: Invalid data supplied
+ *          content:
+ *            application/json:
+ *              schema:
+ *                type: object
+ *                properties:
+ *                  typeError:
+ *                    type: string
+ *                    example:   "type check failed on the server, expected to an objects with countryId, stateName, cityName, restaurantName, description properties as string, foodtag property as array of uuid string , longitude and latitude properties as number"
+ *                  country:
+ *                    type: string
+ *                    example: "The provided countryId doesnot exist in the database"
+ *                  state:
+ *                    type: string
+ *                    example: "The provided stateName in reference to countryId doesnot exist in the database"
+ *                  city:
+ *                    type: string
+ *                    example:  "The provided cityName in reference to countryId and stateName doesnot exist in the database"
+ *                  zipcode:
+ *                    type: string
+ *                    example:  "The provided zipcode in reference to countryId doesnot exist in the database"
+ *                  foodTag:
+ *                    type: string
+ *                    example: "Some of the values provided in foodtag array do not exist in the database"
+ */
+
 export default async function AddState(
   req: NextApiRequest,
   res: NextApiResponse<ResponseAddRestaurant>
@@ -14,7 +105,7 @@ export default async function AddState(
     const isTypeCorrect = PostAddRestaurantZod.safeParse(restaurantData);
     if (!isTypeCorrect.success) {
       console.log(isTypeCorrect.error);
-      res.json({
+      res.status(400).json({
         typeError:
           "type check failed on the server, expected to an objects with countryId, stateName, cityName, restaurantName, description properties as string, foodtag property as array of uuid string , longitude and latitude properties as number",
       });
@@ -35,7 +126,7 @@ export default async function AddState(
       },
     });
     if (!countryExists?.countryId) {
-      res.json({
+      res.status(400).json({
         country: "The provided countryId doesnot exist in the database",
       });
       return;
@@ -49,7 +140,7 @@ export default async function AddState(
       },
     });
     if (!stateExists?.stateId) {
-      res.json({
+      res.status(400).json({
         state:
           "The provided stateName inreference to countryId doesnot exist in the database",
       });
@@ -65,7 +156,7 @@ export default async function AddState(
       },
     });
     if (!cityExists?.cityId) {
-      res.json({
+      res.status(400).json({
         city: "The provided cityName in reference to countryId and stateName doesnot exist in the database",
       });
       return;
@@ -81,7 +172,7 @@ export default async function AddState(
     });
 
     if (!zipcodeExists?.zipcodeId) {
-      res.json({
+      res.status(400).json({
         zipcode:
           "The provided zipcode in reference to countryId doesnot exist in the database",
       });
@@ -100,7 +191,7 @@ export default async function AddState(
       !tag ? (isNullValue = true) : undefined
     );
     if (isNullValue) {
-      res.json({
+      res.status(400).json({
         foodTag:
           "Some of the values provided in foodtag array do not exist in the database",
       });
@@ -131,7 +222,7 @@ export default async function AddState(
       })
     );
     await prisma.$transaction([createRestaurant, ...addRestaurant_FoodTag]);
-    res.status(202).json({ created: "ok" });
+    res.status(201).json({ created: "ok" });
   } catch (err) {
     console.log(err);
     res.status(500).json({ country: "something went wrong with the server" });

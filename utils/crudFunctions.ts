@@ -1,6 +1,6 @@
 import {
   ResponseAddFoodTag,
-  ResponseGetAllGeog,
+  ResponseGetAllGeogByCountry,
   GeoJsonRestaurantFeatureCollection,
 } from "./types";
 
@@ -29,12 +29,12 @@ export const getMapSearchInput = async (data: string) => {
 };
 
 export const getGeogAutoComplete = async () => {
-  const response = await fetch("/api/geography/get-all", {
+  const response = await fetch(`/api/geography/get-all-usa`, {
     method: "GET",
     headers: {
       "Content-Type": "application/json",
     },
   });
-  const res: ResponseGetAllGeog = await response.json();
+  const res: ResponseGetAllGeogByCountry = await response.json();
   return res;
 };
