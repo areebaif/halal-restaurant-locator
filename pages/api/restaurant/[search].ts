@@ -16,6 +16,7 @@ import {
 /**
  *
  * @swagger
+ *
  * /api/restaurant/{zipcode}&{country}:
  *     get:
  *       tags:
