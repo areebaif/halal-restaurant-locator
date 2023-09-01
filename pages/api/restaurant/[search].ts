@@ -22,14 +22,14 @@ export default async function MapSearch(
     const isQueryCorrect = z.string().safeParse(search);
     if (!isQueryCorrect.success) {
       console.log(isQueryCorrect.error);
-      res.json({ typeError: "expected query param as string" });
+      res.status(400).json({ typeError: "expected query param as string" });
       return;
     }
     const searchData = parseQueryVals(search as string);
     const isTypeCorrect = GetSearchInputsZod.safeParse(searchData);
     if (!isTypeCorrect.success) {
       console.log(isTypeCorrect.error);
-      res.json({
+      res.status(400).json({
         typeError:
           "type check failed on the server, expected to an objects with countryName as string, and either zipcode as string or restaurantName as string or stateName, cityName, as string",
       });
@@ -40,7 +40,7 @@ export default async function MapSearch(
     const { country, state, city, zipcode, restaurantName } = queryProps;
 
     if (!state && !city && !restaurantName && !zipcode) {
-      res.json({
+      res.status(400).json({
         typeError:
           "type check failed on the server, you need to define either zipcode & countryName or stateName, cityName & countryName or restaurantName & country.",
       });
@@ -52,7 +52,7 @@ export default async function MapSearch(
       },
     });
     if (!countryExists?.countryId) {
-      res.json({
+      res.status(400).json({
         country: "The provided countryName doesnot exist in the database",
       });
       return;
@@ -69,7 +69,7 @@ export default async function MapSearch(
         },
       });
       if (!zipcodeExists?.zipcodeId) {
-        res.json({
+        res.status(400).json({
           zipcode:
             "The provided zipcode in reference to countryId doesnot exist in the database",
         });
@@ -94,7 +94,7 @@ export default async function MapSearch(
       },
     });
     if (!stateExists?.stateId) {
-      res.json({
+      res.status(400).json({
         state:
           "The provided stateName inreference to countryId doesnot exist in the database",
       });
@@ -110,7 +110,7 @@ export default async function MapSearch(
       },
     });
     if (!cityExists?.cityId) {
-      res.json({
+      res.status(400).json({
         city: "The provided cityName in reference to countryId and stateName doesnot exist in the database",
       });
       return;
@@ -120,7 +120,7 @@ export default async function MapSearch(
       stateId: stateExists.stateId,
       cityId: cityExists.cityId,
     });
-    res.status(200).send({ restaurants: restaurants });
+    res.status(400).status(200).send({ restaurants: restaurants });
     return;
   } catch (err) {
     console.log(err);

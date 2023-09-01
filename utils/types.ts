@@ -11,7 +11,7 @@ import {
   ResponseAddZipcodeZod,
   PostAddRestaurantZod,
   ResponseAddRestaurantZod,
-  ResponseGetAllGeogZod,
+  ResponseGetAllGeogByCountryZod,
   GetSearchInputsZod,
   ResponseRestaurantGeoJsonZod,
   GeoJsonRestaurantPropertiesZod,
@@ -30,7 +30,7 @@ export type PostAddCity = z.infer<typeof PostAddCityZod>;
 export type PostAddZipCode = z.infer<typeof PostAddZipCodeZod>;
 export type PostAddRestaurant = z.infer<typeof PostAddRestaurantZod>;
 export type ResponseAddRestaurant = z.infer<typeof ResponseAddRestaurantZod>;
-export type ResponseGetAllGeog = z.infer<typeof ResponseGetAllGeogZod>;
+export type ResponseGetAllGeogByCountry = z.infer<typeof ResponseGetAllGeogByCountryZod>;
 export type GetSearchInputs = z.infer<typeof GetSearchInputsZod>;
 export type RestaurantReadDb = z.infer<typeof RestaurantReadDbZod>;
 export type RestaurantGeoJsonFeature = z.infer<

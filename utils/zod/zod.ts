@@ -11,9 +11,34 @@ export const ResponseAddFoodTagZod = z.object({
   id: z.string().optional(),
 });
 
-export const ResponseGetAllGeogZod = z.object({
-  zipcode: z.string().array(),
-  city: z.string().array(),
+export const ResponseGetAllGeogByCountryZod = z.object({
+  typeError: z.string().optional(),
+  country: z
+    .object({ countryId: z.string().uuid(), countryName: z.string().uuid() })
+    .optional(),
+  zipcode: z
+    .object({
+      zipcodeId: z.string().uuid(),
+      stateName: z.string(),
+      cityName: z.string(),
+      zipcode: z.string(),
+      latitude: z.number().gte(-90).lte(90),
+      longitude: z.number().gte(-180).lte(180),
+    })
+    .array()
+    .optional(),
+  state: z
+    .object({ stateId: z.string().uuid(), stateName: z.string() })
+    .array()
+    .optional(),
+  city: z
+    .object({
+      cityId: z.string().uuid(),
+      stateName: z.string(),
+      cityName: z.string(),
+    })
+    .array()
+    .optional(),
 });
 
 export const ResponseAddCountryZod = z.object({
@@ -138,7 +163,6 @@ export const ResponseRestaurantGeoJsonZod = z.object({
   zipcode: z.string().optional(),
   typeError: z.string().optional(),
   restaurantError: z.string().optional(),
-  
 });
 
 export const RestaurantReadDbZod = z.object({

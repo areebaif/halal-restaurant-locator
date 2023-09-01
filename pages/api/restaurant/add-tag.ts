@@ -12,7 +12,9 @@ export default async function FoodTag(
     const foodTag = req.body.foodTag;
 
     if (typeof foodTag !== "string" || !foodTag.length) {
-      res.json({ foodTag: "please provide valid value for food tag" });
+      res
+        .status(400)
+        .json({ foodTag: "please provide valid value for food tag" });
       return;
     }
     const tag = foodTag as string;
@@ -24,7 +26,7 @@ export default async function FoodTag(
       },
     });
     if (foodTagExists?.foodTagId) {
-      res.json({
+      res.status(400).json({
         foodTag: "food tag value already exists, please provide a unique name",
       });
       return;
@@ -36,7 +38,7 @@ export default async function FoodTag(
       },
     });
 
-    res.status(202).json({ id: createFoodTag.foodTagId });
+    res.status(201).json({ id: createFoodTag.foodTagId });
   } catch (err) {
     console.log(err);
     res.status(500).json({ foodTag: "something went wrong with the server" });
