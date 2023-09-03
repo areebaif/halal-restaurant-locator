@@ -1,4 +1,4 @@
-This is a [Next.js](https://nextjs.org/) project bootstrapped with [`create-next-app`](https://github.com/vercel/next.js/tree/canary/packages/create-next-app).
+## Halal Restaurant Locator
 
 ## Getting Started
 
@@ -6,7 +6,7 @@ This is a [Next.js](https://nextjs.org/) project bootstrapped with [`create-next
 
 Create .env.local file in the root of the project and have the following environemnt variables defined.
 
-- `DATABASE_URL=[contact admin of repo for the value]`
+- `DATABASE_URL=[contact admin of repo for the value]`.
 - `NEXT_PUBLIC_MAPBOX_ACCESS=[contact admin of repo for the value]`
 
 ### Install dependencies
