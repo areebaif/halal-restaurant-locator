@@ -2,7 +2,7 @@ import { prisma } from "@/db/prisma";
 import {
   RestaurantReadDb,
   ResponseRestaurantGeoJsonFeatureCollection,
-  RestaurantGeoJsonFeature
+  RestaurantGeoJsonFeature,
 } from "./types";
 
 type searchCriteria = {
@@ -11,6 +11,49 @@ type searchCriteria = {
   stateId?: string;
   cityId?: string;
   restaurantName?: string;
+};
+
+export const dataToGeoJson = (data: RestaurantReadDb["restaurants"]) => {
+  const features: RestaurantGeoJsonFeature = data?.map((restaurant, index) => {
+    const {
+      restaurantId,
+      latitude,
+      longitude,
+      restaurantName,
+      description,
+      street,
+      country,
+      state,
+      city,
+      zipcode,
+      FoodTag,
+    } = restaurant;
+    return {
+      id: index,
+      type: "Feature",
+      geometry: {
+        type: "Point",
+        coordinates: [longitude, latitude],
+      },
+      properties: {
+        restaurantId,
+        restaurantName,
+        description,
+        street,
+        country,
+        state,
+        city,
+        zipcode,
+        FoodTag,
+      },
+    };
+  });
+
+  const result: ResponseRestaurantGeoJsonFeatureCollection["restaurants"] = {
+    type: "FeatureCollection",
+    features: features ? features : [],
+  };
+  return result;
 };
 
 export const findRestaurant = async (searchCriteria: searchCriteria) => {
@@ -73,51 +116,6 @@ export const findRestaurant = async (searchCriteria: searchCriteria) => {
       FoodTag: FoodTag.map((tag) => tag.FoodTag.name),
     };
   });
-  const geoJson = restaurantToGeoJson(mappedData);
+  const geoJson = dataToGeoJson(mappedData);
   return geoJson;
-};
-
-export const restaurantToGeoJson = (data: RestaurantReadDb["restaurants"]) => {
-  const features: RestaurantGeoJsonFeature = data?.map(
-    (restaurant, index) => {
-      const {
-        restaurantId,
-        latitude,
-        longitude,
-        restaurantName,
-        description,
-        street,
-        country,
-        state,
-        city,
-        zipcode,
-        FoodTag,
-      } = restaurant;
-      return {
-        id: index,
-        type: "Feature",
-        geometry: {
-          type: "Point",
-          coordinates: [longitude, latitude],
-        },
-        properties: {
-          restaurantId,
-          restaurantName,
-          description,
-          street,
-          country,
-          state,
-          city,
-          zipcode,
-          FoodTag,
-        },
-      };
-    }
-  );
-
-  const result: ResponseRestaurantGeoJsonFeatureCollection["restaurants"] = {
-    type: "FeatureCollection",
-    features: features ? features : [],
-  };
-  return result;
 };
