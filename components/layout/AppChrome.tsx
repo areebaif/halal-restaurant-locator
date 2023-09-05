@@ -2,13 +2,32 @@ import * as React from "react";
 import Link from "next/link";
 import { Button, Image } from "@mantine/core";
 // Mantine Imports
-import { AppShell, Header, Group, Container, Title, Flex } from "@mantine/core";
+import {
+  AppShell,
+  Header,
+  Group,
+  Container,
+  Title,
+  Flex,
+  Footer,
+  Text,
+} from "@mantine/core";
 import { useRouter } from "next/router";
 export const AppChrome: React.FC<React.PropsWithChildren> = (props) => {
   const router = useRouter();
   return (
     <AppShell
       //padding="md"
+      footer={
+        <Footer height={60} p="md">
+          <Group spacing="xs" position="center">
+            <Title order={6}>Location Icon Credits:</Title>
+            <Link href={"https://www.flaticon.com/free-icons/location"}>
+              <Button variant="unstyled">Flaticon</Button>
+            </Link>
+          </Group>
+        </Footer>
+      }
       header={
         <Header
           px="xl"
@@ -29,7 +48,7 @@ export const AppChrome: React.FC<React.PropsWithChildren> = (props) => {
              <Link href={"https://www.facebook.com/zahidtown"}>
               <Image src={"/facebook-logo.png"} height={45} width={45}></Image>
             </Link> */}
-            <Link href="/admin">
+            {/* <Link href="/admin">
               <Button
                 px="xl"
                 mx="xs"
@@ -39,7 +58,7 @@ export const AppChrome: React.FC<React.PropsWithChildren> = (props) => {
               >
                 Admin Dashboard
               </Button>
-            </Link>
+            </Link> */}
           </Group>
         </Header>
       }

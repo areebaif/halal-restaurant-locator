@@ -24,7 +24,7 @@ export const AppChromeAdmin: React.FC<React.PropsWithChildren> = (props) => {
               Is it Halal?
             </Title>
 
-            <Link href="/admin">
+            {/* <Link href="/admin">
               <Button
                 px="xl"
                 mx="xs"
@@ -34,7 +34,7 @@ export const AppChromeAdmin: React.FC<React.PropsWithChildren> = (props) => {
               >
                 Admin Dashboard
               </Button>
-            </Link>
+            </Link> */}
           </Group>
         </Header>
       }
