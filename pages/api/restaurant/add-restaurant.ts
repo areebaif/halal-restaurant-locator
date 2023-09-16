@@ -117,7 +117,8 @@ export default async function AddState(
     const countryId = parsedRestaurants.countryId;
     const stateName = capitalizeFirstWord(parsedRestaurants.stateName);
     const cityName = capitalizeFirstWord(parsedRestaurants.cityName);
-    const street = capitalizeFirstWord(parsedRestaurants.street);
+    //const street = capitalizeFirstWord(parsedRestaurants.street);
+    const street = parsedRestaurants.street;
     const foodTag = parsedRestaurants.foodTag;
 
     const countryExists = await prisma.country.findUnique({

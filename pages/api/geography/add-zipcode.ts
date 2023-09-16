@@ -91,7 +91,6 @@ export default async function AddState(
 ) {
   try {
     const zipcodeData = req.body;
-    console.log(zipcodeData, "sjsjsjsjs");
     const isTypeCorrect = PostAddZipCodeZod.safeParse(zipcodeData);
     if (!isTypeCorrect.success) {
       console.log(isTypeCorrect.error);
