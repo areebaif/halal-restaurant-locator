@@ -36,3 +36,7 @@ The `pages/api` directory is mapped to `/api/*`. Files in this directory are tre
 ### APi Documentation
 
 Open [http://localhost:3000/api-doc](http://localhost:3000/api-doc) to see the api specifications.
+
+### Branching Strategy
+
+Our base branch that everything comes from is called main. All branches originate from the main branch.
