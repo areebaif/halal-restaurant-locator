@@ -15,11 +15,11 @@ import { ErrorAddFoodTag, ResponseAddFoodTag } from "@/utils/types";
 import { ErrorAddFoodTagZod, ResponseAddFoodTagZod } from "@/utils/zod/zod";
 import { postAddFoodTag } from "@/utils";
 import { useRouter } from "next/router";
-// TODO fix this file
+// TODO fix this file we need to add country and then state submission to the backend will be an array of states
 export const AddFoodTag: React.FC = () => {
   const queryClient = useQueryClient();
   const router = useRouter();
-  const [foodTag, setFoodTag] = React.useState("");
+  const [stateName, setStateName] = React.useState("");
   const [error, setError] = React.useState<ErrorAddFoodTag>();
   const mutation = useMutation({
     mutationFn: postAddFoodTag,
@@ -54,7 +54,8 @@ export const AddFoodTag: React.FC = () => {
       });
       return;
     }
-    mutation.mutate({ foodTag: foodTag });
+    // TODO: string[], countrtyId
+    mutation.mutate({ state: val });
   };
 
   return (
@@ -69,7 +70,7 @@ export const AddFoodTag: React.FC = () => {
       }}
     >
       <Card.Section withBorder inheritPadding py="xs">
-        <Title order={3}>Add Food Tag</Title>
+        <Title order={3}>Add State Name</Title>
       </Card.Section>
       <Grid>
         <Grid.Col span={3}>
@@ -89,7 +90,7 @@ export const AddFoodTag: React.FC = () => {
             label="name"
             placeholder="type here"
             type="text"
-            onChange={(event) => setFoodTag(event.currentTarget.value)}
+            onChange={(event) => setStateName(event.currentTarget.value)}
           ></TextInput>
           {error?.foodTag ? <ErrorCard message={error?.foodTag} /> : <></>}
         </Grid.Col>
@@ -99,7 +100,7 @@ export const AddFoodTag: React.FC = () => {
           variant="outline"
           color="dark"
           size="sm"
-          onClick={() => onSubmit(foodTag)}
+          onClick={() => onSubmit(stateName)}
         >
           Submit
         </Button>
