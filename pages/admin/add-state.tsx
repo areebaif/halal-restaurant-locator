@@ -94,6 +94,19 @@ export const AddFoodTag: React.FC = () => {
           ></TextInput>
           {error?.foodTag ? <ErrorCard message={error?.foodTag} /> : <></>}
         </Grid.Col>
+        {/* TODO: fix this, we need to call backend api to populate a list of
+          countries country */}
+        <Grid.Col span={9}>
+          <TextInput
+            mt="xs"
+            withAsterisk
+            label="country"
+            placeholder="type here"
+            type="text"
+            onChange={(event) => setStateName(event.currentTarget.value)}
+          ></TextInput>
+          {error?.foodTag ? <ErrorCard message={error?.foodTag} /> : <></>}
+        </Grid.Col>
       </Grid>
       <Group position="center" mt="sm">
         <Button

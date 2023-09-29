@@ -75,3 +75,15 @@ export const getGeogAutoComplete = async () => {
   const res: ResponseGetAllGeogByCountry = await response.json();
   return res;
 };
+
+export const getAllCountries = async () => {
+  // TODO: we need to create a backedn end point to get countries
+  const response = await fetch(`/api/geography/get-all-usa`, {
+    method: "GET",
+    headers: {
+      "Content-Type": "application/json",
+    },
+  });
+  const res: ResponseGetAllGeogByCountry = await response.json();
+  return res;
+};
