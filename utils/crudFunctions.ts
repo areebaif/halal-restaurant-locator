@@ -2,6 +2,7 @@ import {
   ResponseAddFoodTag,
   ResponseGetAllGeogByCountry,
   GeoJsonRestaurantFeatureCollection,
+  ReadCountriesDb,
 } from "./types";
 
 export const postAddFoodTag = async (data: { foodTag: string }) => {
@@ -77,13 +78,12 @@ export const getGeogAutoComplete = async () => {
 };
 
 export const getAllCountries = async () => {
-  // TODO: we need to create a backedn end point to get countries
-  const response = await fetch(`/api/geography/get-all-usa`, {
+  const response = await fetch(`/api/geography/get-all-countries`, {
     method: "GET",
     headers: {
       "Content-Type": "application/json",
     },
   });
-  const res: ResponseGetAllGeogByCountry = await response.json();
+  const res: ReadCountriesDb = await response.json();
   return res;
 };

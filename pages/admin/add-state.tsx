@@ -16,11 +16,13 @@ import { ErrorAddFoodTagZod, ResponseAddFoodTagZod } from "@/utils/zod/zod";
 import { postAddFoodTag } from "@/utils";
 import { useRouter } from "next/router";
 // TODO fix this file we need to add country and then state submission to the backend will be an array of states
-export const AddFoodTag: React.FC = () => {
+export const AddStates: React.FC = () => {
   const queryClient = useQueryClient();
   const router = useRouter();
   const [stateName, setStateName] = React.useState("");
   const [error, setError] = React.useState<ErrorAddFoodTag>();
+
+  // TODO: fix the mutation to send an array of states
   const mutation = useMutation({
     mutationFn: postAddFoodTag,
     onSuccess: (data) => {
@@ -122,4 +124,4 @@ export const AddFoodTag: React.FC = () => {
   );
 };
 
-export default AddFoodTag;
+export default AddStates;

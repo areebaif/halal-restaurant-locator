@@ -182,3 +182,9 @@ export const RestaurantReadDbZod = z.object({
     })
     .array(),
 });
+
+export const ReadCountriesDbZod = z.object({
+  countries: z
+    .object({ countryId: z.string().uuid(), countryName: z.string() })
+    .array(),
+});
