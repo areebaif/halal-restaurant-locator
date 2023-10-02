@@ -1,5 +1,5 @@
 import * as React from "react";
-import { useQueryClient, useMutation } from "@tanstack/react-query";
+import { useQueryClient, useMutation, useQuery } from "@tanstack/react-query";
 import {
   Card,
   Title,
@@ -15,6 +15,7 @@ import { ErrorAddFoodTag, ResponseAddFoodTag } from "@/utils/types";
 import { ErrorAddFoodTagZod, ResponseAddFoodTagZod } from "@/utils/zod/zod";
 import { postAddFoodTag } from "@/utils";
 import { useRouter } from "next/router";
+import { getAllCountries } from "@/utils/crudFunctions";
 // TODO fix this file we need to add country and then state submission to the backend will be an array of states
 export const AddStates: React.FC = () => {
   const queryClient = useQueryClient();
@@ -22,30 +23,41 @@ export const AddStates: React.FC = () => {
   const [stateName, setStateName] = React.useState("");
   const [error, setError] = React.useState<ErrorAddFoodTag>();
 
-  // TODO: fix the mutation to send an array of states
-  const mutation = useMutation({
-    mutationFn: postAddFoodTag,
-    onSuccess: (data) => {
-      const result = ResponseAddFoodTagZod.safeParse(data);
-      if (!result.success) {
-        console.log(result.error);
-        return (
-          <ErrorCard message="the server responded with incorrect types" />
-        );
-      }
-      if (data.foodTag) {
-        setError({ ...error, foodTag: data.foodTag });
-        return;
-      }
-      router.push("/admin");
-      queryClient.invalidateQueries();
-    },
-    onError: (data) => {},
+  // Queries
+  const allCountriesData = useQuery(["getAllCountries"], getAllCountries, {
+    staleTime: Infinity,
+    cacheTime: Infinity,
   });
-
-  if (mutation.isLoading) {
-    return <Loader />;
+  if (allCountriesData.isLoading) return <Loader />;
+  if (allCountriesData.isError) {
+    console.log(allCountriesData.error);
+    return <ErrorCard message="something went wrong with the server" />;
   }
+
+  // TODO: fix the mutation to send an array of states
+  // const mutation = useMutation({
+  //   mutationFn: postAddFoodTag,
+  //   onSuccess: (data) => {
+  //     const result = ResponseAddFoodTagZod.safeParse(data);
+  //     if (!result.success) {
+  //       console.log(result.error);
+  //       return (
+  //         <ErrorCard message="the server responded with incorrect types" />
+  //       );
+  //     }
+  //     if (data.foodTag) {
+  //       setError({ ...error, foodTag: data.foodTag });
+  //       return;
+  //     }
+  //     router.push("/admin");
+  //     queryClient.invalidateQueries();
+  //   },
+  //   onError: (data) => {},
+  // });
+
+  // if (mutation.isLoading) {
+  //   return <Loader />;
+  // }
 
   const onSubmit = async (val: string) => {
     setError(undefined);
@@ -57,7 +69,7 @@ export const AddStates: React.FC = () => {
       return;
     }
     // TODO: string[], countrtyId
-    mutation.mutate({ state: val });
+    //mutation.mutate({ state: val });
   };
 
   return (

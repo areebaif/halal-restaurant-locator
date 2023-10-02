@@ -13,7 +13,7 @@ const AddRestaurant: React.FC = () => {
   const [name, setName] = React.useState("");
   const [state, setState] = React.useState("");
   const [city, setCity] = React.useState("");
-  const [latitude, setLatitude] = React.useState<number|string>(" ");
+  const [latitude, setLatitude] = React.useState<number | string>(" ");
 
   return (
     <Card
@@ -57,7 +57,7 @@ const AddRestaurant: React.FC = () => {
         type="text"
         onChange={(event) => setName(event.currentTarget.value)}
       />
-      <NumberInput value={latitude} onChange={setLatitude} />
+      {/* <NumberInput value={latitude} onChange={setLatitude} /> */}
       <Group position="center" mt="sm">
         <Button variant="outline" color="dark" size="sm" type="submit">
           Submit
