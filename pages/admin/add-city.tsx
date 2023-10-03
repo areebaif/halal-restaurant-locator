@@ -69,7 +69,7 @@ export const AddFoodTag: React.FC = () => {
       }}
     >
       <Card.Section withBorder inheritPadding py="xs">
-        <Title order={3}>Add Food Tag</Title>
+        <Title order={3}>Add Cities</Title>
       </Card.Section>
       <Grid>
         <Grid.Col span={3}>

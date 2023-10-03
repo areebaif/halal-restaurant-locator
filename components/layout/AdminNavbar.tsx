@@ -18,6 +18,8 @@ import {
   IconDeviceGamepad,
   IconIdBadge2,
   IconTemplate,
+  IconPlaylistAdd,
+  IconMap2,
 } from "@tabler/icons-react";
 
 export const AdminNavigation: React.FC = (props) => {
@@ -106,19 +108,31 @@ function MainLink({ icon, color, label, link }: MainLinkProps) {
 const restaurantData = [
   {
     icon: <IconDatabase size={16} />,
-    color: "teal",
+    color: "pink",
     label: "Add restaurant",
     link: "/admin/add-restaurant",
   },
   {
     icon: <IconDeviceGamepad size={16} />,
-    color: "blue",
+    color: "violet",
     label: "View /Edit restaurant",
     link: "/admin",
   },
   {
+    icon: <IconPlaylistAdd size={16} />,
+    color: "blue",
+    label: "Add State",
+    link: "/admin/add-state",
+  },
+  {
+    icon: <IconMap2 size={16} />,
+    color: "indigo",
+    label: "Add City",
+    link: "/admin/add-city",
+  },
+  {
     icon: <IconIdBadge2 size={16} />,
-    color: "violet",
+    color: "green",
     label: "Add type of food",
     link: "/admin/add-food-tag",
   },

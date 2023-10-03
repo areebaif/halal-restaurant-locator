@@ -12,8 +12,7 @@ import {
 } from "@mantine/core";
 import { ErrorCard } from "@/components";
 import { ErrorAddFoodTag, ResponseAddFoodTag } from "@/utils/types";
-import { ErrorAddFoodTagZod, ResponseAddFoodTagZod } from "@/utils/zod/zod";
-import { postAddFoodTag } from "@/utils";
+
 import { useRouter } from "next/router";
 import { getAllCountries } from "@/utils/crudFunctions";
 // TODO fix this file we need to add country and then state submission to the backend will be an array of states
@@ -33,7 +32,7 @@ export const AddStates: React.FC = () => {
     console.log(allCountriesData.error);
     return <ErrorCard message="something went wrong with the server" />;
   }
-
+  console.log(allCountriesData.data, "slslslsl");
   // TODO: fix the mutation to send an array of states
   // const mutation = useMutation({
   //   mutationFn: postAddFoodTag,
