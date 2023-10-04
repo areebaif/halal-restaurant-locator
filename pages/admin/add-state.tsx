@@ -9,6 +9,7 @@ import {
   Textarea,
   Grid,
   Loader,
+  Autocomplete,
 } from "@mantine/core";
 import { ErrorCard } from "@/components";
 import { ErrorAddFoodTag, ResponseAddFoodTag } from "@/utils/types";
@@ -20,6 +21,7 @@ export const AddStates: React.FC = () => {
   const queryClient = useQueryClient();
   const router = useRouter();
   const [stateName, setStateName] = React.useState("");
+  const [country, setCountry] = React.useState("");
   const [error, setError] = React.useState<ErrorAddFoodTag>();
 
   // Queries
@@ -32,7 +34,8 @@ export const AddStates: React.FC = () => {
     console.log(allCountriesData.error);
     return <ErrorCard message="something went wrong with the server" />;
   }
-  console.log(allCountriesData.data, "slslslsl");
+  // TODO: add data error handling with zod
+
   // TODO: fix the mutation to send an array of states
   // const mutation = useMutation({
   //   mutationFn: postAddFoodTag,
@@ -57,7 +60,10 @@ export const AddStates: React.FC = () => {
   // if (mutation.isLoading) {
   //   return <Loader />;
   // }
-
+  const autoCompleteData = allCountriesData.data.countries.map((item) => ({
+    value: item.countryName,
+    ...item,
+  }));
   const onSubmit = async (val: string) => {
     setError(undefined);
     if (!val.length) {
@@ -88,37 +94,32 @@ export const AddStates: React.FC = () => {
       <Grid>
         <Grid.Col span={3}>
           {" "}
-          <Textarea
-            defaultValue="Typeof food served by the restaurant. Examples include vegetarian,
-            fast food, seafood"
+          <TextInput
+            defaultValue="Select country to add multiple states"
             label="description"
             mt="xs"
             disabled
-          ></Textarea>
+          ></TextInput>
         </Grid.Col>
-        <Grid.Col span={9}>
+        <Grid.Col span={3}>
+          <Autocomplete
+            mt="xs"
+            placeholder="select country"
+            label={"country"}
+            data={autoCompleteData}
+            value={country}
+            onChange={setCountry}
+          />
+        </Grid.Col>
+        <Grid.Col span={3}>
           <TextInput
             mt="xs"
             withAsterisk
-            label="name"
+            label="state"
             placeholder="type here"
             type="text"
             onChange={(event) => setStateName(event.currentTarget.value)}
           ></TextInput>
-          {error?.foodTag ? <ErrorCard message={error?.foodTag} /> : <></>}
-        </Grid.Col>
-        {/* TODO: fix this, we need to call backend api to populate a list of
-          countries country */}
-        <Grid.Col span={9}>
-          <TextInput
-            mt="xs"
-            withAsterisk
-            label="country"
-            placeholder="type here"
-            type="text"
-            onChange={(event) => setStateName(event.currentTarget.value)}
-          ></TextInput>
-          {error?.foodTag ? <ErrorCard message={error?.foodTag} /> : <></>}
         </Grid.Col>
       </Grid>
       <Group position="center" mt="sm">
