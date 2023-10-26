@@ -81,10 +81,7 @@ export const ResponseAddRestaurantZod = z.object({
   created: z.string().optional(),
 });
 
-export const PostAddStateZod = z.object({
-  countryId: z.string().uuid(),
-  stateName: z.string().array(),
-});
+export const PostAddStateZod = z.record(z.string().uuid(), z.string().array());
 
 export const PostAddCityZod = z.object({
   countryId: z.string().uuid(),

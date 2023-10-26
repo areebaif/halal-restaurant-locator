@@ -12,16 +12,19 @@ import {
   Autocomplete,
 } from "@mantine/core";
 import { ErrorCard } from "@/components";
-import { ErrorAddFoodTag, ResponseAddFoodTag } from "@/utils/types";
+import { ErrorAddFoodTag, PostAddState, ResponseAddFoodTag } from "@/utils/types";
 
 import { useRouter } from "next/router";
 import { getAllCountries } from "@/utils/crudFunctions";
+import { ReadCountriesDbZod } from "@/utils/zod/zod";
+import { capitalizeFirstWord } from "@/utils";
 // TODO fix this file we need to add country and then state submission to the backend will be an array of states
 export const AddStates: React.FC = () => {
   const queryClient = useQueryClient();
   const router = useRouter();
   const [stateName, setStateName] = React.useState("");
   const [country, setCountry] = React.useState("");
+  const [allState, setAllState] = React.useState<PostAddState>();
   const [error, setError] = React.useState<ErrorAddFoodTag>();
 
   // Queries
@@ -32,10 +35,17 @@ export const AddStates: React.FC = () => {
   if (allCountriesData.isLoading) return <Loader />;
   if (allCountriesData.isError) {
     console.log(allCountriesData.error);
-    return <ErrorCard message="something went wrong with the server" />;
+    return <ErrorCard message="something went wrong with the api request" />;
   }
-  // TODO: add data error handling with zod
 
+  const isCountriesTypeCorrent = ReadCountriesDbZod.safeParse(
+    allCountriesData.data
+  );
+  if (!isCountriesTypeCorrent.success) {
+    console.log(isCountriesTypeCorrent.error);
+    return <ErrorCard message="Their is a type mismatch from the server" />;
+  }
+  console.log(allCountriesData.data, "s");
   // TODO: fix the mutation to send an array of states
   // const mutation = useMutation({
   //   mutationFn: postAddFoodTag,
@@ -62,7 +72,7 @@ export const AddStates: React.FC = () => {
   // }
   const autoCompleteData = allCountriesData.data.countries.map((item) => ({
     value: item.countryName,
-    ...item,
+    countryid: item.countryId,
   }));
   const onSubmit = async (val: string) => {
     setError(undefined);
@@ -75,6 +85,19 @@ export const AddStates: React.FC = () => {
     }
     // TODO: string[], countrtyId
     //mutation.mutate({ state: val });
+  };
+
+  const onAddState = (stateVal: string) => {
+    const sanitizeState = capitalizeFirstWord(stateVal);
+    const countryIdArray = autoCompleteData.filter(
+      (item) => item.value === country
+    );
+    const countryId = countryIdArray[0].countryid;
+
+    // if (!allState?.countryId ) {
+    //   allState?.countryId= countryId
+    // }
+   
   };
 
   return (
@@ -92,18 +115,17 @@ export const AddStates: React.FC = () => {
         <Title order={3}>Add State Name</Title>
       </Card.Section>
       <Grid>
-        <Grid.Col span={3}>
+        <Grid.Col span={2}>
           {" "}
-          <TextInput
-            defaultValue="Select country to add multiple states"
-            label="description"
-            mt="xs"
+          <Textarea
+            defaultValue="Select country to add multiple states."
+            mt="md"
             disabled
-          ></TextInput>
+          ></Textarea>
         </Grid.Col>
         <Grid.Col span={3}>
           <Autocomplete
-            mt="xs"
+            mt="sm"
             placeholder="select country"
             label={"country"}
             data={autoCompleteData}
