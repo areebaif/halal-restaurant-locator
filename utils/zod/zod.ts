@@ -1,5 +1,6 @@
 import z from "zod";
-
+// dynamic properties of objects
+//z.record(z.string().uuid(), z.string().array());
 export const ErrorAddFoodTagZod = z
   .object({
     foodTag: z.string().optional(),
@@ -81,7 +82,7 @@ export const ResponseAddRestaurantZod = z.object({
   created: z.string().optional(),
 });
 
-export const PostAddStateZod = z.record(z.string().uuid(), z.string().array());
+export const PostAddStateZod = z.map(z.string().uuid(), z.set(z.string()));
 
 export const PostAddCityZod = z.object({
   countryId: z.string().uuid(),
