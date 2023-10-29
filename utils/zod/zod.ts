@@ -82,7 +82,13 @@ export const ResponseAddRestaurantZod = z.object({
   created: z.string().optional(),
 });
 
-export const PostAddStateZod = z.map(z.string().uuid(), z.set(z.string()));
+export const PostAddStateZod = z
+  .object({
+    countryId: z.string().uuid(),
+    countryName: z.string(),
+    stateName: z.string().array(),
+  })
+  .array();
 
 export const PostAddCityZod = z.object({
   countryId: z.string().uuid(),

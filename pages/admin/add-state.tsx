@@ -36,7 +36,7 @@ export const AddStates: React.FC = () => {
   // addState is a map with key as countryId: Map ensures that the key is unique.
   // the value for each key is a set of StateName: set ensures that states are not added twice to each country
   // In Pure JS => {countryId: [stateName1, stateName2, ...] } where countryid is unique and the array associated with countryId holds unique stateNames
-  const [allState, setAllState] = React.useState<PostAddState>(new Map());
+  const [allState, setAllState] = React.useState<PostAddState>([]);
   const [error, setError] = React.useState<ErrorAddFoodTag>();
 
   // Queries
@@ -112,13 +112,26 @@ export const AddStates: React.FC = () => {
       console.log(" I have to dpo eror handling");
     }
     const countryId = countryIdArray[0].countryid;
-    if (allState.has(countryId)) {
-      const state = allState.get(countryId)!;
-      state.add(sanitizeState);
-      setAllState(new Map(allState.set(countryId, state)));
+    const countryName = countryIdArray[0].value;
+    let index;
+    const filterCountry = allState.filter((item, itemIndex) => {
+      if (item.countryId === countryId) {
+        index = itemIndex;
+      }
+      return item.countryId === countryId;
+    });
+    if (filterCountry.length) {
+      const updateAllState = [...allState];
+      updateAllState[index!].stateName.push(sanitizeState);
+      setAllState([...updateAllState]);
     } else {
-      const stateSet = new Set<string>([sanitizeState]);
-      setAllState(new Map(allState.set(countryId, stateSet)));
+      const updateAllState = [...allState];
+      updateAllState.push({
+        countryId: countryId,
+        countryName: countryName,
+        stateName: [sanitizeState],
+      });
+      setAllState(updateAllState);
     }
 
     setStateName("");
@@ -201,8 +214,10 @@ export const AddStates: React.FC = () => {
 export default AddStates;
 
 type DisplayStateProp = {
-  allState: Map<string, Set<string>>;
-  setAllState: (val: Map<string, Set<string>>) => void;
+  allState: { countryId: string; countryName: string; stateName: string[] }[];
+  setAllState: (
+    val: { countryId: string; countryName: string; stateName: string[] }[]
+  ) => void;
   autoCompleteData: { value: string; countryid: string }[];
 };
 export const DisplayStates: React.FC<DisplayStateProp> = ({
@@ -210,35 +225,40 @@ export const DisplayStates: React.FC<DisplayStateProp> = ({
   setAllState,
   autoCompleteData,
 }) => {
-  const mappedStateData: { [key: string]: string[] }[] = [];
-  allState.forEach((value, key) => {
-    // find each key in autoCompleteData
-    // set the key in mappeddata with its value
-    const countryIdArray = autoCompleteData.filter(
-      (item) => item.countryid === key
-    );
-    const stateArray: string[] = [];
-    value.forEach((state) => {
-      stateArray.push(state);
+  //const mappedStateData: { [key: string]: string[] }[] = [];
+  // allState.forEach((value, key) => {
+  //   // find each key in autoCompleteData
+  //   // set the key in mappeddata with its value
+  //   const countryIdArray = autoCompleteData.filter(
+  //     (item) => item.countryid === key
+  //   );
+  //   const stateArray: string[] = [];
+  //   value.forEach((state) => {
+  //     stateArray.push(state);
+  //   });
+  //   const countryName = countryIdArray[0].value;
+  //   const countrySateValue = { [countryName]: stateArray };
+  //   mappedStateData.push(countrySateValue);
+  // });
+
+  const onDelete = (countryId: string, countryName: string, state: string) => {
+    const updateAllState = [...allState];
+    const newState = updateAllState.map((item) => {
+      if (item.countryId === countryId) {
+        const filteredStates = item.stateName.filter((item) => item !== state);
+        return {
+          countryId: countryId,
+          countryName: countryName,
+          stateName: [...filteredStates],
+        };
+      } else return { ...item };
     });
-    const countryName = countryIdArray[0].value;
-    const countrySateValue = { [countryName]: stateArray };
-    mappedStateData.push(countrySateValue);
-  });
+    // TODO: error handling
 
-  const onDelete = (countryName: string, state: string) => {
-    // get CountryId
-    const countryIdArray = autoCompleteData.filter(
-      (item) => item.value === countryName
-    );
-    const countryId = countryIdArray[0].countryid;
-
-    const stateSet = allState.get(countryId)!;
-    stateSet.delete(state);
-    setAllState(new Map(allState.set(countryId, stateSet)));
+    setAllState([...newState]);
   };
 
-  return mappedStateData.length ? (
+  return allState.length ? (
     <Table mt="xl" fontSize="lg" highlightOnHover withBorder>
       <thead>
         <tr>
@@ -248,16 +268,16 @@ export const DisplayStates: React.FC<DisplayStateProp> = ({
         </tr>
       </thead>
 
-      {mappedStateData.map((item, index) => (
+      {allState.map((item, index) => (
         <tbody key={index}>
-          {item[Object.getOwnPropertyNames(item)[0]].map((state, index) => (
+          {item.stateName.map((state, index) => (
             <tr key={index}>
-              <td>{Object.getOwnPropertyNames(item)[0]}</td>
+              <td>{item.countryName}</td>
               <td>{state}</td>
               <td>
                 <Button
                   onClick={() =>
-                    onDelete(Object.getOwnPropertyNames(item)[0], state)
+                    onDelete(item.countryId, item.countryName, state)
                   }
                 >
                   Delete
