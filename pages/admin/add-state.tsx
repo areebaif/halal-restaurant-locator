@@ -12,31 +12,29 @@ import {
   Autocomplete,
   Box,
   Table,
-  Flex,
-  ActionIcon,
+
 } from "@mantine/core";
 import { ErrorCard } from "@/components";
 import {
   ErrorAddFoodTag,
   PostAddState,
-  ResponseAddFoodTag,
+
 } from "@/utils/types";
 
 import { useRouter } from "next/router";
 import { getAllCountries } from "@/utils/crudFunctions";
 import { ReadCountriesDbZod } from "@/utils/zod/zod";
 import { capitalizeFirstWord } from "@/utils";
-import { IconTrash } from "@tabler/icons-react";
-// TODO fix this file we need to add country and then state submission to the backend will be an array of states
+
+// TODO Do submission to the abckedn with api call
+
 export const AddStates: React.FC = () => {
   const queryClient = useQueryClient();
   const router = useRouter();
   const [stateName, setStateName] = React.useState("");
   const [country, setCountry] = React.useState("");
-  // addState is a map with key as countryId: Map ensures that the key is unique.
-  // the value for each key is a set of StateName: set ensures that states are not added twice to each country
-  // In Pure JS => {countryId: [stateName1, stateName2, ...] } where countryid is unique and the array associated with countryId holds unique stateNames
   const [allState, setAllState] = React.useState<PostAddState>([]);
+  // TODO: fix error to proper error
   const [error, setError] = React.useState<ErrorAddFoodTag>();
 
   // Queries
@@ -57,7 +55,7 @@ export const AddStates: React.FC = () => {
     console.log(isCountriesTypeCorrent.error);
     return <ErrorCard message="Their is a type mismatch from the server" />;
   }
-  //console.log(allCountriesData.data, "s");
+
   // TODO: fix the mutation to send an array of states
   // const mutation = useMutation({
   //   mutationFn: postAddFoodTag,
@@ -197,11 +195,7 @@ export const AddStates: React.FC = () => {
           </Box>
         </Grid.Col>
       </Grid>
-      <DisplayStates
-        allState={allState}
-        setAllState={setAllState}
-        autoCompleteData={autoCompleteData}
-      />
+      <DisplayStates allState={allState} setAllState={setAllState} />
       <Group position="center" mt="sm">
         <Button color="dark" size="sm" onClick={() => onSubmit(stateName)}>
           Submit
@@ -218,29 +212,11 @@ type DisplayStateProp = {
   setAllState: (
     val: { countryId: string; countryName: string; stateName: string[] }[]
   ) => void;
-  autoCompleteData: { value: string; countryid: string }[];
 };
 export const DisplayStates: React.FC<DisplayStateProp> = ({
   allState,
   setAllState,
-  autoCompleteData,
 }) => {
-  //const mappedStateData: { [key: string]: string[] }[] = [];
-  // allState.forEach((value, key) => {
-  //   // find each key in autoCompleteData
-  //   // set the key in mappeddata with its value
-  //   const countryIdArray = autoCompleteData.filter(
-  //     (item) => item.countryid === key
-  //   );
-  //   const stateArray: string[] = [];
-  //   value.forEach((state) => {
-  //     stateArray.push(state);
-  //   });
-  //   const countryName = countryIdArray[0].value;
-  //   const countrySateValue = { [countryName]: stateArray };
-  //   mappedStateData.push(countrySateValue);
-  // });
-
   const onDelete = (countryId: string, countryName: string, state: string) => {
     const updateAllState = [...allState];
     const newState = updateAllState.map((item) => {

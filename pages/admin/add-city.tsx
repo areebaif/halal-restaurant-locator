@@ -1,5 +1,5 @@
 import * as React from "react";
-import { useQueryClient, useMutation } from "@tanstack/react-query";
+import { useQueryClient, useMutation, useQuery } from "@tanstack/react-query";
 import {
   Card,
   Title,
@@ -12,38 +12,55 @@ import {
 } from "@mantine/core";
 import { ErrorCard } from "@/components";
 import { ErrorAddFoodTag, ResponseAddFoodTag } from "@/utils/types";
-import { ErrorAddFoodTagZod, ResponseAddFoodTagZod } from "@/utils/zod/zod";
-import { postAddFoodTag } from "@/utils";
+import { ErrorAddFoodTagZod, ReadCountriesDbZod } from "@/utils/zod/zod";
+import { getAllCountries } from "@/utils/crudFunctions";
 import { useRouter } from "next/router";
-// TODO fix this file
-export const AddFoodTag: React.FC = () => {
+
+export const AddCity: React.FC = () => {
   const queryClient = useQueryClient();
   const router = useRouter();
   const [foodTag, setFoodTag] = React.useState("");
   const [error, setError] = React.useState<ErrorAddFoodTag>();
-  const mutation = useMutation({
-    mutationFn: postAddFoodTag,
-    onSuccess: (data) => {
-      const result = ResponseAddFoodTagZod.safeParse(data);
-      if (!result.success) {
-        console.log(result.error);
-        return (
-          <ErrorCard message="the server responded with incorrect types" />
-        );
-      }
-      if (data.foodTag) {
-        setError({ ...error, foodTag: data.foodTag });
-        return;
-      }
-      router.push("/admin");
-      queryClient.invalidateQueries();
-    },
-    onError: (data) => {},
+  const allCountriesData = useQuery(["getAllCountries"], getAllCountries, {
+    staleTime: Infinity,
+    cacheTime: Infinity,
   });
-
-  if (mutation.isLoading) {
-    return <Loader />;
+  if (allCountriesData.isLoading) return <Loader />;
+  if (allCountriesData.isError) {
+    console.log(allCountriesData.error);
+    return <ErrorCard message="something went wrong with the api request" />;
   }
+
+  const isCountriesTypeCorrent = ReadCountriesDbZod.safeParse(
+    allCountriesData.data
+  );
+  if (!isCountriesTypeCorrent.success) {
+    console.log(isCountriesTypeCorrent.error);
+    return <ErrorCard message="Their is a type mismatch from the server" />;
+  }
+  // const mutation = useMutation({
+  //   mutationFn: postAddFoodTag,
+  //   onSuccess: (data) => {
+  //     const result = ResponseAddFoodTagZod.safeParse(data);
+  //     if (!result.success) {
+  //       console.log(result.error);
+  //       return (
+  //         <ErrorCard message="the server responded with incorrect types" />
+  //       );
+  //     }
+  //     if (data.foodTag) {
+  //       setError({ ...error, foodTag: data.foodTag });
+  //       return;
+  //     }
+  //     router.push("/admin");
+  //     queryClient.invalidateQueries();
+  //   },
+  //   onError: (data) => {},
+  // });
+
+  // if (mutation.isLoading) {
+  //   return <Loader />;
+  // }
 
   const onSubmit = async (val: string) => {
     setError(undefined);
@@ -54,7 +71,7 @@ export const AddFoodTag: React.FC = () => {
       });
       return;
     }
-    mutation.mutate({ foodTag: foodTag });
+    // mutation.mutate({ foodTag: foodTag });
   };
 
   return (
@@ -108,4 +125,4 @@ export const AddFoodTag: React.FC = () => {
   );
 };
 
-export default AddFoodTag;
+export default AddCity;
