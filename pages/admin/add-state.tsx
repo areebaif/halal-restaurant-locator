@@ -23,7 +23,7 @@ import {
 
 import { useRouter } from "next/router";
 import { getAllCountries } from "@/utils/crudFunctions";
-import { ReadCountriesDbZod } from "@/utils/zod/zod";
+import { ReadCountriesDbZod } from "@/utils";
 import { capitalizeFirstWord } from "@/utils";
 
 // TODO Do submission to the abckedn with api call

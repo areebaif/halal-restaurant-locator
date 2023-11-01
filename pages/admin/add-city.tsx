@@ -11,8 +11,8 @@ import {
   Loader,
 } from "@mantine/core";
 import { ErrorCard } from "@/components";
-import { ErrorAddFoodTag, ResponseAddFoodTag } from "@/utils/types";
-import { ErrorAddFoodTagZod, ReadCountriesDbZod } from "@/utils/zod/zod";
+import { ErrorAddFoodTag } from "@/utils/types";
+import { ReadCountriesDbZod } from "@/utils";
 import { getAllCountries } from "@/utils/crudFunctions";
 import { useRouter } from "next/router";
 

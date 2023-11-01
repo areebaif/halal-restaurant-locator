@@ -5,6 +5,7 @@ import {
   PostAddZipCodeZod,
   PostAddRestaurantZod,
   GetSearchInputsZod,
+  ReadCountriesDbZod,
 } from "./zod/zod";
 import { findRestaurant } from "./api-utils";
 import { calcBoundsFromCoordinates } from "./map/map-boundary-calculations";
@@ -22,4 +23,5 @@ export {
   GetSearchInputsZod,
   calcBoundsFromCoordinates,
   getMapSearchInput,
+  ReadCountriesDbZod,
 };
