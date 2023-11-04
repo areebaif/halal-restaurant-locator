@@ -12,14 +12,9 @@ import {
   Autocomplete,
   Box,
   Table,
-
 } from "@mantine/core";
 import { ErrorCard } from "@/components";
-import {
-  ErrorAddFoodTag,
-  PostAddState,
-
-} from "@/utils/types";
+import { ErrorAddFoodTag, PostAddState } from "@/utils/types";
 
 import { useRouter } from "next/router";
 import { getAllCountries } from "@/utils/crudFunctions";
@@ -154,7 +149,7 @@ export const AddStates: React.FC = () => {
         <Grid.Col span={"auto"}>
           {" "}
           <Textarea
-            defaultValue="Select country to add multiple states. Add button will populate a list of states with corresponding country."
+            defaultValue="Select country to add multiple states. You can add multiple states for one country in a single form submission."
             mt="md"
             disabled
           ></Textarea>

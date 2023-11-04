@@ -65,7 +65,7 @@ export default async function AddState(
       console.log(isTypeCorrect.error);
       res.status(400).json({
         typeError:
-          "type check failed on the server, expected to recieve an objects with countryId property as string and stateName property as array of string",
+          "type check failed on the server, expected to recieve a single object inside array with countryId property as string and stateName property as array of string",
       });
       return;
     }
