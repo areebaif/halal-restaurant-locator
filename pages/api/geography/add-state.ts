@@ -70,7 +70,8 @@ export default async function AddState(
       return;
     }
     const typeCheckedStateData = stateData as PostAddState;
-    const countryId = typeCheckedStateData.countryId;
+    const countryStateData = typeCheckedStateData[0];
+    const countryId = countryStateData.countryId;
 
     const countryExists = await prisma.country.findUnique({
       where: {
@@ -83,8 +84,8 @@ export default async function AddState(
       });
       return;
     }
-    const mapStateData = typeCheckedStateData.stateName.map((state) => ({
-      countryId: typeCheckedStateData.countryId,
+    const mapStateData = countryStateData.stateName.map((state) => ({
+      countryId: countryStateData.countryId,
       stateName: capitalizeFirstWord(state),
     }));
     const createState = await prisma.state.createMany({
