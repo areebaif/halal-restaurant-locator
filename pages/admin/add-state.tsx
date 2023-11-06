@@ -14,12 +14,13 @@ import {
   Table,
 } from "@mantine/core";
 import { ErrorCard } from "@/components";
-import { ErrorAddFoodTag, PostAddState } from "@/utils/types";
+import { ErrorAddFoodTag, PostAddState, ResponseAddState } from "@/utils/types";
 
 import { useRouter } from "next/router";
-import { getAllCountries } from "@/utils/crudFunctions";
+import { getAllCountries, postAddState } from "@/utils/crudFunctions";
 import { ReadCountriesDbZod } from "@/utils";
 import { capitalizeFirstWord } from "@/utils";
+import { ResponseAddStateZod } from "@/utils/zod/zod";
 
 // TODO Do submission to the abckedn with api call
 
@@ -30,7 +31,7 @@ export const AddStates: React.FC = () => {
   const [country, setCountry] = React.useState("");
   const [allState, setAllState] = React.useState<PostAddState>([]);
   // TODO: fix error to proper error
-  const [error, setError] = React.useState<ErrorAddFoodTag>();
+  const [error, setError] = React.useState<ResponseAddState>();
 
   // Queries
   const allCountriesData = useQuery(["getAllCountries"], getAllCountries, {
@@ -52,44 +53,45 @@ export const AddStates: React.FC = () => {
   }
 
   // TODO: fix the mutation to send an array of states
-  // const mutation = useMutation({
-  //   mutationFn: postAddFoodTag,
-  //   onSuccess: (data) => {
-  //     const result = ResponseAddFoodTagZod.safeParse(data);
-  //     if (!result.success) {
-  //       console.log(result.error);
-  //       return (
-  //         <ErrorCard message="the server responded with incorrect types" />
-  //       );
-  //     }
-  //     if (data.foodTag) {
-  //       setError({ ...error, foodTag: data.foodTag });
-  //       return;
-  //     }
-  //     router.push("/admin");
-  //     queryClient.invalidateQueries();
-  //   },
-  //   onError: (data) => {},
-  // });
+  const mutation = useMutation({
+    mutationFn: postAddState,
+    onSuccess: (data) => {
+      const result = ResponseAddStateZod.safeParse(data);
+      if (!result.success) {
+        console.log(result.error);
+        return <ErrorCard message="unable to add state, please try again" />;
+      }
+      if (!data.created) {
+        console.log(`error:`, data);
+        if (data.country) setError({ ...error, country: data.country });
+        if (data.state) setError({ ...error, state: data.state });
+        if (data.typeError) setError({ ...error, typeError: data.typeError });
+        return;
+      }
+      router.push("/admin");
+      queryClient.invalidateQueries();
+    },
+    onError: (data) => {},
+  });
 
-  // if (mutation.isLoading) {
-  //   return <Loader />;
-  // }
+  if (mutation.isLoading) {
+    return <Loader />;
+  }
   const autoCompleteData = allCountriesData.data.countries.map((item) => ({
     value: item.countryName,
     countryid: item.countryId,
   }));
-  const onSubmit = async (val: string) => {
+  const onSubmit = async (val: PostAddState) => {
     setError(undefined);
-    if (!val.length) {
+    if (!val.length || val.length > 1) {
       setError({
         ...error,
-        foodTag: "The food tag field cannot be empty",
+        country: "Please add state to a single country",
       });
       return;
     }
-    // TODO: string[], countrtyId
-    //mutation.mutate({ state: val });
+
+    mutation.mutate(val);
   };
 
   const onAddState = (stateVal: string) => {
@@ -102,7 +104,7 @@ export const AddStates: React.FC = () => {
     );
     // TODO: error handling if country is not defined
     if (!countryIdArray.length) {
-      console.log(" I have to dpo eror handling");
+      console.log(" I have to do eror handling");
     }
     const countryId = countryIdArray[0].countryid;
     const countryName = countryIdArray[0].value;
@@ -164,6 +166,7 @@ export const AddStates: React.FC = () => {
             value={country}
             onChange={setCountry}
           />
+          {error?.country ? <ErrorCard message={error?.country} /> : <></>}
         </Grid.Col>
         <Grid.Col span={"auto"}>
           <TextInput
@@ -175,6 +178,7 @@ export const AddStates: React.FC = () => {
             type="text"
             onChange={(event) => setStateName(event.currentTarget.value)}
           ></TextInput>
+          {error?.state ? <ErrorCard message={error?.state} /> : <></>}
         </Grid.Col>
         <Grid.Col span={"auto"}>
           <Box mt="xl">
@@ -190,9 +194,10 @@ export const AddStates: React.FC = () => {
           </Box>
         </Grid.Col>
       </Grid>
+      {error?.typeError ? <ErrorCard message={error?.typeError} /> : <></>}
       <DisplayStates allState={allState} setAllState={setAllState} />
       <Group position="center" mt="sm">
-        <Button color="dark" size="sm" onClick={() => onSubmit(stateName)}>
+        <Button color="dark" size="sm" onClick={() => onSubmit(allState)}>
           Submit
         </Button>
       </Group>

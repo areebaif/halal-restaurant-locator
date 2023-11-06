@@ -3,6 +3,7 @@ import {
   ResponseGetAllGeogByCountry,
   GeoJsonRestaurantFeatureCollection,
   ReadCountriesDb,
+  ResponseAddState,
 } from "./types";
 
 export const postAddFoodTag = async (data: { foodTag: string }) => {
@@ -20,17 +21,18 @@ export const postAddFoodTag = async (data: { foodTag: string }) => {
 
 export const postAddState = async (data: {
   stateName: string[];
+  countryName: string;
   countryId: string;
-}) => {
-  const { stateName, countryId } = data;
+}[]) => {
+
   const response = await fetch(`/api/restaurant/add-state`, {
     method: "POST",
     headers: {
       "Content-Type": "application/json",
     },
-    body: JSON.stringify({ countryId: countryId, stateName: stateName }),
+    body: JSON.stringify(data),
   });
-  const res: ResponseAddFoodTag = await response.json();
+  const res: ResponseAddState = await response.json();
   return res;
 };
 
