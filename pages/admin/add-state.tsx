@@ -14,7 +14,7 @@ import {
   Table,
 } from "@mantine/core";
 import { ErrorCard } from "@/components";
-import { ErrorAddFoodTag, PostAddState, ResponseAddState } from "@/utils/types";
+import {  PostAddState, ResponseAddState } from "@/utils/types";
 
 import { useRouter } from "next/router";
 import { getAllCountries, postAddState } from "@/utils/crudFunctions";
@@ -22,15 +22,12 @@ import { ReadCountriesDbZod } from "@/utils";
 import { capitalizeFirstWord } from "@/utils";
 import { ResponseAddStateZod } from "@/utils/zod/zod";
 
-// TODO Do submission to the abckedn with api call
-
 export const AddStates: React.FC = () => {
   const queryClient = useQueryClient();
   const router = useRouter();
   const [stateName, setStateName] = React.useState("");
   const [country, setCountry] = React.useState("");
   const [allState, setAllState] = React.useState<PostAddState>([]);
-  // TODO: fix error to proper error
   const [error, setError] = React.useState<ResponseAddState>();
 
   // Queries
@@ -52,7 +49,6 @@ export const AddStates: React.FC = () => {
     return <ErrorCard message="Their is a type mismatch from the server" />;
   }
 
-  // TODO: fix the mutation to send an array of states
   const mutation = useMutation({
     mutationFn: postAddState,
     onSuccess: (data) => {
