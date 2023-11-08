@@ -14,7 +14,7 @@ import {
   Table,
 } from "@mantine/core";
 import { ErrorCard } from "@/components";
-import {  PostAddState, ResponseAddState } from "@/utils/types";
+import { PostAddState, ResponseAddState } from "@/utils/types";
 
 import { useRouter } from "next/router";
 import { getAllCountries, postAddState } from "@/utils/crudFunctions";
@@ -35,27 +35,15 @@ export const AddStates: React.FC = () => {
     staleTime: Infinity,
     cacheTime: Infinity,
   });
-  if (allCountriesData.isLoading) return <Loader />;
-  if (allCountriesData.isError) {
-    console.log(allCountriesData.error);
-    return <ErrorCard message="something went wrong with the api request" />;
-  }
-
-  const isCountriesTypeCorrent = ReadCountriesDbZod.safeParse(
-    allCountriesData.data
-  );
-  if (!isCountriesTypeCorrent.success) {
-    console.log(isCountriesTypeCorrent.error);
-    return <ErrorCard message="Their is a type mismatch from the server" />;
-  }
-
   const mutation = useMutation({
     mutationFn: postAddState,
     onSuccess: (data) => {
       const result = ResponseAddStateZod.safeParse(data);
       if (!result.success) {
         console.log(result.error);
-        return <ErrorCard message="unable to add state, please try again" />;
+        return (
+          <ErrorCard message="server responded with incorrect return types. An entry in database might have been created before the server responded with incorrect types." />
+        );
       }
       if (!data.created) {
         console.log(`error:`, data);
@@ -67,9 +55,25 @@ export const AddStates: React.FC = () => {
       router.push("/admin");
       queryClient.invalidateQueries();
     },
-    onError: (data) => {},
+    onError: (data) => {
+      console.log(data);
+      return (
+        <ErrorCard message="unable to process request, server responded with an error" />
+      );
+    },
   });
-
+  const isCountriesTypeCorrent = ReadCountriesDbZod.safeParse(
+    allCountriesData.data
+  );
+  if (allCountriesData.isLoading) return <Loader />;
+  if (allCountriesData.isError) {
+    console.log(allCountriesData.error);
+    return <ErrorCard message="something went wrong with the api request" />;
+  }
+  if (!isCountriesTypeCorrent.success) {
+    console.log(isCountriesTypeCorrent.error);
+    return <ErrorCard message="Their is a type mismatch from the server" />;
+  }
   if (mutation.isLoading) {
     return <Loader />;
   }
@@ -144,18 +148,19 @@ export const AddStates: React.FC = () => {
       </Card.Section>
 
       <Grid>
-        <Grid.Col span={"auto"}>
+        <Grid.Col mt="md" span={"auto"}>
           {" "}
           <Textarea
             defaultValue="Select country to add multiple states. You can add multiple states for one country in a single form submission."
-            mt="md"
             disabled
+            minRows={3}
           ></Textarea>
         </Grid.Col>
         <Grid.Col span={"auto"}>
           <Autocomplete
             mt="sm"
             withAsterisk
+            description="select from a list of available countries"
             placeholder="select country"
             label={"country"}
             data={autoCompleteData}
@@ -170,16 +175,21 @@ export const AddStates: React.FC = () => {
             withAsterisk
             value={stateName}
             label="state"
+            description="press enter to add state"
             placeholder="type here"
             type="text"
+            onKeyDown={(event) => {
+              event.key === "Enter" ? onAddState(stateName) : undefined;
+            }}
             onChange={(event) => setStateName(event.currentTarget.value)}
           ></TextInput>
           {error?.state ? <ErrorCard message={error?.state} /> : <></>}
         </Grid.Col>
+
         <Grid.Col span={"auto"}>
-          <Box mt="xl">
+          <Box pt="lg" mt="lg">
             <Button
-              mt="sm"
+              mt="md"
               variant="outline"
               color="dark"
               size="sm"

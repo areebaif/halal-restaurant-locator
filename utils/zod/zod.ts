@@ -195,3 +195,12 @@ export const ReadCountriesDbZod = z.object({
     .object({ countryId: z.string().uuid(), countryName: z.string() })
     .array(),
 });
+
+export const ReadStateDbZod = z
+  .object({
+    countryId: z.string().uuid(),
+    countryName: z.string(),
+    stateId: z.string().uuid(),
+    stateName: z.string(),
+  })
+  .array();

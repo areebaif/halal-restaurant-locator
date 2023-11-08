@@ -20,15 +20,20 @@ import { PostAddState, ResponseAddState } from "@/utils/types";
  *      content:
  *        application/json:
  *          schema:
- *            type: object
- *            properties:
- *              countryId:
- *                type: string
- *                format: uuid
- *                example: "64b31531-28fd-4570-ad64-6aa312e53d69"
- *              stateName:
- *                type: string
- *                example: ["Minnesota", "Ohio"]
+ *            type: array
+ *            items:
+ *              type: object
+ *              properties:
+ *                countryId:
+ *                  type: string
+ *                  format: uuid
+ *                  example: "64b31531-28fd-4570-ad64-6aa312e53d69"
+ *                countryName:
+ *                  type: string
+ *                  example: "U.S.A"
+ *                stateName:
+ *                  type: string
+ *                  example: ["Minnesota", "Ohio"]
  *
  *      required: true
  *    responses:

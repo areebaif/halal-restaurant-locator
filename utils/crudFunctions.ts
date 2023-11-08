@@ -19,13 +19,14 @@ export const postAddFoodTag = async (data: { foodTag: string }) => {
   return res;
 };
 
-export const postAddState = async (data: {
-  stateName: string[];
-  countryName: string;
-  countryId: string;
-}[]) => {
-
-  const response = await fetch(`/api/restaurant/add-state`, {
+export const postAddState = async (
+  data: {
+    stateName: string[];
+    countryName: string;
+    countryId: string;
+  }[]
+) => {
+  const response = await fetch(`/api/geography/add-state`, {
     method: "POST",
     headers: {
       "Content-Type": "application/json",
@@ -42,7 +43,7 @@ export const postAddCity = async (data: {
   stateName: string;
 }) => {
   const { stateName, countryId, cityName } = data;
-  const response = await fetch(`/api/restaurant/add-city`, {
+  const response = await fetch(`/api/geography/add-city`, {
     method: "POST",
     headers: {
       "Content-Type": "application/json",
@@ -68,7 +69,7 @@ export const getMapSearchInput = async (data: string) => {
   return res;
 };
 
-export const getGeogAutoComplete = async () => {
+export const getCountryAutoComplete = async () => {
   const response = await fetch(`/api/geography/get-all-usa`, {
     method: "GET",
     headers: {
