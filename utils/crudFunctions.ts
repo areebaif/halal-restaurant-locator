@@ -5,6 +5,9 @@ import {
   ReadCountriesDb,
   ResponseAddState,
   ReadStateDb,
+  PostAddState,
+  PostAddCity,
+  ResponseAddCity,
 } from "./types";
 
 export const postAddFoodTag = async (data: { foodTag: string }) => {
@@ -20,13 +23,7 @@ export const postAddFoodTag = async (data: { foodTag: string }) => {
   return res;
 };
 
-export const postAddState = async (
-  data: {
-    stateName: string[];
-    countryName: string;
-    countryId: string;
-  }[]
-) => {
+export const postAddState = async (data: PostAddState) => {
   const response = await fetch(`/api/geography/add-state`, {
     method: "POST",
     headers: {
@@ -38,24 +35,15 @@ export const postAddState = async (
   return res;
 };
 
-export const postAddCity = async (data: {
-  cityName: string[];
-  countryId: string;
-  stateName: string;
-}) => {
-  const { stateName, countryId, cityName } = data;
+export const postAddCity = async (data: PostAddCity) => {
   const response = await fetch(`/api/geography/add-city`, {
     method: "POST",
     headers: {
       "Content-Type": "application/json",
     },
-    body: JSON.stringify({
-      countryId,
-      stateName,
-      cityName,
-    }),
+    body: JSON.stringify(data),
   });
-  const res: ResponseAddFoodTag = await response.json();
+  const res: ResponseAddCity = await response.json();
   return res;
 };
 

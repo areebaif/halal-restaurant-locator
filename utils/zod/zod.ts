@@ -98,8 +98,7 @@ export const PostAddCityZod = z
     countryState: z.string(),
     cityName: z.string().array(),
   })
-  .array()
-  .length(1); // must contain 1 items exactly
+  .array();
 export const PostAddZipCodeZod = z.object({
   countryId: z.string().uuid(),
   stateName: z.string(),

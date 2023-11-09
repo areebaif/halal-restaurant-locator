@@ -14,12 +14,11 @@ import {
   Table,
 } from "@mantine/core";
 import { ErrorCard } from "@/components";
-import { PostAddCity, ResponseAddState } from "@/utils/types";
-
+import { PostAddCity, ResponseAddCity } from "@/utils/types";
 import { useRouter } from "next/router";
-import { getStates, postAddState } from "@/utils/crudFunctions";
+import { getStates, postAddCity } from "@/utils/crudFunctions";
 import { capitalizeFirstWord } from "@/utils";
-import { ReadStateDbZod, ResponseAddStateZod } from "@/utils/zod/zod";
+import { ReadStateDbZod, ResponseAddCityZod } from "@/utils/zod/zod";
 
 export const AddCities: React.FC = () => {
   const queryClient = useQueryClient();
@@ -27,7 +26,7 @@ export const AddCities: React.FC = () => {
   const [cityName, setCityName] = React.useState("");
   const [countryState, setCountryState] = React.useState("");
   const [allCity, setAllCity] = React.useState<PostAddCity>([]);
-  const [error, setError] = React.useState<ResponseAddState>();
+  const [error, setError] = React.useState<ResponseAddCity>();
 
   // Queries
   const apiData = useQuery(["getAllStates"], getStates, {
@@ -35,9 +34,9 @@ export const AddCities: React.FC = () => {
     cacheTime: Infinity,
   });
   const mutation = useMutation({
-    mutationFn: postAddState,
+    mutationFn: postAddCity,
     onSuccess: (data) => {
-      const result = ResponseAddStateZod.safeParse(data);
+      const result = ResponseAddCityZod.safeParse(data);
       if (!result.success) {
         console.log(result.error);
         return <ErrorCard message="unable to add state, please try again" />;
@@ -46,6 +45,7 @@ export const AddCities: React.FC = () => {
         console.log(`error:`, data);
         if (data.country) setError({ ...error, country: data.country });
         if (data.state) setError({ ...error, state: data.state });
+        if (data.city) setError({ ...error, state: data.city });
         if (data.typeError) setError({ ...error, typeError: data.typeError });
         return;
       }
@@ -85,7 +85,7 @@ export const AddCities: React.FC = () => {
       return;
     }
 
-    //mutation.mutate(val);
+    mutation.mutate(val);
   };
 
   const onAddCity = (cityVal: string) => {
@@ -165,6 +165,7 @@ export const AddCities: React.FC = () => {
             onChange={setCountryState}
           />
           {error?.country ? <ErrorCard message={error?.country} /> : <></>}
+          {error?.state ? <ErrorCard message={error?.state} /> : <></>}
         </Grid.Col>
 
         <Grid.Col span={"auto"}>
@@ -181,7 +182,7 @@ export const AddCities: React.FC = () => {
             }}
             onChange={(event) => setCityName(event.currentTarget.value)}
           ></TextInput>
-          {error?.state ? <ErrorCard message={error?.state} /> : <></>}
+          {error?.city ? <ErrorCard message={error?.city} /> : <></>}
         </Grid.Col>
         <Grid.Col span={"auto"}>
           <Box pt="lg" mt="lg">

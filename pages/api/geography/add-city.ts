@@ -25,12 +25,16 @@ import { ResponseAddCity, PostAddCity } from "@/utils/types";
  *                type: string
  *                format: uuid
  *                example: "64b31531-28fd-4570-ad64-6aa312e53d69"
- *              stateName:
+ *              stateId:
  *                type: string
- *                example: Minnesota
+ *                format: uuid
+ *                example: "64b31531-28fd-4570-ad64-6aa312e53d69"
+ *              countryState:
+ *                type: string
+ *                example: "U.S.A - Minnesota"
  *              cityName:
  *                type: string
- *                example: ["Minneapolis", "Chicago"]
+ *                example: ["Minneapolis", "Woodbury"]
  *        
  *      required: true
  *    responses:
@@ -78,44 +82,73 @@ export default async function AddState(
       console.log(isTypeCorrect.error);
       res.status(400).json({
         typeError:
-          "type check failed on the server, expected to recieve array of objects with countryId, stateName properties as string and cityName property as array of string",
+          "type check failed on the server, expected to recieve array of objects with countryId, stateId, countryState properties as string and cityName property as array of string",
       });
       return;
     }
     const parsedCityData = cityData as PostAddCity;
-    const countryId = parsedCityData.countryId;
-    const stateName = capitalizeFirstWord(parsedCityData.stateName);
-    const countryExists = await prisma.country.findUnique({
-      where: {
-        countryId: countryId,
-      },
+    // check if country and state combination exists in the database to add city
+    const countryIdSet: Set<string> = new Set();
+    const stateIdSet: Set<string> = new Set();
+    parsedCityData.forEach((item) => {
+      countryIdSet.add(item.countryId);
+      stateIdSet.add(item.stateId);
     });
-    if (!countryExists?.countryId) {
+    const countryArray = Array.from(countryIdSet);
+    const stateArray = Array.from(stateIdSet);
+    const countryPromise = countryArray.map((item) =>
+      prisma.country.findUnique({ where: { countryId: item } })
+    );
+    const statePromise = stateArray.map((item) =>
+      prisma.state.findUnique({ where: { stateId: item } })
+    );
+
+    const resolvedCountry = await Promise.all(countryPromise);
+    const resolvedState = await Promise.all(statePromise);
+    let countryNotFound = false;
+    let stateNotFound = false;
+    resolvedCountry.forEach((item) => {
+      if (!item) {
+        countryNotFound = true;
+      }
+    });
+    if (countryNotFound) {
       res.status(400).json({
         country: "The provided countryId doesnot exist in the database",
       });
       return;
     }
-    const stateExists = await prisma.state.findMany({
-      where: {
-        countryId: countryExists.countryId,
-        stateName: stateName,
-      },
+    resolvedState.forEach((item) => {
+      if (!item) {
+        stateNotFound = true;
+      }
     });
-    if (!stateExists?.[0].stateId) {
+    if (stateNotFound) {
       res.status(400).json({
-        state:
-          "The provided stateName in reference to countryId doesnot exist in the database",
+        state: "The provided stateId doesnot exist in the database",
       });
       return;
     }
-    const mapCityData = parsedCityData.cityName.map((city) => ({
-      countryId: countryExists.countryId,
-      stateId: stateExists[0].stateId,
-      cityName: capitalizeFirstWord(city),
-    }));
+    // It is safe to add cities to the database now
+    const allCities: {
+      countryId: string;
+      stateId: string;
+      cityName: string;
+    }[] = [];
+
+    parsedCityData.forEach((item) => {
+      item.cityName.forEach((city) => {
+        const mapCityData = {
+          countryId: item.countryId,
+          stateId: item.stateId,
+          cityName: capitalizeFirstWord(city),
+        };
+        allCities.push(mapCityData);
+      });
+    });
+
     const createCity = await prisma.city.createMany({
-      data: mapCityData,
+      data: allCities,
     });
     res.status(201).json({ created: "ok" });
   } catch (err) {
@@ -123,11 +156,13 @@ export default async function AddState(
     if (err instanceof Prisma.PrismaClientKnownRequestError) {
       if (err.code === "P2002") {
         res.json({
-          city: "There is a unique constraint violation, the combination of cityName, stateName and countryId already exist in the database or you have provided this combination more than once",
+          city: "There is a unique constraint violation, the combination of cityName, stateId and countryId already exist in the database or you have provided this combination more than once",
         });
         return;
       }
     }
-    res.status(500).json({ country: "something went wrong with the server" });
+    res.status(500).json({
+      country: "something went wrong while inserting values in the database",
+    });
   }
 }
