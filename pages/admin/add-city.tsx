@@ -119,6 +119,7 @@ export const AddCities: React.FC = () => {
       updateAllCity.push({
         countryId: countryId,
         stateId: stateId,
+        countryState: countryState,
         cityName: [sanitizeCity],
       });
       setAllCity(updateAllCity);
@@ -146,9 +147,9 @@ export const AddCities: React.FC = () => {
         <Grid.Col span={"auto"}>
           {" "}
           <Textarea
-            defaultValue="Select country -state to add multiple cities. You can add multiple cities in different states for one country in a single form submission."
+            defaultValue="Select country - state to add multiple cities. You can add multiple cities for one country in a single form submission."
             mt="md"
-            minRows={3}
+            minRows={4}
             disabled
           ></Textarea>
         </Grid.Col>
@@ -197,7 +198,7 @@ export const AddCities: React.FC = () => {
         </Grid.Col>
       </Grid>
       {error?.typeError ? <ErrorCard message={error?.typeError} /> : <></>}
-      {/* <DisplayStates allState={allState} setAllState={setAllState} /> */}
+      <DisplayCities allCity={allCity} setAllCity={setAllCity} />
       <Group position="center" mt="sm">
         <Button color="dark" size="sm" onClick={() => onSubmit(allCity)}>
           Submit
@@ -209,55 +210,49 @@ export const AddCities: React.FC = () => {
 
 export default AddCities;
 
-type DisplayStateProp = {
-  allState: { countryId: string; countryName: string; stateName: string[] }[];
-  setAllState: (
-    val: { countryId: string; countryName: string; stateName: string[] }[]
-  ) => void;
+type DisplayCityProps = {
+  allCity: PostAddCity;
+  setAllCity: (val: PostAddCity) => void;
 };
-export const DisplayStates: React.FC<DisplayStateProp> = ({
-  allState,
-  setAllState,
+export const DisplayCities: React.FC<DisplayCityProps> = ({
+  allCity,
+  setAllCity,
 }) => {
-  const onDelete = (countryId: string, countryName: string, state: string) => {
-    const updateAllState = [...allState];
-    const newState = updateAllState.map((item) => {
-      if (item.countryId === countryId) {
-        const filteredStates = item.stateName.filter((item) => item !== state);
+  const onDelete = (countryState: string, city: string) => {
+    const updateAllCity = [...allCity];
+    const newCity = updateAllCity.map((item) => {
+      if (item.countryState === countryState) {
+        const filteredCities = item.cityName.filter((item) => item !== city);
         return {
-          countryId: countryId,
-          countryName: countryName,
-          stateName: [...filteredStates],
+          countryId: item.countryId,
+          stateId: item.stateId,
+          countryState: item.countryState,
+          cityName: [...filteredCities],
         };
       } else return { ...item };
     });
-    // TODO: error handling
-
-    setAllState([...newState]);
+    // TODO: error handling if countryState not found
+    setAllCity([...newCity]);
   };
 
-  return allState.length ? (
+  return allCity.length ? (
     <Table mt="xl" fontSize="lg" highlightOnHover withBorder>
       <thead>
         <tr>
-          <th>Country</th>
-          <th>State</th>
+          <th>Country - State</th>
+          <th>City</th>
           <th>Delete</th>
         </tr>
       </thead>
 
-      {allState.map((item, index) => (
+      {allCity.map((item, index) => (
         <tbody key={index}>
-          {item.stateName.map((state, index) => (
+          {item.cityName.map((city, index) => (
             <tr key={index}>
-              <td>{item.countryName}</td>
-              <td>{state}</td>
+              <td>{item.countryState}</td>
+              <td>{city}</td>
               <td>
-                <Button
-                  onClick={() =>
-                    onDelete(item.countryId, item.countryName, state)
-                  }
-                >
+                <Button onClick={() => onDelete(item.countryState, city)}>
                   Delete
                 </Button>
               </td>
