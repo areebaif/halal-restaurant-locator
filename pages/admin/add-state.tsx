@@ -13,14 +13,17 @@ import {
   Box,
   Table,
 } from "@mantine/core";
-import { ErrorCard } from "@/components";
-import { PostAddState, ResponseAddState } from "@/utils/types";
-
 import { useRouter } from "next/router";
-import { getAllCountries, postAddState } from "@/utils/crudFunctions";
-import { ReadCountriesDbZod } from "@/utils";
-import { capitalizeFirstWord } from "@/utils";
-import { ResponseAddStateZod } from "@/utils/zod/zod";
+import { ErrorCard } from "@/components";
+import {
+  ReadCountriesDbZod,
+  capitalizeFirstWord,
+  ResponseAddStateZod,
+  getAllCountries,
+  postAddState,
+  
+} from "@/utils";
+import { PostAddState, ResponseAddState } from "@/utils/types";
 
 export const AddStates: React.FC = () => {
   const queryClient = useQueryClient();

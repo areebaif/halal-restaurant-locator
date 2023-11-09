@@ -16,9 +16,13 @@ import {
 import { ErrorCard } from "@/components";
 import { PostAddCity, ResponseAddCity } from "@/utils/types";
 import { useRouter } from "next/router";
-import { getStates, postAddCity } from "@/utils/crudFunctions";
-import { capitalizeFirstWord } from "@/utils";
-import { ReadStateDbZod, ResponseAddCityZod } from "@/utils/zod/zod";
+import {
+  capitalizeFirstWord,
+  getStates,
+  postAddCity,
+  ReadStateDbZod,
+  ResponseAddCityZod,
+} from "@/utils";
 
 export const AddCities: React.FC = () => {
   const queryClient = useQueryClient();
