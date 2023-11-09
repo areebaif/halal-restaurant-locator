@@ -14,41 +14,26 @@ import {
   Table,
 } from "@mantine/core";
 import { ErrorCard } from "@/components";
-import { PostAddCity, PostAddState, ResponseAddState } from "@/utils/types";
+import { PostAddCity, ResponseAddState } from "@/utils/types";
 
 import { useRouter } from "next/router";
-import { getAllCountries, postAddState } from "@/utils/crudFunctions";
-import { ReadCountriesDbZod } from "@/utils";
+import { getStates, postAddState } from "@/utils/crudFunctions";
 import { capitalizeFirstWord } from "@/utils";
-import { ResponseAddStateZod } from "@/utils/zod/zod";
+import { ReadStateDbZod, ResponseAddStateZod } from "@/utils/zod/zod";
 
 export const AddCities: React.FC = () => {
   const queryClient = useQueryClient();
   const router = useRouter();
-  const [stateName, setStateName] = React.useState("");
-  const [country, setCountry] = React.useState("");
+  const [cityName, setCityName] = React.useState("");
+  const [countryState, setCountryState] = React.useState("");
   const [allCity, setAllCity] = React.useState<PostAddCity>([]);
   const [error, setError] = React.useState<ResponseAddState>();
 
   // Queries
-  const allCountriesData = useQuery(["getAllCountries"], getAllCountries, {
+  const apiData = useQuery(["getAllStates"], getStates, {
     staleTime: Infinity,
     cacheTime: Infinity,
   });
-  if (allCountriesData.isLoading) return <Loader />;
-  if (allCountriesData.isError) {
-    console.log(allCountriesData.error);
-    return <ErrorCard message="something went wrong with the api request" />;
-  }
-
-  const isCountriesTypeCorrent = ReadCountriesDbZod.safeParse(
-    allCountriesData.data
-  );
-  if (!isCountriesTypeCorrent.success) {
-    console.log(isCountriesTypeCorrent.error);
-    return <ErrorCard message="Their is a type mismatch from the server" />;
-  }
-
   const mutation = useMutation({
     mutationFn: postAddState,
     onSuccess: (data) => {
@@ -70,13 +55,26 @@ export const AddCities: React.FC = () => {
     onError: (data) => {},
   });
 
+  if (apiData.isLoading) return <Loader />;
+  if (apiData.isError) {
+    console.log(apiData.error);
+    return <ErrorCard message="something went wrong with the api request" />;
+  }
+  const isStateTypeCorrent = ReadStateDbZod.safeParse(apiData.data);
+  if (!isStateTypeCorrent.success) {
+    console.log(isStateTypeCorrent.error);
+    return <ErrorCard message="Their is a type mismatch from the server" />;
+  }
   if (mutation.isLoading) {
     return <Loader />;
   }
-  const autoCompleteData = allCountriesData.data.countries.map((item) => ({
-    value: item.countryName,
+
+  const autoCompleteStateCountry = apiData.data.map((item) => ({
+    value: item.countryNameStateName,
     countryid: item.countryId,
+    stateid: item.stateId,
   }));
+
   const onSubmit = async (val: PostAddCity) => {
     setError(undefined);
     if (!val.length || val.length > 1) {
@@ -95,38 +93,38 @@ export const AddCities: React.FC = () => {
       // TODO: I have to do error handling
     }
     const sanitizeCity = capitalizeFirstWord(cityVal);
-    const countryIdArray = autoCompleteData.filter(
-      (item) => item.value === country
+    const countryStateIdArray = autoCompleteStateCountry.filter(
+      (item) => item.value === countryState
     );
     // TODO: error handling if country is not defined
-    if (!countryIdArray.length) {
+    if (!countryStateIdArray.length) {
       console.log(" I have to do eror handling");
     }
-    const countryId = countryIdArray[0].countryid;
-    const countryName = countryIdArray[0].value;
+    const countryId = countryStateIdArray[0].countryid;
+    const stateId = countryStateIdArray[0].stateid;
     let index;
-    const filterCountry = allCity.filter((item, itemIndex) => {
+    const filterState = allCity.filter((item, itemIndex) => {
       if (item.countryId === countryId) {
         index = itemIndex;
       }
-      return item.countryId === countryId;
+      return item.stateId === stateId;
     });
-    if (filterCountry.length) {
+    if (filterState.length) {
       const updateAllCity = [...allCity];
       updateAllCity[index!].cityName.push(sanitizeCity);
       setAllCity([...updateAllCity]);
     } else {
       const updateAllCity = [...allCity];
-      // TODO: fix this
-      // updateAllCity.push({
-      //   countryId: countryId,
 
-      //   cityVal: [sanitizeState],
-      // });
+      updateAllCity.push({
+        countryId: countryId,
+        stateId: stateId,
+        cityName: [sanitizeCity],
+      });
       setAllCity(updateAllCity);
     }
 
-    setStateName("");
+    setCityName("");
   };
 
   return (
@@ -148,8 +146,9 @@ export const AddCities: React.FC = () => {
         <Grid.Col span={"auto"}>
           {" "}
           <Textarea
-            defaultValue="Select country to add multiple states. You can add multiple states for one country in a single form submission."
+            defaultValue="Select country -state to add multiple cities. You can add multiple cities in different states for one country in a single form submission."
             mt="md"
+            minRows={3}
             disabled
           ></Textarea>
         </Grid.Col>
@@ -157,46 +156,40 @@ export const AddCities: React.FC = () => {
           <Autocomplete
             mt="sm"
             withAsterisk
-            placeholder="select country"
-            label={"country"}
-            data={autoCompleteData}
-            value={country}
-            onChange={setCountry}
+            description="select from a list of available: country - state"
+            placeholder="select country - state"
+            label={"country - state"}
+            data={autoCompleteStateCountry}
+            value={countryState}
+            onChange={setCountryState}
           />
           {error?.country ? <ErrorCard message={error?.country} /> : <></>}
         </Grid.Col>
-        <Grid.Col span={"auto"}>
-          <Autocomplete
-            mt="sm"
-            withAsterisk
-            placeholder="select state"
-            label={"state"}
-            data={autoCompleteData}
-            value={stateName}
-            onChange={setStateName}
-          />
-          {error?.country ? <ErrorCard message={error?.country} /> : <></>}
-        </Grid.Col>
+
         <Grid.Col span={"auto"}>
           <TextInput
             mt="sm"
             withAsterisk
-            value={stateName}
-            label="state"
+            value={cityName}
+            description="press enter to add city"
+            label="city"
             placeholder="type here"
             type="text"
-            onChange={(event) => setStateName(event.currentTarget.value)}
+            onKeyDown={(event) => {
+              event.key === "Enter" ? onAddCity(cityName) : undefined;
+            }}
+            onChange={(event) => setCityName(event.currentTarget.value)}
           ></TextInput>
           {error?.state ? <ErrorCard message={error?.state} /> : <></>}
         </Grid.Col>
         <Grid.Col span={"auto"}>
-          <Box mt="xl">
+          <Box pt="lg" mt="lg">
             <Button
-              mt="sm"
+              mt="md"
               variant="outline"
               color="dark"
               size="sm"
-              onClick={() => onAddCity(stateName)}
+              onClick={() => onAddCity(cityName)}
             >
               Add
             </Button>

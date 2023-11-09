@@ -96,10 +96,12 @@ export const AddStates: React.FC = () => {
 
   const onAddState = (stateVal: string) => {
     if (!stateVal.length) {
-      // TODO: I have to do error handling
+      // TODO: I have to do error handling, stateName cannot be empty
     }
+    // santize user input
     const sanitizeState = capitalizeFirstWord(stateVal);
     const countryIdArray = autoCompleteData.filter(
+      // this country value is the value selected with autocomplete by user
       (item) => item.value === country
     );
     // TODO: error handling if country is not defined
@@ -108,6 +110,8 @@ export const AddStates: React.FC = () => {
     }
     const countryId = countryIdArray[0].countryid;
     const countryName = countryIdArray[0].value;
+    // We need index to push values to appropriate country
+    // The index is useful when we are pushing second state value to a country
     let index;
     const filterCountry = allState.filter((item, itemIndex) => {
       if (item.countryId === countryId) {
@@ -120,6 +124,7 @@ export const AddStates: React.FC = () => {
       updateAllState[index!].stateName.push(sanitizeState);
       setAllState([...updateAllState]);
     } else {
+      // create a copy of allState to update react state accordingly
       const updateAllState = [...allState];
       updateAllState.push({
         countryId: countryId,
@@ -128,7 +133,6 @@ export const AddStates: React.FC = () => {
       });
       setAllState(updateAllState);
     }
-
     setStateName("");
   };
 

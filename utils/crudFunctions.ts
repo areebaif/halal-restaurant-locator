@@ -4,6 +4,7 @@ import {
   GeoJsonRestaurantFeatureCollection,
   ReadCountriesDb,
   ResponseAddState,
+  ReadStateDb,
 } from "./types";
 
 export const postAddFoodTag = async (data: { foodTag: string }) => {
@@ -69,7 +70,7 @@ export const getMapSearchInput = async (data: string) => {
   return res;
 };
 
-export const getCountryAutoComplete = async () => {
+export const getAllUSA = async () => {
   const response = await fetch(`/api/geography/get-all-usa`, {
     method: "GET",
     headers: {
@@ -88,5 +89,16 @@ export const getAllCountries = async () => {
     },
   });
   const res: ReadCountriesDb = await response.json();
+  return res;
+};
+
+export const getStates = async () => {
+  const response = await fetch(`/api/geography/get-state`, {
+    method: "GET",
+    headers: {
+      "Content-Type": "application/json",
+    },
+  });
+  const res: ReadStateDb = await response.json();
   return res;
 };

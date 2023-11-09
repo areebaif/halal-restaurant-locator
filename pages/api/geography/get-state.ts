@@ -22,23 +22,26 @@ import {
  *        content:
  *          application/json:
  *            schema:
- *              type: object
- *              properties:
- *                state:
  *                  type: array
  *                  items:
  *                    type: object
  *                    properties:
+ *                      countryId:
+ *                        type: string
+ *                        format: uuid
+ *                        example: "64b31531-28fd-4570-ad64-6aa312e53d69"
+ *                      countryName:
+ *                        type: string
+ *                        example: "U.S.A"
  *                      stateId:
  *                        type: string
  *                        format: uuid
  *                        example: "64b31531-28fd-4570-ad64-6aa312e53d69"
  *                      stateName:
  *                        type: string
- *                        example: "U.S.A"
+ *                        example: "Minnesota"
  */
 
-// TODO: fix api docs
 export default async function GetAllCountries(
   req: NextApiRequest,
   res: NextApiResponse<ReadStateDb>
@@ -52,12 +55,24 @@ export default async function GetAllCountries(
         select: { countryName: true },
       },
     },
+    orderBy: {
+      Country: {
+        countryName: "asc",
+      },
+    },
   });
-  const mappedStates = country.map((item) => ({
-    countryId: item.countryId,
-    stateId: item.stateId,
-    stateName: item.stateName,
-    countryName: item.Country.countryName,
-  }));
-  res.status(200).send(mappedStates);
+  if (!country.length) {
+    return;
+  }
+  const states = country.map((item, index) => {
+    return {
+      countryId: item.countryId,
+      countryName: item.Country.countryName,
+      stateName: item.stateName,
+      stateId: item.stateId,
+      countryNameStateName: `${item.Country.countryName} - ${item.stateName}`,
+    };
+  });
+
+  res.status(200).send(states);
 }

@@ -94,7 +94,7 @@ export const PostAddStateZod = z
 export const PostAddCityZod = z
   .object({
     countryId: z.string().uuid(),
-    stateName: z.string(),
+    stateId: z.string().uuid(),
     cityName: z.string().array(),
   })
   .array()
@@ -200,7 +200,8 @@ export const ReadStateDbZod = z
   .object({
     countryId: z.string().uuid(),
     countryName: z.string(),
-    stateId: z.string().uuid(),
     stateName: z.string(),
+    stateId: z.string().uuid(),
+    countryNameStateName: z.string(),
   })
   .array();
