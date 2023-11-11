@@ -8,6 +8,7 @@ import {
   PostAddState,
   PostAddCity,
   ResponseAddCity,
+  ReadCityDb,
 } from "./types";
 
 export const postAddFoodTag = async (data: { foodTag: string }) => {
@@ -88,5 +89,16 @@ export const getStates = async () => {
     },
   });
   const res: ReadStateDb = await response.json();
+  return res;
+};
+
+export const getCities = async () => {
+  const response = await fetch(`/api/geography/get-cities`, {
+    method: "GET",
+    headers: {
+      "Content-Type": "application/json",
+    },
+  });
+  const res: ReadCityDb = await response.json();
   return res;
 };

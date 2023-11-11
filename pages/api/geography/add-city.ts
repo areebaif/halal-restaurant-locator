@@ -2,7 +2,12 @@ import { prisma } from "@/db/prisma";
 import { Prisma } from "@prisma/client";
 import type { NextApiRequest, NextApiResponse } from "next";
 // local imports
-import { PostAddCityZod, capitalizeFirstWord } from "@/utils";
+import {
+  PostAddCityZod,
+  capitalizeFirstWord,
+  countryIdExists,
+  stateIdExists,
+} from "@/utils";
 import { ResponseAddCity, PostAddCity } from "@/utils/types";
 
 /**
@@ -87,42 +92,17 @@ export default async function AddState(
       return;
     }
     const parsedCityData = cityData as PostAddCity;
-    // check if country and state combination exists in the database to add city
-    const countryIdSet: Set<string> = new Set();
-    const stateIdSet: Set<string> = new Set();
-    parsedCityData.forEach((item) => {
-      countryIdSet.add(item.countryId);
-      stateIdSet.add(item.stateId);
-    });
-    const countryArray = Array.from(countryIdSet);
-    const stateArray = Array.from(stateIdSet);
-    const countryPromise = countryArray.map((item) =>
-      prisma.country.findUnique({ where: { countryId: item } })
-    );
-    const statePromise = stateArray.map((item) =>
-      prisma.state.findUnique({ where: { stateId: item } })
-    );
+    // check if valid Id's supplied by front end
+    const countryNotFound = await countryIdExists(parsedCityData);
+    const stateNotFound = await stateIdExists(parsedCityData);
 
-    const resolvedCountry = await Promise.all(countryPromise);
-    const resolvedState = await Promise.all(statePromise);
-    let countryNotFound = false;
-    let stateNotFound = false;
-    resolvedCountry.forEach((item) => {
-      if (!item) {
-        countryNotFound = true;
-      }
-    });
     if (countryNotFound) {
       res.status(400).json({
         country: "The provided countryId doesnot exist in the database",
       });
       return;
     }
-    resolvedState.forEach((item) => {
-      if (!item) {
-        stateNotFound = true;
-      }
-    });
+
     if (stateNotFound) {
       res.status(400).json({
         state: "The provided stateId doesnot exist in the database",

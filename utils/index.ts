@@ -4,19 +4,21 @@ import {
   postAddState,
   getStates,
   postAddCity,
+  getCities,
 } from "./crudFunctions";
 import {
   PostAddStateZod,
   PostAddCityZod,
-  PostAddZipCodeZod,
+  PostAddZipcodeZod,
   PostAddRestaurantZod,
   GetSearchInputsZod,
   ReadCountriesDbZod,
   ResponseAddStateZod,
   ReadStateDbZod,
   ResponseAddCityZod,
+  ReadCityDbZod,
 } from "./zod/zod";
-import { findRestaurant } from "./api-utils";
+import { findRestaurant, countryIdExists, stateIdExists } from "./api-utils";
 import { calcBoundsFromCoordinates } from "./map/map-boundary-calculations";
 import { capitalizeFirstWord, parseQueryVals } from "./string-manipulation";
 import { getMapSearchInput } from "./crudFunctions";
@@ -24,7 +26,7 @@ export {
   postAddFoodTag,
   PostAddStateZod,
   PostAddCityZod,
-  PostAddZipCodeZod,
+  PostAddZipcodeZod,
   PostAddRestaurantZod,
   capitalizeFirstWord,
   findRestaurant,
@@ -40,4 +42,8 @@ export {
   postAddCity,
   ReadStateDbZod,
   ResponseAddCityZod,
+  countryIdExists,
+  stateIdExists,
+  getCities,
+  ReadCityDbZod,
 };

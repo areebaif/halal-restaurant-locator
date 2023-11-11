@@ -99,18 +99,21 @@ export const PostAddCityZod = z
     cityName: z.string().array(),
   })
   .array();
-export const PostAddZipCodeZod = z.object({
-  countryId: z.string().uuid(),
-  stateName: z.string(),
-  cityName: z.string(),
-  zipcode: z
-    .object({
-      longitude: z.number().gte(-180).lte(180),
-      latitude: z.number().gte(-90).lte(90),
-      zipcode: z.string(),
-    })
-    .array(),
-});
+export const PostAddZipcodeZod = z
+  .object({
+    countryId: z.string().uuid(),
+    stateId: z.string().uuid(),
+    cityId: z.string().uuid(),
+    countryStateCity: z.string(),
+    zipcode: z
+      .object({
+        longitude: z.number().gte(-180).lte(180),
+        latitude: z.number().gte(-90).lte(90),
+        zipcode: z.string(),
+      })
+      .array(),
+  })
+  .array();
 
 export const PostAddRestaurantZod = z.object({
   countryId: z.string().uuid(),
@@ -203,5 +206,17 @@ export const ReadStateDbZod = z
     stateName: z.string(),
     stateId: z.string().uuid(),
     countryNameStateName: z.string(),
+  })
+  .array();
+
+export const ReadCityDbZod = z
+  .object({
+    countryId: z.string().uuid(),
+    countryName: z.string(),
+    stateName: z.string(),
+    stateId: z.string().uuid(),
+    cityId: z.string().uuid(),
+    cityName: z.string(),
+    countryStateCityName: z.string(),
   })
   .array();

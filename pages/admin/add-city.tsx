@@ -108,7 +108,7 @@ export const AddCities: React.FC = () => {
     const stateId = countryStateIdArray[0].stateid;
     let index;
     const filterState = allCity.filter((item, itemIndex) => {
-      if (item.countryId === countryId) {
+      if (item.stateId === stateId) {
         index = itemIndex;
       }
       return item.stateId === stateId;

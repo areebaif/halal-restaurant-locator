@@ -20,6 +20,10 @@ import {
   IconTemplate,
   IconPlaylistAdd,
   IconMap2,
+  IconMapPin,
+  IconMapPin2,
+  IconMapPins,
+  IconMap,
 } from "@tabler/icons-react";
 
 export const AdminNavigation: React.FC = (props) => {
@@ -48,7 +52,19 @@ export const AdminNavigation: React.FC = (props) => {
                 : theme.colors.dark,
           })}
         >
-          USER
+          Geography
+        </Text>
+        <GeographyMainLinks />
+        <Text
+          size="sm"
+          sx={(theme) => ({
+            color:
+              theme.colorScheme === "dark"
+                ? theme.colors.dark[2]
+                : theme.colors.dark,
+          })}
+        >
+          User
         </Text>
         <UserMainLinks />
       </Navbar.Section>
@@ -118,30 +134,13 @@ const restaurantData = [
     label: "View /Edit restaurant",
     link: "/admin",
   },
-  {
-    icon: <IconPlaylistAdd size={16} />,
-    color: "blue",
-    label: "Add State",
-    link: "/admin/add-state",
-  },
-  {
-    icon: <IconMap2 size={16} />,
-    color: "indigo",
-    label: "Add City",
-    link: "/admin/add-city",
-  },
+
   {
     icon: <IconIdBadge2 size={16} />,
     color: "green",
     label: "Add type of food",
     link: "/admin/add-food-tag",
   },
-  //   {
-  //     icon: <IconTemplate size={16} />,
-  //     color: "gray",
-  //     label: "Add game platform",
-  //     link: "/admin/add-platform",
-  //   },
 ];
 
 const userData = [
@@ -165,8 +164,36 @@ const userData = [
   },
 ];
 
+const geographyData = [
+  {
+    icon: <IconMapPin size={16} />,
+    color: "blue",
+    label: "Add State",
+    link: "/admin/add-state",
+  },
+  {
+    icon: <IconMap2 size={16} />,
+    color: "indigo",
+    label: "Add City",
+    link: "/admin/add-city",
+  },
+  {
+    icon: <IconMapPins size={16} />,
+    color: "violet",
+    label: "Add Zipcode",
+    link: "/admin/add-zipcode",
+  },
+];
+
 export function RestaurantMainLinks() {
   const links = restaurantData.map((link) => (
+    <MainLink {...link} key={link.label} />
+  ));
+  return <div>{links}</div>;
+}
+
+export function GeographyMainLinks() {
+  const links = geographyData.map((link) => (
     <MainLink {...link} key={link.label} />
   ));
   return <div>{links}</div>;
