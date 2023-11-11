@@ -19,7 +19,12 @@ import {
   ResponseAddCityZod,
   ReadCityDbZod,
 } from "./zod/zod";
-import { findRestaurant, countryIdExists, stateIdExists } from "./api-utils";
+import {
+  findRestaurant,
+  countryIdExists,
+  stateIdExists,
+  cityIdExists,
+} from "./api-utils";
 import { calcBoundsFromCoordinates } from "./map/map-boundary-calculations";
 import { capitalizeFirstWord, parseQueryVals } from "./string-manipulation";
 import { getMapSearchInput } from "./crudFunctions";
@@ -48,4 +53,5 @@ export {
   getCities,
   ReadCityDbZod,
   postAddZipcode,
+  cityIdExists,
 };

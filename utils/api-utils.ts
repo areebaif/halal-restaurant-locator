@@ -166,3 +166,27 @@ export const stateIdExists = async (data: { stateId: string }[]) => {
   }
   return stateNotFound;
 };
+
+export const cityIdExists = async (data: { cityId: string }[]) => {
+  const cityIdSet: Set<string> = new Set();
+  data.forEach((item) => {
+    cityIdSet.add(item.cityId);
+  });
+
+  const cityArray = Array.from(cityIdSet);
+
+  const cityPromise = cityArray.map((item) =>
+    prisma.city.findUnique({ where: { cityId: item } })
+  );
+
+  const resolvedCity = await Promise.all(cityPromise);
+
+  let cityNotFound = false;
+  for (let x = 0; x < resolvedCity.length; x++) {
+    if (!resolvedCity[x]) {
+      cityNotFound = true;
+      break;
+    }
+  }
+  return cityNotFound;
+};
