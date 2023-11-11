@@ -23,7 +23,11 @@ import {
   getCities,
   ReadCityDbZod,
 } from "@/utils";
-import { ResponseAddCity, PostAddZipcode } from "@/utils/types";
+import {
+  ResponseAddCity,
+  PostAddZipcode,
+  ResponseAddZipCode,
+} from "@/utils/types";
 
 export const AddZipcode: React.FC = () => {
   const queryClient = useQueryClient();
@@ -33,7 +37,7 @@ export const AddZipcode: React.FC = () => {
   const [allZipcode, setAllZipcode] = React.useState<PostAddZipcode>([]);
   const [latitude, setLatitude] = React.useState("");
   const [longitude, setLongitude] = React.useState("");
-  const [error, setError] = React.useState<ResponseAddCity>();
+  const [error, setError] = React.useState<ResponseAddZipCode>();
 
   // Queries
   const apiData = useQuery(["getAllCities"], getCities, {
@@ -102,20 +106,30 @@ export const AddZipcode: React.FC = () => {
     latitude: string;
     longitude: string;
   }) => {
+    setError(undefined);
     const { zipcodeVal, latitude, longitude } = data;
     const latNum = Number(latitude);
     const longNum = Number(longitude);
 
     if (!zipcodeVal.length || !Boolean(latNum) || !Boolean(longNum)) {
-      // TODO: I have to do error handling
+      setError({
+        ...error,
+        zipcode:
+          "Latitude and longitude values should be decimal numbers and zipcode cannot be empty",
+      });
+      return;
     }
 
     const countryStateIdArray = autoCompleteCountryStateCity.filter(
       (item) => item.value === countryStateCity
     );
-    // TODO: error handling if country is not defined
+
     if (!countryStateIdArray.length) {
-      console.log(" I have to do eror handling");
+      setError({
+        ...error,
+        country: "please select value in country - state - city field",
+      });
+      return;
     }
     const countryId = countryStateIdArray[0].countryid;
     const stateId = countryStateIdArray[0].stateid;
@@ -152,6 +166,7 @@ export const AddZipcode: React.FC = () => {
     setZipcode("");
     setLatitude("");
     setLongitude("");
+    setCountryStateCity("");
   };
 
   return (
@@ -182,6 +197,7 @@ export const AddZipcode: React.FC = () => {
           />
           {error?.country ? <ErrorCard message={error?.country} /> : <></>}
           {error?.state ? <ErrorCard message={error?.state} /> : <></>}
+          {error?.city ? <ErrorCard message={error?.city} /> : <></>}
         </Grid.Col>
         <Grid.Col span={"auto"}>
           <TextInput
@@ -194,7 +210,6 @@ export const AddZipcode: React.FC = () => {
             type="text"
             onChange={(event) => setZipcode(event.currentTarget.value)}
           ></TextInput>
-          {error?.city ? <ErrorCard message={error?.city} /> : <></>}
         </Grid.Col>
         <Grid.Col span="auto">
           <TextInput
@@ -222,6 +237,7 @@ export const AddZipcode: React.FC = () => {
           />
         </Grid.Col>
       </Grid>
+      {error?.zipcode ? <ErrorCard message={error?.zipcode} /> : <></>}
       {error?.typeError ? <ErrorCard message={error?.typeError} /> : <></>}
       <Container size="sm">
         <Grid ml="xl">
@@ -250,70 +266,88 @@ export const AddZipcode: React.FC = () => {
           </Grid.Col>
         </Grid>
       </Container>
-      {/* <DisplayCities allCity={allZipcode} setAllCity={setAllZipcode} /> */}
-      <Group position="center" mt="sm">
-        <Button color="dark" size="sm" onClick={() => onSubmit(allZipcode)}>
-          Submit
-        </Button>
-      </Group>
+      {allZipcode.length ? (
+        <>
+          <DisplayZipcode
+            allZipcode={allZipcode}
+            setAllZipcode={setAllZipcode}
+          />
+          <Group position="center" mt="sm">
+            <Button color="dark" size="sm" onClick={() => onSubmit(allZipcode)}>
+              Submit
+            </Button>
+          </Group>
+        </>
+      ) : (
+        <></>
+      )}
     </Card>
   );
 };
 
 export default AddZipcode;
 
-// type DisplayCityProps = {
-//   allCity: PostAddCity;
-//   setAllCity: (val: PostAddCity) => void;
-// };
-// export const DisplayCities: React.FC<DisplayCityProps> = ({
-//   allCity,
-//   setAllCity,
-// }) => {
-//   const onDelete = (countryState: string, city: string) => {
-//     const updateAllCity = [...allCity];
-//     const newCity = updateAllCity.map((item) => {
-//       if (item.countryState === countryState) {
-//         const filteredCities = item.cityName.filter((item) => item !== city);
-//         return {
-//           countryId: item.countryId,
-//           stateId: item.stateId,
-//           countryState: item.countryState,
-//           cityName: [...filteredCities],
-//         };
-//       } else return { ...item };
-//     });
-//     // TODO: error handling if countryState not found
-//     setAllCity([...newCity]);
-//   };
+type DisplayZipcodeProps = {
+  allZipcode: PostAddZipcode;
+  setAllZipcode: (val: PostAddZipcode) => void;
+};
+export const DisplayZipcode: React.FC<DisplayZipcodeProps> = ({
+  allZipcode,
+  setAllZipcode,
+}) => {
+  const onDelete = (countryStateCity: string, zipcode: string) => {
+    const updateAllCity = [...allZipcode];
+    const newZipcode = updateAllCity.map((item) => {
+      if (item.countryStateCity === countryStateCity) {
+        const filteredZipcode = item.zipcode.filter(
+          (item) => item.zipcode !== zipcode
+        );
+        return {
+          countryId: item.countryId,
+          stateId: item.stateId,
+          cityId: item.cityId,
+          countryStateCity: item.countryStateCity,
+          zipcode: [...filteredZipcode],
+        };
+      } else return { ...item };
+    });
 
-//   return allCity.length ? (
-//     <Table mt="xl" fontSize="lg" highlightOnHover withBorder>
-//       <thead>
-//         <tr>
-//           <th>Country - State</th>
-//           <th>City</th>
-//           <th>Delete</th>
-//         </tr>
-//       </thead>
+    setAllZipcode([...newZipcode]);
+  };
 
-//       {allCity.map((item, index) => (
-//         <tbody key={index}>
-//           {item.cityName.map((city, index) => (
-//             <tr key={index}>
-//               <td>{item.countryState}</td>
-//               <td>{city}</td>
-//               <td>
-//                 <Button onClick={() => onDelete(item.countryState, city)}>
-//                   Delete
-//                 </Button>
-//               </td>
-//             </tr>
-//           ))}
-//         </tbody>
-//       ))}
-//     </Table>
-//   ) : (
-//     <></>
-//   );
-// };
+  return (
+    <Table mt="xl" fontSize="lg" highlightOnHover withBorder>
+      <thead>
+        <tr>
+          <th>Country - State</th>
+          <th>Zipcode</th>
+          <th>Latitude</th>
+          <th>Longitude</th>
+          <th>Delete</th>
+        </tr>
+      </thead>
+
+      {allZipcode.map((item, index) => (
+        <tbody key={index}>
+          {item.zipcode.map((zipcode, index) => (
+            <tr key={index}>
+              <td>{item.countryStateCity}</td>
+              <td>{zipcode.zipcode}</td>
+              <td>{zipcode.latitude}</td>
+              <td>{zipcode.longitude}</td>
+              <td>
+                <Button
+                  onClick={() =>
+                    onDelete(item.countryStateCity, zipcode.zipcode)
+                  }
+                >
+                  Delete
+                </Button>
+              </td>
+            </tr>
+          ))}
+        </tbody>
+      ))}
+    </Table>
+  );
+};
