@@ -21,7 +21,6 @@ import {
   ResponseAddStateZod,
   getAllCountries,
   postAddState,
-  
 } from "@/utils";
 import { PostAddState, ResponseAddState } from "@/utils/types";
 
@@ -98,8 +97,13 @@ export const AddStates: React.FC = () => {
   };
 
   const onAddState = (stateVal: string) => {
+    setError(undefined);
     if (!stateVal.length) {
-      // TODO: I have to do error handling, stateName cannot be empty
+      setError({
+        ...error,
+        state: "Please add state value.",
+      });
+      return;
     }
     // santize user input
     const sanitizeState = capitalizeFirstWord(stateVal);
@@ -107,9 +111,13 @@ export const AddStates: React.FC = () => {
       // this country value is the value selected with autocomplete by user
       (item) => item.value === country
     );
-    // TODO: error handling if country is not defined
+
     if (!countryIdArray.length) {
-      console.log(" I have to do eror handling");
+      setError({
+        ...error,
+        country: "Please add value to country field",
+      });
+      return;
     }
     const countryId = countryIdArray[0].countryid;
     const countryName = countryIdArray[0].value;
@@ -242,7 +250,6 @@ export const DisplayStates: React.FC<DisplayStateProp> = ({
         };
       } else return { ...item };
     });
-    // TODO: error handling
 
     setAllState([...newState]);
   };

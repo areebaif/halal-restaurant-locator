@@ -9,6 +9,8 @@ import {
   PostAddCity,
   ResponseAddCity,
   ReadCityDb,
+  PostAddZipcode,
+  ResponseAddZipCode,
 } from "./types";
 
 export const postAddFoodTag = async (data: { foodTag: string }) => {
@@ -45,6 +47,18 @@ export const postAddCity = async (data: PostAddCity) => {
     body: JSON.stringify(data),
   });
   const res: ResponseAddCity = await response.json();
+  return res;
+};
+
+export const postAddZipcode = async (data: PostAddZipcode) => {
+  const response = await fetch(`/api/geography/add-zipcode`, {
+    method: "POST",
+    headers: {
+      "Content-Type": "application/json",
+    },
+    body: JSON.stringify(data),
+  });
+  const res: ResponseAddZipCode = await response.json();
   return res;
 };
 

@@ -5,6 +5,7 @@ import {
   getStates,
   postAddCity,
   getCities,
+  postAddZipcode,
 } from "./crudFunctions";
 import {
   PostAddStateZod,
@@ -46,4 +47,5 @@ export {
   stateIdExists,
   getCities,
   ReadCityDbZod,
+  postAddZipcode,
 };

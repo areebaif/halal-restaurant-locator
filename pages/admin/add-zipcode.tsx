@@ -17,17 +17,13 @@ import {
 } from "@mantine/core";
 import { ErrorCard } from "@/components";
 import {
-  capitalizeFirstWord,
+  postAddZipcode,
   PostAddZipcodeZod,
   ResponseAddCityZod,
   getCities,
   ReadCityDbZod,
 } from "@/utils";
-import {
-  ResponseAddCity,
-  PostAddZipcode,
-  ResponseAddZipCode,
-} from "@/utils/types";
+import { PostAddZipcode, ResponseAddZipCode } from "@/utils/types";
 
 export const AddZipcode: React.FC = () => {
   const queryClient = useQueryClient();
@@ -44,27 +40,28 @@ export const AddZipcode: React.FC = () => {
     staleTime: Infinity,
     cacheTime: Infinity,
   });
-  //   const mutation = useMutation({
-  //     mutationFn: postAddCity,
-  //     onSuccess: (data) => {
-  //       const result = ResponseAddCityZod.safeParse(data);
-  //       if (!result.success) {
-  //         console.log(result.error);
-  //         return <ErrorCard message="unable to add zipcode, please try again" />;
-  //       }
-  //       if (!data.created) {
-  //         console.log(`error:`, data);
-  //         if (data.country) setError({ ...error, country: data.country });
-  //         if (data.state) setError({ ...error, state: data.state });
-  //         if (data.city) setError({ ...error, state: data.city });
-  //         if (data.typeError) setError({ ...error, typeError: data.typeError });
-  //         return;
-  //       }
-  //       router.push("/admin");
-  //       queryClient.invalidateQueries();
-  //     },
-  //     onError: (data) => {},
-  //   });
+  const mutation = useMutation({
+    mutationFn: postAddZipcode,
+    onSuccess: (data) => {
+      const result = ResponseAddCityZod.safeParse(data);
+      if (!result.success) {
+        console.log(result.error);
+        return <ErrorCard message="unable to add zipcode, please try again" />;
+      }
+      if (!data.created) {
+        console.log(`error:`, data);
+        if (data.country) setError({ ...error, country: data.country });
+        if (data.state) setError({ ...error, state: data.state });
+        if (data.city) setError({ ...error, state: data.city });
+        if (data.zipcode) setError({ ...error, state: data.zipcode });
+        if (data.typeError) setError({ ...error, typeError: data.typeError });
+        return;
+      }
+      router.push("/admin");
+      queryClient.invalidateQueries();
+    },
+    onError: (data) => {},
+  });
 
   if (apiData.isLoading) return <Loader />;
   if (apiData.isError) {
@@ -77,9 +74,9 @@ export const AddZipcode: React.FC = () => {
     console.log(isStateTypeCorrent.error);
     return <ErrorCard message="Their is a type mismatch from the server" />;
   }
-  //   if (mutation.isLoading) {
-  //     return <Loader />;
-  //   }
+  if (mutation.isLoading) {
+    return <Loader />;
+  }
 
   const autoCompleteCountryStateCity = apiData.data.map((item) => ({
     value: item.countryStateCityName,
@@ -90,15 +87,16 @@ export const AddZipcode: React.FC = () => {
 
   const onSubmit = async (val: PostAddZipcode) => {
     setError(undefined);
-    if (!val.length || val.length > 1) {
+    if (!val.length) {
       setError({
         ...error,
-        country: "Please add state to a single country",
+        country:
+          "Please add values before submitting. There is not value to submit in the form",
       });
       return;
     }
 
-    //mutate(val);
+    mutation.mutate(val);
   };
 
   const onAddZipcode = (data: {

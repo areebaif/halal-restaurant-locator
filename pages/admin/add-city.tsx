@@ -1,5 +1,6 @@
 import * as React from "react";
 import { useQueryClient, useMutation, useQuery } from "@tanstack/react-query";
+import { useRouter } from "next/router";
 import {
   Card,
   Title,
@@ -14,8 +15,6 @@ import {
   Table,
 } from "@mantine/core";
 import { ErrorCard } from "@/components";
-import { PostAddCity, ResponseAddCity } from "@/utils/types";
-import { useRouter } from "next/router";
 import {
   capitalizeFirstWord,
   getStates,
@@ -23,6 +22,7 @@ import {
   ReadStateDbZod,
   ResponseAddCityZod,
 } from "@/utils";
+import { PostAddCity, ResponseAddCity } from "@/utils/types";
 
 export const AddCities: React.FC = () => {
   const queryClient = useQueryClient();
@@ -81,10 +81,10 @@ export const AddCities: React.FC = () => {
 
   const onSubmit = async (val: PostAddCity) => {
     setError(undefined);
-    if (!val.length || val.length > 1) {
+    if (!val.length) {
       setError({
         ...error,
-        country: "Please add state to a single country",
+        country: "Please add values before submitting",
       });
       return;
     }
@@ -93,16 +93,25 @@ export const AddCities: React.FC = () => {
   };
 
   const onAddCity = (cityVal: string) => {
+    setError(undefined);
     if (!cityVal.length) {
-      // TODO: I have to do error handling
+      setError({
+        ...error,
+        city: "Please add values to city.",
+      });
+      return;
     }
     const sanitizeCity = capitalizeFirstWord(cityVal);
     const countryStateIdArray = autoCompleteStateCountry.filter(
       (item) => item.value === countryState
     );
-    // TODO: error handling if country is not defined
+
     if (!countryStateIdArray.length) {
-      console.log(" I have to do eror handling");
+      setError({
+        ...error,
+        country: "Please add values to country - state.",
+      });
+      return;
     }
     const countryId = countryStateIdArray[0].countryid;
     const stateId = countryStateIdArray[0].stateid;
@@ -119,7 +128,6 @@ export const AddCities: React.FC = () => {
       setAllCity([...updateAllCity]);
     } else {
       const updateAllCity = [...allCity];
-
       updateAllCity.push({
         countryId: countryId,
         stateId: stateId,
@@ -146,7 +154,6 @@ export const AddCities: React.FC = () => {
       <Card.Section withBorder inheritPadding py="xs">
         <Title order={3}>Add City Name</Title>
       </Card.Section>
-
       <Grid>
         <Grid.Col span={"auto"}>
           {" "}
@@ -171,7 +178,6 @@ export const AddCities: React.FC = () => {
           {error?.country ? <ErrorCard message={error?.country} /> : <></>}
           {error?.state ? <ErrorCard message={error?.state} /> : <></>}
         </Grid.Col>
-
         <Grid.Col span={"auto"}>
           <TextInput
             mt="sm"
@@ -236,7 +242,6 @@ export const DisplayCities: React.FC<DisplayCityProps> = ({
         };
       } else return { ...item };
     });
-    // TODO: error handling if countryState not found
     setAllCity([...newCity]);
   };
 
@@ -249,7 +254,6 @@ export const DisplayCities: React.FC<DisplayCityProps> = ({
           <th>Delete</th>
         </tr>
       </thead>
-
       {allCity.map((item, index) => (
         <tbody key={index}>
           {item.cityName.map((city, index) => (
