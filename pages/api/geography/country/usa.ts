@@ -5,7 +5,7 @@ import { ResponseGetAllGeogByCountry } from "@/utils/types";
 
 /**
  * @swagger
- * /api/geography/get-all-usa:
+ * /api/geography/country/usa:
  *  get:
  *    tags:
  *      - geolocations
@@ -90,7 +90,6 @@ export default async function GetGeographyInputs(
   res: NextApiResponse<ResponseGetAllGeogByCountry>
 ) {
   // get zipcode
-
   const country = await prisma.country.findUnique({
     where: { countryName: "U.S.A" },
   });

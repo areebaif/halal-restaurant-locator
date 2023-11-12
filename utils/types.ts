@@ -7,7 +7,7 @@ import {
   PostAddStateZod,
   PostAddCityZod,
   ResponseAddCityZod,
-  PostAddZipCodeZod,
+  PostAddZipcodeZod,
   ResponseAddZipcodeZod,
   PostAddRestaurantZod,
   ResponseAddRestaurantZod,
@@ -17,6 +17,11 @@ import {
   GeoJsonRestaurantPropertiesZod,
   RestaurantReadDbZod,
   RestaurantGeoJsonFeatureZod,
+  ReadCountriesDbZod,
+  ReadStateDbZod,
+  ReadCityDbZod,
+  ReadZipcodeDbZod,
+  ReadFoodTagsDbZod,
 } from "./zod/zod";
 
 export type ErrorAddFoodTag = z.infer<typeof ErrorAddFoodTagZod>;
@@ -24,13 +29,15 @@ export type ResponseAddFoodTag = z.infer<typeof ResponseAddFoodTagZod>;
 export type ResponseAddCountry = z.infer<typeof ResponseAddCountryZod>;
 export type ResponseAddState = z.infer<typeof ResponseAddStateZod>;
 export type ResponseAddCity = z.infer<typeof ResponseAddCityZod>;
-export type ResponseAddZipCode = z.infer<typeof ResponseAddZipcodeZod>;
+export type ResponseAddZipcode = z.infer<typeof ResponseAddZipcodeZod>;
 export type PostAddState = z.infer<typeof PostAddStateZod>;
 export type PostAddCity = z.infer<typeof PostAddCityZod>;
-export type PostAddZipCode = z.infer<typeof PostAddZipCodeZod>;
+export type PostAddZipcode = z.infer<typeof PostAddZipcodeZod>;
 export type PostAddRestaurant = z.infer<typeof PostAddRestaurantZod>;
 export type ResponseAddRestaurant = z.infer<typeof ResponseAddRestaurantZod>;
-export type ResponseGetAllGeogByCountry = z.infer<typeof ResponseGetAllGeogByCountryZod>;
+export type ResponseGetAllGeogByCountry = z.infer<
+  typeof ResponseGetAllGeogByCountryZod
+>;
 export type GetSearchInputs = z.infer<typeof GetSearchInputsZod>;
 export type RestaurantReadDb = z.infer<typeof RestaurantReadDbZod>;
 export type RestaurantGeoJsonFeature = z.infer<
@@ -42,6 +49,13 @@ export type GeoJsonRestaurantProperties = z.infer<
 export type ResponseRestaurantGeoJsonFeatureCollection = z.infer<
   typeof ResponseRestaurantGeoJsonZod
 >;
+
+export type ReadCountriesDb = z.infer<typeof ReadCountriesDbZod>;
+export type ReadStateDb = z.infer<typeof ReadStateDbZod>;
+export type ReadCityDb = z.infer<typeof ReadCityDbZod>;
+export type ReadZipcodeDb = z.infer<typeof ReadZipcodeDbZod>;
+export type ReadFoodTagsDb = z.infer<typeof ReadFoodTagsDbZod>;
+
 // for client
 export type GeoJsonRestaurantFeatureCollection = {
   restaurants: {

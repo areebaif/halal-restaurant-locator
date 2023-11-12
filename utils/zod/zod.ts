@@ -1,5 +1,6 @@
 import z from "zod";
-
+// dynamic properties of objects
+//z.record(z.string().uuid(), z.string().array());
 export const ErrorAddFoodTagZod = z
   .object({
     foodTag: z.string().optional(),
@@ -81,29 +82,38 @@ export const ResponseAddRestaurantZod = z.object({
   created: z.string().optional(),
 });
 
-export const PostAddStateZod = z.object({
-  countryId: z.string().uuid(),
-  stateName: z.string().array(),
-});
+export const PostAddStateZod = z
+  .object({
+    countryId: z.string().uuid(),
+    countryName: z.string(),
+    stateName: z.string().array(),
+  })
+  .array()
+  .length(1); // must contain 1 items exactly
 
-export const PostAddCityZod = z.object({
-  countryId: z.string().uuid(),
-  stateName: z.string(),
-  cityName: z.string().array(),
-});
-
-export const PostAddZipCodeZod = z.object({
-  countryId: z.string().uuid(),
-  stateName: z.string(),
-  cityName: z.string(),
-  zipcode: z
-    .object({
-      longitude: z.number().gte(-180).lte(180),
-      latitude: z.number().gte(-90).lte(90),
-      zipcode: z.string(),
-    })
-    .array(),
-});
+export const PostAddCityZod = z
+  .object({
+    countryId: z.string().uuid(),
+    stateId: z.string().uuid(),
+    countryState: z.string(),
+    cityName: z.string().array(),
+  })
+  .array();
+export const PostAddZipcodeZod = z
+  .object({
+    countryId: z.string().uuid(),
+    stateId: z.string().uuid(),
+    cityId: z.string().uuid(),
+    countryStateCity: z.string(),
+    zipcode: z
+      .object({
+        longitude: z.number().gte(-180).lte(180),
+        latitude: z.number().gte(-90).lte(90),
+        zipcode: z.string(),
+      })
+      .array(),
+  })
+  .array();
 
 export const PostAddRestaurantZod = z.object({
   countryId: z.string().uuid(),
@@ -182,3 +192,51 @@ export const RestaurantReadDbZod = z.object({
     })
     .array(),
 });
+
+export const ReadCountriesDbZod = z.object({
+  countries: z
+    .object({ countryId: z.string().uuid(), countryName: z.string() })
+    .array(),
+});
+
+export const ReadStateDbZod = z
+  .object({
+    countryId: z.string().uuid(),
+    countryName: z.string(),
+    stateName: z.string(),
+    stateId: z.string().uuid(),
+    countryNameStateName: z.string(),
+  })
+  .array();
+
+export const ReadCityDbZod = z
+  .object({
+    countryId: z.string().uuid(),
+    countryName: z.string(),
+    stateName: z.string(),
+    stateId: z.string().uuid(),
+    cityId: z.string().uuid(),
+    cityName: z.string(),
+    countryStateCityName: z.string(),
+  })
+  .array();
+
+export const ReadZipcodeDbZod = z
+  .object({
+    countryId: z.string().uuid(),
+    countryName: z.string(),
+    stateName: z.string(),
+    stateId: z.string().uuid(),
+    cityId: z.string().uuid(),
+    cityName: z.string(),
+    countryStateCityZipcode: z.string(),
+    zipcodeId: z.string().uuid(),
+    zipcode: z.string(),
+    latitude: z.number().optional(),
+    longitude: z.number().optional(),
+  })
+  .array();
+
+export const ReadFoodTagsDbZod = z
+  .object({ name: z.string(), foodTagId: z.string().uuid() })
+  .array();
