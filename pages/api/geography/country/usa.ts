@@ -5,7 +5,7 @@ import { ResponseGetAllGeogByCountry } from "@/utils/types";
 
 /**
  * @swagger
- * /api/geography/get-all-usa:
+ * /api/geography/country/usa:
  *  get:
  *    tags:
  *      - geolocations

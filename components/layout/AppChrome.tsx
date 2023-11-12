@@ -48,7 +48,7 @@ export const AppChrome: React.FC<React.PropsWithChildren> = (props) => {
              <Link href={"https://www.facebook.com/zahidtown"}>
               <Image src={"/facebook-logo.png"} height={45} width={45}></Image>
             </Link> */}
-            <Link href="/admin">
+            {/* <Link href="/admin">
               <Button
                 px="xl"
                 mx="xs"
@@ -58,7 +58,7 @@ export const AppChrome: React.FC<React.PropsWithChildren> = (props) => {
               >
                 Admin Dashboard
               </Button>
-            </Link>
+            </Link> */}
           </Group>
         </Header>
       }

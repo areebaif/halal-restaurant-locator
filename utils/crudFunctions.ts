@@ -17,7 +17,7 @@ import {
 
 export const postAddFoodTag = async (data: { foodTag: string }) => {
   const { foodTag } = data;
-  const response = await fetch(`/api/restaurant/add-tag`, {
+  const response = await fetch(`/api/restaurant/foodtags`, {
     method: "POST",
     headers: {
       "Content-Type": "application/json",
@@ -29,7 +29,7 @@ export const postAddFoodTag = async (data: { foodTag: string }) => {
 };
 
 export const postAddState = async (data: PostAddState) => {
-  const response = await fetch(`/api/geography/add-state`, {
+  const response = await fetch(`/api/geography/state`, {
     method: "POST",
     headers: {
       "Content-Type": "application/json",
@@ -41,7 +41,7 @@ export const postAddState = async (data: PostAddState) => {
 };
 
 export const postAddCity = async (data: PostAddCity) => {
-  const response = await fetch(`/api/geography/add-city`, {
+  const response = await fetch(`/api/geography/city`, {
     method: "POST",
     headers: {
       "Content-Type": "application/json",
@@ -53,7 +53,7 @@ export const postAddCity = async (data: PostAddCity) => {
 };
 
 export const postAddZipcode = async (data: PostAddZipcode) => {
-  const response = await fetch(`/api/geography/add-zipcode`, {
+  const response = await fetch(`/api/geography/zipcode`, {
     method: "POST",
     headers: {
       "Content-Type": "application/json",
@@ -76,7 +76,7 @@ export const getMapSearchInput = async (data: string) => {
 };
 // this function populates the main search page auto complete
 export const getAllUSA = async () => {
-  const response = await fetch(`/api/geography/get-all-usa`, {
+  const response = await fetch(`/api/geography/country/usa`, {
     method: "GET",
     headers: {
       "Content-Type": "application/json",
@@ -87,7 +87,7 @@ export const getAllUSA = async () => {
 };
 
 export const getAllCountries = async () => {
-  const response = await fetch(`/api/geography/get-all-countries`, {
+  const response = await fetch(`/api/geography/country`, {
     method: "GET",
     headers: {
       "Content-Type": "application/json",
@@ -98,7 +98,7 @@ export const getAllCountries = async () => {
 };
 
 export const getStates = async () => {
-  const response = await fetch(`/api/geography/get-state`, {
+  const response = await fetch(`/api/geography/state`, {
     method: "GET",
     headers: {
       "Content-Type": "application/json",
@@ -109,7 +109,7 @@ export const getStates = async () => {
 };
 
 export const getCities = async () => {
-  const response = await fetch(`/api/geography/get-cities`, {
+  const response = await fetch(`/api/geography/city`, {
     method: "GET",
     headers: {
       "Content-Type": "application/json",
@@ -120,7 +120,7 @@ export const getCities = async () => {
 };
 
 export const getZipcode = async () => {
-  const response = await fetch(`/api/geography/get-zipcode`, {
+  const response = await fetch(`/api/geography/zipcode`, {
     method: "GET",
     headers: {
       "Content-Type": "application/json",
@@ -131,7 +131,7 @@ export const getZipcode = async () => {
 };
 
 export const getFoodTags = async () => {
-  const response = await fetch(`/api/restaurant/get-food-tags`, {
+  const response = await fetch(`/api/restaurant/foodtags`, {
     method: "GET",
     headers: {
       "Content-Type": "application/json",

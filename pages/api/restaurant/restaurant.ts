@@ -8,7 +8,7 @@ import { PostAddRestaurant, ResponseAddRestaurant } from "@/utils/types";
 /**
  *
  * @swagger
- * /api/restaurant/add-restaurant:
+ * /api/restaurant/restaurant:
  *    post:
  *      tags:
  *        - restaurants
