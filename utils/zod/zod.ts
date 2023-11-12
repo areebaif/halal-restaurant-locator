@@ -236,3 +236,7 @@ export const ReadZipcodeDbZod = z
     longitude: z.number().optional(),
   })
   .array();
+
+export const ReadFoodTagsDbZod = z
+  .object({ name: z.string(), foodTagId: z.string().uuid() })
+  .array();

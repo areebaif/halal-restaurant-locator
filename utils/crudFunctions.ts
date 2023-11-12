@@ -10,8 +10,9 @@ import {
   ResponseAddCity,
   ReadCityDb,
   PostAddZipcode,
-  ResponseAddZipCode,
+  ResponseAddZipcode,
   ReadZipcodeDb,
+  ReadFoodTagsDb,
 } from "./types";
 
 export const postAddFoodTag = async (data: { foodTag: string }) => {
@@ -59,7 +60,7 @@ export const postAddZipcode = async (data: PostAddZipcode) => {
     },
     body: JSON.stringify(data),
   });
-  const res: ResponseAddZipCode = await response.json();
+  const res: ResponseAddZipcode = await response.json();
   return res;
 };
 
@@ -126,5 +127,16 @@ export const getZipcode = async () => {
     },
   });
   const res: ReadZipcodeDb = await response.json();
+  return res;
+};
+
+export const getFoodTags = async () => {
+  const response = await fetch(`/api/restaurant/get-food-tags`, {
+    method: "GET",
+    headers: {
+      "Content-Type": "application/json",
+    },
+  });
+  const res: ReadFoodTagsDb = await response.json();
   return res;
 };

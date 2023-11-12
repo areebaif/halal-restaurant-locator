@@ -8,12 +8,16 @@ import {
   Group,
   Button,
   Textarea,
-  NumberInput,
   Loader,
   Autocomplete,
 } from "@mantine/core";
 import { ErrorCard } from "@/components";
-import { ReadZipcodeDbZod, getZipcode } from "@/utils";
+import {
+  ReadZipcodeDbZod,
+  getZipcode,
+  getFoodTags,
+  ReadFoodTagsDbZod,
+} from "@/utils";
 
 const AddRestaurant: React.FC = () => {
   const [name, setName] = React.useState("");
@@ -30,15 +34,26 @@ const AddRestaurant: React.FC = () => {
     staleTime: Infinity,
     cacheTime: Infinity,
   });
-  if (apiData.isLoading) return <Loader />;
-  if (apiData.isError) {
+  const foodTagData = useQuery(["getAllFoodTags"], getFoodTags, {
+    staleTime: Infinity,
+    cacheTime: Infinity,
+  });
+  if (apiData.isLoading || foodTagData.isLoading) return <Loader />;
+  if (apiData.isError || foodTagData.isError) {
     console.log(apiData.error);
+    console.log(foodTagData.error);
     return <ErrorCard message="something went wrong with the api request" />;
   }
   const isTypeCorrent = ReadZipcodeDbZod.safeParse(apiData.data);
+  const isFoodTagTypeCorrent = ReadFoodTagsDbZod.safeParse(foodTagData.data);
 
   if (!isTypeCorrent.success) {
     console.log(isTypeCorrent.error);
+    return <ErrorCard message="Their is a type mismatch from the server" />;
+  }
+
+  if (!isFoodTagTypeCorrent.success) {
+    console.log(isFoodTagTypeCorrent.error);
     return <ErrorCard message="Their is a type mismatch from the server" />;
   }
 

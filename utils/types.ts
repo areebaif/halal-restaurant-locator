@@ -21,6 +21,7 @@ import {
   ReadStateDbZod,
   ReadCityDbZod,
   ReadZipcodeDbZod,
+  ReadFoodTagsDbZod,
 } from "./zod/zod";
 
 export type ErrorAddFoodTag = z.infer<typeof ErrorAddFoodTagZod>;
@@ -53,6 +54,7 @@ export type ReadCountriesDb = z.infer<typeof ReadCountriesDbZod>;
 export type ReadStateDb = z.infer<typeof ReadStateDbZod>;
 export type ReadCityDb = z.infer<typeof ReadCityDbZod>;
 export type ReadZipcodeDb = z.infer<typeof ReadZipcodeDbZod>;
+export type ReadFoodTagsDb = z.infer<typeof ReadFoodTagsDbZod>;
 
 // for client
 export type GeoJsonRestaurantFeatureCollection = {

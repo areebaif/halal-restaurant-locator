@@ -21,6 +21,7 @@ import {
   ReadCityDbZod,
   ReadZipcodeDbZod,
   ResponseAddZipcodeZod,
+  ReadFoodTagsDbZod,
 } from "./zod/zod";
 import {
   findRestaurant,
@@ -30,7 +31,7 @@ import {
 } from "./api-utils";
 import { calcBoundsFromCoordinates } from "./map/map-boundary-calculations";
 import { capitalizeFirstWord, parseQueryVals } from "./string-manipulation";
-import { getMapSearchInput } from "./crudFunctions";
+import { getMapSearchInput, getFoodTags } from "./crudFunctions";
 export {
   postAddFoodTag,
   PostAddStateZod,
@@ -60,4 +61,6 @@ export {
   ReadZipcodeDbZod,
   getZipcode,
   ResponseAddZipcodeZod,
+  ReadFoodTagsDbZod,
+  getFoodTags,
 };
