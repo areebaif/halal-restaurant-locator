@@ -8,7 +8,7 @@ import {
   stateIdExists,
   cityIdExists,
 } from "@/utils";
-import { ResponseAddZipCode, PostAddZipcode } from "@/utils/types";
+import { ResponseAddZipcode, PostAddZipcode } from "@/utils/types";
 
 /**
  * @swagger
@@ -99,7 +99,7 @@ import { ResponseAddZipCode, PostAddZipcode } from "@/utils/types";
 
 export default async function AddState(
   req: NextApiRequest,
-  res: NextApiResponse<ResponseAddZipCode>
+  res: NextApiResponse<ResponseAddZipcode>
 ) {
   try {
     const zipcodeData = req.body;

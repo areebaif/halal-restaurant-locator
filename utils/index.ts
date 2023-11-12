@@ -6,6 +6,7 @@ import {
   postAddCity,
   getCities,
   postAddZipcode,
+  getZipcode,
 } from "./crudFunctions";
 import {
   PostAddStateZod,
@@ -18,6 +19,8 @@ import {
   ReadStateDbZod,
   ResponseAddCityZod,
   ReadCityDbZod,
+  ReadZipcodeDbZod,
+  ResponseAddZipcodeZod,
 } from "./zod/zod";
 import {
   findRestaurant,
@@ -54,4 +57,7 @@ export {
   ReadCityDbZod,
   postAddZipcode,
   cityIdExists,
+  ReadZipcodeDbZod,
+  getZipcode,
+  ResponseAddZipcodeZod,
 };

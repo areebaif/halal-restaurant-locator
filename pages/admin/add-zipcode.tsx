@@ -18,12 +18,11 @@ import {
 import { ErrorCard } from "@/components";
 import {
   postAddZipcode,
-  PostAddZipcodeZod,
-  ResponseAddCityZod,
   getCities,
   ReadCityDbZod,
+  ResponseAddZipcodeZod,
 } from "@/utils";
-import { PostAddZipcode, ResponseAddZipCode } from "@/utils/types";
+import { PostAddZipcode, ResponseAddZipcode } from "@/utils/types";
 
 export const AddZipcode: React.FC = () => {
   const queryClient = useQueryClient();
@@ -33,7 +32,7 @@ export const AddZipcode: React.FC = () => {
   const [allZipcode, setAllZipcode] = React.useState<PostAddZipcode>([]);
   const [latitude, setLatitude] = React.useState("");
   const [longitude, setLongitude] = React.useState("");
-  const [error, setError] = React.useState<ResponseAddZipCode>();
+  const [error, setError] = React.useState<ResponseAddZipcode>();
 
   // Queries
   const apiData = useQuery(["getAllCities"], getCities, {
@@ -43,7 +42,7 @@ export const AddZipcode: React.FC = () => {
   const mutation = useMutation({
     mutationFn: postAddZipcode,
     onSuccess: (data) => {
-      const result = ResponseAddCityZod.safeParse(data);
+      const result = ResponseAddZipcodeZod.safeParse(data);
       if (!result.success) {
         console.log(result.error);
         return <ErrorCard message="unable to add zipcode, please try again" />;
@@ -68,10 +67,10 @@ export const AddZipcode: React.FC = () => {
     console.log(apiData.error);
     return <ErrorCard message="something went wrong with the api request" />;
   }
-  const isStateTypeCorrent = ReadCityDbZod.safeParse(apiData.data);
+  const isTypeCorrect = ReadCityDbZod.safeParse(apiData.data);
 
-  if (!isStateTypeCorrent.success) {
-    console.log(isStateTypeCorrent.error);
+  if (!isTypeCorrect.success) {
+    console.log(isTypeCorrect.error);
     return <ErrorCard message="Their is a type mismatch from the server" />;
   }
   if (mutation.isLoading) {
@@ -182,7 +181,7 @@ export const AddZipcode: React.FC = () => {
         <Title order={3}>Add Zipcode</Title>
       </Card.Section>
       <Grid>
-        <Grid.Col span={"auto"}>
+        <Grid.Col span={4}>
           <Autocomplete
             mt="sm"
             withAsterisk
@@ -224,7 +223,7 @@ export const AddZipcode: React.FC = () => {
             mt="sm"
             withAsterisk
             label="longitude"
-            description="longitude range -180 to 180. Press enter to add"
+            description="longitude range -180 to 180."
             value={longitude}
             onChange={(e) => setLongitude(e.currentTarget.value)}
             onKeyDown={(event) => {
@@ -284,6 +283,7 @@ export const AddZipcode: React.FC = () => {
 };
 
 export default AddZipcode;
+
 
 type DisplayZipcodeProps = {
   allZipcode: PostAddZipcode;

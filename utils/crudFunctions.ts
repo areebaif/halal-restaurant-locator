@@ -11,6 +11,7 @@ import {
   ReadCityDb,
   PostAddZipcode,
   ResponseAddZipCode,
+  ReadZipcodeDb,
 } from "./types";
 
 export const postAddFoodTag = async (data: { foodTag: string }) => {
@@ -72,7 +73,7 @@ export const getMapSearchInput = async (data: string) => {
   const res: GeoJsonRestaurantFeatureCollection = await response.json();
   return res;
 };
-
+// this function populates the main search page auto complete
 export const getAllUSA = async () => {
   const response = await fetch(`/api/geography/get-all-usa`, {
     method: "GET",
@@ -114,5 +115,16 @@ export const getCities = async () => {
     },
   });
   const res: ReadCityDb = await response.json();
+  return res;
+};
+
+export const getZipcode = async () => {
+  const response = await fetch(`/api/geography/get-zipcode`, {
+    method: "GET",
+    headers: {
+      "Content-Type": "application/json",
+    },
+  });
+  const res: ReadZipcodeDb = await response.json();
   return res;
 };

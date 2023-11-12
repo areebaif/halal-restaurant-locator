@@ -5,7 +5,7 @@ import { Autocomplete, Button, Grid, Loader } from "@mantine/core";
 import { IconSearch } from "@tabler/icons-react";
 // local imports
 import { ErrorCard } from ".";
-import { getGeogAutoComplete } from "@/utils/crudFunctions";
+import { getAllUSA } from "@/utils/crudFunctions";
 
 export const SearchInput: React.FC = () => {
   const router = useRouter();
@@ -13,14 +13,10 @@ export const SearchInput: React.FC = () => {
     React.useState("");
   const [error, setError] = React.useState({ inputData: "" });
   // Queries
-  const geogData = useQuery(
-        ["getGeographyAutoCompleteData"],
-    getGeogAutoComplete,
-    {
-      staleTime: Infinity,
-      cacheTime: Infinity,
-    }
-  );
+  const geogData = useQuery(["getGeographyAutoCompleteData"], getAllUSA, {
+    staleTime: Infinity,
+    cacheTime: Infinity,
+  });
   if (geogData.isLoading) return <Loader />;
   if (geogData.isError) {
     console.log(geogData.error);

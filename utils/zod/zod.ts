@@ -220,3 +220,19 @@ export const ReadCityDbZod = z
     countryStateCityName: z.string(),
   })
   .array();
+
+export const ReadZipcodeDbZod = z
+  .object({
+    countryId: z.string().uuid(),
+    countryName: z.string(),
+    stateName: z.string(),
+    stateId: z.string().uuid(),
+    cityId: z.string().uuid(),
+    cityName: z.string(),
+    countryStateCityZipcode: z.string(),
+    zipcodeId: z.string().uuid(),
+    zipcode: z.string(),
+    latitude: z.number().optional(),
+    longitude: z.number().optional(),
+  })
+  .array();

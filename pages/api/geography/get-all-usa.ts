@@ -90,7 +90,6 @@ export default async function GetGeographyInputs(
   res: NextApiResponse<ResponseGetAllGeogByCountry>
 ) {
   // get zipcode
-
   const country = await prisma.country.findUnique({
     where: { countryName: "U.S.A" },
   });
