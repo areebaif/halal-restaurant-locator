@@ -7,9 +7,9 @@ import {
   TextInput,
   Group,
   Button,
-  Textarea,
   Loader,
   Autocomplete,
+  Chip,
 } from "@mantine/core";
 import { ErrorCard } from "@/components";
 import {
@@ -25,9 +25,18 @@ const AddRestaurant: React.FC = () => {
     React.useState("");
   const [latitude, setLatitude] = React.useState<string>("");
   const [longitude, setLongitude] = React.useState<string>("");
-  // food tag
-  // description
-  // street
+  const [foodTag, setFoodTag] = React.useState<string[]>([]);
+  const [description, setDescription] = React.useState("");
+  const [street, setStreet] = React.useState("");
+  const [googleUrl, setGoogleUrl] = React.useState("");
+  // usually instagram, facebook links
+  const [websiteLink, setWebsiteLink] = React.useState("");
+  const [contactNum, setContactNum] = React.useState("");
+  const [picUrl, setPicUrl] = React.useState("");
+  // sset pic by restarauntId
+  const [restaurantId, setRestaurantId] = React.useState("");
+
+  // google link, website link, contact number, pictures
 
   // Queries
   const apiData = useQuery(["getAllZipcode"], getZipcode, {
@@ -64,7 +73,6 @@ const AddRestaurant: React.FC = () => {
     stateid: item.stateId,
     cityid: item.cityId,
   }));
-
   return (
     <Card
       shadow="sm"
@@ -82,18 +90,36 @@ const AddRestaurant: React.FC = () => {
       <TextInput
         mt="xs"
         withAsterisk
-        label="Name"
+        label="name"
         value={name}
         placeholder="type here"
         type="text"
         onChange={(event) => setName(event.currentTarget.value)}
       />
+      <TextInput
+        mt="xs"
+        withAsterisk
+        label="description"
+        value={description}
+        placeholder="type here"
+        type="text"
+        onChange={(event) => setDescription(event.currentTarget.value)}
+      />
+      <TextInput
+        mt="xs"
+        withAsterisk
+        label="street"
+        value={street}
+        placeholder="type here"
+        type="text"
+        onChange={(event) => setStreet(event.currentTarget.value)}
+      />
       <Autocomplete
         mt="sm"
         withAsterisk
-        description="select from a list of: country - state - city"
-        placeholder="select country - state - city"
-        label={"country - state - city"}
+        description="select from a list of: country - state - city - zipcode"
+        placeholder="select country - state - city - zipcode"
+        label={"country - state - city - zipcode"}
         data={autoCompleteCountryStateCityZipcode}
         value={countryStateCityZipcode}
         onChange={setCountryStateCityZipcode}
@@ -109,13 +135,32 @@ const AddRestaurant: React.FC = () => {
       {/* This need to be autocomplete with data from backend */}
       <TextInput
         mt="sm"
+        mb="sm"
         withAsterisk
         label="longitude"
         description="longitude range -180 to 180."
         value={longitude}
         onChange={(e) => setLongitude(e.currentTarget.value)}
       />
-      {/* <NumberInput value={latitude} onChange={setLatitude} /> */}
+
+      <Chip.Group multiple value={foodTag} onChange={setFoodTag}>
+        <label
+          style={{
+            display: "inline-block",
+            fontSize: "0.875rem",
+            fontWeight: 500,
+            wordBreak: "break-word",
+          }}
+        >
+          food tags
+        </label>
+        <span style={{ color: "#fa5252", marginLeft: "1px" }}>*</span>
+        <Group>
+          {foodTagData.data.map((tag) => (
+            <Chip value={`${tag.foodTagId}`}>{tag.name}</Chip>
+          ))}
+        </Group>
+      </Chip.Group>
       <Group position="center" mt="sm">
         <Button variant="outline" color="dark" size="sm" type="submit">
           Submit
