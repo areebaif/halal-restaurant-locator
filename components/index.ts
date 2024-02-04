@@ -1,4 +1,4 @@
-import { HeroHeader } from "./index/HeroHeader";
+
 import { AdminNavigation } from "./layout/AdminNavbar";
 import { AppChromeAdmin } from "./layout/AdminLayout";
 import { AppChrome } from "./layout/AppChrome";
@@ -6,9 +6,10 @@ import { ErrorCard } from "./ErrorCard";
 import { SearchInput } from "./searchInput";
 import { MapContainer } from "./MapContainer";
 import { SearchResultList } from "./SearchResultList";
+import { HeroComponent } from "./homePage/HeroComponent";
+import { MapWithText } from "./homePage/MapWithText";
 
 export {
-  HeroHeader,
   AdminNavigation,
   AppChromeAdmin,
   AppChrome,
@@ -16,4 +17,6 @@ export {
   SearchInput,
   MapContainer,
   SearchResultList,
+  HeroComponent,
+  MapWithText
 };

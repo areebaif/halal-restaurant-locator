@@ -1,24 +1,13 @@
-import {
-  Text,
-  Center,
-  Title,
-  List,
-  ThemeIcon,
-  Autocomplete,
-  Flex,
-  Button,
-  Group,
-  Grid,
-  Box,
-} from "@mantine/core";
+import { Text, Title, List, ThemeIcon } from "@mantine/core";
 
-import { IconCheck, IconSearch } from "@tabler/icons-react";
+import { IconCheck } from "@tabler/icons-react";
 export const HeroText: React.FC = () => {
   return (
     <>
       <Title py="xl" mt="xl">
-        Explore halal food options near you
+        Find halal restaurants near you on a map
       </Title>
+
       <Text py="xl" size="xl">
         Find halal options near you with ease – We update our library every day
         to include new places near you!

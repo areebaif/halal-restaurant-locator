@@ -61,7 +61,7 @@ export const SearchInput: React.FC = () => {
     }
   };
   return (
-    <Grid>
+    <Grid >
       <Grid.Col md={12} lg={9}>
         <Autocomplete
           error={geogData.isError}
