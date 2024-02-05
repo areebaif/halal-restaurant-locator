@@ -1,22 +1,12 @@
 //import * as React from "react";
 import * as React from "react";
 import { AppProps } from "next/app";
-
+import { Box, Container } from "@mantine/core";
 import {
-  Box,
-  BackgroundImage,
-  Flex,
-  Image,
-  Text,
-  Container,
-  Center,
-  Title,
-  List,
-  ThemeIcon,
-} from "@mantine/core";
-import { HeroComponent, MapWithText, SearchInput } from "@/components";
-import { HeroText } from "@/components/homePage/HeroText";
-import { IconCheck } from "@tabler/icons-react";
+  HeroComponent,
+  MapWithText,
+  RestaurantSuggestionForm,
+} from "@/components";
 
 const Home = (props: AppProps) => {
   return <HeroHeaderSearch />;
@@ -30,6 +20,10 @@ export const HeroHeaderSearch: React.FC = ({}) => {
       <Box sx={(theme) => ({ height: 75 })}></Box>
       <Container size={"xl"}>
         <MapWithText />
+      </Container>
+      <Box sx={(theme) => ({ height: 75 })}></Box>
+      <Container size={"xl"}>
+        <RestaurantSuggestionForm />
       </Container>
     </>
   );

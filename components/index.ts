@@ -8,6 +8,7 @@ import { MapContainer } from "./MapContainer";
 import { SearchResultList } from "./SearchResultList";
 import { HeroComponent } from "./homePage/HeroComponent";
 import { MapWithText } from "./homePage/MapWithText";
+import { RestaurantSuggestionForm } from "./homePage/RestaurantSuggestionForm";
 
 export {
   AdminNavigation,
@@ -18,5 +19,6 @@ export {
   MapContainer,
   SearchResultList,
   HeroComponent,
-  MapWithText
+  MapWithText,
+  RestaurantSuggestionForm
 };
