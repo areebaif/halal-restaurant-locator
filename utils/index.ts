@@ -40,7 +40,7 @@ export {
   PostAddRestaurantZod,
   capitalizeFirstWord,
   findRestaurant,
-  parseQueryVals,
+parseQueryVals,
   GetSearchInputsZod,
   calcBoundsFromCoordinates,
   getMapSearchInput,

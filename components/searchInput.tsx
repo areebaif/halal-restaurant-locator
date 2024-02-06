@@ -7,10 +7,15 @@ import { IconSearch } from "@tabler/icons-react";
 import { ErrorCard } from ".";
 import { getAllUSA } from "@/utils/crudFunctions";
 
-export const SearchInput: React.FC = () => {
+export type SearchInput = {
+  queryString?: string;
+};
+
+export const SearchInput: React.FC<SearchInput> = ({ queryString }) => {
   const router = useRouter();
-  const [autoCompleteInputValue, setAutoCompleteInputValue] =
-    React.useState("");
+  const [autoCompleteInputValue, setAutoCompleteInputValue] = React.useState(
+    `${queryString ? queryString : ""}`
+  );
   const [error, setError] = React.useState({ inputData: "" });
   // Queries
   const geogData = useQuery(["getGeographyAutoCompleteData"], getAllUSA, {
@@ -61,7 +66,7 @@ export const SearchInput: React.FC = () => {
     }
   };
   return (
-    <Grid >
+    <Grid>
       <Grid.Col md={12} lg={9}>
         <Autocomplete
           error={geogData.isError}

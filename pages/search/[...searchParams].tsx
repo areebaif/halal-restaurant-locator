@@ -6,7 +6,11 @@ import mapboxgl from "mapbox-gl";
 import Map, { useMap, MapProvider } from "react-map-gl";
 import { Loader, Grid } from "@mantine/core";
 // local imports
-import { getMapSearchInput, calcBoundsFromCoordinates } from "@/utils";
+import {
+  getMapSearchInput,
+  calcBoundsFromCoordinates,
+  parseQueryVals,
+} from "@/utils";
 import {
   ErrorCard,
   SearchInput,
@@ -28,12 +32,14 @@ export default Mapped;
 const MapSearch: React.FC = () => {
   const { MapA } = useMap();
   const router = useRouter();
-  const urlParams = router.query.searchParams as string[];
+  const urlParams = router.query.searchParams;
+
   const [query, setQuery] = React.useState("");
   const [flag, setFlag] = React.useState(false);
   const [hoverId, setHoverId] = React.useState<number | string | undefined>(
     undefined
   );
+  console.log(urlParams, "we are params", query);
   const [popupData, setPopupData] = React.useState({
     restaurantName: "",
     description: "",
@@ -115,9 +121,15 @@ const MapSearch: React.FC = () => {
     popupData,
     setPopupData,
   };
+  // we are doing this so that when we navigate our search input populates with appropriate values
+  let searchInputVal = "";
+  const queryStringValFormatted = parseQueryVals(query);
+  queryStringValFormatted.city
+    ? (searchInputVal = `${queryStringValFormatted.city}, ${queryStringValFormatted.state}, ${queryStringValFormatted.country}`)
+    : (searchInputVal = `${queryStringValFormatted.zipcode}, ${queryStringValFormatted.country}`);
   return (
     <>
-      <SearchInput />
+      {urlParams ? <SearchInput queryString={searchInputVal} /> : <Loader />}
       <Grid>
         <Grid.Col span={4}>
           <SearchResultList {...mapConatinerInputs} />
