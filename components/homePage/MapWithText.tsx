@@ -1,17 +1,17 @@
-import { Flex, Center, Box, Title, Text, Image } from "@mantine/core";
+import { Flex, Center, Box, Title, Text, Image, Card } from "@mantine/core";
 
 export const MapWithText: React.FC = () => {
   return (
-    <Flex gap="xl">
-      <Flex
-        sx={(theme) => ({
-          [theme.fn.smallerThan("lg")]: {
-            width: "100%",
-          },
-          width: "50%",
-        })}
-      >
-        <Center sx={(theme) => ({ backgroundColor: "white" })} px="xl" mx="md">
+    <Card shadow="xs" radius="md" withBorder>
+      <Flex gap="xl">
+        <Flex
+          sx={(theme) => ({
+            [theme.fn.smallerThan("lg")]: {
+              width: "100%",
+            },
+            width: "50%",
+          })}
+        >
           <Box>
             <Title order={2}>Don't know where halal restaurants are?</Title>
             <Text py="xl" size="lmd">
@@ -31,21 +31,24 @@ export const MapWithText: React.FC = () => {
               Don't worry we have you covered
             </Text>
           </Box>
-        </Center>
+        </Flex>
+        <Box
+          sx={(theme) => ({
+            [theme.fn.smallerThan("lg")]: {
+              display: "none",
+            },
+            [theme.fn.largerThan("lg")]: {
+              marginTop: `calc(${theme.spacing.xl} * -1)`,
+              marginBottom: `calc(${theme.spacing.xl} * -1)`,
+              marginRight: `calc(${theme.spacing.xl} * -1)`,
+            },
+            width: "55%",
+            overflow: "hidden",
+          })}
+        >
+          <Image src={"/map-locations.png"} />
+        </Box>
       </Flex>
-      <Box
-        sx={(theme) => ({
-          [theme.fn.smallerThan("lg")]: {
-            display: "none",
-          },
-          [theme.fn.largerThan("lg")]: {},
-          width: "55%",
-
-          overflow: "hidden",
-        })}
-      >
-        <Image src={"/map-locations.png"} />
-      </Box>
-    </Flex>
+    </Card>
   );
 };
