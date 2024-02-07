@@ -9,6 +9,7 @@ import { SearchResultList } from "./SearchResultList";
 import { HeroComponent } from "./homePage/HeroComponent";
 import { MapWithText } from "./homePage/MapWithText";
 import { RestaurantSuggestionForm } from "./homePage/RestaurantSuggestionForm";
+import { MapAndList } from "./MapAndList";
 
 export {
   AdminNavigation,
@@ -20,5 +21,6 @@ export {
   SearchResultList,
   HeroComponent,
   MapWithText,
-  RestaurantSuggestionForm
+  RestaurantSuggestionForm,
+  MapAndList
 };
