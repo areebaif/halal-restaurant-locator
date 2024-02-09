@@ -32,6 +32,8 @@ import {
 import { calcBoundsFromCoordinates } from "./map/map-boundary-calculations";
 import { capitalizeFirstWord, parseQueryVals } from "./string-manipulation";
 import { getMapSearchInput, getFoodTags } from "./crudFunctions";
+import { s3Client } from "./aws-S3-Client";
+import { uploadToS3 } from "./image-uploads";
 export {
   postAddFoodTag,
   PostAddStateZod,
@@ -63,4 +65,6 @@ parseQueryVals,
   ResponseAddZipcodeZod,
   ReadFoodTagsDbZod,
   getFoodTags,
+  s3Client,
+  uploadToS3
 };

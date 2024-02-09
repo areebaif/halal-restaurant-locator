@@ -10,6 +10,7 @@ import { HeroComponent } from "./homePage/HeroComponent";
 import { MapWithText } from "./homePage/MapWithText";
 import { RestaurantSuggestionForm } from "./homePage/RestaurantSuggestionForm";
 import { MapAndList } from "./MapAndList";
+import { CustomImageButton } from "./ImageButton";
 
 export {
   AdminNavigation,
@@ -22,5 +23,6 @@ export {
   HeroComponent,
   MapWithText,
   RestaurantSuggestionForm,
-  MapAndList
+  MapAndList,
+  CustomImageButton
 };

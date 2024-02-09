@@ -1,6 +1,7 @@
 import * as React from "react";
 import { useQueryClient, useMutation, useQuery } from "@tanstack/react-query";
 import { useRouter } from "next/router";
+import { v4 as uuidv4 } from "uuid";
 import {
   Card,
   Title,
@@ -10,8 +11,11 @@ import {
   Loader,
   Autocomplete,
   Chip,
+  FileInput,
+  Textarea,
+  Grid,
 } from "@mantine/core";
-import { ErrorCard } from "@/components";
+import { ErrorCard, CustomImageButton } from "@/components";
 import {
   ReadZipcodeDbZod,
   getZipcode,
@@ -28,16 +32,10 @@ const AddRestaurant: React.FC = () => {
   const [foodTag, setFoodTag] = React.useState<string[]>([]);
   const [description, setDescription] = React.useState("");
   const [street, setStreet] = React.useState("");
-  const [googleUrl, setGoogleUrl] = React.useState("");
-  // usually instagram, facebook links
-  const [websiteLink, setWebsiteLink] = React.useState("");
-  const [contactNum, setContactNum] = React.useState("");
-  const [picUrl, setPicUrl] = React.useState("");
-  // sset pic by restarauntId
-  const [restaurantId, setRestaurantId] = React.useState("");
-
-  // google link, website link, contact number, pictures
-
+  // we are constructing url from uploaded image to display a preview image of the image uplaoded to the user.
+  // Hence, the need for url.
+  const [coverImage, setCoverImage] = React.useState<File | null>(null);
+  const [images, setImages] = React.useState<File[]>([]);
   // Queries
   const apiData = useQuery(["getAllZipcode"], getZipcode, {
     staleTime: Infinity,
@@ -73,6 +71,32 @@ const AddRestaurant: React.FC = () => {
     stateid: item.stateId,
     cityid: item.cityId,
   }));
+
+  const onSubmit = () => {
+    console.log(coverImage, "slslslsl");
+    // we might extract it out as separate function
+    // We are handling image uploads first, then we will come back to implement submit function properly
+    // we need to create a cover imageurl/ extract, size and type amnd create appropriate objects
+    const restaurantId = uuidv4();
+    const images = {
+      cover: {
+        imageId: `/${restaurantId}/cover/${uuidv4()}`,
+      },
+      // other: [
+      //   {
+      //     type: seatingImage.image?.type,
+      //     size: coverImage.image?.size,
+      //     imageId: `/${restaurantId}/cover/${uuidv4()}`,
+      //   },
+      //   {
+      //     type: coverImage.image?.type,
+      //     size: coverImage.image?.size,
+      //     imageId: `/${restaurantId}/cover/${uuidv4()}`,
+      //   },
+      // ],
+    };
+  };
+
   return (
     <Card
       shadow="sm"
@@ -161,8 +185,48 @@ const AddRestaurant: React.FC = () => {
           ))}
         </Group>
       </Chip.Group>
+      <Grid>
+        <Grid.Col span={"auto"}>
+          <Textarea
+            label="image uploads"
+            disabled
+            autosize
+            defaultValue={
+              "restaurant cover image is used for restaurant card displayed with map. The other images are used to show viewers the seating area and the outside area of the restaurant. Cover image is a required image for form submission."
+            }
+          />
+        </Grid.Col>
+        <Grid.Col span={"auto"}>
+          <FileInput
+            placeholder="select .png or .jpeg"
+            label="cover"
+            variant={`${coverImage ? "unstyled" : "default"}`}
+            withAsterisk
+            value={coverImage}
+            valueComponent={CustomImageButton}
+            onChange={setCoverImage}
+          />
+        </Grid.Col>
+        <Grid.Col span={"auto"}>
+          <FileInput
+            multiple
+            variant={`${images.length ? "unstyled" : "default"}`}
+            placeholder="select .png or .jpeg"
+            label="select multiple images"
+            value={images}
+            valueComponent={CustomImageButton}
+            onChange={setImages}
+          />
+        </Grid.Col>
+      </Grid>
       <Group position="center" mt="sm">
-        <Button variant="outline" color="dark" size="sm" type="submit">
+        <Button
+          onClick={onSubmit}
+          variant="outline"
+          color="dark"
+          size="sm"
+          type="submit"
+        >
           Submit
         </Button>
       </Group>

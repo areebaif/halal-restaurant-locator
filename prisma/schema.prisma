@@ -18,6 +18,16 @@ model FoodTag {
     updatedAt       DateTime  @updatedAt
 }
 
+model Restaurant_Image_Url {
+  id String @id @default(uuid())
+  imageUrl String  @unique
+  restaurantId String
+  createdAt       DateTime  @default(now())
+  updatedAt       DateTime  @updatedAt
+  Restaurant Restaurant @relation(fields: [restaurantId], references: [restaurantId])
+  @@index([restaurantId])
+}
+
 model Restaurant {
     restaurantId String @id @default(uuid())
     restaurantName String
@@ -31,6 +41,7 @@ model Restaurant {
     longitude Float
     createdAt       DateTime  @default(now())
     updatedAt       DateTime  @updatedAt
+    RestaurantImageUrl Restaurant_Image_Url[]
     FoodTag Restaurant_FoodTag[] 
     Country Country @relation(fields: [countryId], references: [countryId])
     State State @relation(fields: [stateId], references: [stateId])
