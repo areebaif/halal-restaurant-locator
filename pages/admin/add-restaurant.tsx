@@ -14,6 +14,7 @@ import {
   FileInput,
   Textarea,
   Grid,
+  Text,
 } from "@mantine/core";
 import { ErrorCard, CustomImageButton } from "@/components";
 import {
@@ -21,7 +22,9 @@ import {
   getZipcode,
   getFoodTags,
   ReadFoodTagsDbZod,
+  GetImagePreSignedUrlZod,
 } from "@/utils";
+import { getImagePresignedUrl } from "@/utils/crud-functions";
 
 const AddRestaurant: React.FC = () => {
   const [name, setName] = React.useState("");
@@ -36,6 +39,12 @@ const AddRestaurant: React.FC = () => {
   // Hence, the need for url.
   const [coverImage, setCoverImage] = React.useState<File | null>(null);
   const [images, setImages] = React.useState<File[]>([]);
+
+  const [formFieldsErrorMessage, setFormFieldsErrorMessage] = React.useState<{
+    cover?: string[];
+    otherImages?: string[];
+  }>();
+
   // Queries
   const apiData = useQuery(["getAllZipcode"], getZipcode, {
     staleTime: Infinity,
@@ -72,29 +81,89 @@ const AddRestaurant: React.FC = () => {
     cityid: item.cityId,
   }));
 
-  const onSubmit = () => {
-    console.log(coverImage, "slslslsl");
+  const onSubmit = async () => {
+    setFormFieldsErrorMessage({});
+    const restaurantId = uuidv4();
+    if (!coverImage) {
+      setFormFieldsErrorMessage((prevState) => ({
+        ...prevState,
+        cover: ["you must add cover image"],
+      }));
+      return;
+    }
+    const allImages = {
+      cover: {
+        type: coverImage?.type,
+        size: coverImage?.size,
+        url: `${restaurantId}/cover/${uuidv4()}`,
+      },
+      otherImages: images.map((file) => ({
+        type: file?.type,
+        size: file?.size,
+        url: `${restaurantId}/${uuidv4()}`,
+      })),
+    };
+
+    const isTypeCorrent = GetImagePreSignedUrlZod.safeParse(allImages);
+
+    if (!isTypeCorrent.success) {
+      console.log(isTypeCorrent.error);
+      const schemaErrors = isTypeCorrent.error.flatten().fieldErrors;
+      if (schemaErrors.otherImages?.length) {
+        setFormFieldsErrorMessage((prevState) => ({
+          ...prevState,
+          otherImages: schemaErrors.otherImages!,
+        }));
+      }
+      if (schemaErrors.cover?.length) {
+        setFormFieldsErrorMessage((prevState) => ({
+          ...prevState,
+          cover: schemaErrors.cover!,
+        }));
+      }
+      return;
+    }
+
+    const postSignedUrl: {
+      cover: { uploadS3Url: string; uploadS3Fields: { [key: string]: string } };
+    } = await getImagePresignedUrl(allImages);
+
+    const formData = new FormData();
+    formData.append("Content-Type", coverImage.type);
+    Object.entries(postSignedUrl.cover.uploadS3Fields).forEach(([k, v]) => {
+      formData.append(k, v);
+    });
+    formData.append("file", coverImage); // must be the last one
+    // the upload is working!!!!!!
+   
+    try {
+      const result = await fetch(postSignedUrl.cover.uploadS3Url, {
+        method: "POST",
+        body: formData,
+      });
+      console.log(result);
+    } catch (err) {
+      console.log(err);
+    }
+    /*
+    
+
+Object.entries(data.fields).forEach(([k, v]) => {
+	formData.append(k, v);
+});
+formData.append("file", file); // must be the last one
+The Content-Type must be set if the POST policy contains a Condition for it.
+await fetch(data.url, {
+	method: "POST",
+	body: formData,
+});
+    */
+
+    // call your backend api for images
     // we might extract it out as separate function
     // We are handling image uploads first, then we will come back to implement submit function properly
     // we need to create a cover imageurl/ extract, size and type amnd create appropriate objects
-    const restaurantId = uuidv4();
-    const images = {
-      cover: {
-        imageId: `/${restaurantId}/cover/${uuidv4()}`,
-      },
-      // other: [
-      //   {
-      //     type: seatingImage.image?.type,
-      //     size: coverImage.image?.size,
-      //     imageId: `/${restaurantId}/cover/${uuidv4()}`,
-      //   },
-      //   {
-      //     type: coverImage.image?.type,
-      //     size: coverImage.image?.size,
-      //     imageId: `/${restaurantId}/cover/${uuidv4()}`,
-      //   },
-      // ],
-    };
+    //
   };
 
   return (
@@ -219,6 +288,22 @@ const AddRestaurant: React.FC = () => {
           />
         </Grid.Col>
       </Grid>
+      {formFieldsErrorMessage?.cover ? (
+        <>
+          <Text>cover</Text>
+          <ErrorCard arrayOfErrors={formFieldsErrorMessage?.cover} />
+        </>
+      ) : (
+        <></>
+      )}
+      {formFieldsErrorMessage?.otherImages ? (
+        <>
+          <Text>other images</Text>
+          <ErrorCard arrayOfErrors={formFieldsErrorMessage?.otherImages} />
+        </>
+      ) : (
+        <></>
+      )}
       <Group position="center" mt="sm">
         <Button
           onClick={onSubmit}

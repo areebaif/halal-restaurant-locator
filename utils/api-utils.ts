@@ -190,3 +190,7 @@ export const cityIdExists = async (data: { cityId: string }[]) => {
   }
   return cityNotFound;
 };
+
+
+
+

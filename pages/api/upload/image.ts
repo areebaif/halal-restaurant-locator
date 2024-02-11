@@ -1,9 +1,11 @@
 import type { NextApiRequest, NextApiResponse } from "next";
 // local imports
-import { uploadToS3 } from "@/utils";
+import { S3ImagePreSignedUrl } from "@/utils";
 import { v4 as uuidv4 } from "uuid";
+import { GetImagePreSignedUrlZod } from "@/utils";
+import { GetImagePreSignedUrl } from "@/utils/types";
 
-
+// TODO: do return typing
 /**
  * @swagger
  * /api/image-upload:
@@ -20,9 +22,28 @@ import { v4 as uuidv4 } from "uuid";
  *          schema:
  *            type: object
  *            properties:
- *              foodTag:
- *                type: string
- *                example: "vegetarian"
+ *              cover:
+ *                type: object
+ *                properties:
+ *                  type:
+ *                    type: string
+ *                    example: "image/png"
+ *                  size:
+ *                    type: number
+ *                  url:
+ *                    type: string
+ *              otherImages:
+ *                type: array
+ *                items:
+ *                  type: object
+ *                  properties:
+ *                    type:
+ *                      type: string
+ *                      example: "image/png"
+ *                    size:
+ *                      type: number
+ *                    url:
+ *                      type: string
  *      required: true
  *    responses:
  *      '201':
@@ -47,7 +68,7 @@ import { v4 as uuidv4 } from "uuid";
  *                  example: "food tag value already exists, please provide a unique name"
  *  get:
  *    tags:
- *      - restaurants
+ *      - images
  *    summary: get all food tags stored in the database
  *    description: Returns an array of objects containing food tag name and tag id
  *    operationId: get all food tags
@@ -70,25 +91,74 @@ import { v4 as uuidv4 } from "uuid";
  *                        example: "Vegetarian"
  */
 
-
-
-
 export default async function imageUpload(
   req: NextApiRequest,
   res: NextApiResponse
 ) {
   try {
-  // restaurantId/cover/ImageId
-  // {cover: {imageId, imageType, imageSize},}
-
+    // restaurantId/cover/ImageId
+    // {cover: {imageId, imageType, imageSize},}
+    // login is required to do this!!!!!!!!
     if (req.method === "POST") {
-      const imageId = req.body.image;
-      console.log(imageId)
-      res.status(201).json({  });
+      const images = req.body.image as GetImagePreSignedUrl;
+
+      // do zod typechecking here
+      const isTypeCorrent = GetImagePreSignedUrlZod.safeParse(images);
+      if (!isTypeCorrent.success) {
+        console.log(isTypeCorrent.error);
+        const schemaErrors = isTypeCorrent.error.flatten().fieldErrors;
+        res.status(404).send({
+          cover: schemaErrors.cover,
+          otherImages: schemaErrors.otherImages,
+        });
+      }
+
+      const stringArray = images.cover.type.split("/");
+      const imageExtension = stringArray[1];
+      const coverImageKey = `${images.cover.url}.${imageExtension}`;
+
+      // Array is a collection in which insertion order is preserved. Hence, we are inserting cover image into imageUrl first, then other images.
+      // We will need this sort order once we have the preSigned post url from s3. The first url in the array will correspond to cover image and so on...
+      // Think of this array as tuple!!!!
+      const imageUrl = [{ key: coverImageKey, type: images.cover.type }];
+      images.otherImages.forEach((image) => {
+        if (image) {
+          const stringArray = image.type.split("/");
+          const imageExtension = stringArray[1];
+          imageUrl.push({
+            key: `${image?.url}.${imageExtension}`,
+            type: image.type,
+          });
+        }
+      });
+
+      const imagePromises = imageUrl.map((image) =>
+        S3ImagePreSignedUrl(image.key, image.type)
+      );
+      const preSignedUrlArr = await Promise.all(imagePromises);
+      console.log(preSignedUrlArr);
+      const preSignedUrl = {
+        cover: {
+          uploadS3Url: preSignedUrlArr[0].url,
+          uploadS3Fields: preSignedUrlArr[0].fields,
+          type: images.cover.type,
+          dbUrl: images.cover.url,
+        },
+        otherImages:
+          preSignedUrlArr.length > 1
+            ? images.otherImages.map((image, index) => ({
+                uploadS3Url: preSignedUrlArr[index + 1].url,
+                uploadS3Fields: preSignedUrlArr[index + 1].fields,
+                type: images.otherImages[index]?.type,
+                dbUrl: images.otherImages[index + 1]?.url,
+              }))
+            : undefined,
+      };
+      res.status(201).json(preSignedUrl);
     }
-   
   } catch (err) {
     console.log(err);
+    // TODO: error handling for aws s3. Check its error codes
     res.status(500).json({ foodTag: "something went wrong with the server" });
   }
 }

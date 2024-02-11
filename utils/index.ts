@@ -7,7 +7,7 @@ import {
   getCities,
   postAddZipcode,
   getZipcode,
-} from "./crudFunctions";
+} from "./crud-functions";
 import {
   PostAddStateZod,
   PostAddCityZod,
@@ -22,6 +22,7 @@ import {
   ReadZipcodeDbZod,
   ResponseAddZipcodeZod,
   ReadFoodTagsDbZod,
+  GetImagePreSignedUrlZod
 } from "./zod/zod";
 import {
   findRestaurant,
@@ -31,9 +32,9 @@ import {
 } from "./api-utils";
 import { calcBoundsFromCoordinates } from "./map/map-boundary-calculations";
 import { capitalizeFirstWord, parseQueryVals } from "./string-manipulation";
-import { getMapSearchInput, getFoodTags } from "./crudFunctions";
+import { getMapSearchInput, getFoodTags } from "./crud-functions";
 import { s3Client } from "./aws-S3-Client";
-import { uploadToS3 } from "./image-uploads";
+import { S3ImagePreSignedUrl } from "./image-uploads";
 export {
   postAddFoodTag,
   PostAddStateZod,
@@ -66,5 +67,6 @@ parseQueryVals,
   ReadFoodTagsDbZod,
   getFoodTags,
   s3Client,
-  uploadToS3
+  S3ImagePreSignedUrl,
+  GetImagePreSignedUrlZod
 };

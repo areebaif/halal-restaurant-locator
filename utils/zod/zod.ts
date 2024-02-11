@@ -240,3 +240,49 @@ export const ReadZipcodeDbZod = z
 export const ReadFoodTagsDbZod = z
   .object({ name: z.string(), foodTagId: z.string().uuid() })
   .array();
+
+export const GetImagePreSignedUrlZod = z.object({
+  cover: z.object({
+    type: z.string().regex(new RegExp(/image\/(jpg|jpeg|png)$/), {
+      message: "image must be of type jpg, or jpeg or png",
+    }),
+    size: z.number().lt(5000000, { message: " maximum filesize 5mb" }),
+    url: z
+      .string()
+      .includes("cover", { message: "must include cover in the url" }),
+  }),
+  otherImages: z
+    .object({
+      type: z.string().regex(new RegExp(/image\/(jpg|jpeg|png)$/), {
+        message: "image must be of type jpg, or jpeg or png",
+      }),
+      size: z.number().lt(5000000, { message: " maximum filesize 5mb" }),
+      url: z.string(),
+    })
+    .optional()
+    .array(),
+});
+
+// [x: string]: string
+// TODO: do this typing
+export const ResponseGetPostSignedUrl = z.object({
+  cover: z.object({
+    type: z.string().regex(new RegExp(/image\/(jpg|jpeg|png)$/), {
+      message: "image must be of type jpg, or jpeg or png",
+    }),
+    size: z.number().lt(5000000, { message: " maximum filesize 5mb" }),
+    url: z
+      .string()
+      .includes("cover", { message: "must include cover in the url" }),
+  }),
+  otherImages: z
+    .object({
+      type: z.string().regex(new RegExp(/image\/(jpg|jpeg|png)$/), {
+        message: "image must be of type jpg, or jpeg or png",
+      }),
+      size: z.number().lt(5000000, { message: " maximum filesize 5mb" }),
+      url: z.string(),
+    })
+    .optional()
+    .array(),
+});

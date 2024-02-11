@@ -13,6 +13,7 @@ import {
   ResponseAddZipcode,
   ReadZipcodeDb,
   ReadFoodTagsDb,
+  GetImagePreSignedUrl,
 } from "./types";
 
 export const postAddFoodTag = async (data: { foodTag: string }) => {
@@ -140,3 +141,16 @@ export const getFoodTags = async () => {
   const res: ReadFoodTagsDb = await response.json();
   return res;
 };
+
+export const getImagePresignedUrl = async (data: GetImagePreSignedUrl) => {
+   const response = await fetch(`/api/upload/image`, {
+    method: "POST",
+    headers: {
+      "Content-Type": "application/json",
+    },
+    body: JSON.stringify({image: data}),
+  });
+  const res = await response.json();
+  return res;
+  
+}

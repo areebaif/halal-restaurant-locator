@@ -5,7 +5,7 @@ import { Autocomplete, Button, Grid, Loader } from "@mantine/core";
 import { IconSearch } from "@tabler/icons-react";
 // local imports
 import { ErrorCard } from ".";
-import { getAllUSA } from "@/utils/crudFunctions";
+import { getAllUSA } from "@/utils/crud-functions";
 
 export type SearchInput = {
   queryString?: string;
