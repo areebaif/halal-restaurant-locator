@@ -1,9 +1,10 @@
 import type { NextApiRequest, NextApiResponse } from "next";
 // local imports
-import { S3ImagePreSignedUrl } from "@/utils";
+import { s3ImagePreSignedUrl, s3Client } from "@/utils";
+import { HeadObjectCommand } from "@aws-sdk/client-s3";
 import { v4 as uuidv4 } from "uuid";
-import { GetImagePreSignedUrlZod } from "@/utils";
-import { GetImagePreSignedUrl } from "@/utils/types";
+import { PostImageSignedUrlZod } from "@/utils";
+import { PostImageSignedUrl, ResponsePostSignedUrl } from "@/utils/types";
 
 // TODO: do return typing
 /**
@@ -93,24 +94,23 @@ import { GetImagePreSignedUrl } from "@/utils/types";
 
 export default async function imageUpload(
   req: NextApiRequest,
-  res: NextApiResponse
+  res: NextApiResponse<ResponsePostSignedUrl>
 ) {
   try {
-    // restaurantId/cover/ImageId
-    // {cover: {imageId, imageType, imageSize},}
-    // login is required to do this!!!!!!!!
     if (req.method === "POST") {
-      const images = req.body.image as GetImagePreSignedUrl;
+      const images = req.body.image as PostImageSignedUrl;
 
       // do zod typechecking here
-      const isTypeCorrent = GetImagePreSignedUrlZod.safeParse(images);
+      const isTypeCorrent = PostImageSignedUrlZod.safeParse(images);
       if (!isTypeCorrent.success) {
         console.log(isTypeCorrent.error);
         const schemaErrors = isTypeCorrent.error.flatten().fieldErrors;
+
         res.status(404).send({
-          cover: schemaErrors.cover,
-          otherImages: schemaErrors.otherImages,
+          coverImage: schemaErrors.cover,
+          images: schemaErrors.otherImages,
         });
+        return;
       }
 
       const stringArray = images.cover.type.split("/");
@@ -133,10 +133,10 @@ export default async function imageUpload(
       });
 
       const imagePromises = imageUrl.map((image) =>
-        S3ImagePreSignedUrl(image.key, image.type)
+        s3ImagePreSignedUrl(image.key, image.type)
       );
       const preSignedUrlArr = await Promise.all(imagePromises);
-      console.log(preSignedUrlArr);
+
       const preSignedUrl = {
         cover: {
           uploadS3Url: preSignedUrlArr[0].url,
@@ -149,8 +149,8 @@ export default async function imageUpload(
             ? images.otherImages.map((image, index) => ({
                 uploadS3Url: preSignedUrlArr[index + 1].url,
                 uploadS3Fields: preSignedUrlArr[index + 1].fields,
-                type: images.otherImages[index]?.type,
-                dbUrl: images.otherImages[index + 1]?.url,
+                type: images.otherImages[index]?.type!,
+                dbUrl: images.otherImages[index + 1]?.url!,
               }))
             : undefined,
       };
@@ -158,7 +158,8 @@ export default async function imageUpload(
     }
   } catch (err) {
     console.log(err);
+
     // TODO: error handling for aws s3. Check its error codes
-    res.status(500).json({ foodTag: "something went wrong with the server" });
+    //res.status(500).json({ });
   }
 }

@@ -1,11 +1,6 @@
 import z from "zod";
 // dynamic properties of objects
 //z.record(z.string().uuid(), z.string().array());
-export const ErrorAddFoodTagZod = z
-  .object({
-    foodTag: z.string().optional(),
-  })
-  .optional();
 
 export const ResponseAddFoodTagZod = z.object({
   foodTag: z.string().optional(),
@@ -241,7 +236,7 @@ export const ReadFoodTagsDbZod = z
   .object({ name: z.string(), foodTagId: z.string().uuid() })
   .array();
 
-export const GetImagePreSignedUrlZod = z.object({
+export const PostImageSignedUrlZod = z.object({
   cover: z.object({
     type: z.string().regex(new RegExp(/image\/(jpg|jpeg|png)$/), {
       message: "image must be of type jpg, or jpeg or png",
@@ -263,26 +258,22 @@ export const GetImagePreSignedUrlZod = z.object({
     .array(),
 });
 
-// [x: string]: string
-// TODO: do this typing
-export const ResponseGetPostSignedUrl = z.object({
+export const ResponsePostSignedUrlZod = z.object({
   cover: z.object({
-    type: z.string().regex(new RegExp(/image\/(jpg|jpeg|png)$/), {
-      message: "image must be of type jpg, or jpeg or png",
-    }),
-    size: z.number().lt(5000000, { message: " maximum filesize 5mb" }),
-    url: z
-      .string()
-      .includes("cover", { message: "must include cover in the url" }),
-  }),
+    uploadS3Url: z.string(),
+    uploadS3Fields: z.record(z.string()),
+    type: z.string(),
+    dbUrl: z.string(),
+  }).optional(),
   otherImages: z
     .object({
-      type: z.string().regex(new RegExp(/image\/(jpg|jpeg|png)$/), {
-        message: "image must be of type jpg, or jpeg or png",
-      }),
-      size: z.number().lt(5000000, { message: " maximum filesize 5mb" }),
-      url: z.string(),
+      uploadS3Url: z.string(),
+      uploadS3Fields: z.record(z.string()),
+      type: z.string(),
+      dbUrl: z.string(),
     })
-    .optional()
-    .array(),
+    .array()
+    .optional(),
+  coverImage: z.string().array().optional(),
+  images: z.string().array().optional(),
 });

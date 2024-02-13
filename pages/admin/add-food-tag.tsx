@@ -11,8 +11,7 @@ import {
   Loader,
 } from "@mantine/core";
 import { ErrorCard } from "@/components";
-import { ErrorAddFoodTag, ResponseAddFoodTag } from "@/utils/types";
-import { ErrorAddFoodTagZod, ResponseAddFoodTagZod } from "@/utils/zod/zod";
+import { ResponseAddFoodTagZod } from "@/utils/zod/zod";
 import { postAddFoodTag } from "@/utils";
 import { useRouter } from "next/router";
 
@@ -20,7 +19,9 @@ export const AddFoodTag: React.FC = () => {
   const queryClient = useQueryClient();
   const router = useRouter();
   const [foodTag, setFoodTag] = React.useState("");
-  const [error, setError] = React.useState<ErrorAddFoodTag>();
+  const [error, setError] = React.useState<{
+    foodTag?: string;
+  }>();
   const mutation = useMutation({
     mutationFn: postAddFoodTag,
     onSuccess: (data) => {
@@ -37,8 +38,6 @@ export const AddFoodTag: React.FC = () => {
       }
       router.push("/admin");
       queryClient.invalidateQueries();
-    },
-    onError: (data) => {
     },
   });
 

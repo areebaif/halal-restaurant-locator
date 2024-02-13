@@ -3,7 +3,8 @@ import { getSignedUrl } from "@aws-sdk/s3-request-presigner";
 import { s3Client } from ".";
 import { createPresignedPost } from "@aws-sdk/s3-presigned-post";
 
-export const S3ImagePreSignedUrl = (imageKey: string, imageType: string) => {
+export const s3ImagePreSignedUrl = (imageKey: string, imageType: string) => {
+  // This is preSignedGet
   // const command = new PutObjectCommand({
   //   Bucket: process.env.BUCKET_NAME,
   //   Key: imageKey,
@@ -13,15 +14,14 @@ export const S3ImagePreSignedUrl = (imageKey: string, imageType: string) => {
   // const preSignedUrl = getSignedUrl(s3Client, command, {
   //   expiresIn: 3600
   // })
+
+  // Get ObjectMetadata
+  // const command = new HeadObjectCommand({
+  //   Bucket: process.env.BUCKET_NAME!,
+  //   Key: "7f0c1efe-4eda-44fc-a0c2-a0606d6755a7/cover/3750f429-0d9a-4250-85f1-fbb31690b822.png",
+  // });
+  // const testre = await s3Client.send(command);
   const Bucket = process.env.BUCKET_NAME!;
-  const Fields = { key: imageKey };
-  //   const Conditions = [
-  //   { "bucket": Bucket},
-  //   { key: imageKey! },
-  //   [ "content-length-range", 1048576, 10485760 ], // file size limit 1KB-5MB
-  //   [ "starts-with", "$Content-Type", "image/" ] // only support file of content-type: "image/jpg, image/png, image/gif"
-  // ];
-  // CONST {URL, FIELDS}
 
   const preSignedUrl = createPresignedPost(s3Client, {
     Bucket: Bucket,

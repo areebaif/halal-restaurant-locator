@@ -22,9 +22,9 @@ import {
   getZipcode,
   getFoodTags,
   ReadFoodTagsDbZod,
-  GetImagePreSignedUrlZod,
+  validateAddRestaurantData,
+  getImageUrlToUploadToS3,
 } from "@/utils";
-import { getImagePresignedUrl } from "@/utils/crud-functions";
 
 const AddRestaurant: React.FC = () => {
   const [name, setName] = React.useState("");
@@ -35,8 +35,7 @@ const AddRestaurant: React.FC = () => {
   const [foodTag, setFoodTag] = React.useState<string[]>([]);
   const [description, setDescription] = React.useState("");
   const [street, setStreet] = React.useState("");
-  // we are constructing url from uploaded image to display a preview image of the image uplaoded to the user.
-  // Hence, the need for url.
+  // coverImage is separate, then rest of the images
   const [coverImage, setCoverImage] = React.useState<File | null>(null);
   const [images, setImages] = React.useState<File[]>([]);
 
@@ -84,6 +83,7 @@ const AddRestaurant: React.FC = () => {
   const onSubmit = async () => {
     setFormFieldsErrorMessage({});
     const restaurantId = uuidv4();
+    // check if user inputs are empty
     if (!coverImage) {
       setFormFieldsErrorMessage((prevState) => ({
         ...prevState,
@@ -103,67 +103,42 @@ const AddRestaurant: React.FC = () => {
         url: `${restaurantId}/${uuidv4()}`,
       })),
     };
+    // check if the user sends wrong inputs and return early
+    validateAddRestaurantData(allImages, setFormFieldsErrorMessage);
 
-    const isTypeCorrent = GetImagePreSignedUrlZod.safeParse(allImages);
-
-    if (!isTypeCorrent.success) {
-      console.log(isTypeCorrent.error);
-      const schemaErrors = isTypeCorrent.error.flatten().fieldErrors;
-      if (schemaErrors.otherImages?.length) {
-        setFormFieldsErrorMessage((prevState) => ({
-          ...prevState,
-          otherImages: schemaErrors.otherImages!,
-        }));
-      }
-      if (schemaErrors.cover?.length) {
-        setFormFieldsErrorMessage((prevState) => ({
-          ...prevState,
-          cover: schemaErrors.cover!,
-        }));
-      }
-      return;
-    }
-
-    const postSignedUrl: {
-      cover: { uploadS3Url: string; uploadS3Fields: { [key: string]: string } };
-    } = await getImagePresignedUrl(allImages);
-
-    const formData = new FormData();
-    formData.append("Content-Type", coverImage.type);
-    Object.entries(postSignedUrl.cover.uploadS3Fields).forEach(([k, v]) => {
-      formData.append(k, v);
-    });
-    formData.append("file", coverImage); // must be the last one
-    // the upload is working!!!!!!
-   
+    // In this function we call the backend api to get secure urls (generate urls to restrict content-length, content-type) to upload to s3.
+    // Additionally s3 requires formData with imageFile as last field, hence we are passing the actual image file to the function to append to form data
+    // Note: The actual image file is not sent to the backend!!. We append the image file to the result of backend call
+    let formArray: {
+      formData: FormData;
+      uploadS3Url: string;
+    }[] = [];
     try {
-      const result = await fetch(postSignedUrl.cover.uploadS3Url, {
-        method: "POST",
-        body: formData,
-      });
-      console.log(result);
+      formArray = await getImageUrlToUploadToS3(
+        allImages,
+        coverImage,
+        images,
+        setFormFieldsErrorMessage
+      );
     } catch (err) {
-      console.log(err);
+      // TODO: set Error that somethiong went wrong woth url creation
     }
-    /*
-    
+    // once the image is uploaded to s3, we send the url to backedn to be stored in the db.
+    // for any reason upload to s3 fails, the backend before saving the imageUrl to db, will call AWS Lamba, to verify if the image actually exists.
+    // If the image upload fails, the backend will respond appropriately.
 
-Object.entries(data.fields).forEach(([k, v]) => {
-	formData.append(k, v);
-});
-formData.append("file", file); // must be the last one
-The Content-Type must be set if the POST policy contains a Condition for it.
-await fetch(data.url, {
-	method: "POST",
-	body: formData,
-});
-    */
-
-    // call your backend api for images
-    // we might extract it out as separate function
-    // We are handling image uploads first, then we will come back to implement submit function properly
-    // we need to create a cover imageurl/ extract, size and type amnd create appropriate objects
-    //
+    if (formArray.length) {
+      formArray.forEach(async (form) => {
+        await fetch(form.uploadS3Url, {
+          method: "POST",
+          body: form.formData,
+        });
+      });
+      // result.status(204, is good)
+      //console.log(result);
+    } else {
+      // TODO: set Error that somethiong went wrong woth url creation
+    }
   };
 
   return (
