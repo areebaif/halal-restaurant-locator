@@ -26,6 +26,8 @@ import {
   getImageUrlToUploadToS3,
 } from "@/utils";
 
+// TODO: This file needs to adjust now
+
 const AddRestaurant: React.FC = () => {
   const [name, setName] = React.useState("");
   const [countryStateCityZipcode, setCountryStateCityZipcode] =
