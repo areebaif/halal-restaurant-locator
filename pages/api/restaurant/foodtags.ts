@@ -1,8 +1,8 @@
 import type { NextApiRequest, NextApiResponse } from "next";
 // local imports
 import { prisma } from "@/db/prisma";
-import { ResponseAddFoodTag, ReadFoodTagsDb } from "@/utils/types";
-import { capitalizeFirstWord } from "@/utils";
+import { CreateFoodTag, ListFoodTags } from "@/utils/types";
+import { capitalizeFirstWord, listFoodTags } from "@/utils";
 
 /**
  * @swagger
@@ -42,9 +42,23 @@ import { capitalizeFirstWord } from "@/utils";
  *            schema:
  *              type: object
  *              properties:
- *                 foodTag:
- *                  type: string
- *                  example: "food tag value already exists, please provide a unique name"
+ *                  errors:
+ *                    type: object
+ *                    properties:
+ *                      validationErrors:
+ *                        type: object
+ *                        properties:
+ *                          foodtag:
+ *                            type: array
+ *                            items:
+ *                              type: string
+ *                              example: "please provide valid value for food tag"
+ *                      generalErrors:
+ *                        type: array
+ *                        items:
+ *                          type: string
+ *                          example: "something went wrong with the server"
+
  *  get:
  *    tags:
  *      - restaurants
@@ -71,41 +85,49 @@ import { capitalizeFirstWord } from "@/utils";
  */
 export default async function FoodTag(
   req: NextApiRequest,
-  res: NextApiResponse<ResponseAddFoodTag | ReadFoodTagsDb>
+  res: NextApiResponse<CreateFoodTag | ListFoodTags>
 ) {
   try {
+    // TODO: fix this as accepting a string[] to add to db and then you upsert
     if (req.method === "POST") {
       const foodTag = req.body.foodTag;
 
-      if (typeof foodTag !== "string" || !foodTag.length) {
-        res
-          .status(400)
-          .json({ foodTag: "please provide valid value for food tag" });
-        return;
-      }
-      const tag = foodTag as string;
-      const sanitizeTag = capitalizeFirstWord(tag);
-
-      const foodTagExists = await prisma.foodTag.findUnique({
-        where: {
-          name: sanitizeTag,
-        },
-      });
-      if (foodTagExists?.foodTagId) {
+      if (!foodTag.length || !Array.isArray(foodTag)) {
         res.status(400).json({
-          foodTag:
-            "food tag value already exists, please provide a unique name",
+          created: false,
+          errors: {
+            validationErrors: {
+              foodTag: ["please provide valid value for food tags"],
+            },
+          },
         });
         return;
       }
+      const tags = foodTag as string[];
+      const santizeListTags = tags.map((tag) => capitalizeFirstWord(tag));
 
-      const createFoodTag = await prisma.foodTag.create({
-        data: {
-          name: sanitizeTag,
-        },
+      const foodTagsPromise = santizeListTags.map((tag) =>
+        prisma.foodTag.findUnique({
+          where: {
+            name: tag,
+          },
+        })
+      );
+      const listFoodTagExists = await Promise.all(foodTagsPromise);
+
+      const foodTagsToCreate: { name: string }[] = [];
+      listFoodTagExists.forEach((tag, index) => {
+        if (!tag?.foodTagId) {
+          foodTagsToCreate.push({ name: santizeListTags[index] });
+        }
       });
 
-      res.status(201).json({ id: createFoodTag.foodTagId });
+      await prisma.foodTag.createMany({
+        data: foodTagsToCreate,
+        skipDuplicates: true,
+      });
+
+      res.status(201).json({ created: true });
     }
     if (req.method === "GET") {
       const foodTags = await prisma.foodTag.findMany({
@@ -116,6 +138,9 @@ export default async function FoodTag(
     }
   } catch (err) {
     console.log(err);
-    res.status(500).json({ foodTag: "something went wrong with the server" });
+    res.status(500).json({
+      created: false,
+      errors: { generalErrors: ["something went wrong with the server"] },
+    });
   }
 }

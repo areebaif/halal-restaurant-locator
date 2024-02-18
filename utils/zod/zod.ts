@@ -2,9 +2,22 @@ import z from "zod";
 // dynamic properties of objects
 //z.record(z.string().uuid(), z.string().array());
 
-export const ResponseAddFoodTagZod = z.object({
-  foodTag: z.string().optional(),
-  id: z.string().optional(),
+export const ListFoodTagsZod = z
+  .object({ name: z.string(), foodTagId: z.string().uuid() })
+  .array();
+
+export const CreateFoodTagZod = z.object({
+  created: z.boolean(),
+  errors: z
+    .object({
+      validationErrors: z
+        .object({
+          foodTag: z.string().array(),
+        })
+        .optional(),
+      generalErrors: z.string().array().optional(),
+    })
+    .optional(),
 });
 
 export const ResponseGetAllGeogByCountryZod = z.object({
@@ -232,10 +245,6 @@ export const ReadZipcodeDbZod = z
   })
   .array();
 
-export const ReadFoodTagsDbZod = z
-  .object({ name: z.string(), foodTagId: z.string().uuid() })
-  .array();
-
 export const PostImageSignedUrlZod = z.object({
   cover: z.object({
     type: z.string().regex(new RegExp(/image\/(jpg|jpeg|png)$/), {
@@ -259,12 +268,14 @@ export const PostImageSignedUrlZod = z.object({
 });
 
 export const ResponsePostSignedUrlZod = z.object({
-  cover: z.object({
-    uploadS3Url: z.string(),
-    uploadS3Fields: z.record(z.string()),
-    type: z.string(),
-    dbUrl: z.string(),
-  }).optional(),
+  cover: z
+    .object({
+      uploadS3Url: z.string(),
+      uploadS3Fields: z.record(z.string()),
+      type: z.string(),
+      dbUrl: z.string(),
+    })
+    .optional(),
   otherImages: z
     .object({
       uploadS3Url: z.string(),

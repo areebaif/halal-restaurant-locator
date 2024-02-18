@@ -16,12 +16,11 @@ import {
   Grid,
   Text,
 } from "@mantine/core";
-import { ErrorCard, CustomImageButton } from "@/components";
+import { ErrorCard, CustomImageButton, FoodTags } from "@/components";
 import {
   ReadZipcodeDbZod,
   getZipcode,
-  getFoodTags,
-  ReadFoodTagsDbZod,
+  ListFoodTagsZod,
   validateAddRestaurantData,
   getImageUrlToUploadToS3,
 } from "@/utils";
@@ -47,40 +46,31 @@ const AddRestaurant: React.FC = () => {
   }>();
 
   // Queries
-  const apiData = useQuery(["getAllZipcode"], getZipcode, {
-    staleTime: Infinity,
-    cacheTime: Infinity,
-  });
-  const foodTagData = useQuery(["getAllFoodTags"], getFoodTags, {
-    staleTime: Infinity,
-    cacheTime: Infinity,
-  });
-  if (apiData.isLoading || foodTagData.isLoading) return <Loader />;
-  if (apiData.isError || foodTagData.isError) {
-    console.log(apiData.error);
-    console.log(foodTagData.error);
-    return <ErrorCard message="something went wrong with the api request" />;
-  }
-  const isTypeCorrent = ReadZipcodeDbZod.safeParse(apiData.data);
-  const isFoodTagTypeCorrent = ReadFoodTagsDbZod.safeParse(foodTagData.data);
+  // const apiData = useQuery(["getAllZipcode"], getZipcode, {
+  //   staleTime: Infinity,
+  //   cacheTime: Infinity,
+  // });
 
-  if (!isTypeCorrent.success) {
-    console.log(isTypeCorrent.error);
-    return <ErrorCard message="Their is a type mismatch from the server" />;
-  }
+  // if (apiData.isLoading || foodTagData.isLoading) return <Loader />;
+  // if (apiData.isError || foodTagData.isError) {
+  //   console.log(apiData.error);
+  //   console.log(foodTagData.error);
+  //   return <ErrorCard message="something went wrong with the api request" />;
+  // }
+  //const isTypeCorrent = ReadZipcodeDbZod.safeParse(apiData.data);
 
-  if (!isFoodTagTypeCorrent.success) {
-    console.log(isFoodTagTypeCorrent.error);
-    return <ErrorCard message="Their is a type mismatch from the server" />;
-  }
+  // if (!isTypeCorrent.success) {
+  //   console.log(isTypeCorrent.error);
+  //   return <ErrorCard message="Their is a type mismatch from the server" />;
+  // }
 
-  const autoCompleteCountryStateCityZipcode = apiData.data.map((item) => ({
-    value: item.countryStateCityZipcode,
-    zipcodeid: item.zipcodeId,
-    countryid: item.countryId,
-    stateid: item.stateId,
-    cityid: item.cityId,
-  }));
+  // const autoCompleteCountryStateCityZipcode = apiData.data.map((item) => ({
+  //   value: item.countryStateCityZipcode,
+  //   zipcodeid: item.zipcodeId,
+  //   countryid: item.countryId,
+  //   stateid: item.stateId,
+  //   cityid: item.cityId,
+  // }));
 
   const onSubmit = async () => {
     setFormFieldsErrorMessage({});
@@ -184,7 +174,7 @@ const AddRestaurant: React.FC = () => {
         type="text"
         onChange={(event) => setStreet(event.currentTarget.value)}
       />
-      <Autocomplete
+      {/* <Autocomplete
         mt="sm"
         withAsterisk
         description="select from a list of: country - state - city - zipcode"
@@ -193,7 +183,7 @@ const AddRestaurant: React.FC = () => {
         data={autoCompleteCountryStateCityZipcode}
         value={countryStateCityZipcode}
         onChange={setCountryStateCityZipcode}
-      />
+      /> */}
       <TextInput
         mt="sm"
         withAsterisk
@@ -213,24 +203,7 @@ const AddRestaurant: React.FC = () => {
         onChange={(e) => setLongitude(e.currentTarget.value)}
       />
 
-      <Chip.Group multiple value={foodTag} onChange={setFoodTag}>
-        <label
-          style={{
-            display: "inline-block",
-            fontSize: "0.875rem",
-            fontWeight: 500,
-            wordBreak: "break-word",
-          }}
-        >
-          food tags
-        </label>
-        <span style={{ color: "#fa5252", marginLeft: "1px" }}>*</span>
-        <Group>
-          {foodTagData.data.map((tag) => (
-            <Chip value={`${tag.foodTagId}`}>{tag.name}</Chip>
-          ))}
-        </Group>
-      </Chip.Group>
+      <FoodTags foodTag={foodTag} setFoodTag={setFoodTag} />
       <Grid>
         <Grid.Col span={"auto"}>
           <Textarea

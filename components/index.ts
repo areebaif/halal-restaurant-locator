@@ -1,16 +1,16 @@
-
 import { AdminNavigation } from "./layout/AdminNavbar";
 import { AppChromeAdmin } from "./layout/AdminLayout";
 import { AppChrome } from "./layout/AppChrome";
 import { ErrorCard } from "./ErrorCard";
 import { SearchInput } from "./searchInput";
-import { MapContainer } from "./MapContainer";
-import { SearchResultList } from "./SearchResultList";
+import { MapContainer } from "./mapSearchPage/MapContainer";
+import { SearchResultList } from "./mapSearchPage/SearchResultList";
 import { HeroComponent } from "./homePage/HeroComponent";
 import { MapWithText } from "./homePage/MapWithText";
 import { RestaurantSuggestionForm } from "./homePage/RestaurantSuggestionForm";
-import { MapAndList } from "./MapAndList";
-import { CustomImageButton } from "./ImageButton";
+import { MapAndList } from "./mapSearchPage/MapAndList";
+import { CustomImageButton } from "./admin/addRestaurant/ImageButton";
+import { FoodTags } from "./admin/addRestaurant/FoodTypeTags";
 
 export {
   AdminNavigation,
@@ -24,5 +24,6 @@ export {
   MapWithText,
   RestaurantSuggestionForm,
   MapAndList,
-  CustomImageButton
+  CustomImageButton,
+  FoodTags,
 };
