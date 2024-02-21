@@ -1,7 +1,6 @@
 import { z } from "zod";
 import {
-  ErrorAddFoodTagZod,
-  ResponseAddFoodTagZod,
+  CreateFoodTagZod,
   ResponseAddCountryZod,
   ResponseAddStateZod,
   PostAddStateZod,
@@ -21,11 +20,13 @@ import {
   ReadStateDbZod,
   ReadCityDbZod,
   ReadZipcodeDbZod,
-  ReadFoodTagsDbZod,
+  ListFoodTagsZod,
+  PostImageSignedUrlZod,
+  ResponsePostSignedUrlZod,
 } from "./zod/zod";
 
-export type ErrorAddFoodTag = z.infer<typeof ErrorAddFoodTagZod>;
-export type ResponseAddFoodTag = z.infer<typeof ResponseAddFoodTagZod>;
+export type CreateFoodTag = z.infer<typeof CreateFoodTagZod>;
+export type ListFoodTags = z.infer<typeof ListFoodTagsZod>;
 export type ResponseAddCountry = z.infer<typeof ResponseAddCountryZod>;
 export type ResponseAddState = z.infer<typeof ResponseAddStateZod>;
 export type ResponseAddCity = z.infer<typeof ResponseAddCityZod>;
@@ -54,7 +55,9 @@ export type ReadCountriesDb = z.infer<typeof ReadCountriesDbZod>;
 export type ReadStateDb = z.infer<typeof ReadStateDbZod>;
 export type ReadCityDb = z.infer<typeof ReadCityDbZod>;
 export type ReadZipcodeDb = z.infer<typeof ReadZipcodeDbZod>;
-export type ReadFoodTagsDb = z.infer<typeof ReadFoodTagsDbZod>;
+
+export type PostImageSignedUrl = z.infer<typeof PostImageSignedUrlZod>;
+export type ResponsePostSignedUrl = z.infer<typeof ResponsePostSignedUrlZod>;
 
 // for client
 export type GeoJsonRestaurantFeatureCollection = {

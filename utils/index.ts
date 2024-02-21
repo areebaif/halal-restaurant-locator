@@ -1,5 +1,5 @@
 import {
-  postAddFoodTag,
+  createFoodTag,
   getAllCountries,
   postAddState,
   getStates,
@@ -7,8 +7,10 @@ import {
   getCities,
   postAddZipcode,
   getZipcode,
-} from "./crudFunctions";
+  getImageUrlToUploadToS3,
+} from "./crud-functions";
 import {
+  CreateFoodTagZod,
   PostAddStateZod,
   PostAddCityZod,
   PostAddZipcodeZod,
@@ -21,19 +23,30 @@ import {
   ReadCityDbZod,
   ReadZipcodeDbZod,
   ResponseAddZipcodeZod,
-  ReadFoodTagsDbZod,
+  ListFoodTagsZod,
+  PostImageSignedUrlZod,
+  ResponsePostSignedUrlZod,
 } from "./zod/zod";
 import {
   findRestaurant,
   countryIdExists,
   stateIdExists,
   cityIdExists,
+  validateAddRestaurantData,
 } from "./api-utils";
 import { calcBoundsFromCoordinates } from "./map/map-boundary-calculations";
 import { capitalizeFirstWord, parseQueryVals } from "./string-manipulation";
-import { getMapSearchInput, getFoodTags } from "./crudFunctions";
+import {
+  getMapSearchInput,
+  listFoodTags,
+  getImagePostsignedUrl,
+} from "./crud-functions";
+import { s3Client } from "./aws-S3-Client";
+import { s3ImagePreSignedUrl } from "./image-uploads";
 export {
-  postAddFoodTag,
+  createFoodTag,
+  CreateFoodTagZod,
+  ListFoodTagsZod,
   PostAddStateZod,
   PostAddCityZod,
   PostAddZipcodeZod,
@@ -61,6 +74,12 @@ export {
   ReadZipcodeDbZod,
   getZipcode,
   ResponseAddZipcodeZod,
-  ReadFoodTagsDbZod,
-  getFoodTags,
+  listFoodTags,
+  s3Client,
+  s3ImagePreSignedUrl,
+  PostImageSignedUrlZod,
+  getImagePostsignedUrl,
+  validateAddRestaurantData,
+  getImageUrlToUploadToS3,
+  ResponsePostSignedUrlZod,
 };

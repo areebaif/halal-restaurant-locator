@@ -21,11 +21,9 @@ export const parseQueryVals = (val: string): GetSearchInputs => {
       const zipcodeVal = allQueryArray[0];
       const zipcodeSplit = zipcodeVal.split("=");
       queryValue.zipcode = zipcodeSplit[1];
-
       const countryVal = allQueryArray[1];
       const countrySplit = countryVal.split("=");
       queryValue.country = countrySplit[1];
-
       return queryValue;
     }
     case 3: {
@@ -40,7 +38,6 @@ export const parseQueryVals = (val: string): GetSearchInputs => {
       const countryVal = allQueryArray[2];
       const countrySplit = countryVal.split("=");
       queryValue.country = countrySplit[1];
-
       return queryValue;
     }
   }

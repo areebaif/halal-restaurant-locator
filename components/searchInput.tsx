@@ -5,12 +5,17 @@ import { Autocomplete, Button, Grid, Loader } from "@mantine/core";
 import { IconSearch } from "@tabler/icons-react";
 // local imports
 import { ErrorCard } from ".";
-import { getAllUSA } from "@/utils/crudFunctions";
+import { getAllUSA } from "@/utils/crud-functions";
 
-export const SearchInput: React.FC = () => {
+export type SearchInput = {
+  queryString?: string;
+};
+
+export const SearchInput: React.FC<SearchInput> = ({ queryString }) => {
   const router = useRouter();
-  const [autoCompleteInputValue, setAutoCompleteInputValue] =
-    React.useState("");
+  const [autoCompleteInputValue, setAutoCompleteInputValue] = React.useState(
+    `${queryString ? queryString : ""}`
+  );
   const [error, setError] = React.useState({ inputData: "" });
   // Queries
   const geogData = useQuery(["getGeographyAutoCompleteData"], getAllUSA, {

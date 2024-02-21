@@ -1,7 +1,7 @@
 import { Card, Flex, Title, Text, Badge } from "@mantine/core";
 import { useMap } from "react-map-gl";
 import { GeoJsonRestaurantProperties } from "@/utils/types";
-import { ErrorCard } from ".";
+import { ErrorCard } from "..";
 import { MapContainerProps, PopupDataProps } from "./MapContainer";
 
 export const SearchResultList: React.FC<MapContainerProps> = ({
