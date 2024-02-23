@@ -1,7 +1,7 @@
 import {
   createFoodTag,
   getAllCountries,
-  postAddState,
+  createState,
   getStates,
   postAddCity,
   getCities,
@@ -60,7 +60,7 @@ export {
   ReadCountriesDbZod,
   ResponseAddStateZod,
   getAllCountries,
-  postAddState,
+  createState,
   getStates,
   postAddCity,
   ReadStateDbZod,

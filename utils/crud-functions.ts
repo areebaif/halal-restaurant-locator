@@ -17,6 +17,17 @@ import {
   ResponsePostSignedUrl,
 } from "./types";
 
+export const listFoodTags = async () => {
+  const response = await fetch(`/api/restaurant/foodtags`, {
+    method: "GET",
+    headers: {
+      "Content-Type": "application/json",
+    },
+  });
+  const res: ListFoodTags = await response.json();
+  return res;
+};
+
 export const createFoodTag = async (data: { foodTag: string[] }) => {
   const { foodTag } = data;
   const response = await fetch(`/api/restaurant/foodtags`, {
@@ -30,7 +41,7 @@ export const createFoodTag = async (data: { foodTag: string[] }) => {
   return res;
 };
 
-export const postAddState = async (data: PostAddState) => {
+export const createState = async (data: PostAddState) => {
   const response = await fetch(`/api/geography/state`, {
     method: "POST",
     headers: {
@@ -129,17 +140,6 @@ export const getZipcode = async () => {
     },
   });
   const res: ReadZipcodeDb = await response.json();
-  return res;
-};
-
-export const listFoodTags = async () => {
-  const response = await fetch(`/api/restaurant/foodtags`, {
-    method: "GET",
-    headers: {
-      "Content-Type": "application/json",
-    },
-  });
-  const res: ListFoodTags = await response.json();
   return res;
 };
 

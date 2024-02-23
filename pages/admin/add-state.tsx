@@ -20,7 +20,7 @@ import {
   capitalizeFirstWord,
   ResponseAddStateZod,
   getAllCountries,
-  postAddState,
+  createState,
 } from "@/utils";
 import { PostAddState, ResponseAddState } from "@/utils/types";
 
@@ -38,7 +38,7 @@ export const AddStates: React.FC = () => {
     cacheTime: Infinity,
   });
   const mutation = useMutation({
-    mutationFn: postAddState,
+    mutationFn: createState,
     onSuccess: (data) => {
       const result = ResponseAddStateZod.safeParse(data);
       if (!result.success) {
