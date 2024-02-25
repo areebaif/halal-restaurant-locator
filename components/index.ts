@@ -10,7 +10,7 @@ import { MapWithText } from "./homePage/MapWithText";
 import { RestaurantSuggestionForm } from "./homePage/RestaurantSuggestionForm";
 import { MapAndList } from "./mapSearchPage/MapAndList";
 import { CustomImageButton } from "./admin/addRestaurant/ImageButton";
-import { FoodTags } from "./admin/addRestaurant/FoodTypeTags";
+import { FoodTags } from "./admin/addRestaurant/FoodTags";
 import { AddFoodTag } from "./admin/addRestaurant/AddFoodTag";
 
 export {

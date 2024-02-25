@@ -5,7 +5,7 @@ import { Autocomplete, Button, Grid, Loader } from "@mantine/core";
 import { IconSearch } from "@tabler/icons-react";
 // local imports
 import { ErrorCard } from ".";
-import { getAllUSA } from "@/utils/crud-functions";
+import { listUSAGeog } from "@/utils";
 
 export type SearchInput = {
   queryString?: string;
@@ -18,7 +18,7 @@ export const SearchInput: React.FC<SearchInput> = ({ queryString }) => {
   );
   const [error, setError] = React.useState({ inputData: "" });
   // Queries
-  const geogData = useQuery(["getGeographyAutoCompleteData"], getAllUSA, {
+  const geogData = useQuery(["listGeography"], listUSAGeog, {
     staleTime: Infinity,
     cacheTime: Infinity,
   });
@@ -27,6 +27,7 @@ export const SearchInput: React.FC<SearchInput> = ({ queryString }) => {
     console.log(geogData.error);
     return <ErrorCard message="something went wrong with the server" />;
   }
+  // TODO: add zod checking
   const parsedZipcode = geogData.data?.zipcode?.map(
     (item) => `${item.zipcode}, ${geogData.data.country?.countryName}`
   );

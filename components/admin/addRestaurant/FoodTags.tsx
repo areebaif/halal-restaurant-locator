@@ -19,7 +19,7 @@ export type FoodTags = {
 
 export const FoodTags: React.FC<FoodTags> = ({ foodTag, setFoodTag }) => {
   const [isOpenCreateFoodTag, setIsOpenCreateFoodTag] = React.useState(false);
-  const foodTagData = useQuery(["getAllFoodTags"], listFoodTags, {
+  const foodTagData = useQuery(["listFoodTags"], listFoodTags, {
     staleTime: Infinity,
     cacheTime: Infinity,
   });
@@ -68,8 +68,10 @@ export const FoodTags: React.FC<FoodTags> = ({ foodTag, setFoodTag }) => {
             <Group
               sx={(theme) => ({ marginTop: `calc(${theme.spacing.md}*2)` })}
             >
-              {foodTagData.data.map((tag) => (
-                <Chip value={`${tag.foodTagId}`}>{tag.name}</Chip>
+              {foodTagData.data.map((tag, index) => (
+                <Chip key={index} value={`${tag.foodTagId}`}>
+                  {tag.name}
+                </Chip>
               ))}
             </Group>
           </Chip.Group>

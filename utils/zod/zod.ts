@@ -20,7 +20,7 @@ export const CreateFoodTagZod = z.object({
     .optional(),
 });
 
-export const ResponseGetAllGeogByCountryZod = z.object({
+export const ListGeographyZod = z.object({
   typeError: z.string().optional(),
   country: z
     .object({ countryId: z.string().uuid(), countryName: z.string().uuid() })

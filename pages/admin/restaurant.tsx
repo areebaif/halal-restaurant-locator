@@ -23,7 +23,9 @@ import {
   ListFoodTagsZod,
   validateAddRestaurantData,
   getImageUrlToUploadToS3,
+  listUSAGeog,
 } from "@/utils";
+import { ListGeographyZod } from "@/utils/zod/zod";
 
 // TODO: This file needs to adjust now
 
@@ -46,31 +48,22 @@ const AddRestaurant: React.FC = () => {
   }>();
 
   // Queries
-  // const apiData = useQuery(["getAllZipcode"], getZipcode, {
-  //   staleTime: Infinity,
-  //   cacheTime: Infinity,
-  // });
+  const geogData = useQuery(["listGeography"], listUSAGeog, {
+    staleTime: Infinity,
+    cacheTime: Infinity,
+  });
 
-  // if (apiData.isLoading || foodTagData.isLoading) return <Loader />;
-  // if (apiData.isError || foodTagData.isError) {
-  //   console.log(apiData.error);
-  //   console.log(foodTagData.error);
-  //   return <ErrorCard message="something went wrong with the api request" />;
-  // }
-  //const isTypeCorrent = ReadZipcodeDbZod.safeParse(apiData.data);
-
-  // if (!isTypeCorrent.success) {
-  //   console.log(isTypeCorrent.error);
+  if (geogData.isLoading) return <Loader />;
+  if (geogData.isError) {
+    console.log(geogData.error);
+    return <ErrorCard message="something went wrong with the server" />;
+  }
+  console.log(geogData.data, "slslslslslsl");
+  // const getTypeErrors = ListGeographyZod.safeParse(geogData.data);
+  // if (!getTypeErrors.success) {
+  //   console.log(getTypeErrors.error);
   //   return <ErrorCard message="Their is a type mismatch from the server" />;
   // }
-
-  // const autoCompleteCountryStateCityZipcode = apiData.data.map((item) => ({
-  //   value: item.countryStateCityZipcode,
-  //   zipcodeid: item.zipcodeId,
-  //   countryid: item.countryId,
-  //   stateid: item.stateId,
-  //   cityid: item.cityId,
-  // }));
 
   const onSubmit = async () => {
     setFormFieldsErrorMessage({});

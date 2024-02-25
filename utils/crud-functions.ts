@@ -1,6 +1,6 @@
 import {
   CreateFoodTag,
-  ResponseGetAllGeogByCountry,
+  ListGeography,
   GeoJsonRestaurantFeatureCollection,
   ReadCountriesDb,
   ResponseAddState,
@@ -41,6 +41,23 @@ export const createFoodTag = async (data: { foodTag: string[] }) => {
   return res;
 };
 
+// this function populates the main search page auto complete
+export const listUSAGeog = async () => {
+  const response = await fetch(`/api/geography/country/usa`, {
+    method: "GET",
+    headers: {
+      "Content-Type": "application/json",
+    },
+  });
+  console.log(response);
+  if (!response.ok) {
+    // if i send a res.status(400) it is thrown error because response.ok is false
+    throw new Error("Network response was not ok");
+  }
+  const res: ListGeography = await response.json();
+  return res;
+};
+// TODO fix typing names
 export const createState = async (data: PostAddState) => {
   const response = await fetch(`/api/geography/state`, {
     method: "POST",
@@ -85,17 +102,6 @@ export const getMapSearchInput = async (data: string) => {
     },
   });
   const res: GeoJsonRestaurantFeatureCollection = await response.json();
-  return res;
-};
-// this function populates the main search page auto complete
-export const getAllUSA = async () => {
-  const response = await fetch(`/api/geography/country/usa`, {
-    method: "GET",
-    headers: {
-      "Content-Type": "application/json",
-    },
-  });
-  const res: ResponseGetAllGeogByCountry = await response.json();
   return res;
 };
 

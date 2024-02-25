@@ -14,12 +14,14 @@ import {
 } from "@mantine/core";
 import { ErrorCard } from "@/components";
 
-import { createFoodTag, CreateFoodTagZod, listFoodTags } from "@/utils";
+import { createFoodTag, CreateFoodTagZod } from "@/utils";
 import { CreateFoodTag } from "@/utils/types";
 
 type AddFoodTag = {
   setIsOpenCreateFoodTag: (val: boolean) => void;
 };
+
+// TODO: open a popup to tell client that food tag is created and that they need to select from the list now
 
 export const AddFoodTag: React.FC<AddFoodTag> = ({
   setIsOpenCreateFoodTag,
@@ -49,7 +51,7 @@ export const AddFoodTag: React.FC<AddFoodTag> = ({
 
       setCreateListFoodTag([]);
       setCreateFoodTagInput("");
-      queryClient.invalidateQueries(["getAllFoodTags"]);
+      queryClient.invalidateQueries(["listFoodTags"]);
       setIsOpenCreateFoodTag(false);
     },
   });
@@ -162,7 +164,7 @@ export const AddFoodTag: React.FC<AddFoodTag> = ({
         <List>
           {createListFoodTag.map((tag, index) => (
             <Group>
-              <List.Item>{tag}</List.Item>
+              <List.Item key={index}>{tag}</List.Item>
               <Button onClick={() => onDelete(index)}>Delete</Button>
             </Group>
           ))}

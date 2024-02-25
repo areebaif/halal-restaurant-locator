@@ -8,6 +8,7 @@ import {
   postAddZipcode,
   getZipcode,
   getImageUrlToUploadToS3,
+  listUSAGeog,
 } from "./crud-functions";
 import {
   CreateFoodTagZod,
@@ -82,4 +83,5 @@ export {
   validateAddRestaurantData,
   getImageUrlToUploadToS3,
   ResponsePostSignedUrlZod,
+  listUSAGeog,
 };

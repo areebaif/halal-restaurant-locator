@@ -1,7 +1,7 @@
 import { prisma } from "@/db/prisma";
 import type { NextApiRequest, NextApiResponse } from "next";
 import { z } from "zod";
-import { ResponseGetAllGeogByCountry } from "@/utils/types";
+import { ListGeography } from "@/utils/types";
 
 /**
  * @swagger
@@ -87,79 +87,85 @@ import { ResponseGetAllGeogByCountry } from "@/utils/types";
 
 export default async function GetGeographyInputs(
   req: NextApiRequest,
-  res: NextApiResponse<ResponseGetAllGeogByCountry>
+  res: NextApiResponse<ListGeography>
 ) {
-  // get zipcode
-  const country = await prisma.country.findUnique({
-    where: { countryName: "U.S.A" },
-  });
+  // TODO: error handling
+  try {
+    throw new Error("bla");
+    const country = await prisma.country.findUnique({
+      where: { countryName: "U.S.A" },
+    });
 
-  const zipcode = await prisma.zipcode.findMany({
-    select: {
-      zipcodeId: true,
-      zipcode: true,
-      latitude: true,
-      longitude: true,
-      Country: {
-        select: { countryName: true, countryId: true },
+    const zipcode = await prisma.zipcode.findMany({
+      select: {
+        zipcodeId: true,
+        zipcode: true,
+        latitude: true,
+        longitude: true,
+        Country: {
+          select: { countryName: true, countryId: true },
+        },
+        State: {
+          select: { stateName: true, stateId: true },
+        },
+        City: {
+          select: { cityName: true, cityId: true },
+        },
       },
-      State: {
-        select: { stateName: true, stateId: true },
+    });
+    const mappedZipcode = zipcode.map((item) => ({
+      zipcodeId: item.zipcodeId,
+      stateName: item.State.stateName,
+      cityName: item.City.cityName,
+      zipcode: item.zipcode,
+      latitude: item.latitude,
+      longitude: item.longitude,
+      //country: item.Country.countryName,
+    }));
+    const state = await prisma.state.findMany({
+      select: {
+        stateId: true,
+        stateName: true,
+        Country: {
+          select: { countryName: true, countryId: true },
+        },
       },
-      City: {
-        select: { cityName: true, cityId: true },
+    });
+    const mappedState = state.map((item) => ({
+      stateId: item.stateId,
+      stateName: item.stateName,
+      //country: item.Country.countryName,
+    }));
+    //get city
+    const city = await prisma.city.findMany({
+      select: {
+        cityId: true,
+        cityName: true,
+        State: {
+          select: { stateName: true, stateId: true },
+        },
+        Country: {
+          select: { countryName: true, countryId: true },
+        },
       },
-    },
-  });
-  const mappedZipcode = zipcode.map((item) => ({
-    zipcodeId: item.zipcodeId,
-    stateName: item.State.stateName,
-    cityName: item.City.cityName,
-    zipcode: item.zipcode,
-    latitude: item.latitude,
-    longitude: item.longitude,
-    //country: item.Country.countryName,
-  }));
-  const state = await prisma.state.findMany({
-    select: {
-      stateId: true,
-      stateName: true,
-      Country: {
-        select: { countryName: true, countryId: true },
+    });
+    const mappedCity = city.map((item) => ({
+      cityId: item.cityId,
+      stateName: item.State.stateName,
+      cityName: item.cityName,
+      //country: item.Country.countryName,
+    }));
+    res.status(200).send({
+      zipcode: mappedZipcode,
+      city: mappedCity,
+      state: mappedState,
+      country: {
+        countryId: country?.countryId!,
+        countryName: country?.countryName!,
       },
-    },
-  });
-  const mappedState = state.map((item) => ({
-    stateId: item.stateId,
-    stateName: item.stateName,
-    //country: item.Country.countryName,
-  }));
-  //get city
-  const city = await prisma.city.findMany({
-    select: {
-      cityId: true,
-      cityName: true,
-      State: {
-        select: { stateName: true, stateId: true },
-      },
-      Country: {
-        select: { countryName: true, countryId: true },
-      },
-    },
-  });
-  const mappedCity = city.map((item) => ({
-    cityId: item.cityId,
-    stateName: item.State.stateName,
-    cityName: item.cityName,
-    //country: item.Country.countryName,
-  }));
-  res.status(200).send({
-    zipcode: mappedZipcode,
-    city: mappedCity,
-    state: mappedState,
-    country: {
-      countryId: country?.countryId!,
-      countryName: country?.countryName!,
-    },
-  });
+    });
+  } catch (err) {
+    // TODO: error handling
+    res.status(404).send({});
+  }
 }
