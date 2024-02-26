@@ -12,7 +12,7 @@ import {
 } from "./crud-functions";
 import {
   CreateFoodTagZod,
-  PostAddStateZod,
+  CreateStateZod,
   PostAddCityZod,
   PostAddZipcodeZod,
   PostAddRestaurantZod,
@@ -48,7 +48,7 @@ export {
   createFoodTag,
   CreateFoodTagZod,
   ListFoodTagsZod,
-  PostAddStateZod,
+  CreateStateZod,
   PostAddCityZod,
   PostAddZipcodeZod,
   PostAddRestaurantZod,

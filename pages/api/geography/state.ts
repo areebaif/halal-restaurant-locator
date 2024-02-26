@@ -3,8 +3,8 @@ import { Prisma } from "@prisma/client";
 import type { NextApiRequest, NextApiResponse } from "next";
 import { z } from "zod";
 // local imports
-import { PostAddStateZod, capitalizeFirstWord } from "@/utils";
-import { PostAddState, ReadStateDb, ResponseAddState } from "@/utils/types";
+import { CreateStateZod, capitalizeFirstWord } from "@/utils";
+import { CreateState, ReadStateDb, ResponseAddState } from "@/utils/types";
 
 /**
  * @swagger
@@ -99,7 +99,7 @@ export default async function State(
     if (req.method === "POST") {
       const stateData = req.body;
       // state will be an array
-      const isTypeCorrect = PostAddStateZod.safeParse(stateData);
+      const isTypeCorrect = CreateStateZod.safeParse(stateData);
       if (!isTypeCorrect.success) {
         console.log(isTypeCorrect.error);
         res.status(400).json({
@@ -108,7 +108,7 @@ export default async function State(
         });
         return;
       }
-      const typeCheckedStateData = stateData as PostAddState;
+      const typeCheckedStateData = stateData as CreateState;
       const countryStateData = typeCheckedStateData[0];
       const countryId = countryStateData.countryId;
 

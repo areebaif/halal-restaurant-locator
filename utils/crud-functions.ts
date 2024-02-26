@@ -1,18 +1,18 @@
 import {
   CreateFoodTag,
+  ListFoodTags,
   ListGeography,
+  CreateState,
   GeoJsonRestaurantFeatureCollection,
   ReadCountriesDb,
   ResponseAddState,
   ReadStateDb,
-  PostAddState,
   PostAddCity,
   ResponseAddCity,
   ReadCityDb,
   PostAddZipcode,
   ResponseAddZipcode,
   ReadZipcodeDb,
-  ListFoodTags,
   PostImageSignedUrl,
   ResponsePostSignedUrl,
 } from "./types";
@@ -57,8 +57,8 @@ export const listUSAGeog = async () => {
   const res: ListGeography = await response.json();
   return res;
 };
-// TODO fix typing names
-export const createState = async (data: PostAddState) => {
+
+export const createState = async (data: CreateState) => {
   const response = await fetch(`/api/geography/state`, {
     method: "POST",
     headers: {

@@ -3,9 +3,9 @@ import {
   CreateFoodTagZod,
   ListGeographyZod,
   ListFoodTagsZod,
+  CreateStateZod,
   ResponseAddCountryZod,
   ResponseAddStateZod,
-  PostAddStateZod,
   PostAddCityZod,
   ResponseAddCityZod,
   PostAddZipcodeZod,
@@ -28,11 +28,11 @@ import {
 export type CreateFoodTag = z.infer<typeof CreateFoodTagZod>;
 export type ListFoodTags = z.infer<typeof ListFoodTagsZod>;
 export type ListGeography = z.infer<typeof ListGeographyZod>;
+export type CreateState = z.infer<typeof CreateStateZod>;
 export type ResponseAddCountry = z.infer<typeof ResponseAddCountryZod>;
 export type ResponseAddState = z.infer<typeof ResponseAddStateZod>;
 export type ResponseAddCity = z.infer<typeof ResponseAddCityZod>;
 export type ResponseAddZipcode = z.infer<typeof ResponseAddZipcodeZod>;
-export type PostAddState = z.infer<typeof PostAddStateZod>;
 export type PostAddCity = z.infer<typeof PostAddCityZod>;
 export type PostAddZipcode = z.infer<typeof PostAddZipcodeZod>;
 export type PostAddRestaurant = z.infer<typeof PostAddRestaurantZod>;

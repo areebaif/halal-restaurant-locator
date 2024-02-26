@@ -90,7 +90,7 @@ export const ResponseAddRestaurantZod = z.object({
   created: z.string().optional(),
 });
 
-export const PostAddStateZod = z
+export const CreateStateZod = z
   .object({
     countryId: z.string().uuid(),
     countryName: z.string(),
