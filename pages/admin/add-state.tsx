@@ -22,14 +22,14 @@ import {
   getAllCountries,
   createState,
 } from "@/utils";
-import { PostAddState, ResponseAddState } from "@/utils/types";
+import { CreateState, ResponseAddState } from "@/utils/types";
 
 export const AddStates: React.FC = () => {
   const queryClient = useQueryClient();
   const router = useRouter();
   const [stateName, setStateName] = React.useState("");
   const [country, setCountry] = React.useState("");
-  const [allState, setAllState] = React.useState<PostAddState>([]);
+  const [allState, setAllState] = React.useState<CreateState>([]);
   const [error, setError] = React.useState<ResponseAddState>();
 
   // Queries
@@ -83,7 +83,7 @@ export const AddStates: React.FC = () => {
     value: item.countryName,
     countryid: item.countryId,
   }));
-  const onSubmit = async (val: PostAddState) => {
+  const onSubmit = async (val: CreateState) => {
     setError(undefined);
     if (!val.length || val.length > 1) {
       setError({
