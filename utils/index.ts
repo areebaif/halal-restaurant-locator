@@ -2,8 +2,8 @@ import {
   createFoodTag,
   getAllCountries,
   createState,
+  createCity,
   getStates,
-  postAddCity,
   getCities,
   postAddZipcode,
   getZipcode,
@@ -45,10 +45,13 @@ import {
 import { s3Client } from "./aws-S3-Client";
 import { s3ImagePreSignedUrl } from "./image-uploads";
 export {
-  createFoodTag,
+  listUSAGeog,
   CreateFoodTagZod,
   ListFoodTagsZod,
+  createFoodTag,
+  listFoodTags,
   CreateStateZod,
+  createCity,
   PostAddCityZod,
   PostAddZipcodeZod,
   PostAddRestaurantZod,
@@ -63,7 +66,6 @@ export {
   getAllCountries,
   createState,
   getStates,
-  postAddCity,
   ReadStateDbZod,
   ResponseAddCityZod,
   countryIdExists,
@@ -75,7 +77,6 @@ export {
   ReadZipcodeDbZod,
   getZipcode,
   ResponseAddZipcodeZod,
-  listFoodTags,
   s3Client,
   s3ImagePreSignedUrl,
   PostImageSignedUrlZod,
@@ -83,5 +84,4 @@ export {
   validateAddRestaurantData,
   getImageUrlToUploadToS3,
   ResponsePostSignedUrlZod,
-  listUSAGeog,
 };

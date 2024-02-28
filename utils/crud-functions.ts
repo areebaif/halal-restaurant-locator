@@ -70,7 +70,7 @@ export const createState = async (data: CreateState) => {
   return res;
 };
 
-export const postAddCity = async (data: PostAddCity) => {
+export const createCity = async (data: PostAddCity) => {
   const response = await fetch(`/api/geography/city`, {
     method: "POST",
     headers: {

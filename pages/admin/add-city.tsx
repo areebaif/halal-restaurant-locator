@@ -18,7 +18,7 @@ import { ErrorCard } from "@/components";
 import {
   capitalizeFirstWord,
   getStates,
-  postAddCity,
+  createCity,
   ReadStateDbZod,
   ResponseAddCityZod,
 } from "@/utils";
@@ -38,7 +38,7 @@ export const AddCities: React.FC = () => {
     cacheTime: Infinity,
   });
   const mutation = useMutation({
-    mutationFn: postAddCity,
+    mutationFn: createCity,
     onSuccess: (data) => {
       const result = ResponseAddCityZod.safeParse(data);
       if (!result.success) {
