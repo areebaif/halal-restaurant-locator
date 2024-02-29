@@ -17,7 +17,7 @@ import {
 import { ErrorCard } from "@/components";
 import {
   capitalizeFirstWord,
-  getStates,
+  listStates,
   createCity,
   ReadStateDbZod,
   ResponseAddCityZod,
@@ -33,7 +33,7 @@ export const AddCities: React.FC = () => {
   const [error, setError] = React.useState<ResponseAddCity>();
 
   // Queries
-  const apiData = useQuery(["getAllStates"], getStates, {
+  const apiData = useQuery(["listStates"], listStates, {
     staleTime: Infinity,
     cacheTime: Infinity,
   });

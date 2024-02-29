@@ -58,6 +58,17 @@ export const listUSAGeog = async () => {
   return res;
 };
 
+export const listStates = async () => {
+  const response = await fetch(`/api/geography/state`, {
+    method: "GET",
+    headers: {
+      "Content-Type": "application/json",
+    },
+  });
+  const res: ReadStateDb = await response.json();
+  return res;
+};
+
 export const createState = async (data: CreateState) => {
   const response = await fetch(`/api/geography/state`, {
     method: "POST",
@@ -79,6 +90,17 @@ export const createCity = async (data: PostAddCity) => {
     body: JSON.stringify(data),
   });
   const res: ResponseAddCity = await response.json();
+  return res;
+};
+
+export const getCities = async () => {
+  const response = await fetch(`/api/geography/city`, {
+    method: "GET",
+    headers: {
+      "Content-Type": "application/json",
+    },
+  });
+  const res: ReadCityDb = await response.json();
   return res;
 };
 
@@ -113,28 +135,6 @@ export const getAllCountries = async () => {
     },
   });
   const res: ReadCountriesDb = await response.json();
-  return res;
-};
-
-export const getStates = async () => {
-  const response = await fetch(`/api/geography/state`, {
-    method: "GET",
-    headers: {
-      "Content-Type": "application/json",
-    },
-  });
-  const res: ReadStateDb = await response.json();
-  return res;
-};
-
-export const getCities = async () => {
-  const response = await fetch(`/api/geography/city`, {
-    method: "GET",
-    headers: {
-      "Content-Type": "application/json",
-    },
-  });
-  const res: ReadCityDb = await response.json();
   return res;
 };
 
