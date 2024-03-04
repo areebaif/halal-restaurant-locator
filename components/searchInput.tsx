@@ -6,8 +6,7 @@ import { IconSearch } from "@tabler/icons-react";
 // local imports
 import { ErrorCard } from ".";
 import { listUSAGeog, mapCountryData } from "@/utils";
-import { listCountryError, ListGeography } from "@/utils/types";
-import { infinite } from "swr/infinite";
+import { ListCountryError, ListGeography } from "@/utils/types";
 
 export type SearchInput = {
   queryString?: string;
@@ -31,11 +30,18 @@ export const SearchInput: React.FC<SearchInput> = ({ queryString }) => {
       cacheTime: Infinity,
     }
   );
-  if (geogData.data?.hasOwnProperty("apiErrors")) {
-    const error = geogData.data as listCountryError;
-    return <ErrorCard message={`${error.apiErrors?.generalError}`} />;
+  if (geogData.error) {
+    return <ErrorCard message={`something went wrong please try again`} />;
   }
-
+  if (geogData.data?.hasOwnProperty("apiErrors")) {
+    const error = geogData.data as ListCountryError;
+    let errorArray: string[] = [];
+    if (error.apiErrors?.generalError?.length)
+      errorArray = [...errorArray, ...error.apiErrors?.generalError];
+    if (error.apiErrors?.queryParamError)
+      errorArray = [...errorArray, ...error.apiErrors?.queryParamError];
+    return <ErrorCard arrayOfErrors={errorArray} />;
+  }
   const mergedData = geogData.data
     ? mapCountryData(geogData.data as ListGeography)
     : [];

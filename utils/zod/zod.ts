@@ -2,29 +2,52 @@ import z from "zod";
 // dynamic properties of objects
 //z.record(z.string().uuid(), z.string().array());
 
-export const ListFoodTagsZod = z
-  .object({ name: z.string(), foodTagId: z.string().uuid() })
-  .array();
-
-export const CreateFoodTagZod = z.object({
-  created: z.boolean(),
-  errors: z
-    .object({
-      validationErrors: z
-        .object({
-          foodTag: z.string().array(),
-        })
-        .optional(),
-      generalErrors: z.string().array().optional(),
-    })
-    .optional(),
+export const ListCountryZod = z.object({
+  countries: z
+    .object({ countryId: z.string().uuid(), countryName: z.string() })
+    .array(),
 });
 
 export const listCountryErrorZod = z.object({
   apiErrors: z
     .object({
-      generalError: z.string().optional(),
-      typeError: z.string().optional(),
+      generalError: z.string().array().optional(),
+      queryParamError: z.string().array().optional(),
+    })
+    .optional(),
+});
+export const CreateCountryResponseZod = z.object({
+  country: z.string(),
+  id: z.string(),
+});
+
+export const CreateCountryErrorZod = z.object({
+  apiErrors: z
+    .object({
+      generalError: z.string().array().optional(),
+      validationError: z
+        .object({
+          country: z.string().array(),
+        })
+        .optional(),
+    })
+    .optional(),
+});
+
+export const ListStatesZod = z
+  .object({
+    countryId: z.string().uuid(),
+    countryName: z.string(),
+    stateName: z.string(),
+    stateId: z.string().uuid(),
+    countryNameStateName: z.string(),
+  })
+  .array();
+
+export const ListStateErrorZod = z.object({
+  apiErrors: z
+    .object({
+      generalError: z.string().array().optional(),
     })
     .optional(),
 });
@@ -58,16 +81,22 @@ export const ListGeographyZod = z.object({
     .optional(),
 });
 
-export const ResponseAddCountryZod = z.object({
-  country: z.string().optional(),
-  id: z.string().optional(),
-});
+export const ListFoodTagsZod = z
+  .object({ name: z.string(), foodTagId: z.string().uuid() })
+  .array();
 
-export const ResponseAddStateZod = z.object({
-  state: z.string().optional(),
-  country: z.string().optional(),
-  typeError: z.string().optional(),
-  created: z.string().optional(),
+export const CreateFoodTagZod = z.object({
+  created: z.boolean(),
+  errors: z
+    .object({
+      validationErrors: z
+        .object({
+          foodTag: z.string().array(),
+        })
+        .optional(),
+      generalErrors: z.string().array().optional(),
+    })
+    .optional(),
 });
 
 export const ResponseAddCityZod = z.object({
@@ -97,15 +126,6 @@ export const ResponseAddRestaurantZod = z.object({
   typeError: z.string().optional(),
   created: z.string().optional(),
 });
-
-export const CreateStateZod = z
-  .object({
-    countryId: z.string().uuid(),
-    countryName: z.string(),
-    stateName: z.string().array(),
-  })
-  .array()
-  .length(1); // must contain 1 items exactly
 
 export const PostAddCityZod = z
   .object({
@@ -208,22 +228,6 @@ export const RestaurantReadDbZod = z.object({
     })
     .array(),
 });
-
-export const ReadCountriesDbZod = z.object({
-  countries: z
-    .object({ countryId: z.string().uuid(), countryName: z.string() })
-    .array(),
-});
-
-export const ReadStateDbZod = z
-  .object({
-    countryId: z.string().uuid(),
-    countryName: z.string(),
-    stateName: z.string(),
-    stateId: z.string().uuid(),
-    countryNameStateName: z.string(),
-  })
-  .array();
 
 export const ReadCityDbZod = z
   .object({

@@ -19,10 +19,15 @@ import {
   capitalizeFirstWord,
   listStates,
   createCity,
-  ReadStateDbZod,
+  ListStatesZod,
   ResponseAddCityZod,
 } from "@/utils";
-import { PostAddCity, ResponseAddCity } from "@/utils/types";
+import {
+  ListStateError,
+  ListStates,
+  PostAddCity,
+  ResponseAddCity,
+} from "@/utils/types";
 
 export const AddCities: React.FC = () => {
   const queryClient = useQueryClient();
@@ -64,7 +69,11 @@ export const AddCities: React.FC = () => {
     console.log(apiData.error);
     return <ErrorCard message="something went wrong with the api request" />;
   }
-  const isStateTypeCorrent = ReadStateDbZod.safeParse(apiData.data);
+  if (apiData.data.hasOwnProperty("apiErrors")) {
+    const error = apiData.data as ListStateError;
+    return <ErrorCard arrayOfErrors={error.apiErrors?.generalError} />;
+  }
+  const isStateTypeCorrent = ListStatesZod.safeParse(apiData.data);
   if (!isStateTypeCorrent.success) {
     console.log(isStateTypeCorrent.error);
     return <ErrorCard message="Their is a type mismatch from the server" />;
@@ -72,8 +81,8 @@ export const AddCities: React.FC = () => {
   if (mutation.isLoading) {
     return <Loader />;
   }
-
-  const autoCompleteStateCountry = apiData.data.map((item) => ({
+  const stateData = apiData.data as ListStates;
+  const autoCompleteStateCountry = stateData.map((item) => ({
     value: item.countryNameStateName,
     countryid: item.countryId,
     stateid: item.stateId,

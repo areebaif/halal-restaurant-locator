@@ -166,12 +166,6 @@ const userData = [
 
 const geographyData = [
   {
-    icon: <IconMapPin size={16} />,
-    color: "blue",
-    label: "Add State",
-    link: "/admin/add-state",
-  },
-  {
     icon: <IconMap2 size={16} />,
     color: "indigo",
     label: "Add City",

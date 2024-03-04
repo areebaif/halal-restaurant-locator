@@ -2,19 +2,131 @@ import { prisma } from "@/db/prisma";
 import type { NextApiRequest, NextApiResponse } from "next";
 import { z } from "zod";
 import { hasNumbers } from "@/utils";
+import { ListGeography, ListCountryError } from "@/utils/types";
 
+/**
+ *
+ * @swagger
+ *
+ * /api/country/usa/{search}:
+ *  get:
+ *    tags:
+ *      - country
+ *    summary: query either zipcode or city based on user input
+ *    description: This api looks at the first 3 characters of the search term to filter rather large zipcode and city dataset to send relevant data
+ *    operationId: listGeography
+ *    parameters:
+ *      - name: search
+ *        in: path
+ *        description: first 3 charcters of zipcode or city in U.S.A
+ *        required: true
+ *        schema:
+ *          type: string
+ *          example: "554"
+ *    responses:
+ *      '200':
+ *        description: successful operation
+ *        content:
+ *          application/json:
+ *            schema:
+ *              type: object
+ *              properties:
+ *                zipcode:
+ *                  type: array
+ *                  items:
+ *                    type: object
+ *                    properties:
+ *                      zipcodeId:
+ *                        type: string
+ *                        format: uuid
+ *                        example: "64b31531-28fd-4570-ad64-6aa312e53d69"
+ *                      stateName:
+ *                        type: string
+ *                        example: "Minnesota"
+ *                      cityName:
+ *                        type: string
+ *                        example: "Minneapolis"
+ *                      latitude:
+ *                        type: number
+ *                        format: float
+ *                        example: 45.04856
+ *                      longitude:
+ *                        type: number
+ *                        format: float
+ *                        example: -93.4269,
+ *                      zipcode:
+ *                        type: string
+ *                        example: "55442"
+ *                city:
+ *                  type: array
+ *                  items:
+ *                    type: object
+ *                    properties:
+ *                      stateId:
+ *                        type: string
+ *                        format: uuid
+ *                        example: "64b31531-28fd-4570-ad64-6aa312e53d69"
+ *                      stateName:
+ *                        type: string
+ *                        example: "Minnesota"
+ *                      cityName:
+ *                        type: string
+ *                        example: "Minneapolis"
+ *                country:
+ *                  type: object
+ *                  properties:
+ *                    countryId:
+ *                      type: string
+ *                      format: uuid
+ *                      example: "64b31531-28fd-4570-ad64-6aa312e53d69"
+ *                    countryName:
+ *                      type: string
+ *                      example: "U.S.A"
+ *
+ *      '400':
+ *        description: Invalid data supplied
+ *        content:
+ *          application/json:
+ *            schema:
+ *              type: object
+ *              properties:
+ *                  apiErrors:
+ *                    type: object
+ *                    properties:
+ *                      queryParamError:
+ *                            type: array
+ *                            items:
+ *                              type: string
+ *                              example: "expected query param as string"
+ *      '500':
+ *        description: Internal server error
+ *        content:
+ *          application/json:
+ *            schema:
+ *              type: object
+ *              properties:
+ *                  apiErrors:
+ *                    type: object
+ *                    properties:
+ *                      generalErrors:
+ *                        type: array
+ *                        items:
+ *                          type: string
+ *                          example: "something went wrong with the server"
+ *
+ */
 export default async function GeographySearch(
   req: NextApiRequest,
-  res: NextApiResponse
+  res: NextApiResponse<ListGeography | ListCountryError>
 ) {
   try {
     const { search } = req.query;
     const isQueryParamCorrect = z.string().safeParse(search);
     if (!isQueryParamCorrect.success) {
       console.log(isQueryParamCorrect.error);
-      res
-        .status(400)
-        .json({ apiErrors: { typeError: "expected query param as string" } });
+      res.status(400).json({
+        apiErrors: { queryParamError: ["expected query param as string"] },
+      });
       return;
     }
     const stringQuery = search as string;
@@ -99,5 +211,11 @@ export default async function GeographySearch(
         },
       });
     }
-  } catch (err) {}
+  } catch (err) {
+    res.status(500).json({
+      apiErrors: {
+        generalError: ["something went wrong, please try again later"],
+      },
+    });
+  }
 }
