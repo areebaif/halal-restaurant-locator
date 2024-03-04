@@ -28,6 +28,7 @@ import {
   capitalizeFirstWord,
   parseQueryVals,
   hasNumbers,
+  onlyNumbers,
 } from "./string-manipulation";
 import {
   getMapSearchInput,
@@ -67,4 +68,5 @@ export {
   validateAddRestaurantData,
   getImageUrlToUploadToS3,
   ResponsePostSignedUrlZod,
+  onlyNumbers,
 };

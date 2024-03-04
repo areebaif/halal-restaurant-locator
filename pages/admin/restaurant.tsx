@@ -16,7 +16,12 @@ import {
   Grid,
   Text,
 } from "@mantine/core";
-import { ErrorCard, CustomImageButton, FoodTags } from "@/components";
+import {
+  ErrorCard,
+  CustomImageButton,
+  FoodTags,
+  SearchZipcode,
+} from "@/components";
 import {
   ReadZipcodeDbZod,
   getZipcode,
@@ -167,6 +172,7 @@ const AddRestaurant: React.FC = () => {
         type="text"
         onChange={(event) => setStreet(event.currentTarget.value)}
       />
+      <SearchZipcode />
       {/* <Autocomplete
         mt="sm"
         withAsterisk

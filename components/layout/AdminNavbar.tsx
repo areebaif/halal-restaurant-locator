@@ -126,7 +126,7 @@ const restaurantData = [
     icon: <IconDatabase size={16} />,
     color: "pink",
     label: "Add restaurant",
-    link: "/admin/add-restaurant",
+    link: "/admin/restaurant",
   },
   {
     icon: <IconDeviceGamepad size={16} />,
