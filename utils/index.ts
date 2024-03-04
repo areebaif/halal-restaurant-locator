@@ -36,7 +36,11 @@ import {
   validateAddRestaurantData,
 } from "./api-utils";
 import { calcBoundsFromCoordinates } from "./map/map-boundary-calculations";
-import { capitalizeFirstWord, parseQueryVals } from "./string-manipulation";
+import {
+  capitalizeFirstWord,
+  parseQueryVals,
+  hasNumbers,
+} from "./string-manipulation";
 import {
   getMapSearchInput,
   listFoodTags,
@@ -44,6 +48,7 @@ import {
 } from "./crud-functions";
 import { s3Client } from "./aws-S3-Client";
 import { s3ImagePreSignedUrl } from "./image-uploads";
+import { mapCountryData } from "./client-api-data-conversion";
 export {
   listUSAGeog,
   CreateFoodTagZod,
@@ -53,6 +58,8 @@ export {
   listStates,
   CreateStateZod,
   createCity,
+  hasNumbers,
+  mapCountryData,
   PostAddCityZod,
   PostAddZipcodeZod,
   PostAddRestaurantZod,

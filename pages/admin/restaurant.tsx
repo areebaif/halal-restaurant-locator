@@ -48,17 +48,17 @@ const AddRestaurant: React.FC = () => {
   }>();
 
   // Queries
-  const geogData = useQuery(["listGeography"], listUSAGeog, {
-    staleTime: Infinity,
-    cacheTime: Infinity,
-  });
+  // const geogData = useQuery(["listGeography"], listUSAGeog, {
+  //   staleTime: Infinity,
+  //   cacheTime: Infinity,
+  // });
 
-  if (geogData.isLoading) return <Loader />;
-  if (geogData.isError) {
-    console.log(geogData.error);
-    return <ErrorCard message="something went wrong with the server" />;
-  }
-  console.log(geogData.data, "slslslslslsl");
+  // if (geogData.isLoading) return <Loader />;
+  // if (geogData.isError) {
+  //   console.log(geogData.error);
+  //   return <ErrorCard message="something went wrong with the server" />;
+  // }
+
   // const getTypeErrors = ListGeographyZod.safeParse(geogData.data);
   // if (!getTypeErrors.success) {
   //   console.log(getTypeErrors.error);

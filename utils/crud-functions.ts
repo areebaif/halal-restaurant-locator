@@ -15,6 +15,7 @@ import {
   ReadZipcodeDb,
   PostImageSignedUrl,
   ResponsePostSignedUrl,
+  listCountryError,
 } from "./types";
 
 export const listFoodTags = async () => {
@@ -42,18 +43,23 @@ export const createFoodTag = async (data: { foodTag: string[] }) => {
 };
 
 // this function populates the main search page auto complete
-export const listUSAGeog = async () => {
-  const response = await fetch(`/api/geography/country/usa`, {
+export const listUSAGeog = async (searchTerm: string) => {
+  const response = await fetch(`/api/country/usa/search=${searchTerm}`, {
     method: "GET",
     headers: {
       "Content-Type": "application/json",
     },
   });
-  console.log(response);
-  if (!response.ok) {
-    // if i send a res.status(400) it is thrown error because response.ok is false
-    throw new Error("Network response was not ok");
+
+  if (response.status === 500 || response.status === 400) {
+    console.log(" I am here");
+    const res: listCountryError = await response.json();
+    return res;
   }
+  // if (!response.ok) {
+  //   // if i send a res.status(400) it is thrown error because response.ok is false
+  //   throw new Error("Network response was not ok");
+  // }
   const res: ListGeography = await response.json();
   return res;
 };

@@ -2,6 +2,7 @@ import { z } from "zod";
 import {
   CreateFoodTagZod,
   ListGeographyZod,
+  listCountryErrorZod,
   ListFoodTagsZod,
   CreateStateZod,
   ResponseAddCountryZod,
@@ -28,6 +29,7 @@ import {
 export type CreateFoodTag = z.infer<typeof CreateFoodTagZod>;
 export type ListFoodTags = z.infer<typeof ListFoodTagsZod>;
 export type ListGeography = z.infer<typeof ListGeographyZod>;
+export type listCountryError = z.infer<typeof listCountryErrorZod>;
 export type CreateState = z.infer<typeof CreateStateZod>;
 export type ResponseAddCountry = z.infer<typeof ResponseAddCountryZod>;
 export type ResponseAddState = z.infer<typeof ResponseAddStateZod>;

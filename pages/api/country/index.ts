@@ -6,10 +6,10 @@ import { capitalizeFirstWord } from "@/utils";
 
 /**
  * @swagger
- * /api/geography/country:
+ * /api/country:
  *  post:
  *    tags:
- *      - geolocations
+ *      - country
  *    summary: create a new country
  *    description: add a country to the database.
  *    operationId: createCountry
@@ -44,10 +44,10 @@ import { capitalizeFirstWord } from "@/utils";
  *                  example: "country value already exists, please provide a unique name"
  *  get:
  *    tags:
- *      - geolocations
- *    summary: get all countries stored in the database
+ *      - country
+ *    summary: list countries stored in the database
  *    description: Returns an array of objects containing countryId and countryName
- *    operationId: getAllGeographyByCountry
+ *    operationId: listCountry
  *    responses:
  *      '200':
  *        description: successful operation

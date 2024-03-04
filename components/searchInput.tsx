@@ -5,7 +5,9 @@ import { Autocomplete, Button, Grid, Loader } from "@mantine/core";
 import { IconSearch } from "@tabler/icons-react";
 // local imports
 import { ErrorCard } from ".";
-import { listUSAGeog } from "@/utils";
+import { listUSAGeog, mapCountryData } from "@/utils";
+import { listCountryError, ListGeography } from "@/utils/types";
+import { infinite } from "swr/infinite";
 
 export type SearchInput = {
   queryString?: string;
@@ -16,28 +18,36 @@ export const SearchInput: React.FC<SearchInput> = ({ queryString }) => {
   const [autoCompleteInputValue, setAutoCompleteInputValue] = React.useState(
     `${queryString ? queryString : ""}`
   );
+  const [apiQueryFlag, setApiQueryFlag] = React.useState(false);
+  const [apiSearchTerm, setApiSearchTerm] = React.useState("");
   const [error, setError] = React.useState({ inputData: "" });
   // Queries
-  const geogData = useQuery(["listGeography"], listUSAGeog, {
-    staleTime: Infinity,
-    cacheTime: Infinity,
-  });
-  if (geogData.isLoading) return <Loader />;
-  if (geogData.isError) {
-    console.log(geogData.error);
-    return <ErrorCard message="something went wrong with the server" />;
+  const geogData = useQuery(
+    ["listGeography", apiSearchTerm],
+    () => listUSAGeog(apiSearchTerm),
+    {
+      enabled: apiQueryFlag,
+      staleTime: Infinity,
+      cacheTime: Infinity,
+    }
+  );
+  if (geogData.data?.hasOwnProperty("apiErrors")) {
+    const error = geogData.data as listCountryError;
+    return <ErrorCard message={`${error.apiErrors?.generalError}`} />;
   }
-  // TODO: add zod checking
-  const parsedZipcode = geogData.data?.zipcode?.map(
-    (item) => `${item.zipcode}, ${geogData.data.country?.countryName}`
-  );
 
-  const parsedCity = geogData.data.city?.map(
-    (city) =>
-      `${city.cityName}, ${city.stateName}, ${geogData.data.country?.countryName}`
-  );
-  const mergedData = [...parsedZipcode!, ...parsedCity!];
+  const mergedData = geogData.data
+    ? mapCountryData(geogData.data as ListGeography)
+    : [];
 
+  const onInputSearch = (val: string) => {
+    if (val.length < 3 && apiQueryFlag) {
+      setApiQueryFlag(false);
+    } else if (val.length === 3) {
+      setApiQueryFlag(true);
+      setApiSearchTerm(val);
+    }
+  };
   const onSubmit = (val: string) => {
     // check if zipcode or city
     const splitValue = val.split(",");
@@ -74,12 +84,15 @@ export const SearchInput: React.FC<SearchInput> = ({ queryString }) => {
           placeholder={
             geogData.isError
               ? "uanble to load data from the server"
-              : "search restaurants by city, zipcode, neighborhood"
+              : "search restaurants by city or zipcode"
           }
           icon={<IconSearch />}
-          data={!geogData.isError ? mergedData : []}
+          data={mergedData.length ? mergedData : []}
           value={autoCompleteInputValue}
-          onChange={setAutoCompleteInputValue}
+          onChange={(e) => {
+            setAutoCompleteInputValue(e);
+            onInputSearch(e);
+          }}
           styles={(theme) => ({
             input: {
               backgroundColor: theme.colors.gray[0],

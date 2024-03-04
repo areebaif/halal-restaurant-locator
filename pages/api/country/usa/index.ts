@@ -1,17 +1,17 @@
 import { prisma } from "@/db/prisma";
 import type { NextApiRequest, NextApiResponse } from "next";
 import { z } from "zod";
-import { ListGeography } from "@/utils/types";
+import { ListGeography, listCountryError } from "@/utils/types";
 
 /**
  * @swagger
- * /api/geography/country/usa:
+ * /api/country/usa:
  *  get:
  *    tags:
- *      - geolocations
- *    summary: get states, cities, zipcodes populated in the database with respect to U.S.A
- *    description: Returns object with zipcode, state, city as array of objects
- *    operationId: getAllGeographyByCountry
+ *      - country
+ *    summary: get states, cities, zipcodes populated in the database with respect to U.S.A. Note - Future version of api will update this api endpoint to be more generic to query any country by its id.
+ *    description: Returns object with zipcode, state, city as array of objects.
+ *    operationId: listGeographyUSA
  *    responses:
  *      '200':
  *        description: successful operation
@@ -85,13 +85,11 @@ import { ListGeography } from "@/utils/types";
  *                      example: "U.S.A"
  */
 
-export default async function GetGeographyInputs(
+export default async function ListCountryGeography(
   req: NextApiRequest,
-  res: NextApiResponse<ListGeography>
+  res: NextApiResponse<ListGeography | listCountryError>
 ) {
-  // TODO: error handling
   try {
-    throw new Error("bla");
     const country = await prisma.country.findUnique({
       where: { countryName: "U.S.A" },
     });
@@ -165,7 +163,10 @@ export default async function GetGeographyInputs(
       },
     });
   } catch (err) {
-    // TODO: error handling
-    res.status(404).send({});
+    res.status(500).send({
+      apiErrors: {
+        generalError: "internal server error. please try again later",
+      },
+    });
   }
 }

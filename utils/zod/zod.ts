@@ -20,8 +20,16 @@ export const CreateFoodTagZod = z.object({
     .optional(),
 });
 
+export const listCountryErrorZod = z.object({
+  apiErrors: z
+    .object({
+      generalError: z.string().optional(),
+      typeError: z.string().optional(),
+    })
+    .optional(),
+});
+
 export const ListGeographyZod = z.object({
-  typeError: z.string().optional(),
   country: z
     .object({ countryId: z.string().uuid(), countryName: z.string().uuid() })
     .optional(),
