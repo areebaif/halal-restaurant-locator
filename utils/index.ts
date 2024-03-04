@@ -1,31 +1,20 @@
 import {
   createFoodTag,
-  getAllCountries,
-  postAddState,
-  getStates,
-  postAddCity,
-  getCities,
-  postAddZipcode,
+  listStates,
   getZipcode,
   getImageUrlToUploadToS3,
+  listUSAGeog,
 } from "./crud-functions";
 import {
   CreateFoodTagZod,
-  PostAddStateZod,
-  PostAddCityZod,
-  PostAddZipcodeZod,
+  ListCountryZod,
+  ListStatesZod,
   PostAddRestaurantZod,
   GetSearchInputsZod,
-  ReadCountriesDbZod,
-  ResponseAddStateZod,
-  ReadStateDbZod,
-  ResponseAddCityZod,
-  ReadCityDbZod,
-  ReadZipcodeDbZod,
-  ResponseAddZipcodeZod,
   ListFoodTagsZod,
   PostImageSignedUrlZod,
   ResponsePostSignedUrlZod,
+  ReadZipcodeDbZod,
 } from "./zod/zod";
 import {
   findRestaurant,
@@ -35,7 +24,11 @@ import {
   validateAddRestaurantData,
 } from "./api-utils";
 import { calcBoundsFromCoordinates } from "./map/map-boundary-calculations";
-import { capitalizeFirstWord, parseQueryVals } from "./string-manipulation";
+import {
+  capitalizeFirstWord,
+  parseQueryVals,
+  hasNumbers,
+} from "./string-manipulation";
 import {
   getMapSearchInput,
   listFoodTags,
@@ -43,13 +36,19 @@ import {
 } from "./crud-functions";
 import { s3Client } from "./aws-S3-Client";
 import { s3ImagePreSignedUrl } from "./image-uploads";
+import { mapCountryData } from "./client-api-data-conversion";
 export {
-  createFoodTag,
+  listUSAGeog,
+  ListCountryZod,
   CreateFoodTagZod,
   ListFoodTagsZod,
-  PostAddStateZod,
-  PostAddCityZod,
-  PostAddZipcodeZod,
+  createFoodTag,
+  listFoodTags,
+  listStates,
+  ListStatesZod,
+  ReadZipcodeDbZod,
+  hasNumbers,
+  mapCountryData,
   PostAddRestaurantZod,
   capitalizeFirstWord,
   findRestaurant,
@@ -57,24 +56,10 @@ export {
   GetSearchInputsZod,
   calcBoundsFromCoordinates,
   getMapSearchInput,
-  ReadCountriesDbZod,
-  ResponseAddStateZod,
-  getAllCountries,
-  postAddState,
-  getStates,
-  postAddCity,
-  ReadStateDbZod,
-  ResponseAddCityZod,
   countryIdExists,
   stateIdExists,
-  getCities,
-  ReadCityDbZod,
-  postAddZipcode,
   cityIdExists,
-  ReadZipcodeDbZod,
   getZipcode,
-  ResponseAddZipcodeZod,
-  listFoodTags,
   s3Client,
   s3ImagePreSignedUrl,
   PostImageSignedUrlZod,

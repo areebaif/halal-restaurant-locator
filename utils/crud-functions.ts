@@ -1,123 +1,53 @@
 import {
   CreateFoodTag,
-  ResponseGetAllGeogByCountry,
-  GeoJsonRestaurantFeatureCollection,
-  ReadCountriesDb,
-  ResponseAddState,
-  ReadStateDb,
-  PostAddState,
-  PostAddCity,
-  ResponseAddCity,
-  ReadCityDb,
-  PostAddZipcode,
-  ResponseAddZipcode,
-  ReadZipcodeDb,
   ListFoodTags,
+  ListGeography,
+  GeoJsonRestaurantFeatureCollection,
+  ListStates,
+  ReadZipcodeDb,
   PostImageSignedUrl,
   ResponsePostSignedUrl,
+  ListCountryError,
+  ListStateError,
 } from "./types";
 
-export const createFoodTag = async (data: { foodTag: string[] }) => {
-  const { foodTag } = data;
-  const response = await fetch(`/api/restaurant/foodtags`, {
-    method: "POST",
-    headers: {
-      "Content-Type": "application/json",
-    },
-    body: JSON.stringify({ foodTag: foodTag }),
-  });
-  const res: CreateFoodTag = await response.json();
-  return res;
-};
-
-export const postAddState = async (data: PostAddState) => {
-  const response = await fetch(`/api/geography/state`, {
-    method: "POST",
-    headers: {
-      "Content-Type": "application/json",
-    },
-    body: JSON.stringify(data),
-  });
-  const res: ResponseAddState = await response.json();
-  return res;
-};
-
-export const postAddCity = async (data: PostAddCity) => {
-  const response = await fetch(`/api/geography/city`, {
-    method: "POST",
-    headers: {
-      "Content-Type": "application/json",
-    },
-    body: JSON.stringify(data),
-  });
-  const res: ResponseAddCity = await response.json();
-  return res;
-};
-
-export const postAddZipcode = async (data: PostAddZipcode) => {
-  const response = await fetch(`/api/geography/zipcode`, {
-    method: "POST",
-    headers: {
-      "Content-Type": "application/json",
-    },
-    body: JSON.stringify(data),
-  });
-  const res: ResponseAddZipcode = await response.json();
-  return res;
-};
-
-export const getMapSearchInput = async (data: string) => {
-  const response = await fetch(`/api/restaurant/${data}`, {
+export const listUSAGeog = async (searchTerm: string) => {
+  const response = await fetch(`/api/country/usa/search=${searchTerm}`, {
     method: "GET",
     headers: {
       "Content-Type": "application/json",
     },
   });
-  const res: GeoJsonRestaurantFeatureCollection = await response.json();
-  return res;
-};
-// this function populates the main search page auto complete
-export const getAllUSA = async () => {
-  const response = await fetch(`/api/geography/country/usa`, {
-    method: "GET",
-    headers: {
-      "Content-Type": "application/json",
-    },
-  });
-  const res: ResponseGetAllGeogByCountry = await response.json();
-  return res;
-};
-
-export const getAllCountries = async () => {
-  const response = await fetch(`/api/geography/country`, {
-    method: "GET",
-    headers: {
-      "Content-Type": "application/json",
-    },
-  });
-  const res: ReadCountriesDb = await response.json();
+  const apiErrors = /(4|5)\d{2}/.test(`${response.status}`);
+  if (apiErrors) {
+    const res: ListCountryError = await response.json();
+    return res;
+  }
+  // anything other than apiErrors went wrong
+  if (!response.ok) {
+    throw new Error("something went wrong");
+  }
+  const res: ListGeography = await response.json();
   return res;
 };
 
-export const getStates = async () => {
-  const response = await fetch(`/api/geography/state`, {
+export const listStates = async () => {
+  const response = await fetch(`/api/country/usa/states`, {
     method: "GET",
     headers: {
       "Content-Type": "application/json",
     },
   });
-  const res: ReadStateDb = await response.json();
-  return res;
-};
-
-export const getCities = async () => {
-  const response = await fetch(`/api/geography/city`, {
-    method: "GET",
-    headers: {
-      "Content-Type": "application/json",
-    },
-  });
-  const res: ReadCityDb = await response.json();
+  const apiErrors = /(4|5)\d{2}/.test(`${response.status}`);
+  if (apiErrors) {
+    const res: ListStateError = await response.json();
+    return res;
+  }
+  // anything other than apiErrors went wrong
+  if (!response.ok) {
+    throw new Error("something went wrong");
+  }
+  const res: ListStates = await response.json();
   return res;
 };
 
@@ -140,6 +70,30 @@ export const listFoodTags = async () => {
     },
   });
   const res: ListFoodTags = await response.json();
+  return res;
+};
+
+export const createFoodTag = async (data: { foodTag: string[] }) => {
+  const { foodTag } = data;
+  const response = await fetch(`/api/restaurant/foodtags`, {
+    method: "POST",
+    headers: {
+      "Content-Type": "application/json",
+    },
+    body: JSON.stringify({ foodTag: foodTag }),
+  });
+  const res: CreateFoodTag = await response.json();
+  return res;
+};
+
+export const getMapSearchInput = async (data: string) => {
+  const response = await fetch(`/api/restaurant/${data}`, {
+    method: "GET",
+    headers: {
+      "Content-Type": "application/json",
+    },
+  });
+  const res: GeoJsonRestaurantFeatureCollection = await response.json();
   return res;
 };
 

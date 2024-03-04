@@ -5,7 +5,8 @@ import { Autocomplete, Button, Grid, Loader } from "@mantine/core";
 import { IconSearch } from "@tabler/icons-react";
 // local imports
 import { ErrorCard } from ".";
-import { getAllUSA } from "@/utils/crud-functions";
+import { listUSAGeog, mapCountryData } from "@/utils";
+import { ListCountryError, ListGeography } from "@/utils/types";
 
 export type SearchInput = {
   queryString?: string;
@@ -16,27 +17,43 @@ export const SearchInput: React.FC<SearchInput> = ({ queryString }) => {
   const [autoCompleteInputValue, setAutoCompleteInputValue] = React.useState(
     `${queryString ? queryString : ""}`
   );
+  const [apiQueryFlag, setApiQueryFlag] = React.useState(false);
+  const [apiSearchTerm, setApiSearchTerm] = React.useState("");
   const [error, setError] = React.useState({ inputData: "" });
   // Queries
-  const geogData = useQuery(["getGeographyAutoCompleteData"], getAllUSA, {
-    staleTime: Infinity,
-    cacheTime: Infinity,
-  });
-  if (geogData.isLoading) return <Loader />;
-  if (geogData.isError) {
-    console.log(geogData.error);
-    return <ErrorCard message="something went wrong with the server" />;
+  const geogData = useQuery(
+    ["listGeography", apiSearchTerm],
+    () => listUSAGeog(apiSearchTerm),
+    {
+      enabled: apiQueryFlag,
+      staleTime: Infinity,
+      cacheTime: Infinity,
+    }
+  );
+  if (geogData.error) {
+    return <ErrorCard message={`something went wrong please try again`} />;
   }
-  const parsedZipcode = geogData.data?.zipcode?.map(
-    (item) => `${item.zipcode}, ${geogData.data.country?.countryName}`
-  );
+  if (geogData.data?.hasOwnProperty("apiErrors")) {
+    const error = geogData.data as ListCountryError;
+    let errorArray: string[] = [];
+    if (error.apiErrors?.generalError?.length)
+      errorArray = [...errorArray, ...error.apiErrors?.generalError];
+    if (error.apiErrors?.queryParamError)
+      errorArray = [...errorArray, ...error.apiErrors?.queryParamError];
+    return <ErrorCard arrayOfErrors={errorArray} />;
+  }
+  const mergedData = geogData.data
+    ? mapCountryData(geogData.data as ListGeography)
+    : [];
 
-  const parsedCity = geogData.data.city?.map(
-    (city) =>
-      `${city.cityName}, ${city.stateName}, ${geogData.data.country?.countryName}`
-  );
-  const mergedData = [...parsedZipcode!, ...parsedCity!];
-
+  const onInputSearch = (val: string) => {
+    if (val.length < 3 && apiQueryFlag) {
+      setApiQueryFlag(false);
+    } else if (val.length === 3) {
+      setApiQueryFlag(true);
+      setApiSearchTerm(val);
+    }
+  };
   const onSubmit = (val: string) => {
     // check if zipcode or city
     const splitValue = val.split(",");
@@ -73,12 +90,15 @@ export const SearchInput: React.FC<SearchInput> = ({ queryString }) => {
           placeholder={
             geogData.isError
               ? "uanble to load data from the server"
-              : "search restaurants by city, zipcode, neighborhood"
+              : "search restaurants by city or zipcode"
           }
           icon={<IconSearch />}
-          data={!geogData.isError ? mergedData : []}
+          data={mergedData.length ? mergedData : []}
           value={autoCompleteInputValue}
-          onChange={setAutoCompleteInputValue}
+          onChange={(e) => {
+            setAutoCompleteInputValue(e);
+            onInputSearch(e);
+          }}
           styles={(theme) => ({
             input: {
               backgroundColor: theme.colors.gray[0],

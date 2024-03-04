@@ -43,3 +43,7 @@ export const parseQueryVals = (val: string): GetSearchInputs => {
   }
   return queryValue;
 };
+
+export const hasNumbers = (str: string) => {
+  return /\d/.test(str);
+};
