@@ -99,22 +99,7 @@ export const CreateFoodTagZod = z.object({
     .optional(),
 });
 
-export const ResponseAddCityZod = z.object({
-  state: z.string().optional(),
-  country: z.string().optional(),
-  city: z.string().optional(),
-  typeError: z.string().optional(),
-  created: z.string().optional(),
-});
 
-export const ResponseAddZipcodeZod = z.object({
-  state: z.string().optional(),
-  country: z.string().optional(),
-  city: z.string().optional(),
-  zipcode: z.string().optional(),
-  typeError: z.string().optional(),
-  created: z.string().optional(),
-});
 
 export const ResponseAddRestaurantZod = z.object({
   state: z.string().optional(),
@@ -127,29 +112,6 @@ export const ResponseAddRestaurantZod = z.object({
   created: z.string().optional(),
 });
 
-export const PostAddCityZod = z
-  .object({
-    countryId: z.string().uuid(),
-    stateId: z.string().uuid(),
-    countryState: z.string(),
-    cityName: z.string().array(),
-  })
-  .array();
-export const PostAddZipcodeZod = z
-  .object({
-    countryId: z.string().uuid(),
-    stateId: z.string().uuid(),
-    cityId: z.string().uuid(),
-    countryStateCity: z.string(),
-    zipcode: z
-      .object({
-        longitude: z.number().gte(-180).lte(180),
-        latitude: z.number().gte(-90).lte(90),
-        zipcode: z.string(),
-      })
-      .array(),
-  })
-  .array();
 
 export const PostAddRestaurantZod = z.object({
   countryId: z.string().uuid(),
@@ -228,18 +190,6 @@ export const RestaurantReadDbZod = z.object({
     })
     .array(),
 });
-
-export const ReadCityDbZod = z
-  .object({
-    countryId: z.string().uuid(),
-    countryName: z.string(),
-    stateName: z.string(),
-    stateId: z.string().uuid(),
-    cityId: z.string().uuid(),
-    cityName: z.string(),
-    countryStateCityName: z.string(),
-  })
-  .array();
 
 export const ReadZipcodeDbZod = z
   .object({

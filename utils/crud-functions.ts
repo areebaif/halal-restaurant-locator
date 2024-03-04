@@ -4,11 +4,6 @@ import {
   ListGeography,
   GeoJsonRestaurantFeatureCollection,
   ListStates,
-  PostAddCity,
-  ResponseAddCity,
-  ReadCityDb,
-  PostAddZipcode,
-  ResponseAddZipcode,
   ReadZipcodeDb,
   PostImageSignedUrl,
   ResponsePostSignedUrl,
@@ -56,6 +51,17 @@ export const listStates = async () => {
   return res;
 };
 
+export const getZipcode = async () => {
+  const response = await fetch(`/api/geography/zipcode`, {
+    method: "GET",
+    headers: {
+      "Content-Type": "application/json",
+    },
+  });
+  const res: ReadZipcodeDb = await response.json();
+  return res;
+};
+
 export const listFoodTags = async () => {
   const response = await fetch(`/api/restaurant/foodtags`, {
     method: "GET",
@@ -80,41 +86,6 @@ export const createFoodTag = async (data: { foodTag: string[] }) => {
   return res;
 };
 
-export const createCity = async (data: PostAddCity) => {
-  const response = await fetch(`/api/geography/city`, {
-    method: "POST",
-    headers: {
-      "Content-Type": "application/json",
-    },
-    body: JSON.stringify(data),
-  });
-  const res: ResponseAddCity = await response.json();
-  return res;
-};
-
-export const getCities = async () => {
-  const response = await fetch(`/api/geography/city`, {
-    method: "GET",
-    headers: {
-      "Content-Type": "application/json",
-    },
-  });
-  const res: ReadCityDb = await response.json();
-  return res;
-};
-
-export const postAddZipcode = async (data: PostAddZipcode) => {
-  const response = await fetch(`/api/geography/zipcode`, {
-    method: "POST",
-    headers: {
-      "Content-Type": "application/json",
-    },
-    body: JSON.stringify(data),
-  });
-  const res: ResponseAddZipcode = await response.json();
-  return res;
-};
-
 export const getMapSearchInput = async (data: string) => {
   const response = await fetch(`/api/restaurant/${data}`, {
     method: "GET",
@@ -123,17 +94,6 @@ export const getMapSearchInput = async (data: string) => {
     },
   });
   const res: GeoJsonRestaurantFeatureCollection = await response.json();
-  return res;
-};
-
-export const getZipcode = async () => {
-  const response = await fetch(`/api/geography/zipcode`, {
-    method: "GET",
-    headers: {
-      "Content-Type": "application/json",
-    },
-  });
-  const res: ReadZipcodeDb = await response.json();
   return res;
 };
 
