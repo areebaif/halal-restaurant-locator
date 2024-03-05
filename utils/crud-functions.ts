@@ -4,13 +4,14 @@ import {
   ListGeography,
   GeoJsonRestaurantFeatureCollection,
   ListStates,
-  ReadZipcodeDb,
   PostImageSignedUrl,
   ResponsePostSignedUrl,
   ListCountryError,
   ListStateError,
   GetZipcode,
   GetZipcodeError,
+  CreateFoodTagErrors,
+  ListFoodTagsError,
 } from "./types";
 
 export const listUSAGeog = async (searchTerm: string) => {
@@ -74,29 +75,51 @@ export const getZipcode = async (zipcode: string) => {
   return res;
 };
 
-export const listFoodTags = async () => {
-  const response = await fetch(`/api/restaurant/foodtags`, {
-    method: "GET",
-    headers: {
-      "Content-Type": "application/json",
-    },
-  });
-  const res: ListFoodTags = await response.json();
-  return res;
-};
-
 export const createFoodTag = async (data: { foodTag: string[] }) => {
   const { foodTag } = data;
-  const response = await fetch(`/api/restaurant/foodtags`, {
+  const response = await fetch(`/api/foodtags`, {
     method: "POST",
     headers: {
       "Content-Type": "application/json",
     },
     body: JSON.stringify({ foodTag: foodTag }),
   });
+
+  const apiErrors = /(4|5)\d{2}/.test(`${response.status}`);
+  if (apiErrors) {
+    const res: CreateFoodTagErrors = await response.json();
+    return res;
+  }
+  // anything other than apiErrors went wrong
+  if (!response.ok) {
+    throw new Error("something went wrong");
+  }
+
   const res: CreateFoodTag = await response.json();
   return res;
 };
+
+export const listFoodTags = async () => {
+  const response = await fetch(`/api/foodtags`, {
+    method: "GET",
+    headers: {
+      "Content-Type": "application/json",
+    },
+  });
+  const apiErrors = /(4|5)\d{2}/.test(`${response.status}`);
+  if (apiErrors) {
+    const res: ListFoodTagsError = await response.json();
+    return res;
+  }
+  // anything other than apiErrors went wrong
+  if (!response.ok) {
+    throw new Error("something went wrong");
+  }
+  const res: ListFoodTags = await response.json();
+  return res;
+};
+
+
 
 export const getMapSearchInput = async (data: string) => {
   const response = await fetch(`/api/restaurant/${data}`, {

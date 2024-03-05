@@ -111,13 +111,25 @@ export const GetZipCodeResponseZod = z.union([
   GetZipcodeZod,
 ]);
 
+export const ListFoodTagsErrorZod = z.object({
+  apiErrors: z
+    .object({
+      generalErrors: z.string().array().optional(),
+    })
+    .optional(),
+});
+
 export const ListFoodTagsZod = z
   .object({ name: z.string(), foodTagId: z.string().uuid() })
   .array();
 
-export const CreateFoodTagZod = z.object({
-  created: z.boolean(),
-  errors: z
+export const ListFoodTagsResponseZod = z.union([
+  ListFoodTagsZod,
+  ListFoodTagsErrorZod,
+]);
+
+export const CreateFoodTagErrorsZod = z.object({
+  apiErrors: z
     .object({
       validationErrors: z
         .object({
@@ -127,6 +139,9 @@ export const CreateFoodTagZod = z.object({
       generalErrors: z.string().array().optional(),
     })
     .optional(),
+});
+export const CreateFoodTagZod = z.object({
+  created: z.boolean(),
 });
 
 export const ResponseAddRestaurantZod = z.object({
@@ -217,22 +232,6 @@ export const RestaurantReadDbZod = z.object({
     })
     .array(),
 });
-
-export const ReadZipcodeDbZod = z
-  .object({
-    countryId: z.string().uuid(),
-    countryName: z.string(),
-    stateName: z.string(),
-    stateId: z.string().uuid(),
-    cityId: z.string().uuid(),
-    cityName: z.string(),
-    countryStateCityZipcode: z.string(),
-    zipcodeId: z.string().uuid(),
-    zipcode: z.string(),
-    latitude: z.number().optional(),
-    longitude: z.number().optional(),
-  })
-  .array();
 
 export const PostImageSignedUrlZod = z.object({
   cover: z.object({
