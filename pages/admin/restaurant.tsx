@@ -2,27 +2,9 @@ import * as React from "react";
 import { useQueryClient, useMutation, useQuery } from "@tanstack/react-query";
 import { useRouter } from "next/router";
 import { v4 as uuidv4 } from "uuid";
-import {
-  Card,
-  Title,
-  TextInput,
-  Group,
-  Button,
-  FileInput,
-  Textarea,
-  Grid,
-  Text,
-} from "@mantine/core";
-import {
-  ErrorCard,
-  CustomImageButton,
-  FoodTags,
-  SearchZipcode,
-} from "@/components";
-import {
-  validateAddRestaurantData,
-  getImageUrlToUploadToS3,
-} from "@/utils";
+import { Card, Title, TextInput, Group, Button, Text } from "@mantine/core";
+import { ErrorCard, FoodTags, SearchZipcode, ImageUpload } from "@/components";
+import { validateAddRestaurantData, getImageUrlToUploadToS3 } from "@/utils";
 
 const AddRestaurant: React.FC = () => {
   const [name, setName] = React.useState("");
@@ -163,40 +145,12 @@ const AddRestaurant: React.FC = () => {
         onChange={(e) => setLongitude(e.currentTarget.value)}
       />
       <FoodTags foodTag={foodTag} setFoodTag={setFoodTag} />
-      <Grid>
-        <Grid.Col span={"auto"}>
-          <Textarea
-            label="image uploads"
-            disabled
-            autosize
-            defaultValue={
-              "restaurant cover image is used for restaurant card displayed with map. The other images are used to show viewers the seating area and the outside area of the restaurant. Cover image is a required image for form submission."
-            }
-          />
-        </Grid.Col>
-        <Grid.Col span={"auto"}>
-          <FileInput
-            placeholder="select .png or .jpeg"
-            label="cover"
-            variant={`${coverImage ? "unstyled" : "default"}`}
-            withAsterisk
-            value={coverImage}
-            valueComponent={CustomImageButton}
-            onChange={setCoverImage}
-          />
-        </Grid.Col>
-        <Grid.Col span={"auto"}>
-          <FileInput
-            multiple
-            variant={`${images.length ? "unstyled" : "default"}`}
-            placeholder="select .png or .jpeg"
-            label="select multiple images"
-            value={images}
-            valueComponent={CustomImageButton}
-            onChange={setImages}
-          />
-        </Grid.Col>
-      </Grid>
+      <ImageUpload
+        coverImage={coverImage}
+        setCoverImage={setCoverImage}
+        setImages={setImages}
+        images={images}
+      />
       {formFieldsErrorMessage?.cover ? (
         <>
           <Text>cover</Text>

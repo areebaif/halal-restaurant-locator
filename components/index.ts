@@ -13,6 +13,7 @@ import { CustomImageButton } from "./admin/createRestaurant/ImageButton";
 import { FoodTags } from "./admin/createRestaurant/FoodTags";
 import { AddFoodTag } from "./admin/createRestaurant/AddFoodTag";
 import { SearchZipcode } from "./admin/createRestaurant/SearchZipcode";
+import { ImageUpload } from "./admin/createRestaurant/ImageUpload";
 
 export {
   AdminNavigation,
@@ -30,4 +31,5 @@ export {
   FoodTags,
   AddFoodTag,
   SearchZipcode,
+  ImageUpload,
 };

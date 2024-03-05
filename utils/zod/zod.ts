@@ -149,6 +149,50 @@ export const CreateFoodTagResponseZod = z.union([
   CreateFoodTagZod,
 ]);
 
+export const PostImageSignedUrlZod = z.object({
+  cover: z.object({
+    type: z.string().regex(new RegExp(/image\/(jpg|jpeg|png)$/), {
+      message: "image must be of type jpg, or jpeg or png",
+    }),
+    size: z.number().lt(5000000, { message: " maximum filesize 5mb" }),
+    url: z
+      .string()
+      .includes("cover", { message: "must include cover in the url" }),
+  }),
+  otherImages: z
+    .object({
+      type: z.string().regex(new RegExp(/image\/(jpg|jpeg|png)$/), {
+        message: "image must be of type jpg, or jpeg or png",
+      }),
+      size: z.number().lt(5000000, { message: " maximum filesize 5mb" }),
+      url: z.string(),
+    })
+    .optional()
+    .array(),
+});
+
+export const ResponsePostSignedUrlZod = z.object({
+  cover: z
+    .object({
+      uploadS3Url: z.string(),
+      uploadS3Fields: z.record(z.string()),
+      type: z.string(),
+      dbUrl: z.string(),
+    })
+    .optional(),
+  otherImages: z
+    .object({
+      uploadS3Url: z.string(),
+      uploadS3Fields: z.record(z.string()),
+      type: z.string(),
+      dbUrl: z.string(),
+    })
+    .array()
+    .optional(),
+  coverImage: z.string().array().optional(),
+  images: z.string().array().optional(),
+});
+
 export const ResponseAddRestaurantZod = z.object({
   state: z.string().optional(),
   country: z.string().optional(),
@@ -236,48 +280,4 @@ export const RestaurantReadDbZod = z.object({
       FoodTag: z.string().array(),
     })
     .array(),
-});
-
-export const PostImageSignedUrlZod = z.object({
-  cover: z.object({
-    type: z.string().regex(new RegExp(/image\/(jpg|jpeg|png)$/), {
-      message: "image must be of type jpg, or jpeg or png",
-    }),
-    size: z.number().lt(5000000, { message: " maximum filesize 5mb" }),
-    url: z
-      .string()
-      .includes("cover", { message: "must include cover in the url" }),
-  }),
-  otherImages: z
-    .object({
-      type: z.string().regex(new RegExp(/image\/(jpg|jpeg|png)$/), {
-        message: "image must be of type jpg, or jpeg or png",
-      }),
-      size: z.number().lt(5000000, { message: " maximum filesize 5mb" }),
-      url: z.string(),
-    })
-    .optional()
-    .array(),
-});
-
-export const ResponsePostSignedUrlZod = z.object({
-  cover: z
-    .object({
-      uploadS3Url: z.string(),
-      uploadS3Fields: z.record(z.string()),
-      type: z.string(),
-      dbUrl: z.string(),
-    })
-    .optional(),
-  otherImages: z
-    .object({
-      uploadS3Url: z.string(),
-      uploadS3Fields: z.record(z.string()),
-      type: z.string(),
-      dbUrl: z.string(),
-    })
-    .array()
-    .optional(),
-  coverImage: z.string().array().optional(),
-  images: z.string().array().optional(),
 });
