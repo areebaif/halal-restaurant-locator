@@ -14,7 +14,8 @@ import {
   ListFoodTagsZod,
   PostImageSignedUrlZod,
   ResponsePostSignedUrlZod,
-  ReadZipcodeDbZod,
+
+  GetZipCodeResponseZod,
 } from "./zod/zod";
 import {
   findRestaurant,
@@ -47,7 +48,7 @@ export {
   listFoodTags,
   listStates,
   ListStatesZod,
-  ReadZipcodeDbZod,
+  GetZipCodeResponseZod,
   hasNumbers,
   mapCountryData,
   PostAddRestaurantZod,

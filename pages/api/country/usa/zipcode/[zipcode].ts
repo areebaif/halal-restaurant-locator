@@ -2,7 +2,7 @@ import { prisma } from "@/db/prisma";
 import type { NextApiRequest, NextApiResponse } from "next";
 import { z } from "zod";
 import { onlyNumbers } from "@/utils";
-import { getZipcodeError, getZipcode } from "@/utils/types";
+import { GetZipcodeError, GetZipcode } from "@/utils/types";
 
 /**
  *
@@ -99,7 +99,7 @@ import { getZipcodeError, getZipcode } from "@/utils/types";
  */
 export default async function GeographySearch(
   req: NextApiRequest,
-  res: NextApiResponse<getZipcode | getZipcodeError>
+  res: NextApiResponse<GetZipcode | GetZipcodeError>
 ) {
   try {
     const { zipcode } = req.query;
@@ -113,13 +113,11 @@ export default async function GeographySearch(
       });
       return;
     }
-    const stringQuery = zipcode as string;
-
     const country = await prisma.country.findUnique({
       where: { countryName: "U.S.A" },
     });
-    const zipcodeSplit = stringQuery.split("=");
-    const zipcodeVal = zipcodeSplit[1];
+
+    const zipcodeVal = zipcode as string;
     const isZipcode = onlyNumbers(zipcodeVal);
     if (!isZipcode || zipcodeVal.length !== 5) {
       res.status(400).json({

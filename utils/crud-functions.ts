@@ -9,6 +9,8 @@ import {
   ResponsePostSignedUrl,
   ListCountryError,
   ListStateError,
+  GetZipcode,
+  GetZipcodeError,
 } from "./types";
 
 export const listUSAGeog = async (searchTerm: string) => {
@@ -51,14 +53,23 @@ export const listStates = async () => {
   return res;
 };
 
-export const getZipcode = async () => {
-  const response = await fetch(`/api/geography/zipcode`, {
+export const getZipcode = async (zipcode: string) => {
+  const response = await fetch(`/api/country/usa/zipcode/${zipcode}`, {
     method: "GET",
     headers: {
       "Content-Type": "application/json",
     },
   });
-  const res: ReadZipcodeDb = await response.json();
+  const apiErrors = /(4|5)\d{2}/.test(`${response.status}`);
+  if (apiErrors) {
+    const res: GetZipcodeError = await response.json();
+    return res;
+  }
+  // anything other than apiErrors went wrong
+  if (!response.ok) {
+    throw new Error("something went wrong");
+  }
+  const res: GetZipcode = await response.json();
   return res;
 };
 

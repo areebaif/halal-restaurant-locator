@@ -81,7 +81,7 @@ export const ListGeographyZod = z.object({
     .optional(),
 });
 
-export const getZipcodeZod = z.object({
+export const GetZipcodeZod = z.object({
   zipcode: z.object({
     zipcodeId: z.string().uuid(),
     zipcode: z.string(),
@@ -94,7 +94,7 @@ export const getZipcodeZod = z.object({
   }),
 });
 
-export const getZipcodeErrorZod = z.object({
+export const GetZipcodeErrorZod = z.object({
   apiErrors: z
     .object({
       validationErrors: z
@@ -106,6 +106,10 @@ export const getZipcodeErrorZod = z.object({
     })
     .optional(),
 });
+export const GetZipCodeResponseZod = z.union([
+  GetZipcodeErrorZod,
+  GetZipcodeZod,
+]);
 
 export const ListFoodTagsZod = z
   .object({ name: z.string(), foodTagId: z.string().uuid() })
