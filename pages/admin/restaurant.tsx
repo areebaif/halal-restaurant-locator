@@ -8,9 +8,6 @@ import {
   TextInput,
   Group,
   Button,
-  Loader,
-  Autocomplete,
-  Chip,
   FileInput,
   Textarea,
   Grid,
@@ -23,16 +20,9 @@ import {
   SearchZipcode,
 } from "@/components";
 import {
-
-  getZipcode,
-  ListFoodTagsZod,
   validateAddRestaurantData,
   getImageUrlToUploadToS3,
-  listUSAGeog,
 } from "@/utils";
-import { ListGeographyZod } from "@/utils/zod/zod";
-
-// TODO: This file needs to adjust now
 
 const AddRestaurant: React.FC = () => {
   const [name, setName] = React.useState("");
@@ -51,24 +41,6 @@ const AddRestaurant: React.FC = () => {
     cover?: string[];
     otherImages?: string[];
   }>();
-
-  // Queries
-  // const geogData = useQuery(["listGeography"], listUSAGeog, {
-  //   staleTime: Infinity,
-  //   cacheTime: Infinity,
-  // });
-
-  // if (geogData.isLoading) return <Loader />;
-  // if (geogData.isError) {
-  //   console.log(geogData.error);
-  //   return <ErrorCard message="something went wrong with the server" />;
-  // }
-
-  // const getTypeErrors = ListGeographyZod.safeParse(geogData.data);
-  // if (!getTypeErrors.success) {
-  //   console.log(getTypeErrors.error);
-  //   return <ErrorCard message="Their is a type mismatch from the server" />;
-  // }
 
   const onSubmit = async () => {
     setFormFieldsErrorMessage({});
@@ -173,16 +145,6 @@ const AddRestaurant: React.FC = () => {
         onChange={(event) => setStreet(event.currentTarget.value)}
       />
       <SearchZipcode />
-      {/* <Autocomplete
-        mt="sm"
-        withAsterisk
-        description="select from a list of: country - state - city - zipcode"
-        placeholder="select country - state - city - zipcode"
-        label={"country - state - city - zipcode"}
-        data={autoCompleteCountryStateCityZipcode}
-        value={countryStateCityZipcode}
-        onChange={setCountryStateCityZipcode}
-      /> */}
       <TextInput
         mt="sm"
         withAsterisk
@@ -191,7 +153,6 @@ const AddRestaurant: React.FC = () => {
         value={latitude}
         onChange={(e) => setLatitude(e.currentTarget.value)}
       />
-      {/* This need to be autocomplete with data from backend */}
       <TextInput
         mt="sm"
         mb="sm"
@@ -201,7 +162,6 @@ const AddRestaurant: React.FC = () => {
         value={longitude}
         onChange={(e) => setLongitude(e.currentTarget.value)}
       />
-
       <FoodTags foodTag={foodTag} setFoodTag={setFoodTag} />
       <Grid>
         <Grid.Col span={"auto"}>

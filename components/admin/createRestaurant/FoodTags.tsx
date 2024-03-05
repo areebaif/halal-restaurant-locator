@@ -19,6 +19,7 @@ export type FoodTags = {
 
 export const FoodTags: React.FC<FoodTags> = ({ foodTag, setFoodTag }) => {
   const [isOpenCreateFoodTag, setIsOpenCreateFoodTag] = React.useState(false);
+  
   const foodTagData = useQuery(["listFoodTags"], listFoodTags, {
     staleTime: Infinity,
     cacheTime: Infinity,

@@ -1,13 +1,6 @@
 import * as React from "react";
 import { useQuery } from "@tanstack/react-query";
-import {
-  Group,
-  TextInput,
-  Textarea,
-  Button,
-  Grid,
-  Loader,
-} from "@mantine/core";
+import { TextInput, Textarea, Button, Grid, Loader } from "@mantine/core";
 import { ErrorCard } from "@/components";
 import { getZipcode, GetZipCodeResponseZod, onlyNumbers } from "@/utils";
 
@@ -27,9 +20,10 @@ export const SearchZipcode: React.FC = () => {
     {
       staleTime: Infinity,
       cacheTime: Infinity,
-      enabled: getApiFlag ,
+      enabled: getApiFlag,
       onSuccess: (data) => {
         setGetApiFlag(false);
+
         const isTypeCorrentZipcode = GetZipCodeResponseZod.safeParse(data);
         if (!isTypeCorrentZipcode.success) {
           setErrors(true);
@@ -37,8 +31,26 @@ export const SearchZipcode: React.FC = () => {
             zipcode: [...errorVal.zipcode, "type mismatch from server"],
           });
         }
-        // this means we have the correct data to display
-        if (!data.hasOwnProperty("apiErrors")) {
+        if (data.hasOwnProperty("apiErrors")) {
+          const apiErrors = data as GetZipcodeError;
+          if (apiErrors.apiErrors?.validationErrors) {
+            setErrorVal({
+              zipcode: [
+                ...errorVal.zipcode,
+                ...apiErrors.apiErrors?.validationErrors.zipcode,
+              ],
+            });
+          }
+          if (apiErrors.apiErrors?.generalError) {
+            setErrorVal({
+              zipcode: [
+                ...errorVal.zipcode,
+                ...apiErrors.apiErrors?.generalError,
+              ],
+            });
+          }
+          setErrors(true);
+        } else {
           setDisplayZipcodeCard(true);
         }
       },
@@ -50,24 +62,6 @@ export const SearchZipcode: React.FC = () => {
   if (zipcodeVal.isError) {
     console.log(zipcodeVal.error);
     return <ErrorCard message="something went wrong with the api request" />;
-  }
-
-  if (zipcodeVal.data?.hasOwnProperty("apiErrors")) {
-    const apiErrors = zipcodeVal.data as GetZipcodeError;
-    if (apiErrors.apiErrors?.validationErrors) {
-      setErrorVal({
-        zipcode: [
-          ...errorVal.zipcode,
-          ...apiErrors.apiErrors?.validationErrors.zipcode,
-        ],
-      });
-    }
-    if (apiErrors.apiErrors?.generalError) {
-      setErrorVal({
-        zipcode: [...errorVal.zipcode, ...apiErrors.apiErrors?.generalError],
-      });
-    }
-    setErrors(true);
   }
 
   const zipcodeApiResponse = zipcodeVal.data as GetZipcode;
@@ -103,38 +97,45 @@ export const SearchZipcode: React.FC = () => {
       setGetApiFlag={setGetApiFlag}
     />
   ) : (
-    <Grid mt="xs">
-      <Grid.Col span={2}>
-        <Textarea
-          label={"zipcode"}
-          defaultValue="search five digit zipcode to auto populate the state and city."
-          disabled
-          withAsterisk
-        />
-      </Grid.Col>
-      <Grid.Col span={2}>
-        <TextInput
-          mt="md"
-          value={zipcode}
-          onChange={(event) => setZipcode(event.currentTarget.value)}
-          label={"search"}
-          placeholder="five digit zipcode"
-        ></TextInput>
-        {errors && <ErrorCard arrayOfErrors={errorVal.zipcode} />}
-      </Grid.Col>
-      <Grid.Col span={2}>
-        <Button
-          sx={(theme) => ({
-            marginTop: `calc(${theme.spacing.lg}*2)`,
-          })}
-          variant="outline"
-          color="dark"
-          onClick={() => onSubmit(zipcode)}
-        >
-          Search
-        </Button>
-      </Grid.Col>
-    </Grid>
+    <>
+      <Grid mt="xs">
+        <Grid.Col span={3}>
+          <Textarea
+            label={"zipcode"}
+            defaultValue="search five digit zipcode to auto populate the state and city. You can also press enter to search."
+            disabled
+            withAsterisk
+          />
+        </Grid.Col>
+        <Grid.Col span={4}>
+          <TextInput
+            mt="md"
+            value={zipcode}
+            onChange={(event) => setZipcode(event.currentTarget.value)}
+            onKeyDown={(e) => {
+              if (e.key === "Enter") {
+                onSubmit(zipcode);
+              }
+            }}
+            label={"search"}
+            placeholder="five digit zipcode"
+          ></TextInput>
+        </Grid.Col>
+        <Grid.Col span={2}>
+          <Button
+            sx={(theme) => ({
+              marginTop: `calc(${theme.spacing.lg}*2)`,
+            })}
+            variant="outline"
+            color="dark"
+            onClick={() => onSubmit(zipcode)}
+          >
+            Search
+          </Button>
+        </Grid.Col>
+      </Grid>
+      {errors && <ErrorCard arrayOfErrors={errorVal.zipcode} />}
+    </>
   );
 };
 
@@ -162,8 +163,9 @@ export const GetZipcodeDisplayCard: React.FC<GetZipcodeDisplayCardProps> = ({
           withAsterisk
         />
       </Grid.Col>
-      <Grid.Col span={3}>
+      <Grid.Col span={4}>
         <TextInput
+          mt="md"
           label="city-state-zipcode-country"
           defaultValue={`${data.cityName}, ${data.stateName}, ${data.zipcode}, ${data.countryName}`}
           disabled
@@ -172,7 +174,7 @@ export const GetZipcodeDisplayCard: React.FC<GetZipcodeDisplayCardProps> = ({
       <Grid.Col span={2}>
         <Button
           sx={(theme) => ({
-            marginTop: theme.spacing.xl,
+            marginTop: `calc(${theme.spacing.lg}*2)`,
           })}
           variant="outline"
           color="dark"

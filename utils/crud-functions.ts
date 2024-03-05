@@ -60,6 +60,7 @@ export const getZipcode = async (zipcode: string) => {
       "Content-Type": "application/json",
     },
   });
+
   const apiErrors = /(4|5)\d{2}/.test(`${response.status}`);
   if (apiErrors) {
     const res: GetZipcodeError = await response.json();
