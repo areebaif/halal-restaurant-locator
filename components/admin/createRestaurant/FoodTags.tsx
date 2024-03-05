@@ -44,7 +44,7 @@ export const FoodTags: React.FC<FoodTags> = ({ foodTag, setFoodTag }) => {
   });
 
   if (foodTagData.isLoading) return <Loader />;
-
+  console.log(foodTag, "slsl");
   if (foodTagData.isError) {
     console.log(foodTagData.error);
     return <ErrorCard message="something went wrong with the api request" />;

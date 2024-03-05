@@ -11,7 +11,7 @@ import {
   ListStatesZod,
   ListFoodTagsResponseZod,
   ListFoodTagsZod,
-
+  CreateFoodTagResponseZod,
   PostAddRestaurantZod,
   GetSearchInputsZod,
   PostImageSignedUrlZod,
@@ -50,6 +50,7 @@ export {
   listStates,
   ListStatesZod,
   GetZipCodeResponseZod,
+  CreateFoodTagResponseZod,
   hasNumbers,
   mapCountryData,
   ListFoodTagsResponseZod,

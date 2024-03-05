@@ -10,9 +10,10 @@ import {
   GetZipcodeErrorZod,
   GetZipcodeZod,
   CreateFoodTagErrorsZod,
+  CreateFoodTagZod,
+  CreateFoodTagResponseZod,
   ListFoodTagsErrorZod,
   ListFoodTagsZod,
-  CreateFoodTagZod,
   ListFoodTagsResponseZod,
   PostAddRestaurantZod,
   ResponseAddRestaurantZod,
@@ -38,6 +39,7 @@ export type GetZipcode = z.infer<typeof GetZipcodeZod>;
 export type GetZipCodeResponse = z.infer<typeof GetZipCodeResponseZod>;
 export type CreateFoodTagErrors = z.infer<typeof CreateFoodTagErrorsZod>;
 export type CreateFoodTag = z.infer<typeof CreateFoodTagZod>;
+export type CreateFoodTagResponse = z.infer<typeof CreateFoodTagResponseZod>;
 export type ListFoodTagsError = z.infer<typeof ListFoodTagsErrorZod>;
 export type ListFoodTags = z.infer<typeof ListFoodTagsZod>;
 export type ListFoodTagsResponse = z.infer<typeof ListFoodTagsResponseZod>;

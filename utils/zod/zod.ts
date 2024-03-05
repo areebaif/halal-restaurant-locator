@@ -144,6 +144,11 @@ export const CreateFoodTagZod = z.object({
   created: z.boolean(),
 });
 
+export const CreateFoodTagResponseZod = z.union([
+  CreateFoodTagErrorsZod,
+  CreateFoodTagZod,
+]);
+
 export const ResponseAddRestaurantZod = z.object({
   state: z.string().optional(),
   country: z.string().optional(),
