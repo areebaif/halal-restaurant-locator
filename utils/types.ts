@@ -15,6 +15,10 @@ import {
   ListFoodTagsErrorZod,
   ListFoodTagsZod,
   ListFoodTagsResponseZod,
+  CreateUploadImageUrlZod,
+  ListUploadImageUrlZod,
+  ListUploadImageUrlErrorZod,
+  ListUploadImageUrlResponseZod,
   PostAddRestaurantZod,
   ResponseAddRestaurantZod,
   GetSearchInputsZod,
@@ -22,8 +26,6 @@ import {
   GeoJsonRestaurantPropertiesZod,
   RestaurantReadDbZod,
   RestaurantGeoJsonFeatureZod,
-  PostImageSignedUrlZod,
-  ResponsePostSignedUrlZod,
   GetZipCodeResponseZod,
 } from "./zod/zod";
 
@@ -43,6 +45,14 @@ export type CreateFoodTagResponse = z.infer<typeof CreateFoodTagResponseZod>;
 export type ListFoodTagsError = z.infer<typeof ListFoodTagsErrorZod>;
 export type ListFoodTags = z.infer<typeof ListFoodTagsZod>;
 export type ListFoodTagsResponse = z.infer<typeof ListFoodTagsResponseZod>;
+export type CreateUploadImageUrl = z.infer<typeof CreateUploadImageUrlZod>;
+export type ListUploadImageUrl = z.infer<typeof ListUploadImageUrlZod>;
+export type ListUploadImageUrlError = z.infer<
+  typeof ListUploadImageUrlErrorZod
+>;
+export type ListUploadImageUrlResponse = z.infer<
+  typeof ListUploadImageUrlResponseZod
+>;
 
 export type PostAddRestaurant = z.infer<typeof PostAddRestaurantZod>;
 export type ResponseAddRestaurant = z.infer<typeof ResponseAddRestaurantZod>;
@@ -57,9 +67,6 @@ export type GeoJsonRestaurantProperties = z.infer<
 export type ResponseRestaurantGeoJsonFeatureCollection = z.infer<
   typeof ResponseRestaurantGeoJsonZod
 >;
-
-export type PostImageSignedUrl = z.infer<typeof PostImageSignedUrlZod>;
-export type ResponsePostSignedUrl = z.infer<typeof ResponsePostSignedUrlZod>;
 
 // for client
 export type GeoJsonRestaurantFeatureCollection = {

@@ -3,10 +3,10 @@ import {
   RestaurantReadDb,
   ResponseRestaurantGeoJsonFeatureCollection,
   RestaurantGeoJsonFeature,
-  PostImageSignedUrl,
+  CreateUploadImageUrl,
 } from "./types";
 
-import { PostImageSignedUrlZod, getImagePostsignedUrl } from ".";
+import { CreateUploadImageUrlZod, getImagePostsignedUrl } from ".";
 type searchCriteria = {
   zipcodeId?: string;
   countryId?: string;
@@ -192,8 +192,8 @@ export const cityIdExists = async (data: { cityId: string }[]) => {
   return cityNotFound;
 };
 
-export const validateAddRestaurantData = (
-  allImages: PostImageSignedUrl,
+export const validateFormDataCreateRestaurant = (
+  allImages: CreateUploadImageUrl,
   setFormFieldsErrorMessage: React.Dispatch<
     React.SetStateAction<
       | {
@@ -204,7 +204,7 @@ export const validateAddRestaurantData = (
     >
   >
 ) => {
-  const isTypeCorrent = PostImageSignedUrlZod.safeParse(allImages);
+  const isTypeCorrent = CreateUploadImageUrlZod.safeParse(allImages);
 
   if (!isTypeCorrent.success) {
     console.log(isTypeCorrent.error);
@@ -224,4 +224,3 @@ export const validateAddRestaurantData = (
     return;
   }
 };
-

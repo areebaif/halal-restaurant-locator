@@ -3,7 +3,7 @@ import { getSignedUrl } from "@aws-sdk/s3-request-presigner";
 import { s3Client } from ".";
 import { createPresignedPost } from "@aws-sdk/s3-presigned-post";
 
-export const s3ImagePreSignedUrl = (imageKey: string, imageType: string) => {
+export const helperCreateUploadImageUrl = (imageKey: string) => {
   // This is preSignedGet
   // const command = new PutObjectCommand({
   //   Bucket: process.env.BUCKET_NAME,

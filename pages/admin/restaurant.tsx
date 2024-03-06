@@ -4,7 +4,21 @@ import { useRouter } from "next/router";
 import { v4 as uuidv4 } from "uuid";
 import { Card, Title, TextInput, Group, Button, Text } from "@mantine/core";
 import { ErrorCard, FoodTags, SearchZipcode, ImageUpload } from "@/components";
-import { validateAddRestaurantData, getImageUrlToUploadToS3 } from "@/utils";
+import {
+  validateFormDataCreateRestaurant,
+  helperListUploadImageUrl,
+} from "@/utils";
+
+type ListForm =
+  | {
+      listFormData: {
+        formData: FormData;
+        uploadS3Url: string;
+      }[];
+      restaurantId: string;
+      listDbImageUrl: string[];
+    }
+  | undefined;
 
 const AddRestaurant: React.FC = () => {
   const [name, setName] = React.useState("");
@@ -26,7 +40,6 @@ const AddRestaurant: React.FC = () => {
 
   const onSubmit = async () => {
     setFormFieldsErrorMessage({});
-    const restaurantId = uuidv4();
     // check if user inputs are empty
     if (!coverImage) {
       setFormFieldsErrorMessage((prevState) => ({
@@ -39,50 +52,55 @@ const AddRestaurant: React.FC = () => {
       cover: {
         type: coverImage?.type,
         size: coverImage?.size,
-        url: `${restaurantId}/cover/${uuidv4()}`,
       },
       otherImages: images.map((file) => ({
         type: file?.type,
         size: file?.size,
-        url: `${restaurantId}/${uuidv4()}`,
       })),
     };
-    // check if the user sends wrong inputs and return early
-    validateAddRestaurantData(allImages, setFormFieldsErrorMessage);
+    // helper to validate form data
+    validateFormDataCreateRestaurant(allImages, setFormFieldsErrorMessage);
 
-    // In this function we call the backend api to get secure urls (generate urls to restrict content-length, content-type) to upload to s3.
-    // Additionally s3 requires formData with imageFile as last field, hence we are passing the actual image file to the function to append to form data
-    // Note: The actual image file is not sent to the backend!!. We append the image file to the result of backend call
-    let formArray: {
-      formData: FormData;
-      uploadS3Url: string;
-    }[] = [];
+    let listForm: ListForm = undefined;
+
     try {
-      formArray = await getImageUrlToUploadToS3(
+      // Before we submit the restaurant data to backend, we need to upload images to a 3rd party service.
+      // helperListUploadImageUrl gets a secure urls to upload image to s3 ensuring that the image type and image size properties conform to business logic.
+      // FAQ:
+      // 1. Why is this function returning a restaurantId?
+      //    restaurantId is used to tie images to correct restaurant and restaurant Id's are generated more securily at the api layer rather than client layer.
+      // 2. Why are the actual image and setFormFieldsErrorMessage arguments to the function?
+      //    This function returns form data along woth imageUrl to upload to 3rd party service. Hence the actual image is appended to the form.
+      //    setFormFieldsErrorMessage is used to set any errors during validation of image type or size e.t.c.
+      const listFormData = await helperListUploadImageUrl(
         allImages,
         coverImage,
         images,
         setFormFieldsErrorMessage
       );
+      listForm = listFormData;
     } catch (err) {
-      // TODO: set Error that somethiong went wrong woth url creation
+      // at this point, no actual upload of image has taken place, hence we can return early and tell client to try again.
+      setFormFieldsErrorMessage((prevState) => ({
+        ...prevState,
+        cover: ["something went wrong, please try again"],
+      }));
+      return;
     }
-    // once the image is uploaded to s3, we send the url to backedn to be stored in the db.
-    // for any reason upload to s3 fails, the backend before saving the imageUrl to db, will call AWS Lamba, to verify if the image actually exists.
-    // If the image upload fails, the backend will respond appropriately.
-
-    if (formArray.length) {
-      formArray.forEach(async (form) => {
+    if (listForm) {
+      // We are not putting this in the try catch block. These are multiple images, any of the image upload can fail.
+      // The backend will check if all images have upload succefully by caling the 3rd party service and querrying for image metadata.
+      // If not then the api will respond appropriately, and do any necessary cleanup
+      listForm.listFormData.forEach(async (form) => {
         await fetch(form.uploadS3Url, {
           method: "POST",
           body: form.formData,
         });
       });
-      // result.status(204, is good)
-      //console.log(result);
-    } else {
-      // TODO: set Error that somethiong went wrong woth url creation
+      //result.status(204, is good)
     }
+
+    // now send all the data to api to save to database.
   };
 
   return (

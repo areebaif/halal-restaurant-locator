@@ -1,17 +1,19 @@
+import { ListUploadImageUrlResponseZod } from ".";
 import {
   CreateFoodTag,
   ListFoodTags,
   ListGeography,
   GeoJsonRestaurantFeatureCollection,
   ListStates,
-  PostImageSignedUrl,
-  ResponsePostSignedUrl,
+  CreateUploadImageUrl,
+  ListUploadImageUrl,
   ListCountryError,
   ListStateError,
   GetZipcode,
   GetZipcodeError,
   CreateFoodTagErrors,
   ListFoodTagsError,
+  ListUploadImageUrlError,
 } from "./types";
 
 export const listUSAGeog = async (searchTerm: string) => {
@@ -119,7 +121,26 @@ export const listFoodTags = async () => {
   return res;
 };
 
-
+export const getUploadImageUrl = async (data: CreateUploadImageUrl) => {
+  const response = await fetch(`/api/image:getUploadImageUrl`, {
+    method: "POST",
+    headers: {
+      "Content-Type": "application/json",
+    },
+    body: JSON.stringify({ image: data }),
+  });
+  const apiErrors = /(4|5)\d{2}/.test(`${response.status}`);
+  if (apiErrors) {
+    const res: ListUploadImageUrlError = await response.json();
+    return res;
+  }
+  // anything other than apiErrors went wrong
+  if (!response.ok) {
+    throw new Error("something went wrong");
+  }
+  const res: ListUploadImageUrl = await response.json();
+  return res;
+};
 
 export const getMapSearchInput = async (data: string) => {
   const response = await fetch(`/api/restaurant/${data}`, {
@@ -132,20 +153,8 @@ export const getMapSearchInput = async (data: string) => {
   return res;
 };
 
-export const getImagePostsignedUrl = async (data: PostImageSignedUrl) => {
-  const response = await fetch(`/api/upload/image`, {
-    method: "POST",
-    headers: {
-      "Content-Type": "application/json",
-    },
-    body: JSON.stringify({ image: data }),
-  });
-  const res: ResponsePostSignedUrl = await response.json();
-  return res;
-};
-
-export const getImageUrlToUploadToS3 = async (
-  allImages: PostImageSignedUrl,
+export const helperListUploadImageUrl = async (
+  allImages: CreateUploadImageUrl,
   coverImage: File,
   images: File[],
   setFormFieldsErrorMessage: React.Dispatch<
@@ -158,35 +167,63 @@ export const getImageUrlToUploadToS3 = async (
     >
   >
 ) => {
-  const postSignedUrl = await getImagePostsignedUrl(allImages);
-  if (postSignedUrl.coverImage || postSignedUrl.images) {
-    setFormFieldsErrorMessage((prevState) => ({
-      ...prevState,
-      cover: postSignedUrl.coverImage,
-      otherImages: postSignedUrl.images,
-    }));
-    return [];
-  }
+  try {
+    const postSignedUrl = await getUploadImageUrl(allImages);
+    const isSchemaCorrect =
+      ListUploadImageUrlResponseZod.safeParse(postSignedUrl);
+    if (!isSchemaCorrect.success) {
+      setFormFieldsErrorMessage((prevState) => ({
+        ...prevState,
+        cover: ["type mismatch from server"],
+      }));
+      return;
+    }
+    // return errors
+    if (postSignedUrl.hasOwnProperty("apiErrors")) {
+      const errorVal = postSignedUrl as ListUploadImageUrlError;
+      if (errorVal.apiErrors.validationErrors) {
+        setFormFieldsErrorMessage((prevState) => ({
+          ...prevState,
+          cover: errorVal.apiErrors.validationErrors?.images,
+        }));
+      }
+      if (errorVal.apiErrors.generalErrors) {
+        setFormFieldsErrorMessage((prevState) => ({
+          ...prevState,
+          cover: errorVal.apiErrors.generalErrors,
+        }));
+      }
+      return;
+    }
+    // at this point it is safe to assume we have data
+    const listUrl = postSignedUrl as ListUploadImageUrl;
 
-  const formArray = [];
-  // for cover
-  const formData = new FormData();
-  formData.append("Content-Type", allImages.cover.type);
-  Object.entries(postSignedUrl.cover!.uploadS3Fields).forEach(([k, v]) => {
-    formData.append(k, v);
-  });
-  formData.append("file", coverImage);
-
-  formArray.push({ formData, uploadS3Url: postSignedUrl.cover!.uploadS3Url });
-
-  postSignedUrl.otherImages?.forEach((items, index) => {
+    const listFormData = [];
+    const listDbImageUrl = [listUrl.cover.dbUrl];
+    // for cover
     const formData = new FormData();
-    formData.append("Content-Type", images[index].type);
-    Object.entries(items.uploadS3Fields).forEach(([k, v]) => {
+    formData.append("Content-Type", allImages.cover.type);
+    Object.entries(listUrl.cover.uploadS3Fields).forEach(([k, v]) => {
       formData.append(k, v);
     });
-    formData.append("file", images[index]); // must be the last one
-    formArray.push({ formData, uploadS3Url: items.uploadS3Url });
-  });
-  return formArray;
+    formData.append("file", coverImage);
+    listFormData.push({ formData, uploadS3Url: listUrl.cover.uploadS3Url });
+
+    listUrl.otherImages?.forEach((items, index) => {
+      listDbImageUrl.push(items.dbUrl);
+      const formData = new FormData();
+      formData.append("Content-Type", images[index].type);
+      Object.entries(items.uploadS3Fields).forEach(([k, v]) => {
+        formData.append(k, v);
+      });
+      formData.append("file", images[index]); // must be the last one
+      listFormData.push({ formData, uploadS3Url: items.uploadS3Url });
+    });
+    return { listFormData, restaurantId: listUrl.restaurantId, listDbImageUrl };
+  } catch (err) {
+    setFormFieldsErrorMessage((prevState) => ({
+      ...prevState,
+      cover: ["something went wrong please try again"],
+    }));
+  }
 };
