@@ -47,3 +47,11 @@ export const parseQueryVals = (val: string): GetSearchInputs => {
 export const hasNumbers = (str: string) => {
   return /\d/.test(str);
 };
+
+export const onlyNumbers = (str: string) => {
+  return /^\d+$/.test(str);
+};
+
+export const isValidCoordinate = (val: string) => {
+  return /^[+-]?([0-9]+([.][0-9]*)?|[.][0-9]+)$/.test(val)
+}

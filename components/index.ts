@@ -9,9 +9,11 @@ import { HeroComponent } from "./homePage/HeroComponent";
 import { MapWithText } from "./homePage/MapWithText";
 import { RestaurantSuggestionForm } from "./homePage/RestaurantSuggestionForm";
 import { MapAndList } from "./mapSearchPage/MapAndList";
-import { CustomImageButton } from "./admin/addRestaurant/ImageButton";
-import { FoodTags } from "./admin/addRestaurant/FoodTags";
-import { AddFoodTag } from "./admin/addRestaurant/AddFoodTag";
+import { CustomImageButton } from "./admin/createRestaurant/ImageButton";
+import { FoodTags } from "./admin/createRestaurant/FoodTags";
+import { AddFoodTag } from "./admin/createRestaurant/AddFoodTag";
+import { SearchZipcode } from "./admin/createRestaurant/SearchZipcode";
+import { ImageUpload } from "./admin/createRestaurant/ImageUpload";
 
 export {
   AdminNavigation,
@@ -28,4 +30,6 @@ export {
   CustomImageButton,
   FoodTags,
   AddFoodTag,
+  SearchZipcode,
+  ImageUpload,
 };

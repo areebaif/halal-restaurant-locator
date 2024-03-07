@@ -43,18 +43,7 @@ export const AdminNavigation: React.FC = (props) => {
           Restaurant
         </Text>
         <RestaurantMainLinks />
-        <Text
-          size="sm"
-          sx={(theme) => ({
-            color:
-              theme.colorScheme === "dark"
-                ? theme.colors.dark[2]
-                : theme.colors.dark,
-          })}
-        >
-          Geography
-        </Text>
-        <GeographyMainLinks />
+
         <Text
           size="sm"
           sx={(theme) => ({
@@ -126,20 +115,13 @@ const restaurantData = [
     icon: <IconDatabase size={16} />,
     color: "pink",
     label: "Add restaurant",
-    link: "/admin/add-restaurant",
+    link: "/admin/restaurant",
   },
   {
     icon: <IconDeviceGamepad size={16} />,
     color: "violet",
     label: "View /Edit restaurant",
     link: "/admin",
-  },
-
-  {
-    icon: <IconIdBadge2 size={16} />,
-    color: "green",
-    label: "Add type of food",
-    link: "/admin/add-food-tag",
   },
 ];
 
@@ -164,30 +146,17 @@ const userData = [
   },
 ];
 
-const geographyData = [
+const FoodTags = [
   {
-    icon: <IconMap2 size={16} />,
-    color: "indigo",
-    label: "Add City",
-    link: "/admin/add-city",
-  },
-  {
-    icon: <IconMapPins size={16} />,
-    color: "violet",
-    label: "Add Zipcode",
-    link: "/admin/add-zipcode",
+    icon: <IconIdBadge2 size={16} />,
+    color: "green",
+    label: "create foodtag",
+    link: "/admin/add-food-tag",
   },
 ];
 
 export function RestaurantMainLinks() {
   const links = restaurantData.map((link) => (
-    <MainLink {...link} key={link.label} />
-  ));
-  return <div>{links}</div>;
-}
-
-export function GeographyMainLinks() {
-  const links = geographyData.map((link) => (
     <MainLink {...link} key={link.label} />
   ));
   return <div>{links}</div>;

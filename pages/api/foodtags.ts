@@ -1,28 +1,35 @@
 import type { NextApiRequest, NextApiResponse } from "next";
 // local imports
 import { prisma } from "@/db/prisma";
-import { CreateFoodTag, ListFoodTags } from "@/utils/types";
-import { capitalizeFirstWord, listFoodTags } from "@/utils";
+import {
+  CreateFoodTag,
+  ListFoodTags,
+  CreateFoodTagErrors,
+  ListFoodTagsError,
+} from "@/utils/types";
+import { capitalizeFirstWord } from "@/utils";
 
 /**
  * @swagger
- * /api/restaurant/foodtags:
+ * /api/foodtags:
  *  post:
  *    tags:
- *      - restaurants
- *    summary: create a new food tag
- *    description: add a food tag to the database.
- *    operationId: createTag
+ *      - foodtags
+ *    summary: upsert foodtag
+ *    description: create foodtags or update food tags if they exist in the database.
+ *    operationId: createFoodtag
  *    requestBody:
- *      description: add a food tag in the database.
+ *      description: list of foodtags to add to the database.
  *      content:
  *        application/json:
  *          schema:
  *            type: object
  *            properties:
  *              foodTag:
- *                type: string
- *                example: "vegetarian"
+ *                type: array
+ *                items:
+ *                  type: string
+ *                  example: "vegetarian, Indian"
  *      required: true
  *    responses:
  *      '201':
@@ -32,9 +39,9 @@ import { capitalizeFirstWord, listFoodTags } from "@/utils";
  *            schema:
  *              type: object
  *              properties:
- *                id:
- *                  type: string
- *                  example: "8eb6525d-6fc5-429e-a1a4-cba290d0367a"
+ *                created:
+ *                  type: boolean
+ *                  example: true
  *      '400':
  *        description: Invalid data supplied
  *        content:
@@ -42,7 +49,7 @@ import { capitalizeFirstWord, listFoodTags } from "@/utils";
  *            schema:
  *              type: object
  *              properties:
- *                  errors:
+ *                  apiErrors:
  *                    type: object
  *                    properties:
  *                      validationErrors:
@@ -53,15 +60,25 @@ import { capitalizeFirstWord, listFoodTags } from "@/utils";
  *                            items:
  *                              type: string
  *                              example: "please provide valid value for food tag"
+ *      '500':
+ *        description: Internal server error
+ *        content:
+ *          application/json:
+ *            schema:
+ *              type: object
+ *              properties:
+ *                  apiErrors:
+ *                    type: object
+ *                    properties:
  *                      generalErrors:
  *                        type: array
  *                        items:
  *                          type: string
  *                          example: "something went wrong with the server"
-
+ *
  *  get:
  *    tags:
- *      - restaurants
+ *      - foodtags
  *    summary: get all food tags stored in the database
  *    description: Returns an array of objects containing food tag name and tag id
  *    operationId: get all food tags
@@ -82,20 +99,34 @@ import { capitalizeFirstWord, listFoodTags } from "@/utils";
  *                      name:
  *                        type: string
  *                        example: "Vegetarian"
+ *      '500':
+ *        description: Internal server error
+ *        content:
+ *          application/json:
+ *            schema:
+ *              type: object
+ *              properties:
+ *                  apiErrors:
+ *                    type: object
+ *                    properties:
+ *                      generalErrors:
+ *                        type: array
+ *                        items:
+ *                          type: string
+ *                          example: "something went wrong with the server"
  */
 export default async function FoodTag(
   req: NextApiRequest,
-  res: NextApiResponse<CreateFoodTag | ListFoodTags>
+  res: NextApiResponse<
+    CreateFoodTag | CreateFoodTagErrors | ListFoodTags | ListFoodTagsError
+  >
 ) {
   try {
-    // TODO: fix this as accepting a string[] to add to db and then you upsert
     if (req.method === "POST") {
       const foodTag = req.body.foodTag;
-
       if (!foodTag.length || !Array.isArray(foodTag)) {
         res.status(400).json({
-          created: false,
-          errors: {
+          apiErrors: {
             validationErrors: {
               foodTag: ["please provide valid value for food tags"],
             },
@@ -133,14 +164,12 @@ export default async function FoodTag(
       const foodTags = await prisma.foodTag.findMany({
         select: { name: true, foodTagId: true },
       });
-
       res.status(200).send(foodTags);
     }
   } catch (err) {
     console.log(err);
     res.status(500).json({
-      created: false,
-      errors: { generalErrors: ["something went wrong with the server"] },
+      apiErrors: { generalErrors: ["something went wrong with the server"] },
     });
   }
 }

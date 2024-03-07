@@ -14,8 +14,8 @@ import {
 } from "@mantine/core";
 import { ErrorCard } from "@/components";
 
-import { createFoodTag, CreateFoodTagZod } from "@/utils";
-import { CreateFoodTag } from "@/utils/types";
+import { createFoodTag, CreateFoodTagResponseZod } from "@/utils";
+import { CreateFoodTagErrors } from "@/utils/types";
 
 type AddFoodTag = {
   setIsOpenCreateFoodTag: (val: boolean) => void;
@@ -31,21 +31,32 @@ export const AddFoodTag: React.FC<AddFoodTag> = ({
   const [createListFoodTag, setCreateListFoodTag] = React.useState<string[]>(
     []
   );
-  const [error, setError] = React.useState<CreateFoodTag["errors"]>();
+  const [errorVal, setErrorVal] = React.useState<string[]>([]);
+  const [isError, setIsError] = React.useState(false);
 
   const mutation = useMutation({
     mutationFn: createFoodTag,
     onSuccess: (data) => {
-      const result = CreateFoodTagZod.safeParse(data);
+      const result = CreateFoodTagResponseZod.safeParse(data);
       if (!result.success) {
         console.log(result.error);
+
         return (
           <ErrorCard message="the server responded with incorrect types" />
         );
       }
-      // these are the errors returned by backend that we need to show the client
-      if (data.errors) {
-        setError(data.errors);
+      if (data.hasOwnProperty("apiErrors")) {
+        const apiErrors = data as CreateFoodTagErrors;
+        if (apiErrors.apiErrors?.generalErrors) {
+          setErrorVal([...errorVal, ...apiErrors.apiErrors?.generalErrors]);
+        }
+        if (apiErrors.apiErrors?.validationErrors) {
+          setErrorVal([
+            ...errorVal,
+            ...apiErrors.apiErrors?.validationErrors.foodTag,
+          ]);
+        }
+        setIsError(true);
         return;
       }
 
@@ -61,34 +72,24 @@ export const AddFoodTag: React.FC<AddFoodTag> = ({
   }
 
   if (mutation.isError) {
-    setError({
-      generalErrors: ["something went wrong while creating food tags"],
-    });
+    setErrorVal([...errorVal, "something went wrong while creating food tags"]);
   }
 
   const onSubmit = async (val: string[]) => {
-    setError(undefined);
+    setIsError(false);
     if (!val.length) {
-      setError({
-        ...error,
-        validationErrors: {
-          foodTag: ["The food tag field cannot be empty"],
-        },
-      });
+      setErrorVal([...errorVal, "The food tag field cannot be empty"]);
+      setIsError(true);
       return;
     }
     mutation.mutate({ foodTag: createListFoodTag });
   };
 
   const onAdd = (val: string) => {
-    setError(undefined);
+    setIsError(false);
     if (!val.length) {
-      setError({
-        ...error,
-        validationErrors: {
-          foodTag: ["The food tag field cannot be empty"],
-        },
-      });
+      setErrorVal([...errorVal, "The food tag field cannot be empty"]);
+      setIsError(true);
       return;
     }
     setCreateFoodTagInput("");
@@ -137,16 +138,7 @@ export const AddFoodTag: React.FC<AddFoodTag> = ({
               setCreateFoodTagInput(event.currentTarget.value)
             }
           ></TextInput>
-          {error?.validationErrors?.foodTag ? (
-            <ErrorCard arrayOfErrors={error.validationErrors.foodTag} />
-          ) : (
-            <></>
-          )}
-          {error?.generalErrors ? (
-            <ErrorCard arrayOfErrors={error.generalErrors} />
-          ) : (
-            <></>
-          )}
+          {isError ? <ErrorCard arrayOfErrors={errorVal} /> : <></>}
         </Grid.Col>
         <Grid.Col span={4}>
           <Button

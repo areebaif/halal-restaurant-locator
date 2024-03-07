@@ -33,6 +33,7 @@ export const SearchInput: React.FC<SearchInput> = ({ queryString }) => {
   if (geogData.error) {
     return <ErrorCard message={`something went wrong please try again`} />;
   }
+  // TODO: zod typecheck
   if (geogData.data?.hasOwnProperty("apiErrors")) {
     const error = geogData.data as ListCountryError;
     let errorArray: string[] = [];

@@ -3,10 +3,11 @@ import {
   RestaurantReadDb,
   ResponseRestaurantGeoJsonFeatureCollection,
   RestaurantGeoJsonFeature,
-  PostImageSignedUrl,
 } from "./types";
 
-import { PostImageSignedUrlZod, getImagePostsignedUrl } from ".";
+import { isValidCoordinate } from ".";
+
+import { CreateUploadImageUrlZod } from ".";
 type searchCriteria = {
   zipcodeId?: string;
   countryId?: string;
@@ -192,8 +193,29 @@ export const cityIdExists = async (data: { cityId: string }[]) => {
   return cityNotFound;
 };
 
-export const validateAddRestaurantData = (
-  allImages: PostImageSignedUrl,
+export const validateFormDataCreateRestaurant = (
+  allImages: {
+    cover: {
+      type: string | undefined;
+      size: number | undefined;
+    };
+    otherImages: {
+      type: string;
+      size: number;
+    }[];
+  },
+  validateRestaurantData: {
+    countryId: string;
+    stateId: string;
+    cityId: string;
+    zipcodeId: string;
+    foodTag: string[];
+    restaurantName: string;
+    description: string;
+    street: string;
+    longitude: string;
+    latitude: string;
+  },
   setFormFieldsErrorMessage: React.Dispatch<
     React.SetStateAction<
       | {
@@ -204,24 +226,119 @@ export const validateAddRestaurantData = (
     >
   >
 ) => {
-  const isTypeCorrent = PostImageSignedUrlZod.safeParse(allImages);
-
+  // check if image exists
+  let isError = false;
+  if (!allImages.cover.size || !allImages.cover.type) {
+    setFormFieldsErrorMessage((prevState) => ({
+      ...prevState,
+      cover: ["you must add cover image"],
+    }));
+    isError = true;
+  }
+  // check image is of proper type and size
+  const isTypeCorrent = CreateUploadImageUrlZod.safeParse(allImages);
   if (!isTypeCorrent.success) {
     console.log(isTypeCorrent.error);
     const schemaErrors = isTypeCorrent.error.flatten().fieldErrors;
     if (schemaErrors.otherImages?.length) {
       setFormFieldsErrorMessage((prevState) => ({
         ...prevState,
-        otherImages: schemaErrors.otherImages!,
+        otherImages: ["type mismatch"],
       }));
     }
     if (schemaErrors.cover?.length) {
       setFormFieldsErrorMessage((prevState) => ({
         ...prevState,
-        cover: schemaErrors.cover!,
+        cover: schemaErrors.cover,
       }));
     }
+    isError = true;
+  }
+  // check valid latitude and longitude
+  const isValidlat = isValidCoordinate(validateRestaurantData.latitude);
+  const isValidLng = isValidCoordinate(validateRestaurantData.longitude);
+  if (!isValidlat || !isValidLng) {
+    if (!isValidlat)
+      setFormFieldsErrorMessage((prevState) => ({
+        ...prevState,
+        latitude: ["enter valid latitude"],
+      }));
+    if (!isValidLng)
+      setFormFieldsErrorMessage((prevState) => ({
+        ...prevState,
+        longitude: ["enter valid longitude"],
+      }));
+    isError = true;
+  }
+
+  if (
+    !validateRestaurantData.countryId ||
+    !validateRestaurantData.cityId ||
+    !validateRestaurantData.stateId ||
+    !validateRestaurantData.zipcodeId
+  ) {
+    setFormFieldsErrorMessage((prevState) => ({
+      ...prevState,
+      zipcode: ["please search valid zipcode"],
+    }));
+    isError = true;
+  }
+  if (!validateRestaurantData.restaurantName) {
+    setFormFieldsErrorMessage((prevState) => ({
+      ...prevState,
+      restaurantName: ["filed cannot be empty"],
+    }));
+    isError = true;
+  }
+
+  if (!validateRestaurantData.foodTag.length) {
+    setFormFieldsErrorMessage((prevState) => ({
+      ...prevState,
+      foodTag: ["please select foodtag, this field cannot be empty"],
+    }));
+    isError = true;
+  }
+
+  if (!validateRestaurantData.street) {
+    setFormFieldsErrorMessage((prevState) => ({
+      ...prevState,
+      street: ["field cannot be empty"],
+    }));
+    isError = true;
+  }
+
+  if (!validateRestaurantData.description) {
+    setFormFieldsErrorMessage((prevState) => ({
+      ...prevState,
+      description: ["field cannot be empty"],
+    }));
+    isError = true;
+  }
+
+  if (isError) {
     return;
   }
-};
 
+  const returnData = {
+    countryId: validateRestaurantData.countryId,
+    stateId: validateRestaurantData.stateId,
+    cityId: validateRestaurantData.cityId,
+    zipcodeId: validateRestaurantData.zipcodeId,
+    restaurantName: validateRestaurantData.restaurantName,
+    description: validateRestaurantData.description,
+    street: validateRestaurantData.street,
+    longitude: parseFloat(validateRestaurantData.longitude),
+    latitude: parseFloat(validateRestaurantData.latitude),
+    foodTag: validateRestaurantData.foodTag,
+  };
+  return {
+    data: returnData,
+    allImages: {
+      cover: {
+        size: allImages.cover.size!,
+        type: allImages.cover.type!,
+      },
+      otherImages: allImages.otherImages,
+    },
+  };
+};
