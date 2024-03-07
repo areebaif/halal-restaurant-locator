@@ -153,9 +153,12 @@ export const CreateFoodTagResponseZod = z.union([
 
 export const CreateUploadImageUrlZod = z.object({
   cover: z.object({
-    type: z.string().regex(new RegExp(/image\/(jpg|jpeg|png)$/), {
-      message: "image must be of type jpg, or jpeg or png",
-    }),
+    type: z
+      .string()
+      .min(1, { message: "no image provided, cover image is required" })
+      .regex(new RegExp(/image\/(jpg|jpeg|png)$/), {
+        message: "image must be of type jpg, or jpeg or png",
+      }),
     size: z.number().lt(5000000, { message: " maximum filesize 5mb" }),
     // url: z
     //   .string()
@@ -209,28 +212,50 @@ export const ListUploadImageUrlResponseZod = z.union([
 ]);
 
 export const CreateRestaurantZod = z.object({
-  countryId: z.string().uuid(),
-  stateId: z.string(),
-  cityId: z.string(),
-  zipcodeId: z.string(),
-  restaurantName: z.string(),
-  description: z.string(),
-  street: z.string(),
-  longitude: z.number().gte(-180).lte(180),
-  latitude: z.number().gte(-90).lte(90),
-  foodTag: z.string().uuid().array(),
+  restaurantName: z
+    .string()
+    .min(1, { message: "please provide a value as string" }),
+  description: z
+    .string()
+    .min(1, { message: "please provide a value as string" }),
+  street: z.string().min(1, { message: "please provide a value as string" }),
   imageUrl: z.string().array(),
-  restaurantId: z.string().uuid(),
+  countryId: z
+    .string()
+    .uuid({ message: "please provide a valid uuid as string" }),
+  stateId: z
+    .string()
+    .uuid({ message: "please provide a valid uuid as string" }),
+  cityId: z.string().uuid({ message: "please provide a valid uuid as string" }),
+  zipcodeId: z
+    .string()
+    .uuid({ message: "please provide a valid uuid as string" }),
+
+  longitude: z.number().gte(-180).lte(180, {
+    message: "please provide a valid longitude as float between -180 and 180 ",
+  }),
+  latitude: z.number().gte(-90).lte(90, {
+    message: "please provide a valid latitude as float between -90 and 90",
+  }),
+  foodTag: z
+    .string()
+    .uuid({ message: "please provide a valid uuid as string" })
+    .array(),
+  restaurantId: z
+    .string()
+    .uuid({ message: "please provide a valid uuid as string" }),
 });
 
 export const CreateRestaurantSuccessZod = z.object({
   created: z.boolean(),
+  restaurantId: z.string().uuid(),
 });
 
 export const CreateRestaurantErrorZod = z.object({
   apiErrors: z.object({
     validationErrors: z
       .object({
+        restaurantId: z.string().array().optional(),
         countryId: z.string().array().optional(),
         stateId: z.string().array().optional(),
         cityId: z.string().array().optional(),

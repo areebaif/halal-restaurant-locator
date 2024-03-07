@@ -1,21 +1,17 @@
 import * as React from "react";
 import { useQueryClient, useMutation, useQuery } from "@tanstack/react-query";
 import { useRouter } from "next/router";
-import {
-  Card,
-  Title,
-  TextInput,
-  Group,
-  Button,
-  Text,
-  Loader,
-} from "@mantine/core";
+import { Card, Title, TextInput, Group, Button, Loader } from "@mantine/core";
 import { ErrorCard, FoodTags, SearchZipcode, ImageUpload } from "@/components";
 import {
   validateFormDataCreateRestaurant,
   helperListUploadImageUrl,
 } from "@/utils";
-import { CreateRestaurant, CreateRestaurantError } from "@/utils/types";
+import {
+  CreateRestaurant,
+  CreateRestaurantError,
+  CreateRestaurantSuccess,
+} from "@/utils/types";
 import { createRestaurant } from "@/utils/crud-functions";
 import { CreateRestaurantResponseZod } from "@/utils/zod/zod";
 
@@ -81,15 +77,47 @@ const AddRestaurant: React.FC = () => {
       }
       if (data.hasOwnProperty("apiErrors")) {
         const apiErrors = data as CreateRestaurantError;
-        // if (apiErrors.apiErrors?.generalErrors) {
-        //   setErrorVal([...errorVal, ...apiErrors.apiErrors?.generalErrors]);
-        // }
+        if (apiErrors.apiErrors?.generalErrors) {
+          return <ErrorCard message="something went wrong, please try again" />;
+        }
         if (apiErrors.apiErrors?.validationErrors) {
-          // TODO: setFormField Error messages
+          const errors = apiErrors.apiErrors
+            ?.validationErrors as CreateRestaurantError["apiErrors"]["validationErrors"];
+          const restaurantId = errors?.restaurantId;
+          const countryId = errors?.countryId;
+          const stateId = errors?.stateId;
+          const cityId = errors?.cityId;
+          const foodTag = errors?.foodTag;
+          const zipcodeId = errors?.zipcodeId;
+          const description = errors?.description;
+          const latitude = errors?.latitude;
+          const longitude = errors?.longitude;
+          const cover = errors?.imageUrl;
+          const restaurantName = errors?.restaurantName;
+          const street = errors?.street;
+          // zipcode: add all the errors
+          const zipcode: string[] = [];
+          if (countryId) [...zipcode, ...countryId];
+          if (stateId) [...zipcode, ...stateId];
+          if (cityId) [...zipcode, ...cityId];
+          if (zipcodeId) [...zipcode, ...zipcodeId];
+          setFormFieldsErrorMessage((prevState) => ({
+            ...prevState,
+            cover,
+            zipcode,
+            foodTag,
+            restaurantName,
+            description,
+            longitude,
+            latitude,
+            street,
+          }));
         }
         return;
       }
-      // TODO: if we succeed with the data then navigate the user to the restaurant product page
+      const restaurantData = data as CreateRestaurantSuccess;
+      // TODO: if we succeed with the data then navigate the user to the restaurant product page. Use the Id below
+      const { restaurantId } = restaurantData;
       router.push("/");
     },
   });
@@ -99,8 +127,8 @@ const AddRestaurant: React.FC = () => {
   }
 
   if (mutation.isError) {
-    // TODO:
-    // tell the user something went wrong with creating restaurant and they need to start again, probably make sure the user doesnt ned to enter all info again.
+    // TODO: this need to be a popup so that the data that the user entered is not lost and they dont have to start again
+    return <ErrorCard message="something went wrong please try again" />;
   }
 
   const onSubmit = async () => {
@@ -168,12 +196,12 @@ const AddRestaurant: React.FC = () => {
       // We are not putting this in the try catch block. These are multiple images, any of the image upload can fail.
       // The backend will check if all images have upload succefully by caling the 3rd party service and querrying for image metadata.
       // If not then the api will respond appropriately, and do any necessary cleanup
-      listForm.listFormData.forEach(async (form) => {
-        await fetch(form.uploadS3Url, {
-          method: "POST",
-          body: form.formData,
-        });
-      });
+      // listForm.listFormData.forEach(async (form) => {
+      //   await fetch(form.uploadS3Url, {
+      //     method: "POST",
+      //     body: form.formData,
+      //   });
+      // });
       //result.status(204, is good)
     }
 

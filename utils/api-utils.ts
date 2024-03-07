@@ -249,7 +249,7 @@ export const validateFormDataCreateRestaurant = (
     if (schemaErrors.cover?.length) {
       setFormFieldsErrorMessage((prevState) => ({
         ...prevState,
-        cover: ["you must add cover image"],
+        cover: schemaErrors.cover,
       }));
     }
     isError = true;
