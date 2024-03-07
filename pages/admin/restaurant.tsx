@@ -196,12 +196,12 @@ const AddRestaurant: React.FC = () => {
       // We are not putting this in the try catch block. These are multiple images, any of the image upload can fail.
       // The backend will check if all images have upload succefully by caling the 3rd party service and querrying for image metadata.
       // If not then the api will respond appropriately, and do any necessary cleanup
-      // listForm.listFormData.forEach(async (form) => {
-      //   await fetch(form.uploadS3Url, {
-      //     method: "POST",
-      //     body: form.formData,
-      //   });
-      // });
+      listForm.listFormData.forEach(async (form) => {
+        await fetch(form.uploadS3Url, {
+          method: "POST",
+          body: form.formData,
+        });
+      });
       //result.status(204, is good)
     }
 
