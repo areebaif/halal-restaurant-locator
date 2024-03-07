@@ -2,13 +2,13 @@ import { prisma } from "@/db/prisma";
 import { v4 as uuidv4 } from "uuid";
 import type { NextApiRequest, NextApiResponse } from "next";
 // local imports
-import { PostAddRestaurantZod, capitalizeFirstWord } from "@/utils";
-import { PostAddRestaurant, ResponseAddRestaurant } from "@/utils/types";
+import { CreateRestaurantZod, capitalizeFirstWord } from "@/utils";
+import { CreateRestaurant, ResponseAddRestaurant } from "@/utils/types";
 
 /**
  *
  * @swagger
- * /api/restaurant/restaurant:
+ * /api/restaurant:
  *    post:
  *      tags:
  *        - restaurants
@@ -96,13 +96,13 @@ import { PostAddRestaurant, ResponseAddRestaurant } from "@/utils/types";
  *                    example: "Some of the values provided in foodtag array do not exist in the database"
  */
 
-export default async function AddState(
+export default async function CreateRestaurant(
   req: NextApiRequest,
   res: NextApiResponse<ResponseAddRestaurant>
 ) {
   try {
     const restaurantData = req.body;
-    const isTypeCorrect = PostAddRestaurantZod.safeParse(restaurantData);
+    const isTypeCorrect = CreateRestaurantZod.safeParse(restaurantData);
     if (!isTypeCorrect.success) {
       console.log(isTypeCorrect.error);
       res.status(400).json({
@@ -112,7 +112,7 @@ export default async function AddState(
       return;
     }
 
-    const parsedRestaurants = restaurantData as PostAddRestaurant;
+    const parsedRestaurants = restaurantData as CreateRestaurant;
     // const parsedRestaurants = restaurantData as PostAddRestaurant;
     const countryId = parsedRestaurants.countryId;
     const stateName = capitalizeFirstWord(parsedRestaurants.stateName);

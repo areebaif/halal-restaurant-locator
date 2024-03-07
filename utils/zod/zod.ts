@@ -206,6 +206,20 @@ export const ListUploadImageUrlResponseZod = z.union([
   ListUploadImageUrlZod,
 ]);
 
+export const CreateRestaurantZod = z.object({
+  countryId: z.string().uuid(),
+  stateId: z.string(),
+  cityId: z.string(),
+  zipcode: z.string(),
+  restaurantName: z.string(),
+  description: z.string(),
+  street: z.string(),
+  longitude: z.number().gte(-180).lte(180),
+  latitude: z.number().gte(-90).lte(90),
+  foodTag: z.string().uuid().array(),
+  imageUrl: z.string().array(),
+});
+
 export const ResponseAddRestaurantZod = z.object({
   state: z.string().optional(),
   country: z.string().optional(),
@@ -215,19 +229,6 @@ export const ResponseAddRestaurantZod = z.object({
   foodTag: z.string().optional(),
   typeError: z.string().optional(),
   created: z.string().optional(),
-});
-
-export const PostAddRestaurantZod = z.object({
-  countryId: z.string().uuid(),
-  street: z.string(),
-  stateName: z.string(),
-  cityName: z.string(),
-  zipcode: z.string(),
-  restaurantName: z.string(),
-  description: z.string(),
-  longitude: z.number().gte(-180).lte(180),
-  latitude: z.number().gte(-90).lte(90),
-  foodTag: z.string().uuid().array(),
 });
 
 export const GetSearchInputsZod = z.object({

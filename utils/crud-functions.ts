@@ -142,6 +142,32 @@ export const getUploadImageUrl = async (data: CreateUploadImageUrl) => {
   return res;
 };
 
+// TODO: fix typing
+export const createRestaurant = async (data: any) => {
+ 
+  const response = await fetch(`/api/restaurant`, {
+    method: "POST",
+    headers: {
+      "Content-Type": "application/json",
+    },
+    body: JSON.stringify(data),
+  });
+
+  const apiErrors = /(4|5)\d{2}/.test(`${response.status}`);
+  if (apiErrors) {
+    // TODO: fix typing
+    const res: CreateFoodTagErrors = await response.json();
+    return res;
+  }
+  // anything other than apiErrors went wrong
+  if (!response.ok) {
+    throw new Error("something went wrong");
+  }
+
+  const res: CreateFoodTag = await response.json();
+  return res;
+};
+
 export const getMapSearchInput = async (data: string) => {
   const response = await fetch(`/api/restaurant/${data}`, {
     method: "GET",

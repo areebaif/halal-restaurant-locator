@@ -6,7 +6,7 @@ import {
   CreateUploadImageUrl,
 } from "./types";
 
-import { CreateUploadImageUrlZod, getImagePostsignedUrl } from ".";
+import { CreateUploadImageUrlZod } from ".";
 type searchCriteria = {
   zipcodeId?: string;
   countryId?: string;

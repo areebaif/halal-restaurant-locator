@@ -16,7 +16,7 @@ import {
   ListUploadImageUrlZod,
   GetZipCodeResponseZod,
   ListUploadImageUrlResponseZod,
-  PostAddRestaurantZod,
+  CreateRestaurantZod,
   GetSearchInputsZod,
 } from "./zod/zod";
 import {
@@ -61,7 +61,7 @@ export {
   helperCreateUploadImageUrl,
   parseQueryVals,
   onlyNumbers,
-  PostAddRestaurantZod,
+  CreateRestaurantZod,
   findRestaurant,
   GetSearchInputsZod,
   calcBoundsFromCoordinates,

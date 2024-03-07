@@ -1,13 +1,13 @@
 import * as React from "react";
 import { useQueryClient, useMutation, useQuery } from "@tanstack/react-query";
 import { useRouter } from "next/router";
-import { v4 as uuidv4 } from "uuid";
 import { Card, Title, TextInput, Group, Button, Text } from "@mantine/core";
 import { ErrorCard, FoodTags, SearchZipcode, ImageUpload } from "@/components";
 import {
   validateFormDataCreateRestaurant,
   helperListUploadImageUrl,
 } from "@/utils";
+import { CreateRestaurant } from "@/utils/types";
 
 type ListForm =
   | {
@@ -20,10 +20,13 @@ type ListForm =
     }
   | undefined;
 
+export type FormFieldsErrorMessage = {
+  cover?: string[];
+  otherImages?: string[];
+};
+
 const AddRestaurant: React.FC = () => {
   const [name, setName] = React.useState("");
-  const [countryStateCityZipcode, setCountryStateCityZipcode] =
-    React.useState("");
   const [latitude, setLatitude] = React.useState<string>("");
   const [longitude, setLongitude] = React.useState<string>("");
   const [foodTag, setFoodTag] = React.useState<string[]>([]);
@@ -32,11 +35,8 @@ const AddRestaurant: React.FC = () => {
   // coverImage is separate, then rest of the images
   const [coverImage, setCoverImage] = React.useState<File | null>(null);
   const [images, setImages] = React.useState<File[]>([]);
-
-  const [formFieldsErrorMessage, setFormFieldsErrorMessage] = React.useState<{
-    cover?: string[];
-    otherImages?: string[];
-  }>();
+  const [formFieldsErrorMessage, setFormFieldsErrorMessage] =
+    React.useState<FormFieldsErrorMessage>();
 
   const onSubmit = async () => {
     setFormFieldsErrorMessage({});
@@ -100,7 +100,9 @@ const AddRestaurant: React.FC = () => {
       //result.status(204, is good)
     }
 
-    // now send all the data to api to save to database.
+    const createRestaurantData: CreateRestaurant = {};
+
+    // TODO: now send all the data to api to save to database.
   };
 
   return (
@@ -168,23 +170,8 @@ const AddRestaurant: React.FC = () => {
         setCoverImage={setCoverImage}
         setImages={setImages}
         images={images}
+        formFieldsErrorMessage={formFieldsErrorMessage}
       />
-      {formFieldsErrorMessage?.cover ? (
-        <>
-          <Text>cover</Text>
-          <ErrorCard arrayOfErrors={formFieldsErrorMessage?.cover} />
-        </>
-      ) : (
-        <></>
-      )}
-      {formFieldsErrorMessage?.otherImages ? (
-        <>
-          <Text>other images</Text>
-          <ErrorCard arrayOfErrors={formFieldsErrorMessage?.otherImages} />
-        </>
-      ) : (
-        <></>
-      )}
       <Group position="center" mt="sm">
         <Button
           onClick={onSubmit}

@@ -19,7 +19,8 @@ import {
   ListUploadImageUrlZod,
   ListUploadImageUrlErrorZod,
   ListUploadImageUrlResponseZod,
-  PostAddRestaurantZod,
+  CreateRestaurantZod,
+  
   ResponseAddRestaurantZod,
   GetSearchInputsZod,
   ResponseRestaurantGeoJsonZod,
@@ -54,7 +55,7 @@ export type ListUploadImageUrlResponse = z.infer<
   typeof ListUploadImageUrlResponseZod
 >;
 
-export type PostAddRestaurant = z.infer<typeof PostAddRestaurantZod>;
+export type CreateRestaurant = z.infer<typeof CreateRestaurantZod>;
 export type ResponseAddRestaurant = z.infer<typeof ResponseAddRestaurantZod>;
 export type GetSearchInputs = z.infer<typeof GetSearchInputsZod>;
 export type RestaurantReadDb = z.infer<typeof RestaurantReadDbZod>;
