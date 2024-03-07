@@ -4,6 +4,7 @@ import {
   getZipcode,
   helperListUploadImageUrl,
   listUSAGeog,
+  createRestaurant,
 } from "./crud-functions";
 import {
   CreateFoodTagZod,
@@ -32,6 +33,7 @@ import {
   parseQueryVals,
   hasNumbers,
   onlyNumbers,
+  isValidCoordinate,
 } from "./string-manipulation";
 import { getMapSearchInput, listFoodTags } from "./crud-functions";
 import { s3Client } from "./aws-S3-Client";
@@ -70,4 +72,5 @@ export {
   stateIdExists,
   cityIdExists,
   getZipcode,
+  isValidCoordinate,
 };

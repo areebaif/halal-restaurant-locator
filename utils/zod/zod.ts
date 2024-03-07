@@ -85,6 +85,8 @@ export const GetZipcodeZod = z.object({
   zipcode: z.object({
     zipcodeId: z.string().uuid(),
     zipcode: z.string(),
+    cityId: z.string().uuid(),
+    stateId: z.string().uuid(),
     stateName: z.string(),
     cityName: z.string(),
     latitude: z.number().gte(-90).lte(90),
@@ -210,7 +212,7 @@ export const CreateRestaurantZod = z.object({
   countryId: z.string().uuid(),
   stateId: z.string(),
   cityId: z.string(),
-  zipcode: z.string(),
+  zipcodeId: z.string(),
   restaurantName: z.string(),
   description: z.string(),
   street: z.string(),
@@ -218,7 +220,38 @@ export const CreateRestaurantZod = z.object({
   latitude: z.number().gte(-90).lte(90),
   foodTag: z.string().uuid().array(),
   imageUrl: z.string().array(),
+  restaurantId: z.string().uuid(),
 });
+
+export const CreateRestaurantSuccessZod = z.object({
+  created: z.boolean(),
+});
+
+export const CreateRestaurantErrorZod = z.object({
+  apiErrors: z.object({
+    validationErrors: z
+      .object({
+        countryId: z.string().array().optional(),
+        stateId: z.string().array().optional(),
+        cityId: z.string().array().optional(),
+        foodTag: z.string().array().optional(),
+        description: z.string().array().optional(),
+        street: z.string().array().optional(),
+        latitude: z.string().array().optional(),
+        longitude: z.string().array().optional(),
+        imageUrl: z.string().array().optional(),
+        zipcodeId: z.string().array().optional(),
+        restaurantName: z.string().array().optional(),
+      })
+      .optional(),
+    generalErrors: z.string().array().optional(),
+  }),
+});
+
+export const CreateRestaurantResponseZod = z.union([
+  CreateRestaurantSuccessZod,
+  CreateRestaurantErrorZod,
+]);
 
 export const ResponseAddRestaurantZod = z.object({
   state: z.string().optional(),

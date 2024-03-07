@@ -51,3 +51,7 @@ export const hasNumbers = (str: string) => {
 export const onlyNumbers = (str: string) => {
   return /^\d+$/.test(str);
 };
+
+export const isValidCoordinate = (val: string) => {
+  return /^[+-]?([0-9]+([.][0-9]*)?|[.][0-9]+)$/.test(val)
+}

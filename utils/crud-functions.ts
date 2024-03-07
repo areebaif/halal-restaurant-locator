@@ -14,6 +14,9 @@ import {
   CreateFoodTagErrors,
   ListFoodTagsError,
   ListUploadImageUrlError,
+  CreateRestaurant,
+  CreateRestaurantError,
+  CreateRestaurantSuccess,
 } from "./types";
 
 export const listUSAGeog = async (searchTerm: string) => {
@@ -142,9 +145,7 @@ export const getUploadImageUrl = async (data: CreateUploadImageUrl) => {
   return res;
 };
 
-// TODO: fix typing
-export const createRestaurant = async (data: any) => {
- 
+export const createRestaurant = async (data: CreateRestaurant) => {
   const response = await fetch(`/api/restaurant`, {
     method: "POST",
     headers: {
@@ -155,8 +156,7 @@ export const createRestaurant = async (data: any) => {
 
   const apiErrors = /(4|5)\d{2}/.test(`${response.status}`);
   if (apiErrors) {
-    // TODO: fix typing
-    const res: CreateFoodTagErrors = await response.json();
+    const res: CreateRestaurantError = await response.json();
     return res;
   }
   // anything other than apiErrors went wrong
@@ -164,7 +164,7 @@ export const createRestaurant = async (data: any) => {
     throw new Error("something went wrong");
   }
 
-  const res: CreateFoodTag = await response.json();
+  const res: CreateRestaurantSuccess = await response.json();
   return res;
 };
 

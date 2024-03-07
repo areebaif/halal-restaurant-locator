@@ -82,7 +82,6 @@ export default async function imageUpload(
 ) {
   try {
     if (req.method === "POST") {
-      console.log(" I am here", req.body.image);
       const images = req.body.image as CreateUploadImageUrl;
 
       // do zod typechecking here
@@ -114,7 +113,7 @@ export default async function imageUpload(
       imageUrl.push({
         key: `${coverDbUrl}.${imageExtension}`,
         type: images.cover.type,
-        dbUrl: coverDbUrl,
+        dbUrl: `${coverDbUrl}.${imageExtension}`,
       });
       images.otherImages.forEach((file) => {
         if (file) {
@@ -124,7 +123,7 @@ export default async function imageUpload(
           imageUrl.push({
             key: `${dbUrl}.${imageExtension}`,
             type: file?.type,
-            dbUrl: dbUrl,
+            dbUrl: `${dbUrl}.${imageExtension}`,
           });
         }
       });

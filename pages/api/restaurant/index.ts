@@ -1,9 +1,14 @@
 import { prisma } from "@/db/prisma";
 import { v4 as uuidv4 } from "uuid";
 import type { NextApiRequest, NextApiResponse } from "next";
+import { z } from "zod";
 // local imports
-import { CreateRestaurantZod, capitalizeFirstWord } from "@/utils";
-import { CreateRestaurant, ResponseAddRestaurant } from "@/utils/types";
+import { CreateRestaurantZod } from "@/utils";
+import {
+  CreateRestaurant,
+  CreateRestaurantSuccess,
+  CreateRestaurantError,
+} from "@/utils/types";
 
 /**
  *
@@ -98,7 +103,7 @@ import { CreateRestaurant, ResponseAddRestaurant } from "@/utils/types";
 
 export default async function CreateRestaurant(
   req: NextApiRequest,
-  res: NextApiResponse<ResponseAddRestaurant>
+  res: NextApiResponse<CreateRestaurantSuccess | CreateRestaurantError>
 ) {
   try {
     const restaurantData = req.body;
@@ -106,21 +111,35 @@ export default async function CreateRestaurant(
     if (!isTypeCorrect.success) {
       console.log(isTypeCorrect.error);
       res.status(400).json({
-        typeError:
-          "type check failed on the server, expected to an objects with countryId, stateName, cityName, restaurantName, description properties as string, foodtag property as array of uuid string , longitude and latitude properties as number",
+        apiErrors: {
+          validationErrors: {
+            countryId: [
+              "type check failed on the server, expected to an objects with countryId, stateName, cityName, restaurantName, description properties as string, foodtag property as array of uuid string , longitude and latitude properties as number",
+            ],
+          },
+        },
       });
       return;
     }
 
-    const parsedRestaurants = restaurantData as CreateRestaurant;
-    // const parsedRestaurants = restaurantData as PostAddRestaurant;
-    const countryId = parsedRestaurants.countryId;
-    const stateName = capitalizeFirstWord(parsedRestaurants.stateName);
-    const cityName = capitalizeFirstWord(parsedRestaurants.cityName);
-    //const street = capitalizeFirstWord(parsedRestaurants.street);
-    const street = parsedRestaurants.street;
-    const foodTag = parsedRestaurants.foodTag;
+    const restaurant = restaurantData as CreateRestaurant;
 
+    const {
+      countryId,
+      stateId,
+      cityId,
+      foodTag,
+      description,
+      street,
+      latitude,
+      longitude,
+      imageUrl,
+      zipcodeId,
+      restaurantName,
+      restaurantId,
+    } = restaurant;
+
+    z.string().uuid().safeParse(restaurantId);
     const countryExists = await prisma.country.findUnique({
       where: {
         countryId: countryId,
@@ -128,54 +147,62 @@ export default async function CreateRestaurant(
     });
     if (!countryExists?.countryId) {
       res.status(400).json({
-        country: "The provided countryId doesnot exist in the database",
+        apiErrors: {
+          validationErrors: {
+            countryId: [
+              "The provided countryId does not exist in the database.",
+            ],
+          },
+        },
       });
       return;
     }
     const stateExists = await prisma.state.findUnique({
       where: {
-        countryId_stateName: {
-          countryId: countryExists?.countryId,
-          stateName: stateName,
-        },
+        stateId: stateId,
       },
     });
     if (!stateExists?.stateId) {
       res.status(400).json({
-        state:
-          "The provided stateName inreference to countryId doesnot exist in the database",
+        apiErrors: {
+          validationErrors: {
+            stateId: ["The provided stateId does not exist in the database."],
+          },
+        },
       });
       return;
     }
     const cityExists = await prisma.city.findUnique({
       where: {
-        countryId_stateId_cityName: {
-          countryId: countryExists.countryId,
-          stateId: stateExists.stateId,
-          cityName: cityName,
-        },
+        cityId: cityId,
       },
     });
     if (!cityExists?.cityId) {
       res.status(400).json({
-        city: "The provided cityName in reference to countryId and stateName doesnot exist in the database",
+        apiErrors: {
+          validationErrors: {
+            cityId: ["The provided cityId does not exist in the database."],
+          },
+        },
       });
       return;
     }
 
     const zipcodeExists = await prisma.zipcode.findUnique({
       where: {
-        zipcode_countryId: {
-          zipcode: parsedRestaurants.zipcode,
-          countryId: countryExists.countryId,
-        },
+        zipcodeId: zipcodeId,
       },
     });
 
     if (!zipcodeExists?.zipcodeId) {
       res.status(400).json({
-        zipcode:
-          "The provided zipcode in reference to countryId doesnot exist in the database",
+        apiErrors: {
+          validationErrors: {
+            zipcodeId: [
+              "The provided zipcodeId does not exist in the database.",
+            ],
+          },
+        },
       });
       return;
     }
@@ -193,13 +220,14 @@ export default async function CreateRestaurant(
     );
     if (isNullValue) {
       res.status(400).json({
-        foodTag:
-          "Some of the values provided in foodtag array do not exist in the database",
+        apiErrors: {
+          validationErrors: {
+            foodTag: ["The provided foodtagId does not exist in the database."],
+          },
+        },
       });
       return;
     }
-
-    const restaurantId = uuidv4();
     const createRestaurant = prisma.restaurant.create({
       data: {
         restaurantId: restaurantId,
@@ -208,13 +236,13 @@ export default async function CreateRestaurant(
         stateId: stateExists.stateId,
         cityId: cityExists.cityId,
         street: street,
-        description: parsedRestaurants.description,
-        restaurantName: parsedRestaurants.restaurantName,
-        latitude: parsedRestaurants.latitude,
-        longitude: parsedRestaurants.longitude,
+        description: description,
+        restaurantName: restaurantName,
+        latitude: latitude,
+        longitude: longitude,
       },
     });
-    const addRestaurant_FoodTag = resolvedFoodTags.map((tag) =>
+    const createRestaurant_FoodTag = resolvedFoodTags.map((tag) =>
       prisma.restaurant_FoodTag.createMany({
         data: {
           FoodTagId: tag?.foodTagId!,
@@ -222,10 +250,24 @@ export default async function CreateRestaurant(
         },
       })
     );
-    await prisma.$transaction([createRestaurant, ...addRestaurant_FoodTag]);
-    res.status(201).json({ created: "ok" });
+    const createRestaurant_ImageUrl = imageUrl.map((url) =>
+      prisma.restaurant_Image_Url.createMany({
+        data: {
+          restaurantId: restaurantId,
+          imageUrl: url,
+        },
+      })
+    );
+    await prisma.$transaction([
+      createRestaurant,
+      ...createRestaurant_FoodTag,
+      ...createRestaurant_ImageUrl,
+    ]);
+    res.status(201).json({ created: true });
   } catch (err) {
     console.log(err);
-    res.status(500).json({ country: "something went wrong with the server" });
+    res.status(500).json({
+      apiErrors: { generalErrors: ["something went wrong with the server"] },
+    });
   }
 }

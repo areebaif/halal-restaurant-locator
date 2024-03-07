@@ -24,8 +24,8 @@ export const ErrorCard: React.FC<ErrorCardProps> = ({
           message
         ) : (
           <List>
-            {arrayOfErrors?.map((error) => (
-              <List.Item>{error}</List.Item>
+            {arrayOfErrors?.map((error, index) => (
+              <List.Item key={index}>{error}</List.Item>
             ))}
           </List>
         )}

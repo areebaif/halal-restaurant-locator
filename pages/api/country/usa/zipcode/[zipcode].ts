@@ -38,6 +38,14 @@ import { GetZipcodeError, GetZipcode } from "@/utils/types";
  *                        type: string
  *                        format: uuid
  *                        example: "64b31531-28fd-4570-ad64-6aa312e53d69"
+ *                      stateId:
+ *                        type: string
+ *                        format: uuid
+ *                        example: "64b31531-28fd-4570-ad64-6aa312e53d69"
+ *                      cityId:
+ *                        type: string
+ *                        format: uuid
+ *                        example: "64b31531-28fd-4570-ad64-6aa312e53d69"
  *                      stateName:
  *                        type: string
  *                        example: "Minnesota"
@@ -165,7 +173,8 @@ export default async function GeographySearch(
       zipcode: item.zipcode,
       stateName: item.State.stateName,
       cityName: item.City.cityName,
-
+      cityId: item.City.cityId,
+      stateId: item.State.stateId,
       latitude: item.latitude,
       longitude: item.longitude,
       countryId: item.Country.countryId,

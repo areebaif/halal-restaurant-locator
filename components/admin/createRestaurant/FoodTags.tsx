@@ -4,13 +4,19 @@ import { Chip, Group, Loader, Textarea, Grid, Button } from "@mantine/core";
 import { listFoodTags, ListFoodTagsResponseZod } from "@/utils";
 import { ErrorCard, AddFoodTag } from "@/components";
 import { ListFoodTags, ListFoodTagsError } from "@/utils/types";
+import { FormFieldsErrorMessage } from "@/pages/admin/restaurant";
 
 export type FoodTags = {
   foodTag: string[];
   setFoodTag: (val: string[]) => void;
+  formFieldsErrorMessage: FormFieldsErrorMessage | undefined;
 };
 
-export const FoodTags: React.FC<FoodTags> = ({ foodTag, setFoodTag }) => {
+export const FoodTags: React.FC<FoodTags> = ({
+  foodTag,
+  setFoodTag,
+  formFieldsErrorMessage,
+}) => {
   const [isOpenCreateFoodTag, setIsOpenCreateFoodTag] = React.useState(false);
   const [isError, setIsError] = React.useState(false);
   const [errorVal, setIsErrorVal] = React.useState<{ foodTag: string[] }>({
@@ -44,7 +50,7 @@ export const FoodTags: React.FC<FoodTags> = ({ foodTag, setFoodTag }) => {
   });
 
   if (foodTagData.isLoading) return <Loader />;
-  console.log(foodTag, "slsl");
+
   if (foodTagData.isError) {
     console.log(foodTagData.error);
     return <ErrorCard message="something went wrong with the api request" />;
@@ -103,6 +109,9 @@ export const FoodTags: React.FC<FoodTags> = ({ foodTag, setFoodTag }) => {
         </Grid.Col>
       </Grid>
       {isError && <ErrorCard arrayOfErrors={errorVal.foodTag} />}
+      {formFieldsErrorMessage?.foodTag && (
+        <ErrorCard arrayOfErrors={formFieldsErrorMessage.foodTag} />
+      )}
       {isOpenCreateFoodTag && (
         <AddFoodTag setIsOpenCreateFoodTag={setIsOpenCreateFoodTag} />
       )}

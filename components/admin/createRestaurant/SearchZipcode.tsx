@@ -3,10 +3,18 @@ import { useQuery } from "@tanstack/react-query";
 import { TextInput, Textarea, Button, Grid, Loader } from "@mantine/core";
 import { ErrorCard } from "@/components";
 import { getZipcode, GetZipCodeResponseZod, onlyNumbers } from "@/utils";
-
 import { GetZipcode, GetZipcodeError } from "@/utils/types";
+import { Adress, FormFieldsErrorMessage } from "@/pages/admin/restaurant";
 
-export const SearchZipcode: React.FC = () => {
+type SearchZipcodeProps = {
+  setAddress: (data: Adress) => void;
+  formFieldsErrorMessage: FormFieldsErrorMessage | undefined;
+};
+
+export const SearchZipcode: React.FC<SearchZipcodeProps> = ({
+  setAddress,
+  formFieldsErrorMessage,
+}) => {
   const [zipcode, setZipcode] = React.useState("");
   const [errors, setErrors] = React.useState(false);
   const [getApiFlag, setGetApiFlag] = React.useState(false);
@@ -23,7 +31,6 @@ export const SearchZipcode: React.FC = () => {
       enabled: getApiFlag,
       onSuccess: (data) => {
         setGetApiFlag(false);
-
         const isTypeCorrentZipcode = GetZipCodeResponseZod.safeParse(data);
         if (!isTypeCorrentZipcode.success) {
           setErrors(true);
@@ -51,6 +58,13 @@ export const SearchZipcode: React.FC = () => {
           }
           setErrors(true);
         } else {
+          const adress = data as GetZipcode;
+          setAddress({
+            countryId: adress.zipcode.countryId,
+            stateId: adress.zipcode.stateId,
+            cityId: adress.zipcode.cityId,
+            zipcodeId: adress.zipcode.zipcodeId,
+          });
           setDisplayZipcodeCard(true);
         }
       },
@@ -85,6 +99,13 @@ export const SearchZipcode: React.FC = () => {
     }
     setGetApiFlag(true);
     if (zipcodeApiResponse && zipcodeApiResponse.zipcode) {
+      const adress = zipcodeApiResponse;
+      setAddress({
+        countryId: adress.zipcode.countryId,
+        stateId: adress.zipcode.stateId,
+        cityId: adress.zipcode.cityId,
+        zipcodeId: adress.zipcode.zipcodeId,
+      });
       setDisplayZipcodeCard(true);
     }
   };
@@ -95,6 +116,7 @@ export const SearchZipcode: React.FC = () => {
       setDisplayZipcodeCard={setDisplayZipcodeCard}
       setZipcode={setZipcode}
       setGetApiFlag={setGetApiFlag}
+      setAddress={setAddress}
     />
   ) : (
     <>
@@ -135,6 +157,9 @@ export const SearchZipcode: React.FC = () => {
         </Grid.Col>
       </Grid>
       {errors && <ErrorCard arrayOfErrors={errorVal.zipcode} />}
+      {formFieldsErrorMessage?.zipcode && (
+        <ErrorCard arrayOfErrors={formFieldsErrorMessage.zipcode} />
+      )}
     </>
   );
 };
@@ -144,6 +169,7 @@ type GetZipcodeDisplayCardProps = {
   setDisplayZipcodeCard: (val: boolean) => void;
   setZipcode: (val: string) => void;
   setGetApiFlag: (val: boolean) => void;
+  setAddress: (data: Adress) => void;
 };
 
 export const GetZipcodeDisplayCard: React.FC<GetZipcodeDisplayCardProps> = ({
@@ -151,6 +177,7 @@ export const GetZipcodeDisplayCard: React.FC<GetZipcodeDisplayCardProps> = ({
   setDisplayZipcodeCard,
   setZipcode,
   setGetApiFlag,
+  setAddress,
 }) => {
   return (
     <Grid mt="xs">
@@ -179,6 +206,12 @@ export const GetZipcodeDisplayCard: React.FC<GetZipcodeDisplayCardProps> = ({
           variant="outline"
           color="dark"
           onClick={() => {
+            setAddress({
+              countryId: "",
+              stateId: "",
+              cityId: "",
+              zipcodeId: "",
+            });
             setZipcode("");
             setDisplayZipcodeCard(false);
             setGetApiFlag(false);
