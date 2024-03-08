@@ -2,7 +2,7 @@
  *
  * @swagger
  *
- * /api/restaurant/{city}&{state}&{country}:
+ * /api/restaurant/{country}&{state}&{city}:
  *     get:
  *       tags:
  *         - restaurants

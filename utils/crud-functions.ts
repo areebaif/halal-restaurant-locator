@@ -3,7 +3,6 @@ import {
   CreateFoodTag,
   ListFoodTags,
   ListGeography,
-  GeoJsonRestaurantFeatureCollection,
   ListStates,
   CreateUploadImageUrl,
   ListUploadImageUrl,
@@ -17,6 +16,7 @@ import {
   CreateRestaurant,
   CreateRestaurantError,
   CreateRestaurantSuccess,
+  RestaurantGeoJsonFeatureCollectionClient,
 } from "./types";
 
 export const listUSAGeog = async (searchTerm: string) => {
@@ -168,14 +168,14 @@ export const createRestaurant = async (data: CreateRestaurant) => {
   return res;
 };
 
-export const getMapSearchInput = async (data: string) => {
-  const response = await fetch(`/api/restaurant/${data}`, {
+export const listRestaurantBySearchCriteria = async (data: string) => {
+  const response = await fetch(`/api/restaurant?${data}`, {
     method: "GET",
     headers: {
       "Content-Type": "application/json",
     },
   });
-  const res: GeoJsonRestaurantFeatureCollection = await response.json();
+  const res: RestaurantGeoJsonFeatureCollectionClient = await response.json();
   return res;
 };
 

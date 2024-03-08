@@ -9,24 +9,26 @@ import { SearchInput, MapAndList } from "@/components";
 
 const MapSearch: React.FC = () => {
   const router = useRouter();
-  const urlParams = router.query.searchParams;
+  const urlParams = router.query;
+  const { country, zipcode, city, state } = urlParams;
   const [query, setQuery] = React.useState("");
 
   React.useEffect(() => {
     // since this is a client component, during initial two renders, urlParams is empty
-    if (urlParams) {
-      const queryVal = urlParams[0];
-      setQuery(queryVal);
+    if (city || zipcode) {
+      city
+        ? setQuery(`country=${country}&state=${state}&city=${city}`)
+        : setQuery(`country=${country}&zipcode=${zipcode}`);
     }
-  }, [urlParams]);
+  }, [country, zipcode, city, state]);
 
   // we are doing this so that when we navigate our search input populates with appropriate values
   let searchInputVal = "";
-  const queryStringValFormatted = parseQueryVals(query);
-  queryStringValFormatted.city
-    ? (searchInputVal = `${queryStringValFormatted.city}, ${queryStringValFormatted.state}, ${queryStringValFormatted.country}`)
-    : (searchInputVal = `${queryStringValFormatted.zipcode}, ${queryStringValFormatted.country}`);
-
+  if (city) {
+    searchInputVal = `${city}, ${state}, ${country}`;
+  } else {
+    searchInputVal = `${zipcode}, ${country}`;
+  }
   const mapAndListProps = {
     query,
     setQuery,

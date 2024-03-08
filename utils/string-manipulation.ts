@@ -18,16 +18,16 @@ export const parseQueryVals = (val: string): GetSearchInputs => {
   const allQueryArray = val.split("&");
   switch (allQueryArray.length) {
     case 2: {
-      const zipcodeVal = allQueryArray[0];
+      const zipcodeVal = allQueryArray[1];
       const zipcodeSplit = zipcodeVal.split("=");
       queryValue.zipcode = zipcodeSplit[1];
-      const countryVal = allQueryArray[1];
+      const countryVal = allQueryArray[0];
       const countrySplit = countryVal.split("=");
       queryValue.country = countrySplit[1];
       return queryValue;
     }
     case 3: {
-      const cityVal = allQueryArray[0];
+      const cityVal = allQueryArray[2];
       const citySplit = cityVal.split("=");
       queryValue.city = citySplit[1];
 
@@ -35,7 +35,7 @@ export const parseQueryVals = (val: string): GetSearchInputs => {
       const stateSplit = stateVal.split("=");
       queryValue.state = stateSplit[1];
 
-      const countryVal = allQueryArray[2];
+      const countryVal = allQueryArray[0];
       const countrySplit = countryVal.split("=");
       queryValue.country = countrySplit[1];
       return queryValue;
@@ -53,5 +53,5 @@ export const onlyNumbers = (str: string) => {
 };
 
 export const isValidCoordinate = (val: string) => {
-  return /^[+-]?([0-9]+([.][0-9]*)?|[.][0-9]+)$/.test(val)
-}
+  return /^[+-]?([0-9]+([.][0-9]*)?|[.][0-9]+)$/.test(val);
+};

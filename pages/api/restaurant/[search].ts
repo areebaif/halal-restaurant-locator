@@ -17,7 +17,7 @@ import {
  *
  * @swagger
  *
- * /api/restaurant/{zipcode}&{country}:
+ * /api/restaurant?{country}&{zipcode}:
  *     get:
  *       tags:
  *         - restaurants
@@ -26,14 +26,14 @@ import {
  *       operationId: searchRestaurant
  *       parameters:
  *         - name: zipcode
- *           in: path
+ *           in: query
  *           description: zipcode in USA
  *           required: true
  *           schema:
  *             type: string
  *             example: "55442"
  *         - name: country
- *           in: path
+ *           in: query
  *           description: country name
  *           required: true
  *           schema:
