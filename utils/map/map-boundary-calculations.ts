@@ -1,4 +1,4 @@
-import { GeoJsonRestaurantProperties } from "../types";
+import { GeoJsonPropertiesRestaurant } from "../types";
 const getSWCoordinates = (coordinatesCollection: any) => {
   const lowestLng = Math.min(
     ...coordinatesCollection.map((coordinates: any) => coordinates[0])
@@ -31,7 +31,7 @@ const getNECoordinates = (coordinatesCollection: any) => {
 const calcBoundsFromCoordinates = (
   geolocations: GeoJSON.FeatureCollection<
     GeoJSON.Geometry,
-    GeoJsonRestaurantProperties
+    GeoJsonPropertiesRestaurant
   >
 ) => {
   const coordinatesArray = geolocations?.features.map((item) => {
