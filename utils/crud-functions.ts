@@ -21,7 +21,7 @@ import {
 } from "./types";
 
 export const listUSAGeog = async (searchTerm: string) => {
-  const response = await fetch(`/api/country/usa/search=${searchTerm}`, {
+  const response = await fetch(`/api/country/usa?search=${searchTerm}`, {
     method: "GET",
     headers: {
       "Content-Type": "application/json",

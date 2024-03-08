@@ -1,28 +1,28 @@
 import { prisma } from "@/db/prisma";
 import type { NextApiRequest, NextApiResponse } from "next";
 import { z } from "zod";
-import { hasNumbers } from "@/utils";
+import { hasNumbers, onlyNumbers } from "@/utils";
 import { ListGeography, ListCountryError } from "@/utils/types";
 
 /**
  *
  * @swagger
  *
- * /api/country/usa/{search}:
+ * /api/country/usa?search="554":
  *  get:
  *    tags:
  *      - country
- *    summary: query either zipcode or city based on user input
+ *    summary: query either zipcode or city based on client input
  *    description: This api looks at the first 3 characters of the search term to filter rather large zipcode and city dataset to send relevant data
  *    operationId: listGeography
  *    parameters:
  *      - name: search
- *        in: path
+ *        in: query
  *        description: first 3 charcters of zipcode or city in U.S.A
  *        required: true
  *        schema:
  *          type: string
- *          example: "554"
+ *          example: "Chi"
  *    responses:
  *      '200':
  *        description: successful operation
@@ -130,18 +130,16 @@ export default async function GeographySearch(
       return;
     }
     const stringQuery = search as string;
-    const isZipcode = hasNumbers(stringQuery);
+    const isZipcode = onlyNumbers(stringQuery);
     const country = await prisma.country.findUnique({
       where: { countryName: "U.S.A" },
     });
     if (isZipcode) {
       // the search is a zipcode or invalid zipcode
-      const zipcodeSplit = stringQuery.split("=");
-      const zipcodeVal = zipcodeSplit[1];
       const zipcode = await prisma.zipcode.findMany({
         where: {
           zipcode: {
-            startsWith: zipcodeVal,
+            startsWith: stringQuery,
           },
         },
         select: {
@@ -178,12 +176,10 @@ export default async function GeographySearch(
       });
     } else {
       // the search is a city name or invalid city name
-      const citySplit = stringQuery.split("=");
-      const cityVal = citySplit[1];
       const city = await prisma.city.findMany({
         where: {
           cityName: {
-            startsWith: cityVal,
+            startsWith: stringQuery,
           },
         },
         select: {
