@@ -1,14 +1,23 @@
 import { prisma } from "@/db/prisma";
-import { v4 as uuidv4 } from "uuid";
 import type { NextApiRequest, NextApiResponse } from "next";
 import { z } from "zod";
 // local imports
-import { CreateRestaurantZod } from "@/utils";
 import {
   CreateRestaurant,
   CreateRestaurantSuccess,
   CreateRestaurantError,
+  FilterRestaurantsByZipcode,
+  FilterRestaurantsByCity,
+  FilterRestaurantsErrors,
+  GeoJsonFeatureCollectionRestaurants,
 } from "@/utils/types";
+import {
+  filterRestaurants,
+  capitalizeFirstWord,
+  FilterRestaurantsByZipcodeZod,
+  FilterRestaurantsByCityZod,
+  CreateRestaurantZod,
+} from "@/utils";
 
 /**
  *
@@ -71,7 +80,6 @@ import {
  *                    type:
  *                      string
  *                    example: "d16d6b71-c382-48ba-986b-c570b450f430/cover/131fa780-92e0-4c30-8428-9a5c780a91a3.png"
-
  *
  *        required: true
  *      responses:
@@ -176,11 +184,153 @@ import {
  *                          items:
  *                            type: string
  *                            example: "something went wrong with the server"
+ * 
+ * /api/restaurant?country=U.S.A&zipcode=55433:
+ *     get:
+ *       tags:
+ *         - restaurants
+ *       summary: find restaurants depending on query parameters
+ *       description: Returns geojson restaurant feature collection
+ *       operationId: searchRestaurant
+ *       parameters:
+ *         - name: zipcode
+ *           in: query
+ *           description: zipcode in USA
+ *           required: true
+ *           schema:
+ *             type: string
+ *             example: "55442"
+ *         - name: country
+ *           in: query
+ *           description: country name
+ *           required: true
+ *           schema:
+ *             type: string
+ *             example: "U.S.A"
+ *       responses:
+ *         '200':
+ *           description: successful operation
+ *           content:
+ *             application/json:
+ *               schema:
+ *                 type: object
+ *                 properties:
+ *                   type:
+ *                     type: string
+ *                     example: "FeatureCollection"
+ *                   features:
+ *                     type: array
+ *                     items:
+ *                       type: object
+ *                       properties:
+ *                         type:
+ *                           type: string
+ *                           example: "Feature"
+ *                         id:
+ *                           type: number
+ *                         geometry:
+ *                           type: object
+ *                           properties:
+ *                             type:
+ *                               type: string
+ *                               example: "Point"
+ *                             coordinates:
+ *                               type: array
+ *                               items:
+ *                                 type: number
+ *                                 example: -84.8076, 45.944
+ *                         properties:
+ *                            type: object
+ *                            properties:
+ *                              restaurantId:
+ *                                type: string
+ *                                format: uuid
+ *                                example: "64b31531-28fd-4570-ad64-6aa312e53d69"
+ *                              restaurantName:
+ *                                type: string
+ *                              description:
+ *                                type: string
+ *                              street:
+ *                                type: string
+ *                                example: string
+ *                              country:
+ *                                type: string
+ *                                example: "U.S.A"
+ *                              state:
+ *                                type: string
+ *                                example: "Minnesota"
+ *                              city:
+ *                                type: string
+ *                                example: "Minneapolis"
+ *                              zipcode:
+ *                                type: string
+ *                                example: "55442"
+ *                              foodTag:
+ *                                type: array
+ *                                items:
+ *                                  type:
+ *                                    string
+ *                                  example: "64b31531-28fd-4570-ad64-6aa312e53d69"
+ *
+ *         '400':
+ *           description: Invalid data supplied
+ *           content:
+ *             application/json:
+ *               schema:
+ *                 type: object
+ *                 properties:
+ *                     apiErrors:
+ *                       type: object
+ *                       properties:
+ *                          validationErrors:
+ *                            type: object
+ *                          properties:
+ *                              country:
+ *                                    type: array
+ *                                    items:
+ *                                      type: string
+ *                                      example: "The provided country name does not exist in the database"
+ *                              state:
+ *                                    type: array
+ *                                    items:
+ *                                      type: string
+ *                                      example: "The provided state does not exist in the database"
+ *                              city:
+ *                                    type: array
+ *                                    items:
+ *                                      type: string
+ *                                      example: "The provided city does not exist in the database"
+ *                              zipcode:
+ *                                    type: array
+ *                                    items:
+ *                                      type: string
+ *                                      example: "The provided zipcode does not exist in the database"
+ *         '500':
+ *           description: Internal server error
+ *           content:
+ *             application/json:
+ *               schema:
+ *                 type: object
+ *                 properties:
+ *                     apiErrors:
+ *                       type: object
+ *                       properties:
+ *                         generalErrors:
+ *                           type: array
+ *                           items:
+ *                             type: string
+ *                             example: "something went wrong with the server"
+ 
  */
 
 export default async function CreateRestaurant(
   req: NextApiRequest,
-  res: NextApiResponse<CreateRestaurantSuccess | CreateRestaurantError>
+  res: NextApiResponse<
+    | CreateRestaurantSuccess
+    | CreateRestaurantError
+    | FilterRestaurantsErrors
+    | GeoJsonFeatureCollectionRestaurants
+  >
 ) {
   try {
     if (req.method === "POST") {
@@ -367,6 +517,170 @@ export default async function CreateRestaurant(
         ...createRestaurant_ImageUrl,
       ]);
       res.status(201).json({ created: true, restaurantId: restaurantId });
+    }
+
+    if (req.method == "GET") {
+      const { country, zipcode, state, city } = req.query;
+
+      if (!state && !city && !zipcode && !country) {
+        res.status(400).json({
+          apiErrors: {
+            validationErrors: {
+              zipcode: [
+                "please provide value for either zipcode & country or country, state & city",
+              ],
+              city: [
+                "please provide value for either zipcode & country or country, state & city",
+              ],
+            },
+          },
+        });
+        return;
+      }
+      if (typeof country !== "string") {
+        res.status(400).json({
+          apiErrors: {
+            validationErrors: {
+              country: ["please provide value for country as string"],
+            },
+          },
+        });
+        return;
+      }
+      const countryExists = await prisma.country.findUnique({
+        where: {
+          countryName: country as string,
+        },
+      });
+
+      if (!countryExists?.countryId) {
+        res.status(400).json({
+          apiErrors: {
+            validationErrors: {
+              country: [
+                "Country does not exist in the database with the name provided",
+              ],
+            },
+          },
+        });
+        return;
+      }
+      // search by zipcode
+      if (zipcode && zipcode.length > 1) {
+        const isTypeCorrect = FilterRestaurantsByZipcodeZod.safeParse(
+          req.query
+        );
+        if (!isTypeCorrect.success) {
+          console.log(isTypeCorrect.error);
+          res.status(400).json({
+            apiErrors: {
+              validationErrors: {
+                country: [
+                  "Typecheck failed on the server, provide country and zipcode value as string",
+                ],
+                zipcode: [
+                  "Typecheck failed on the server, provide country and zipcode value as string",
+                ],
+              },
+            },
+          });
+          return;
+        }
+        const queryProps = req.query as FilterRestaurantsByZipcode;
+        // send data by zipcode
+        const zipcodeExists = await prisma.zipcode.findUnique({
+          where: {
+            zipcode_countryId: {
+              zipcode: queryProps.zipcode,
+              countryId: countryExists.countryId,
+            },
+          },
+        });
+        if (!zipcodeExists?.zipcodeId) {
+          res.status(400).json({
+            apiErrors: {
+              validationErrors: {
+                zipcode: [
+                  "The zipcode does not exist in relation to country value provided",
+                ],
+              },
+            },
+          });
+          return;
+        }
+        // find restaurants by zipcde and countryId
+        const restaurants = await filterRestaurants({
+          zipcodeId: zipcodeExists.zipcodeId,
+          countryId: countryExists.countryId,
+        });
+
+        res.status(200).send({ restaurants: restaurants });
+        return;
+      } else {
+        // search by city
+        const isTypeCorrect = FilterRestaurantsByCityZod.safeParse(req.query);
+        if (!isTypeCorrect.success) {
+          console.log(isTypeCorrect.error);
+          res.status(400).json({
+            apiErrors: {
+              validationErrors: {
+                city: [
+                  "Please provide query as city, state and country values as string",
+                ],
+              },
+            },
+          });
+          return;
+        }
+        const queryProps = req.query as FilterRestaurantsByCity;
+        const stateExists = await prisma.state.findUnique({
+          where: {
+            countryId_stateName: {
+              countryId: countryExists?.countryId,
+              stateName: capitalizeFirstWord(queryProps.state),
+            },
+          },
+        });
+        if (!stateExists?.stateId) {
+          res.status(400).json({
+            apiErrors: {
+              validationErrors: {
+                state: [
+                  "The state does not exist in relation to country value provided",
+                ],
+              },
+            },
+          });
+          return;
+        }
+        const cityExists = await prisma.city.findUnique({
+          where: {
+            countryId_stateId_cityName: {
+              countryId: countryExists.countryId,
+              stateId: stateExists.stateId,
+              cityName: capitalizeFirstWord(queryProps.city),
+            },
+          },
+        });
+        if (!cityExists?.cityId) {
+          res.status(400).json({
+            apiErrors: {
+              validationErrors: {
+                city: [
+                  "The city does not exist in relation to country and state value provided",
+                ],
+              },
+            },
+          });
+          return;
+        }
+        const restaurants = await filterRestaurants({
+          countryId: countryExists.countryId,
+          stateId: stateExists.stateId,
+          cityId: cityExists.cityId,
+        });
+        res.status(200).send({ restaurants: restaurants });
+      }
     }
   } catch (err) {
     console.log(err);

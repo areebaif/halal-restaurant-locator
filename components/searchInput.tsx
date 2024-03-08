@@ -65,14 +65,29 @@ export const SearchInput: React.FC<SearchInput> = ({ queryString }) => {
       case 2: {
         const zipcode = splitValue[0].trim();
         const country = splitValue[1].trim();
-        router.push(`/search/zipcode=${zipcode}&country=${country}`);
+        //router.push(`/restaurants/?country=${country}&zipcode=${zipcode}`);
+        router.push({
+          pathname: "/restaurants",
+          query: { country: `${country}`, zipcode: `${zipcode}` },
+        });
         break;
       }
       case 3: {
         const city = splitValue[0].trim();
         const state = splitValue[1].trim();
         const country = splitValue[2].trim();
-        router.push(`/search/city=${city}&state=${state}&country=${country}`);
+        console.log(city, state, country, "slslslslslslslslsl");
+        router.push(
+          //`/restaurants?country=${country}&state=${state}&city=${city}`
+          {
+            pathname: "/restaurants",
+            query: {
+              country: `${country}`,
+              state: `${state}`,
+              city: `${city}`,
+            },
+          }
+        );
         break;
       }
       default: {

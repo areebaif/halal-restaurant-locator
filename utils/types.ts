@@ -23,13 +23,15 @@ import {
   CreateRestaurantErrorZod,
   CreateRestaurantSuccessZod,
   CreateRestaurantResponseZod,
-  
-  RestaurantReadDbZod,
-  GetSearchInputsZod,
-  ResponseRestaurantGeoJsonZod,
-  GeoJsonRestaurantPropertiesZod,
-  RestaurantGeoJsonFeatureZod,
+  FilterRestaurantsByZipcodeZod,
+  FilterRestaurantsByCityZod,
   GetZipCodeResponseZod,
+  FilterRestaurantsErrorsZod,
+  GeoJsonPropertiesRestaurantZod,
+  FilterRestaurantResponseZod,
+  GeoJsonFeatureRestaurantZod,
+  GeoJsonFeatureCollectionRestaurantsZod,
+  RestaurantReadDbZod,
 } from "./zod/zod";
 
 export type CreateCountryResponse = z.infer<typeof CreateCountryResponseZod>;
@@ -64,20 +66,32 @@ export type CreateRestaurantSuccess = z.infer<
 export type CreateRestaurantResponse = z.infer<
   typeof CreateRestaurantResponseZod
 >;
-
+export type FilterRestaurantsByZipcode = z.infer<
+  typeof FilterRestaurantsByZipcodeZod
+>;
+export type FilterRestaurantsByCity = z.infer<
+  typeof FilterRestaurantsByCityZod
+>;
+export type FilterRestaurantsErrors = z.infer<
+  typeof FilterRestaurantsErrorsZod
+>;
+export type GeoJsonFeatureCollectionRestaurants = z.infer<
+  typeof GeoJsonFeatureCollectionRestaurantsZod
+>;
+export type FilterRestaurantResponse = z.infer<
+  typeof FilterRestaurantResponseZod
+>;
 export type RestaurantReadDb = z.infer<typeof RestaurantReadDbZod>;
-export type GetSearchInputs = z.infer<typeof GetSearchInputsZod>;
-export type RestaurantGeoJsonFeature = z.infer<
-  typeof RestaurantGeoJsonFeatureZod
+
+export type GeoJsonFeatureRestaurant = z.infer<
+  typeof GeoJsonFeatureRestaurantZod
 >;
-export type GeoJsonRestaurantProperties = z.infer<
-  typeof GeoJsonRestaurantPropertiesZod
+export type GeoJsonPropertiesRestaurant = z.infer<
+  typeof GeoJsonPropertiesRestaurantZod
 >;
-export type ResponseRestaurantGeoJsonFeatureCollection = z.infer<
-  typeof ResponseRestaurantGeoJsonZod
->;
+
 // for client
-export type GeoJsonRestaurantFeatureCollection = {
+export type RestaurantGeoJsonFeatureCollectionClient = {
   restaurants: {
     type: "FeatureCollection";
     features: {
@@ -87,8 +101,7 @@ export type GeoJsonRestaurantFeatureCollection = {
         type: "Point";
         coordinates: [number, number];
       };
-
-      properties: GeoJsonRestaurantProperties;
+      properties: GeoJsonPropertiesRestaurant;
     }[];
   };
   country?: string;

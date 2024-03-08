@@ -3,7 +3,6 @@ import {
   CreateFoodTag,
   ListFoodTags,
   ListGeography,
-  GeoJsonRestaurantFeatureCollection,
   ListStates,
   CreateUploadImageUrl,
   ListUploadImageUrl,
@@ -17,10 +16,12 @@ import {
   CreateRestaurant,
   CreateRestaurantError,
   CreateRestaurantSuccess,
+  RestaurantGeoJsonFeatureCollectionClient,
+  FilterRestaurantsErrors,
 } from "./types";
 
 export const listUSAGeog = async (searchTerm: string) => {
-  const response = await fetch(`/api/country/usa/search=${searchTerm}`, {
+  const response = await fetch(`/api/country/usa?search=${searchTerm}`, {
     method: "GET",
     headers: {
       "Content-Type": "application/json",
@@ -168,14 +169,23 @@ export const createRestaurant = async (data: CreateRestaurant) => {
   return res;
 };
 
-export const getMapSearchInput = async (data: string) => {
-  const response = await fetch(`/api/restaurant/${data}`, {
+export const listRestaurantBySearchCriteria = async (data: string) => {
+  const response = await fetch(`/api/restaurant?${data}`, {
     method: "GET",
     headers: {
       "Content-Type": "application/json",
     },
   });
-  const res: GeoJsonRestaurantFeatureCollection = await response.json();
+  const apiErrors = /(4|5)\d{2}/.test(`${response.status}`);
+  if (apiErrors) {
+    const res: FilterRestaurantsErrors = await response.json();
+    return res;
+  }
+  // anything other than apiErrors went wrong
+  if (!response.ok) {
+    throw new Error("something went wrong");
+  }
+  const res: RestaurantGeoJsonFeatureCollectionClient = await response.json();
   return res;
 };
 

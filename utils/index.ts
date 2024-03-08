@@ -5,6 +5,8 @@ import {
   helperListUploadImageUrl,
   listUSAGeog,
   createRestaurant,
+  listRestaurantBySearchCriteria,
+  listFoodTags,
 } from "./crud-functions";
 import {
   CreateFoodTagZod,
@@ -18,10 +20,15 @@ import {
   GetZipCodeResponseZod,
   ListUploadImageUrlResponseZod,
   CreateRestaurantZod,
-  GetSearchInputsZod,
+  FilterRestaurantsByZipcodeZod,
+  FilterRestaurantsByCityZod,
+  GeoJsonFeatureCollectionRestaurantsZod,
+  CreateRestaurantResponseZod,
+  FilterRestaurantResponseZod,
+  FilterRestaurantsErrorsZod,
 } from "./zod/zod";
 import {
-  findRestaurant,
+  filterRestaurants,
   countryIdExists,
   stateIdExists,
   cityIdExists,
@@ -30,12 +37,10 @@ import {
 import { calcBoundsFromCoordinates } from "./map/map-boundary-calculations";
 import {
   capitalizeFirstWord,
-  parseQueryVals,
-  hasNumbers,
   onlyNumbers,
   isValidCoordinate,
 } from "./string-manipulation";
-import { getMapSearchInput, listFoodTags } from "./crud-functions";
+
 import { s3Client } from "./aws-S3-Client";
 import { helperCreateUploadImageUrl } from "./image-uploads";
 import { mapCountryData } from "./client-api-data-conversion";
@@ -51,7 +56,6 @@ export {
   ListStatesZod,
   GetZipCodeResponseZod,
   CreateFoodTagResponseZod,
-  hasNumbers,
   mapCountryData,
   ListFoodTagsResponseZod,
   capitalizeFirstWord,
@@ -61,16 +65,22 @@ export {
   ListUploadImageUrlZod,
   ListUploadImageUrlResponseZod,
   helperCreateUploadImageUrl,
-  parseQueryVals,
+ // parseQueryVals,
   onlyNumbers,
+  getZipcode,
+  isValidCoordinate,
   CreateRestaurantZod,
-  findRestaurant,
-  GetSearchInputsZod,
+  CreateRestaurantResponseZod,
+  FilterRestaurantsByZipcodeZod,
+  FilterRestaurantsByCityZod,
   calcBoundsFromCoordinates,
-  getMapSearchInput,
+  listRestaurantBySearchCriteria,
+  createRestaurant,
+  filterRestaurants,
   countryIdExists,
   stateIdExists,
   cityIdExists,
-  getZipcode,
-  isValidCoordinate,
+  GeoJsonFeatureCollectionRestaurantsZod,
+  FilterRestaurantResponseZod,
+  FilterRestaurantsErrorsZod,
 };

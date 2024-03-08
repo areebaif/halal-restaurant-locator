@@ -1,13 +1,13 @@
 import { prisma } from "@/db/prisma";
 import {
+  GeoJsonFeatureCollectionRestaurants,
+  GeoJsonFeatureRestaurant,
   RestaurantReadDb,
-  ResponseRestaurantGeoJsonFeatureCollection,
-  RestaurantGeoJsonFeature,
 } from "./types";
 
+import { CreateUploadImageUrlZod } from ".";
 import { isValidCoordinate } from ".";
 
-import { CreateUploadImageUrlZod } from ".";
 type searchCriteria = {
   zipcodeId?: string;
   countryId?: string;
@@ -17,7 +17,7 @@ type searchCriteria = {
 };
 
 export const dataToGeoJson = (data: RestaurantReadDb["restaurants"]) => {
-  const features: RestaurantGeoJsonFeature = data?.map((restaurant, index) => {
+  const features: GeoJsonFeatureRestaurant = data?.map((restaurant, index) => {
     const {
       restaurantId,
       latitude,
@@ -52,14 +52,14 @@ export const dataToGeoJson = (data: RestaurantReadDb["restaurants"]) => {
     };
   });
 
-  const result: ResponseRestaurantGeoJsonFeatureCollection["restaurants"] = {
+  const result: GeoJsonFeatureCollectionRestaurants["restaurants"] = {
     type: "FeatureCollection",
     features: features ? features : [],
   };
   return result;
 };
 
-export const findRestaurant = async (searchCriteria: searchCriteria) => {
+export const filterRestaurants = async (searchCriteria: searchCriteria) => {
   const result = await prisma.restaurant.findMany({
     where: searchCriteria,
     select: {
