@@ -4,7 +4,6 @@ import "mapbox-gl/dist/mapbox-gl.css";
 import { MapProvider } from "react-map-gl";
 import { Loader } from "@mantine/core";
 // local imports
-import { parseQueryVals } from "@/utils";
 import { SearchInput, MapAndList } from "@/components";
 
 const MapSearch: React.FC = () => {

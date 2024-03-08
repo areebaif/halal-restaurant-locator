@@ -37,8 +37,6 @@ import {
 import { calcBoundsFromCoordinates } from "./map/map-boundary-calculations";
 import {
   capitalizeFirstWord,
-  parseQueryVals,
-  hasNumbers,
   onlyNumbers,
   isValidCoordinate,
 } from "./string-manipulation";
@@ -58,7 +56,6 @@ export {
   ListStatesZod,
   GetZipCodeResponseZod,
   CreateFoodTagResponseZod,
-  hasNumbers,
   mapCountryData,
   ListFoodTagsResponseZod,
   capitalizeFirstWord,
@@ -68,7 +65,7 @@ export {
   ListUploadImageUrlZod,
   ListUploadImageUrlResponseZod,
   helperCreateUploadImageUrl,
-  parseQueryVals,
+ // parseQueryVals,
   onlyNumbers,
   getZipcode,
   isValidCoordinate,
