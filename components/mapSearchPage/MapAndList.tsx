@@ -8,8 +8,14 @@ import {
   calcBoundsFromCoordinates,
   GeoJsonFeatureCollectionRestaurantsZod,
   listRestaurantBySearchCriteria,
+  FilterRestaurantResponseZod,
 } from "@/utils";
+
 import { ErrorCard, MapContainer, SearchResultList } from "@/components";
+import {
+  FilterRestaurantsErrors,
+  RestaurantGeoJsonFeatureCollectionClient,
+} from "@/utils/types";
 
 export type MapAndList = {
   query: string;
@@ -29,21 +35,49 @@ export const MapAndList: React.FC<MapAndList> = ({ query, setQuery }) => {
     latitude: 0,
     longitude: 0,
   });
-
   const [showPopup, setShowPopup] = React.useState<boolean>(false);
+
   const mapData = useQuery(
     ["getMapData", query],
     () => listRestaurantBySearchCriteria(query),
     {
-      onSuccess() {
+      onSuccess(data) {
+        const result = FilterRestaurantResponseZod.safeParse(data);
+        if (!result.success) {
+          console.log(result.error);
+          return (
+            <ErrorCard message="the server responded with incorrect types, but the restaurant may have been created in the database" />
+          );
+        }
+        if (data.hasOwnProperty("apiErrors")) {
+          const apiErrors = data as FilterRestaurantsErrors;
+          if (apiErrors.apiErrors?.generalErrors) {
+            return (
+              <ErrorCard message="something went wrong, please try again" />
+            );
+          }
+          if (apiErrors.apiErrors?.validationErrors) {
+            const errorsProps = apiErrors.apiErrors.validationErrors;
+            const { zipcode, city, state, country } = errorsProps;
+            let errors: string[] = [];
+            if (zipcode) errors = [...errors, ...zipcode];
+            if (country) errors = [...errors, ...country];
+            if (state) errors = [...errors, ...state];
+            if (city) errors = [...errors, ...city];
+            return <ErrorCard arrayOfErrors={errors} />;
+          }
+        }
         setFlag(true);
       },
     }
   );
+
   React.useEffect(() => {
     if (query.length) {
-      if (mapData.data?.restaurants?.features.length) {
-        const mapBounds = calcBoundsFromCoordinates(mapData.data.restaurants);
+      const correctData =
+        mapData.data as RestaurantGeoJsonFeatureCollectionClient;
+      if (correctData && correctData.restaurants?.features.length) {
+        const mapBounds = calcBoundsFromCoordinates(correctData.restaurants);
         MapA?.fitBounds(new mapboxgl.LngLatBounds(mapBounds));
         setFlag(false);
       }
@@ -65,9 +99,9 @@ export const MapAndList: React.FC<MapAndList> = ({ query, setQuery }) => {
     console.log(isTypeCorrect.error);
     return <ErrorCard message="There is a type mismatch from the server" />;
   }
-
-  if (!mapData.data?.restaurants) {
-    const data = mapData.data;
+  const correctData = mapData.data as RestaurantGeoJsonFeatureCollectionClient;
+  if (!correctData.restaurants) {
+    const data = correctData;
     const { city, restaurantError, country, state, zipcode, typeError } = data!;
     let ErrorMessage = "";
     switch (true) {
@@ -92,7 +126,7 @@ export const MapAndList: React.FC<MapAndList> = ({ query, setQuery }) => {
     }
     return <ErrorCard message={ErrorMessage} />;
   }
-  const geolocations = mapData.data?.restaurants;
+  const geolocations = correctData.restaurants;
 
   const mapConatinerInputs = {
     geolocations,

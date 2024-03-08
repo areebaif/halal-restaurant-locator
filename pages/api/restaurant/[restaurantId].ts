@@ -17,28 +17,22 @@ import {
  *
  * @swagger
  *
- * /api/restaurant?{country}&{zipcode}:
+ * /api/restaurant/{restaurantId}:
  *     get:
  *       tags:
  *         - restaurants
- *       summary: find restaurants depending on query parameters
+ *       summary: get restaurant by restaurantId
  *       description: Returns geojson restaurant feature collection
- *       operationId: searchRestaurant
+ *       operationId: findRestaurantById
  *       parameters:
- *         - name: zipcode
- *           in: query
- *           description: zipcode in USA
+ *         - name: restaurantId
+ *           in: path
+ *           description: restaurantId
  *           required: true
  *           schema:
  *             type: string
- *             example: "55442"
- *         - name: country
- *           in: query
- *           description: country name
- *           required: true
- *           schema:
- *             type: string
- *             example: "U.S.A"
+ *             format: uuid
+ *             example: "64b31531-28fd-4570-ad64-6aa312e53d69"
  *       responses:
  *         '200':
  *           description: successful operation

@@ -23,6 +23,9 @@ import {
   FilterRestaurantsByZipcodeZod,
   FilterRestaurantsByCityZod,
   GeoJsonFeatureCollectionRestaurantsZod,
+  CreateRestaurantResponseZod,
+  FilterRestaurantResponseZod,
+  FilterRestaurantsErrorsZod,
 } from "./zod/zod";
 import {
   filterRestaurants,
@@ -70,13 +73,17 @@ export {
   getZipcode,
   isValidCoordinate,
   CreateRestaurantZod,
+  CreateRestaurantResponseZod,
   FilterRestaurantsByZipcodeZod,
   FilterRestaurantsByCityZod,
   calcBoundsFromCoordinates,
   listRestaurantBySearchCriteria,
+  createRestaurant,
   filterRestaurants,
   countryIdExists,
   stateIdExists,
   cityIdExists,
   GeoJsonFeatureCollectionRestaurantsZod,
+  FilterRestaurantResponseZod,
+  FilterRestaurantsErrorsZod,
 };

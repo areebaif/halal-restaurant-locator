@@ -344,6 +344,11 @@ export const GeoJsonFeatureCollectionRestaurantsZod = z.object({
   restaurantError: z.string().optional(),
 });
 
+export const FilterRestaurantResponseZod = z.union([
+  GeoJsonFeatureCollectionRestaurantsZod,
+  FilterRestaurantsErrorsZod,
+]);
+
 export const RestaurantReadDbZod = z.object({
   restaurants: z
     .object({

@@ -17,6 +17,7 @@ import {
   CreateRestaurantError,
   CreateRestaurantSuccess,
   RestaurantGeoJsonFeatureCollectionClient,
+  FilterRestaurantsErrors,
 } from "./types";
 
 export const listUSAGeog = async (searchTerm: string) => {
@@ -175,6 +176,15 @@ export const listRestaurantBySearchCriteria = async (data: string) => {
       "Content-Type": "application/json",
     },
   });
+  const apiErrors = /(4|5)\d{2}/.test(`${response.status}`);
+  if (apiErrors) {
+    const res: FilterRestaurantsErrors = await response.json();
+    return res;
+  }
+  // anything other than apiErrors went wrong
+  if (!response.ok) {
+    throw new Error("something went wrong");
+  }
   const res: RestaurantGeoJsonFeatureCollectionClient = await response.json();
   return res;
 };

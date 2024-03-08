@@ -28,6 +28,7 @@ import {
   GetZipCodeResponseZod,
   FilterRestaurantsErrorsZod,
   GeoJsonPropertiesRestaurantZod,
+  FilterRestaurantResponseZod,
   GeoJsonFeatureRestaurantZod,
   GeoJsonFeatureCollectionRestaurantsZod,
   RestaurantReadDbZod,
@@ -77,7 +78,9 @@ export type FilterRestaurantsErrors = z.infer<
 export type GeoJsonFeatureCollectionRestaurants = z.infer<
   typeof GeoJsonFeatureCollectionRestaurantsZod
 >;
-
+export type FilterRestaurantResponse = z.infer<
+  typeof FilterRestaurantResponseZod
+>;
 export type RestaurantReadDb = z.infer<typeof RestaurantReadDbZod>;
 
 export type GeoJsonFeatureRestaurant = z.infer<

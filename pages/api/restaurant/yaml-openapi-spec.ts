@@ -2,7 +2,7 @@
  *
  * @swagger
  *
- * /api/restaurant/{country}&{state}&{city}:
+ * /api/restaurant?country=U.S.A&state=Minnesota&city=Minneapolis:
  *     get:
  *       tags:
  *         - restaurants
@@ -11,21 +11,21 @@
  *       operationId: searchRestaurant
  *       parameters:
  *         - name: city
- *           in: path
+ *           in: query
  *           description: city in USA
  *           required: true
  *           schema:
  *             type: string
  *             example: "Minneapolis"
  *         - name: state
- *           in: path
+ *           in: query
  *           description: state name
  *           required: true
  *           schema:
  *             type: string
  *             example: "Minnesota"
  *         - name: country
- *           in: path
+ *           in: query
  *           description: country name
  *           required: true
  *           schema:
@@ -103,17 +103,46 @@
  *               schema:
  *                 type: object
  *                 properties:
- *                     typeError:
- *                       type: string
- *                       example: "type check failed on the server, expected to an objects with countryName as string, and either zipcode as string or restaurantName as string or stateName, cityName, as string"
- *                     country:
- *                       type: string
- *                       example: "The provided countryName doesnot exist in the database"
- *                     state:
- *                       type: string
- *                       example: "The provided stateName inreference to countryId doesnot exist in the database"
- *                     city:
- *                       type: string
- *                       example: "The provided cityName in reference to countryId and stateName doesnot exist in the database"
- *
+ *                     apiErrors:
+ *                       type: object
+ *                       properties:
+ *                          validationErrors:
+ *                            type: object
+ *                            properties:
+ *                              country:
+ *                                    type: array
+ *                                    items:
+ *                                      type: string
+ *                                      example: "The provided country name does not exist in the database"
+ *                              state:
+ *                                    type: array
+ *                                    items:
+ *                                      type: string
+ *                                      example: "The provided state does not exist in the database"
+ *                              city:
+ *                                    type: array
+ *                                    items:
+ *                                      type: string
+ *                                      example: "The provided city does not exist in the database"
+ *                              zipcode:
+ *                                    type: array
+ *                                    items:
+ *                                      type: string
+ *                                      example: "The provided zipcode does not exist in the database"
+ *         '500':
+ *           description: Internal server error
+ *           content:
+ *             application/json:
+ *               schema:
+ *                 type: object
+ *                 properties:
+ *                     apiErrors:
+ *                       type: object
+ *                       properties:
+ *                         generalErrors:
+ *                           type: array
+ *                           items:
+ *                             type: string
+ *                             example: "something went wrong with the server"
+
  */
