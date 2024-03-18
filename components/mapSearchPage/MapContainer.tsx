@@ -1,19 +1,22 @@
 import * as React from "react";
+import Link from "next/link";
 import "mapbox-gl/dist/mapbox-gl.css";
 import mapboxgl, { MapLayerMouseEvent } from "mapbox-gl";
 import Map, { Source, Layer, Popup } from "react-map-gl";
 // local imports
 import { calcBoundsFromCoordinates } from "@/utils";
 import { ErrorCard } from "@/components";
-import { Card, Title, Text } from "@mantine/core";
+import { Card, Title, Text, Image } from "@mantine/core";
 import { GeoJsonPropertiesRestaurant } from "@/utils/types";
 
 export type PopupDataProps = {
+  restaurantId: string;
   restaurantName: string;
   description: string;
   address: string;
   latitude: number;
   longitude: number;
+  imageUrl: string;
 };
 
 export type MapContainerProps = {
@@ -45,7 +48,6 @@ export const MapContainer: React.FC<MapContainerProps> = ({
   setShowPopup,
 }) => {
   const mapRef = React.useRef<any>();
-
   const [cameraViewState, setCameraViewState] =
     React.useState<CameraViewState>();
   const onViewStateChange = (data: CameraViewState) => {
@@ -87,30 +89,34 @@ export const MapContainer: React.FC<MapContainerProps> = ({
       const coordinates = coordinatesObject.coordinates.slice();
       const description = e.features[0].properties?.description;
       const restaurantName = e.features[0].properties?.restaurantName;
+      const restaurantId = e.features[0].properties?.restaurantId;
       const street = e.features[0].properties?.street;
       const city = e.features[0].properties?.city;
       const state = e.features[0].properties?.state;
       const zip = e.features[0].properties?.zipcode;
       const country = e.features[0].properties?.country;
       const address = `${street}, ${city}, ${state}, ${zip}, ${country}`;
+      const imageUrl = e.features[0].properties?.imageUrl;
+      const listParsedImageUrl = imageUrl.split(`"`);
+      const image = listParsedImageUrl[1];
       const id = e.features[0].id;
-
       setHoverId(id);
       mapRef.current.setFeatureState(
         { source: "restaurant locations", id: id },
         { hover: true }
       );
       setPopupData({
+        restaurantId,
         restaurantName,
         address,
         description,
         latitude: coordinates[1],
         longitude: coordinates[0],
+        imageUrl: image,
       });
       setShowPopup(true);
     }
   };
-
   return (
     <Map
       id="MapA"
@@ -160,23 +166,41 @@ export const MapContainer: React.FC<MapContainerProps> = ({
               { hover: false }
             );
             setPopupData({
+              restaurantId: "",
               restaurantName: "",
               description: "",
               address: "",
               latitude: 0,
               longitude: 0,
+              imageUrl: "",
             });
             setHoverId(undefined);
             setShowPopup(false);
           }}
         >
-          <Card shadow="sm" radius="md" withBorder>
-            <Title order={4}>{popupData.restaurantName}</Title>
+          <Card
+            component={Link}
+            href={`/restaurants/${popupData.restaurantId}`}
+            target="_blank"
+            style={{
+              marginTop: "-10px",
+              marginLeft: "-10px",
+              marginRight: "-10px",
+              marginBottom: "-10px",
+            }}
+          >
+            <Card.Section>
+              <Image
+                src={`${process.env.NEXT_PUBLIC_BASE_IMAGE_URL}/${popupData.imageUrl}`}
+                height={120}
+                alt="cover image for restaurant"
+              />
+            </Card.Section>
+            <Title mt="xs" order={5}>
+              {popupData.restaurantName}
+            </Title>
             <Text size="xs" color="dimmed">
               {`${popupData.address}`}
-            </Text>
-            <Text size="xs" color="dimmed">
-              {`${popupData.description}`}
             </Text>
           </Card>
         </Popup>

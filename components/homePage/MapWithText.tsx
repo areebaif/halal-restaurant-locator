@@ -1,54 +1,145 @@
-import { Flex, Center, Box, Title, Text, Image, Card } from "@mantine/core";
+import { Box, Title, Text, Image, Card, Grid, ThemeIcon } from "@mantine/core";
+import { IconCircleDotted } from "@tabler/icons-react";
 
 export const MapWithText: React.FC = () => {
   return (
-    <Card shadow="xs" radius="md" withBorder>
-      <Flex gap="xl">
-        <Flex
-          sx={(theme) => ({
-            [theme.fn.smallerThan("lg")]: {
-              width: "100%",
-            },
-            width: "50%",
-          })}
-        >
-          <Box>
-            <Title order={2}>Don't know where halal restaurants are?</Title>
-            <Text py="xl" size="lmd">
-              Our search functonality along with displaying halal restaurant
-              locations on a map quickly allow you to browse restaurants in
-              U.S.A with ease.
+    <>
+      <LargeSizeMapWithText />
+      <SmallSizeMapWithText />
+    </>
+  );
+};
+
+const LargeSizeMapWithText: React.FC = () => {
+  return (
+    <Card
+      sx={(theme) => ({
+        [theme.fn.smallerThan("md")]: {
+          display: "none",
+        },
+      })}
+      style={{ backgroundColor: "inherit" }}
+    >
+      <Card.Section>
+        {" "}
+        <Title ta="center" order={1}>
+          {" "}
+          Use our search functionality to browse halal restaurant on a map
+        </Title>
+      </Card.Section>
+      <Grid gutter={"xl"} align="center" mt="md">
+        <Grid.Col span={6}>
+          <Box
+            sx={(theme) => ({
+              [theme.fn.largerThan("lg")]: {
+                //marginTop: `calc(${theme.spacing.xl} * -1)`,
+                //marginBottom: `calc(${theme.spacing.xl} * -1)`,
+                //marginRight: `calc(${theme.spacing.xl} * -1)`,
+              },
+              overflow: "hidden",
+            })}
+          >
+            <Image src={"/map-locations.png"} />
+          </Box>
+        </Grid.Col>
+        <Grid.Col span={6}>
+          <Box
+            sx={(theme) => ({
+              [theme.fn.largerThan("md")]: {
+                marginLeft: `calc(${theme.spacing.xl}*2)`,
+              },
+              [theme.fn.smallerThan("md")]: {
+                marginLeft: `calc(${theme.spacing.xl}*2)`,
+                marginRight: `calc(${theme.spacing.xl}*2)`,
+              },
+            })}
+          >
+            <Text
+              mb="md"
+              fw={500}
+              sx={(theme) => ({
+                fontSize: `calc(${theme.fontSizes.xs}*2.5)`,
+              })}
+            >
+              Don't know where halal restaurants are?
             </Text>
 
-            <Text py="xl" size="lmd">
-              Are you travelling to a new city and don't know where halal
-              restaurants are?
+            <Text size="xl">
+              <span>
+                <ThemeIcon
+                  variant="outline"
+                  color="gray"
+                  size={13}
+                  radius="xl"
+                  mr="xs"
+                >
+                  <IconCircleDotted size={10} stroke={1.5} />
+                </ThemeIcon>
+              </span>
+              Are you travelling to a new city?
             </Text>
-            <Text py="xl" size="lmd">
+
+            <Text size="xl">
+              <span>
+                <ThemeIcon
+                  variant="outline"
+                  color="gray"
+                  size={13}
+                  radius="xl"
+                  mr="xs"
+                >
+                  <IconCircleDotted size={10} stroke={1.5} />
+                </ThemeIcon>
+              </span>
               Do you want to try something new in your area?
             </Text>
-            <Text py="xl" size="lmd">
-              Don't worry we have you covered
+
+            <Text size="xl">
+              <span>
+                <ThemeIcon
+                  variant="outline"
+                  color="gray"
+                  size={13}
+                  radius="xl"
+                  mr="xs"
+                >
+                  <IconCircleDotted size={10} stroke={1.5} />
+                </ThemeIcon>
+              </span>
+              Don't worry, we have you covered!
             </Text>
           </Box>
-        </Flex>
-        <Box
-          sx={(theme) => ({
-            [theme.fn.smallerThan("lg")]: {
-              display: "none",
-            },
-            [theme.fn.largerThan("lg")]: {
-              marginTop: `calc(${theme.spacing.xl} * -1)`,
-              marginBottom: `calc(${theme.spacing.xl} * -1)`,
-              marginRight: `calc(${theme.spacing.xl} * -1)`,
-            },
-            width: "55%",
-            overflow: "hidden",
-          })}
-        >
-          <Image src={"/map-locations.png"} />
-        </Box>
-      </Flex>
+        </Grid.Col>
+      </Grid>
+    </Card>
+  );
+};
+
+const SmallSizeMapWithText: React.FC = () => {
+  return (
+    <Card
+      sx={(theme) => ({
+        [theme.fn.largerThan("md")]: {
+          display: "none",
+        },
+      })}
+      style={{ backgroundColor: "inherit" }}
+    >
+      <Card.Section>
+        {" "}
+        <Title ta="center" order={1}>
+          {" "}
+          Use our search functionality to browse halal restaurant on a map
+        </Title>
+      </Card.Section>
+      <Box
+        sx={(theme) => ({
+          overflow: "hidden",
+          marginTop: theme.spacing.md,
+        })}
+      >
+        <Image src={"/map-locations.png"} />
+      </Box>
     </Card>
   );
 };
