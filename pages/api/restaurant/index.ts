@@ -284,27 +284,27 @@ import {
  *                       properties:
  *                          validationErrors:
  *                            type: object
- *                          properties:
- *                              country:
- *                                    type: array
- *                                    items:
- *                                      type: string
- *                                      example: "The provided country name does not exist in the database"
- *                              state:
- *                                    type: array
- *                                    items:
- *                                      type: string
- *                                      example: "The provided state does not exist in the database"
- *                              city:
- *                                    type: array
- *                                    items:
- *                                      type: string
- *                                      example: "The provided city does not exist in the database"
- *                              zipcode:
- *                                    type: array
- *                                    items:
- *                                      type: string
- *                                      example: "The provided zipcode does not exist in the database"
+ *                            properties:
+ *                                country:
+ *                                      type: array
+ *                                      items:
+ *                                        type: string
+ *                                        example: "The provided country name does not exist in the database"
+ *                                state:
+ *                                      type: array
+ *                                      items:
+ *                                        type: string
+ *                                        example: "The provided state does not exist in the database"
+ *                                city:
+ *                                      type: array
+ *                                      items:
+ *                                        type: string
+ *                                        example: "The provided city does not exist in the database"
+ *                                zipcode:
+ *                                      type: array
+ *                                      items:
+ *                                        type: string
+ *                                        example: "The provided zipcode does not exist in the database"
  *         '500':
  *           description: Internal server error
  *           content:

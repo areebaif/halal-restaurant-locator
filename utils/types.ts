@@ -1,12 +1,12 @@
 import { z } from "zod";
 import {
-  ListGeographyZod,
-  listCountryErrorZod,
-  ListCountryZod,
-  ListStateErrorZod,
-  CreateCountryErrorZod,
-  CreateCountryResponseZod,
-  ListStatesZod,
+  ListGeographySchema,
+  ListCountrySchema,
+  ListCountryErrorSchema,
+  ListStateErrorSchema,
+  CreateCountryErrorSchema,
+  CreateCountryResponseSchema,
+  ListStatesSchema,
   GetZipcodeErrorZod,
   GetZipcodeZod,
   CreateFoodTagErrorsZod,
@@ -31,16 +31,18 @@ import {
   FilterRestaurantResponseZod,
   GeoJsonFeatureRestaurantZod,
   GeoJsonFeatureCollectionRestaurantsZod,
-  RestaurantReadDbZod,
-} from "./zod/zod";
+  ListRestaurantsZod,
+  GetRestaurantErrorZod,
+  GetRestaurantZod,
+} from "./zod/schema";
 
-export type CreateCountryResponse = z.infer<typeof CreateCountryResponseZod>;
-export type CreateCountryError = z.infer<typeof CreateCountryErrorZod>;
-export type ListCountries = z.infer<typeof ListCountryZod>;
-export type ListCountryError = z.infer<typeof listCountryErrorZod>;
-export type ListGeography = z.infer<typeof ListGeographyZod>;
-export type ListStates = z.infer<typeof ListStatesZod>;
-export type ListStateError = z.infer<typeof ListStateErrorZod>;
+export type CreateCountryResponse = z.infer<typeof CreateCountryResponseSchema>;
+export type CreateCountryError = z.infer<typeof CreateCountryErrorSchema>;
+export type ListCountries = z.infer<typeof ListCountrySchema>;
+export type ListCountryError = z.infer<typeof ListCountryErrorSchema>;
+export type ListGeography = z.infer<typeof ListGeographySchema>;
+export type ListStates = z.infer<typeof ListStatesSchema>;
+export type ListStateError = z.infer<typeof ListStateErrorSchema>;
 export type GetZipcodeError = z.infer<typeof GetZipcodeErrorZod>;
 export type GetZipcode = z.infer<typeof GetZipcodeZod>;
 export type GetZipCodeResponse = z.infer<typeof GetZipCodeResponseZod>;
@@ -58,6 +60,8 @@ export type ListUploadImageUrlError = z.infer<
 export type ListUploadImageUrlResponse = z.infer<
   typeof ListUploadImageUrlResponseZod
 >;
+export type GetRestaurantError = z.infer<typeof GetRestaurantErrorZod>;
+export type GetRestaurant = z.infer<typeof GetRestaurantZod>;
 export type CreateRestaurant = z.infer<typeof CreateRestaurantZod>;
 export type CreateRestaurantError = z.infer<typeof CreateRestaurantErrorZod>;
 export type CreateRestaurantSuccess = z.infer<
@@ -81,7 +85,7 @@ export type GeoJsonFeatureCollectionRestaurants = z.infer<
 export type FilterRestaurantResponse = z.infer<
   typeof FilterRestaurantResponseZod
 >;
-export type RestaurantReadDb = z.infer<typeof RestaurantReadDbZod>;
+export type ListRestaurants = z.infer<typeof ListRestaurantsZod>;
 
 export type GeoJsonFeatureRestaurant = z.infer<
   typeof GeoJsonFeatureRestaurantZod

@@ -7,11 +7,12 @@ import {
   createRestaurant,
   listRestaurantBySearchCriteria,
   listFoodTags,
+  getRestaurantById,
 } from "./crud-functions";
 import {
   CreateFoodTagZod,
-  ListCountryZod,
-  ListStatesZod,
+  ListCountrySchema,
+  ListStatesSchema,
   ListFoodTagsResponseZod,
   ListFoodTagsZod,
   CreateFoodTagResponseZod,
@@ -26,7 +27,7 @@ import {
   CreateRestaurantResponseZod,
   FilterRestaurantResponseZod,
   FilterRestaurantsErrorsZod,
-} from "./zod/zod";
+} from "./zod/schema";
 import {
   filterRestaurants,
   countryIdExists,
@@ -47,13 +48,13 @@ import { mapCountryData } from "./client-api-data-conversion";
 export {
   s3Client,
   listUSAGeog,
-  ListCountryZod,
+  ListCountrySchema,
   CreateFoodTagZod,
   ListFoodTagsZod,
   createFoodTag,
   listFoodTags,
   listStates,
-  ListStatesZod,
+  ListStatesSchema,
   GetZipCodeResponseZod,
   CreateFoodTagResponseZod,
   mapCountryData,
@@ -65,7 +66,7 @@ export {
   ListUploadImageUrlZod,
   ListUploadImageUrlResponseZod,
   helperCreateUploadImageUrl,
- // parseQueryVals,
+  // parseQueryVals,
   onlyNumbers,
   getZipcode,
   isValidCoordinate,
@@ -83,4 +84,5 @@ export {
   GeoJsonFeatureCollectionRestaurantsZod,
   FilterRestaurantResponseZod,
   FilterRestaurantsErrorsZod,
+  getRestaurantById,
 };

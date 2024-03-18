@@ -2,7 +2,7 @@ import { prisma } from "@/db/prisma";
 import {
   GeoJsonFeatureCollectionRestaurants,
   GeoJsonFeatureRestaurant,
-  RestaurantReadDb,
+  ListRestaurants,
 } from "./types";
 
 import { CreateUploadImageUrlZod } from ".";
@@ -16,7 +16,7 @@ type searchCriteria = {
   restaurantName?: string;
 };
 
-export const dataToGeoJson = (data: RestaurantReadDb["restaurants"]) => {
+export const dataToGeoJson = (data: ListRestaurants["restaurants"]) => {
   const features: GeoJsonFeatureRestaurant = data?.map((restaurant, index) => {
     const {
       restaurantId,
@@ -30,6 +30,7 @@ export const dataToGeoJson = (data: RestaurantReadDb["restaurants"]) => {
       city,
       zipcode,
       FoodTag,
+      imageUrl,
     } = restaurant;
     return {
       id: index,
@@ -48,6 +49,7 @@ export const dataToGeoJson = (data: RestaurantReadDb["restaurants"]) => {
         city,
         zipcode,
         FoodTag,
+        imageUrl,
       },
     };
   });
@@ -88,6 +90,9 @@ export const filterRestaurants = async (searchCriteria: searchCriteria) => {
       Zipcode: {
         select: { zipcode: true },
       },
+      RestaurantImageUrl: {
+        select: { imageUrl: true },
+      },
     },
   });
 
@@ -104,7 +109,11 @@ export const filterRestaurants = async (searchCriteria: searchCriteria) => {
       Zipcode,
       FoodTag,
       street,
+      RestaurantImageUrl,
     } = restaurantItem;
+    const coverImageUrl = RestaurantImageUrl.filter((item) =>
+      item.imageUrl.includes("cover")
+    );
     return {
       restaurantId,
       latitude,
@@ -117,6 +126,7 @@ export const filterRestaurants = async (searchCriteria: searchCriteria) => {
       city: City.cityName,
       zipcode: Zipcode.zipcode,
       FoodTag: FoodTag.map((tag) => tag.FoodTag.name),
+      imageUrl: coverImageUrl.map((url) => url.imageUrl),
     };
   });
   const geoJson = dataToGeoJson(mappedData);

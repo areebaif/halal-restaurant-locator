@@ -29,11 +29,13 @@ export const MapAndList: React.FC<MapAndList> = ({ query, setQuery }) => {
     undefined
   );
   const [popupData, setPopupData] = React.useState({
+    restaurantId: "",
     restaurantName: "",
     description: "",
     address: "",
     latitude: 0,
     longitude: 0,
+    imageUrl: "",
   });
   const [showPopup, setShowPopup] = React.useState<boolean>(false);
 
@@ -140,10 +142,10 @@ export const MapAndList: React.FC<MapAndList> = ({ query, setQuery }) => {
 
   return (
     <Grid>
-      <Grid.Col span={4}>
+      <Grid.Col span={3}>
         <SearchResultList {...mapConatinerInputs} />
       </Grid.Col>
-      <Grid.Col span={8}>
+      <Grid.Col span={9}>
         <MapContainer {...mapConatinerInputs} />
       </Grid.Col>
     </Grid>
