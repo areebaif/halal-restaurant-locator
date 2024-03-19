@@ -8,6 +8,7 @@ import {
   listRestaurantBySearchCriteria,
   listFoodTags,
   getRestaurantById,
+  listRestaurantByCoordinate,
 } from "./crud-functions";
 import {
   CreateFoodTagZod,
@@ -85,4 +86,5 @@ export {
   FilterRestaurantResponseZod,
   FilterRestaurantsErrorsZod,
   getRestaurantById,
+  listRestaurantByCoordinate,
 };

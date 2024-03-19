@@ -193,7 +193,35 @@ export const getRestaurantById = async (restaurantId: string) => {
   return res;
 };
 
+export const listRestaurantByCoordinate = async (data: {
+  latitude: string;
+  longitude: string;
+}) => {
+  console.log(" heleleleoeoeoeoeoeoeo!!!!!!!!!!!!!");
+  const response = await fetch(
+    `/api/restaurant?latitude=${data.latitude}&longitude=${data.longitude}`,
+    {
+      method: "GET",
+      headers: {
+        "Content-Type": "application/json",
+      },
+    }
+  );
+  const apiErrors = /(4|5)\d{2}/.test(`${response.status}`);
+  if (apiErrors) {
+    const res: FilterRestaurantsErrors = await response.json();
+    return res;
+  }
+  // anything other than apiErrors went wrong
+  if (!response.ok) {
+    throw new Error("something went wrong");
+  }
+  const res: RestaurantGeoJsonFeatureCollectionClient = await response.json();
+  return res;
+};
+
 export const listRestaurantBySearchCriteria = async (data: string) => {
+  console.log("shshsh", data, "!!!!!!!!!!!!!!!!!!!!!!!!!");
   const response = await fetch(`/api/restaurant?${data}`, {
     method: "GET",
     headers: {

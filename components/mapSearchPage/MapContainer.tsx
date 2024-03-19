@@ -1,13 +1,23 @@
 import * as React from "react";
 import Link from "next/link";
+import { useQuery, useQueryClient } from "@tanstack/react-query";
+
 import "mapbox-gl/dist/mapbox-gl.css";
 import mapboxgl, { MapLayerMouseEvent } from "mapbox-gl";
 import Map, { Source, Layer, Popup } from "react-map-gl";
+import { Card, Title, Text, Image, Button, Loader } from "@mantine/core";
 // local imports
-import { calcBoundsFromCoordinates } from "@/utils";
+import {
+  calcBoundsFromCoordinates,
+  listRestaurantByCoordinate,
+  FilterRestaurantResponseZod,
+} from "@/utils";
 import { ErrorCard } from "@/components";
-import { Card, Title, Text, Image } from "@mantine/core";
-import { GeoJsonPropertiesRestaurant } from "@/utils/types";
+import {
+  GeoJsonPropertiesRestaurant,
+  FilterRestaurantsErrors,
+  RestaurantGeoJsonFeatureCollectionClient,
+} from "@/utils/types";
 
 export type PopupDataProps = {
   restaurantId: string;
@@ -47,7 +57,12 @@ export const MapContainer: React.FC<MapContainerProps> = ({
   showPopup,
   setShowPopup,
 }) => {
+  const queryClient = useQueryClient();
   const mapRef = React.useRef<any>();
+  const [queryCoordinates, setQueryCoordinates] = React.useState({
+    latitude: "",
+    longitude: "",
+  });
   const [cameraViewState, setCameraViewState] =
     React.useState<CameraViewState>();
   const onViewStateChange = (data: CameraViewState) => {
@@ -55,6 +70,50 @@ export const MapContainer: React.FC<MapContainerProps> = ({
       return { ...previousState, ...data };
     });
   };
+  console.log(queryCoordinates.latitude.length, "i am length");
+  const updateMapData = useQuery(
+    ["updateMapData", queryCoordinates],
+    () => listRestaurantByCoordinate(queryCoordinates),
+    {
+      enabled: queryCoordinates.latitude.length > 1,
+      onSuccess(data) {
+        console.log(data, " We are ready to roll");
+        const result = FilterRestaurantResponseZod.safeParse(data);
+        if (!result.success) {
+          console.log(result.error);
+          return (
+            <ErrorCard message="the server responded with incorrect types, but the restaurant may have been created in the database" />
+          );
+        }
+        if (data.hasOwnProperty("apiErrors")) {
+          const apiErrors = data as FilterRestaurantsErrors;
+          if (apiErrors.apiErrors?.generalErrors) {
+            return (
+              <ErrorCard message="something went wrong, please try again" />
+            );
+          }
+          if (apiErrors.apiErrors?.validationErrors) {
+            const errorsProps = apiErrors.apiErrors.validationErrors;
+            const { coordinates } = errorsProps;
+            let errors: string[] = [];
+            if (coordinates) errors = [...errors, ...coordinates];
+            return <ErrorCard arrayOfErrors={errors} />;
+          }
+        }
+        const validData = data as RestaurantGeoJsonFeatureCollectionClient;
+        // setQueryData for getMapData since data has been updated
+        queryClient.setQueryData(["getMapData"], validData);
+      },
+    }
+  );
+
+  if (updateMapData.isInitialLoading) {
+    return <Loader />;
+  }
+
+  if (updateMapData.isError) {
+    return <ErrorCard message="unable to load data from the server" />;
+  }
 
   const onLoad = () => {
     if (mapRef.current) {
@@ -117,94 +176,116 @@ export const MapContainer: React.FC<MapContainerProps> = ({
       setShowPopup(true);
     }
   };
+
+  const onExpandSearchRadius = () => {
+    const centreCooridnates = mapRef.current.getCenter() as {
+      lat: number;
+      lng: number;
+    };
+    // {lng: -93.24952280000048, lat: 45.052795108312296}
+    setQueryCoordinates({
+      latitude: centreCooridnates.lat.toString(),
+      longitude: centreCooridnates.lng.toString(),
+    });
+  };
+  // console.log(queryCoordinates, "slslslsl");
   return (
-    <Map
-      id="MapA"
-      reuseMaps={true}
-      ref={mapRef}
-      initialViewState={cameraViewState}
-      onMove={(evt) => onViewStateChange(evt.viewState)}
-      style={{ width: "100%", maxHeight: 600, minHeight: 600, height: 600 }}
-      mapStyle="mapbox://styles/mapbox/streets-v9"
-      mapboxAccessToken={process.env.NEXT_PUBLIC_MAPBOX_ACCESS}
-      interactiveLayerIds={["points"]}
-      onMouseEnter={onMouseEnter}
-      onLoad={onLoad}
-    >
-      <Source id={"restaurant locations"} type="geojson" data={geolocations}>
-        <Layer
-          id={"points"}
-          type="symbol"
-          source={"restaurant locations"}
-          layout={{
-            "icon-image": "custom-marker",
-            "icon-allow-overlap": true,
-            "text-field": ["get", "restaurantName"],
-            "text-offset": [0, 1.2],
-            "text-allow-overlap": true,
-          }}
-          paint={{
-            "icon-opacity": [
-              "case",
-              ["boolean", ["feature-state", "hover"], false],
-              0.5,
-              1,
-            ],
-          }}
-        />
-      </Source>
-      {/* TODO: do styling */}
-      {showPopup && (
-        <Popup
-          //closeButton={false}
-          longitude={popupData.longitude}
-          latitude={popupData.latitude}
-          anchor="top"
-          onClose={() => {
-            mapRef.current.setFeatureState(
-              { source: "restaurant locations", id: hoverId },
-              { hover: false }
-            );
-            setPopupData({
-              restaurantId: "",
-              restaurantName: "",
-              description: "",
-              address: "",
-              latitude: 0,
-              longitude: 0,
-              imageUrl: "",
-            });
-            setHoverId(undefined);
-            setShowPopup(false);
-          }}
-        >
-          <Card
-            component={Link}
-            href={`/restaurants/${popupData.restaurantId}`}
-            target="_blank"
-            style={{
-              marginTop: "-10px",
-              marginLeft: "-10px",
-              marginRight: "-10px",
-              marginBottom: "-10px",
+    <div style={{ position: "relative" }}>
+      <Button
+        onClick={onExpandSearchRadius}
+        size="xl"
+        style={{ position: "absolute", zIndex: 1, top: 0, right: 0 }}
+      >
+        Test
+      </Button>
+      <Map
+        id="MapA"
+        reuseMaps={true}
+        ref={mapRef}
+        initialViewState={cameraViewState}
+        onMove={(evt) => onViewStateChange(evt.viewState)}
+        style={{ width: "100%", maxHeight: 600, minHeight: 600, height: 600 }}
+        mapStyle="mapbox://styles/mapbox/streets-v9"
+        mapboxAccessToken={process.env.NEXT_PUBLIC_MAPBOX_ACCESS}
+        interactiveLayerIds={["points"]}
+        onMouseEnter={onMouseEnter}
+        onLoad={onLoad}
+      >
+        <Source id={"restaurant locations"} type="geojson" data={geolocations}>
+          <Layer
+            id={"points"}
+            type="symbol"
+            source={"restaurant locations"}
+            layout={{
+              "icon-image": "custom-marker",
+              "icon-allow-overlap": true,
+              "text-field": ["get", "restaurantName"],
+              "text-offset": [0, 1.2],
+              "text-allow-overlap": true,
+            }}
+            paint={{
+              "icon-opacity": [
+                "case",
+                ["boolean", ["feature-state", "hover"], false],
+                0.5,
+                1,
+              ],
+            }}
+          />
+        </Source>
+        {/* TODO: do styling */}
+        {showPopup && (
+          <Popup
+            //closeButton={false}
+            longitude={popupData.longitude}
+            latitude={popupData.latitude}
+            anchor="top"
+            onClose={() => {
+              mapRef.current.setFeatureState(
+                { source: "restaurant locations", id: hoverId },
+                { hover: false }
+              );
+              setPopupData({
+                restaurantId: "",
+                restaurantName: "",
+                description: "",
+                address: "",
+                latitude: 0,
+                longitude: 0,
+                imageUrl: "",
+              });
+              setHoverId(undefined);
+              setShowPopup(false);
             }}
           >
-            <Card.Section>
-              <Image
-                src={`${process.env.NEXT_PUBLIC_BASE_IMAGE_URL}/${popupData.imageUrl}`}
-                height={120}
-                alt="cover image for restaurant"
-              />
-            </Card.Section>
-            <Title mt="xs" order={5}>
-              {popupData.restaurantName}
-            </Title>
-            <Text size="xs" color="dimmed">
-              {`${popupData.address}`}
-            </Text>
-          </Card>
-        </Popup>
-      )}
-    </Map>
+            <Card
+              component={Link}
+              href={`/restaurants/${popupData.restaurantId}`}
+              target="_blank"
+              style={{
+                marginTop: "-10px",
+                marginLeft: "-10px",
+                marginRight: "-10px",
+                marginBottom: "-10px",
+              }}
+            >
+              <Card.Section>
+                <Image
+                  src={`${process.env.NEXT_PUBLIC_BASE_IMAGE_URL}/${popupData.imageUrl}`}
+                  height={120}
+                  alt="cover image for restaurant"
+                />
+              </Card.Section>
+              <Title mt="xs" order={5}>
+                {popupData.restaurantName}
+              </Title>
+              <Text size="xs" color="dimmed">
+                {`${popupData.address}`}
+              </Text>
+            </Card>
+          </Popup>
+        )}
+      </Map>
+    </div>
   );
 };

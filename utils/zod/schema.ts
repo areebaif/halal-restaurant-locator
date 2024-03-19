@@ -324,6 +324,7 @@ export const FilterRestaurantsErrorsZod = z.object({
           country: z.string().array().optional(),
           state: z.string().array().optional(),
           city: z.string().array().optional(),
+          coordinates: z.string().array().optional(),
         })
         .optional(),
       generalErrors: z.string().array().optional(),

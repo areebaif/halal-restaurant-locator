@@ -17,6 +17,7 @@ import {
   FilterRestaurantsByZipcodeZod,
   FilterRestaurantsByCityZod,
   CreateRestaurantZod,
+  isValidCoordinate,
 } from "@/utils";
 
 /**
@@ -189,9 +190,9 @@ import {
  *     get:
  *       tags:
  *         - restaurants
- *       summary: find restaurants depending on query parameters
+ *       summary: filter restaurants by city, state and country
  *       description: Returns geojson restaurant feature collection
- *       operationId: searchRestaurant
+ *       operationId: filterRestaurantsByCity
  *       parameters:
  *         - name: zipcode
  *           in: query
@@ -520,9 +521,10 @@ export default async function CreateRestaurant(
     }
 
     if (req.method == "GET") {
-      const { country, zipcode, state, city } = req.query;
+      const { country, zipcode, state, city, latitude, longitude } = req.query;
+      console.log(req.query, " I just hit the correct end point");
 
-      if (!state && !city && !zipcode && !country) {
+      if (!state && !city && !zipcode && !country && !latitude && !longitude) {
         res.status(400).json({
           apiErrors: {
             validationErrors: {
@@ -532,154 +534,214 @@ export default async function CreateRestaurant(
               city: [
                 "please provide value for either zipcode & country or country, state & city",
               ],
-            },
-          },
-        });
-        return;
-      }
-      if (typeof country !== "string") {
-        res.status(400).json({
-          apiErrors: {
-            validationErrors: {
-              country: ["please provide value for country as string"],
-            },
-          },
-        });
-        return;
-      }
-      const countryExists = await prisma.country.findUnique({
-        where: {
-          countryName: country as string,
-        },
-      });
-
-      if (!countryExists?.countryId) {
-        res.status(400).json({
-          apiErrors: {
-            validationErrors: {
-              country: [
-                "Country does not exist in the database with the name provided",
+              coordinates: [
+                "please provide value for latitude and longitude in the query parameters",
               ],
             },
           },
         });
         return;
       }
-      // search by zipcode
-      if (zipcode && zipcode.length > 1) {
-        const isTypeCorrect = FilterRestaurantsByZipcodeZod.safeParse(
-          req.query
-        );
-        if (!isTypeCorrect.success) {
-          console.log(isTypeCorrect.error);
+      // at this point we either have latitude & longitude or zipcode or city
+      // latitude and longitude are defined
+      if (latitude && longitude) {
+        if (typeof latitude !== "string" || typeof longitude !== "string") {
+          res.status(400).json({
+            apiErrors: {
+              validationErrors: {
+                coordinates: [
+                  "please provide value for latitude and longitude as string",
+                ],
+              },
+            },
+          });
+          return;
+        }
+        // using regex, chekc if we have valid coordinates then convert them to numbers
+        const isValidLat = isValidCoordinate(latitude);
+        const isValidLng = isValidCoordinate(longitude);
+
+        if (!isValidLat || !isValidLng) {
+          res.status(400).json({
+            apiErrors: {
+              validationErrors: {
+                coordinates: [
+                  "incorrect latitude and longitude values recieved",
+                ],
+              },
+            },
+          });
+          return;
+        }
+        // check values in proper lat and lng range after converting them to float
+        const floatLat = parseFloat(latitude);
+        const floatLng = parseFloat(longitude);
+        const validRangeLat = z.number().gte(-90).lte(90).safeParse(floatLat);
+        const validRangeLng = z.number().gte(-180).lte(180).safeParse(floatLng);
+        if (!validRangeLat.success || !validRangeLng.success) {
+          res.status(400).json({
+            apiErrors: {
+              validationErrors: {
+                coordinates: [
+                  "latitude should be in range from -90 to 90 and longitude lavlues should be in the range of -180 to 180",
+                ],
+              },
+            },
+          });
+          return;
+        }
+        // TODO: we have to optimise this query
+        // This query searches in a default 40 mile radius
+        const restaurants =
+          await prisma.$queryRaw`select * from Restaurant where ST_Distance_Sphere(point(${floatLng}, ${floatLat}), point(longitude, latitude)) * 0.000621371 < 40;`;
+        // We either have zipcode or city
+        console.log(restaurants);
+        //res.status(200).send(restaurants)
+      } else {
+        if (typeof country !== "string") {
+          res.status(400).json({
+            apiErrors: {
+              validationErrors: {
+                country: ["please provide value for country as string"],
+              },
+            },
+          });
+          return;
+        }
+        const countryExists = await prisma.country.findUnique({
+          where: {
+            countryName: country as string,
+          },
+        });
+
+        if (!countryExists?.countryId) {
           res.status(400).json({
             apiErrors: {
               validationErrors: {
                 country: [
-                  "Typecheck failed on the server, provide country and zipcode value as string",
-                ],
-                zipcode: [
-                  "Typecheck failed on the server, provide country and zipcode value as string",
+                  "Country does not exist in the database with the name provided",
                 ],
               },
             },
           });
           return;
         }
-        const queryProps = req.query as FilterRestaurantsByZipcode;
-        // send data by zipcode
-        const zipcodeExists = await prisma.zipcode.findUnique({
-          where: {
-            zipcode_countryId: {
-              zipcode: queryProps.zipcode,
-              countryId: countryExists.countryId,
-            },
-          },
-        });
-        if (!zipcodeExists?.zipcodeId) {
-          res.status(400).json({
-            apiErrors: {
-              validationErrors: {
-                zipcode: [
-                  "The zipcode does not exist in relation to country value provided",
-                ],
+        // search by zipcode
+        if (zipcode && zipcode.length > 1) {
+          const isTypeCorrect = FilterRestaurantsByZipcodeZod.safeParse(
+            req.query
+          );
+          if (!isTypeCorrect.success) {
+            console.log(isTypeCorrect.error);
+            res.status(400).json({
+              apiErrors: {
+                validationErrors: {
+                  country: [
+                    "Typecheck failed on the server, provide country and zipcode value as string",
+                  ],
+                  zipcode: [
+                    "Typecheck failed on the server, provide country and zipcode value as string",
+                  ],
+                },
+              },
+            });
+            return;
+          }
+          const queryProps = req.query as FilterRestaurantsByZipcode;
+          // send data by zipcode
+          const zipcodeExists = await prisma.zipcode.findUnique({
+            where: {
+              zipcode_countryId: {
+                zipcode: queryProps.zipcode,
+                countryId: countryExists.countryId,
               },
             },
           });
-          return;
-        }
-        // find restaurants by zipcde and countryId
-        const restaurants = await filterRestaurants({
-          zipcodeId: zipcodeExists.zipcodeId,
-          countryId: countryExists.countryId,
-        });
+          if (!zipcodeExists?.zipcodeId) {
+            res.status(400).json({
+              apiErrors: {
+                validationErrors: {
+                  zipcode: [
+                    "The zipcode does not exist in relation to country value provided",
+                  ],
+                },
+              },
+            });
+            return;
+          }
+          // find restaurants by zipcde and countryId
+          const restaurants = await filterRestaurants({
+            zipcodeId: zipcodeExists.zipcodeId,
+            countryId: countryExists.countryId,
+          });
 
-        res.status(200).send({ restaurants: restaurants });
-        return;
-      } else {
-        // search by city
-        const isTypeCorrect = FilterRestaurantsByCityZod.safeParse(req.query);
-        if (!isTypeCorrect.success) {
-          console.log(isTypeCorrect.error);
-          res.status(400).json({
-            apiErrors: {
-              validationErrors: {
-                city: [
-                  "Please provide query as city, state and country values as string",
-                ],
+          res.status(200).send({ restaurants: restaurants });
+          return;
+        } else {
+          // search by city
+          const isTypeCorrect = FilterRestaurantsByCityZod.safeParse(req.query);
+          if (!isTypeCorrect.success) {
+            console.log(isTypeCorrect.error);
+            res.status(400).json({
+              apiErrors: {
+                validationErrors: {
+                  city: [
+                    "Please provide query as city, state and country values as string",
+                  ],
+                },
+              },
+            });
+            return;
+          }
+          const queryProps = req.query as FilterRestaurantsByCity;
+          const stateExists = await prisma.state.findUnique({
+            where: {
+              countryId_stateName: {
+                countryId: countryExists?.countryId,
+                stateName: capitalizeFirstWord(queryProps.state),
               },
             },
           });
-          return;
-        }
-        const queryProps = req.query as FilterRestaurantsByCity;
-        const stateExists = await prisma.state.findUnique({
-          where: {
-            countryId_stateName: {
-              countryId: countryExists?.countryId,
-              stateName: capitalizeFirstWord(queryProps.state),
-            },
-          },
-        });
-        if (!stateExists?.stateId) {
-          res.status(400).json({
-            apiErrors: {
-              validationErrors: {
-                state: [
-                  "The state does not exist in relation to country value provided",
-                ],
+          if (!stateExists?.stateId) {
+            res.status(400).json({
+              apiErrors: {
+                validationErrors: {
+                  state: [
+                    "The state does not exist in relation to country value provided",
+                  ],
+                },
+              },
+            });
+            return;
+          }
+          const cityExists = await prisma.city.findUnique({
+            where: {
+              countryId_stateId_cityName: {
+                countryId: countryExists.countryId,
+                stateId: stateExists.stateId,
+                cityName: capitalizeFirstWord(queryProps.city),
               },
             },
           });
-          return;
-        }
-        const cityExists = await prisma.city.findUnique({
-          where: {
-            countryId_stateId_cityName: {
-              countryId: countryExists.countryId,
-              stateId: stateExists.stateId,
-              cityName: capitalizeFirstWord(queryProps.city),
-            },
-          },
-        });
-        if (!cityExists?.cityId) {
-          res.status(400).json({
-            apiErrors: {
-              validationErrors: {
-                city: [
-                  "The city does not exist in relation to country and state value provided",
-                ],
+          if (!cityExists?.cityId) {
+            res.status(400).json({
+              apiErrors: {
+                validationErrors: {
+                  city: [
+                    "The city does not exist in relation to country and state value provided",
+                  ],
+                },
               },
-            },
+            });
+            return;
+          }
+          const restaurants = await filterRestaurants({
+            countryId: countryExists.countryId,
+            stateId: stateExists.stateId,
+            cityId: cityExists.cityId,
           });
-          return;
+          res.status(200).send({ restaurants: restaurants });
         }
-        const restaurants = await filterRestaurants({
-          countryId: countryExists.countryId,
-          stateId: stateExists.stateId,
-          cityId: cityExists.cityId,
-        });
-        res.status(200).send({ restaurants: restaurants });
       }
     }
   } catch (err) {
