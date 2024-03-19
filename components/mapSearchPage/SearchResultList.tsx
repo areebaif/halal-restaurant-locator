@@ -116,6 +116,7 @@ const GeoLocationCard: React.FC<GeoLocationCard> = ({
       { source: "restaurant locations", id: location.id },
       { hover: false }
     );
+    setHoverId(undefined);
     setShowPopup(false);
     setPopupData({
       restaurantId: "",

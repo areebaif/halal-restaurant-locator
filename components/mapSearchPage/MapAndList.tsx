@@ -11,7 +11,12 @@ import {
   FilterRestaurantResponseZod,
 } from "@/utils";
 
-import { ErrorCard, MapContainer, SearchResultList } from "@/components";
+import {
+  ErrorCard,
+  MapContainer,
+  SearchResultCarousol,
+  SearchResultList,
+} from "@/components";
 import {
   FilterRestaurantsErrors,
   RestaurantGeoJsonFeatureCollectionClient,
@@ -139,15 +144,21 @@ export const MapAndList: React.FC<MapAndList> = ({ query, setQuery }) => {
     popupData,
     setPopupData,
   };
-
   return (
-    <Grid>
-      <Grid.Col span={3}>
-        <SearchResultList {...mapConatinerInputs} />
-      </Grid.Col>
-      <Grid.Col span={9}>
-        <MapContainer {...mapConatinerInputs} />
-      </Grid.Col>
-    </Grid>
+    <>
+      <SearchResultCarousol
+        geolocations={geolocations}
+        hoverId={hoverId}
+        setHoverId={setHoverId}
+      />
+      <Grid>
+        <Grid.Col span={3}>
+          <SearchResultList {...mapConatinerInputs} />
+        </Grid.Col>
+        {/* <Grid.Col span={9}>
+          <MapContainer {...mapConatinerInputs} />
+        </Grid.Col> */}
+      </Grid>
+    </>
   );
 };
