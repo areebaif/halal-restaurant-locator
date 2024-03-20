@@ -19,6 +19,7 @@ import {
   CreateRestaurantZod,
   isValidCoordinate,
 } from "@/utils";
+import { dataToGeoJson } from "@/utils/api-utils";
 
 /**
  *
@@ -324,6 +325,23 @@ import {
  
  */
 
+type RestaurantBySearchRadius = {
+  restaurantId: string;
+  latitude: number;
+  longitude: number;
+  restaurantName: string;
+  description: string;
+  street: string;
+  country: string;
+  state: string;
+  city: string;
+  zipcode: string;
+  //comma separated list as string;
+  foodTag: string;
+  //comma separated list as string;
+  imageUrl: string;
+}[];
+
 export default async function CreateRestaurant(
   req: NextApiRequest,
   res: NextApiResponse<
@@ -592,11 +610,46 @@ export default async function CreateRestaurant(
         }
         // TODO: we have to optimise this query
         // This query searches in a default 40 mile radius
-        const restaurants =
-          await prisma.$queryRaw`select * from Restaurant where ST_Distance_Sphere(point(${floatLng}, ${floatLat}), point(longitude, latitude)) * 0.000621371 < 40;`;
+        // restaurantBySearchRadius uses group_concat sql function which returns a distinct comma separated list as string, this applies to imageUrl and foodtags.
+        const searchRadius = 40;
+        const restaurantsBySearchRadiusOne: RestaurantBySearchRadius =
+          await prisma.$queryRaw`select Restaurant.restaurantId ,Restaurant.restaurantName, Restaurant.description, Restaurant.latitude, Restaurant.longitude, Restaurant.street, Country.countryName, State.stateName, City.cityName, Zipcode.zipcode, GROUP_CONCAT(distinct Restaurant_Image_Url.imageUrl) as imageUrl, GROUP_CONCAT(DISTINCT FoodTag.name) as foodTag
+            from Restaurant
+            join Country
+            on Restaurant.countryId=Country.countryId
+            join State
+            on Restaurant.stateId=State.stateId
+            join City
+            on Restaurant.cityId=City.cityId
+            join Zipcode
+            on Restaurant.ZipcodeId=Zipcode.zipcodeId
+            join Restaurant_Image_Url
+            on Restaurant.restaurantId= Restaurant_Image_Url.restaurantId
+            join Restaurant_FoodTag
+            on Restaurant.restaurantId= Restaurant_FoodTag.restaurantId
+            join FoodTag
+            on FoodTag.foodTagId = Restaurant_FoodTag.FoodTagId
+            where ST_Distance_Sphere(point(${floatLng}, ${floatLat}), point( Restaurant.longitude, Restaurant.latitude)) * 0.000621371 < ${searchRadius}
+            GROUP BY Restaurant.restaurantId;`;
+
+        const restaurants = restaurantsBySearchRadiusOne.map((restaurant) => ({
+          restaurantId: restaurant.restaurantId,
+          latitude: restaurant.latitude,
+          longitude: restaurant.longitude,
+          restaurantName: restaurant.restaurantName,
+          description: restaurant.description,
+          street: restaurant.street,
+          country: restaurant.country,
+          state: restaurant.state,
+          city: restaurant.city,
+          zipcode: restaurant.zipcode,
+          FoodTag: restaurant.foodTag.split(","),
+          imageUrl: restaurant.imageUrl.split(","),
+        }));
+        const geojson = dataToGeoJson(restaurants);
+        res.status(200).send({ restaurants: geojson });
+
         // We either have zipcode or city
-        console.log(restaurants);
-        //res.status(200).send(restaurants)
       } else {
         if (typeof country !== "string") {
           res.status(400).json({
