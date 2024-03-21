@@ -333,9 +333,9 @@ type RestaurantBySearchRadius = {
   restaurantName: string;
   description: string;
   street: string;
-  country: string;
-  state: string;
-  city: string;
+  countryName: string;
+  stateName: string;
+  cityName: string;
   zipcode: string;
   //comma separated list as string;
   foodTag: string;
@@ -621,7 +621,7 @@ export default async function CreateRestaurant(
         const maxLat = coordinates[2];
         const minLng = coordinates[1];
         const maxLng = coordinates[3];
-      
+
         // restaurantBySearchRadius uses group_concat sql function which returns a distinct comma separated list as string, this applies to imageUrl and foodtags.
         const restaurantsBySearchRadiusOne: RestaurantBySearchRadius =
           await prisma.$queryRaw`select Restaurant.restaurantId ,Restaurant.restaurantName, Restaurant.description, Restaurant.latitude, Restaurant.longitude, Restaurant.street, Country.countryName, State.stateName, City.cityName, Zipcode.zipcode, GROUP_CONCAT(distinct Restaurant_Image_Url.imageUrl) as imageUrl, GROUP_CONCAT(DISTINCT FoodTag.name) as foodTag
@@ -667,9 +667,9 @@ export default async function CreateRestaurant(
             restaurantName: restaurant.restaurantName,
             description: restaurant.description,
             street: restaurant.street,
-            country: restaurant.country,
-            state: restaurant.state,
-            city: restaurant.city,
+            country: restaurant.countryName,
+            state: restaurant.stateName,
+            city: restaurant.cityName,
             zipcode: restaurant.zipcode,
             FoodTag: restaurant.foodTag.split(","),
             coverImageUrl: coverImageUrl,

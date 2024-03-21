@@ -4,7 +4,7 @@ import { useQuery } from "@tanstack/react-query";
 import "mapbox-gl/dist/mapbox-gl.css";
 import mapboxgl from "mapbox-gl";
 import Map, { useMap } from "react-map-gl";
-import { Loader, Grid } from "@mantine/core";
+import { Loader, Grid, MediaQuery, Flex, Box } from "@mantine/core";
 import {
   calcBoundsFromCoordinates,
   listRestaurantBySearchCriteria,
@@ -17,12 +17,7 @@ import {
   RestaurantGeoJsonFeatureCollectionClient,
 } from "@/utils/types";
 
-export type MapAndList = {
-  // query: string;
-  // setQuery: (val: string) => void;
-};
-
-export const MapAndList: React.FC<MapAndList> = () => {
+export const MapAndList: React.FC = () => {
   const { MapA } = useMap();
   const router = useRouter();
   const urlParams = router.query;
@@ -124,13 +119,35 @@ export const MapAndList: React.FC<MapAndList> = () => {
   };
 
   return (
-    <Grid>
-      <Grid.Col span={3}>
+    <Flex gap="md">
+      <Box
+        sx={(theme) => ({
+          [theme.fn.smallerThan("sm")]: {
+            display: "none",
+          },
+
+          [theme.fn.largerThan("lg")]: {
+            width: "20%",
+          },
+          width: "30%",
+        })}
+      >
         <SearchResultList {...mapConatinerInputs} />
-      </Grid.Col>
-      <Grid.Col span={9}>
+      </Box>
+      <Box
+        sx={(theme) => ({
+          [theme.fn.smallerThan("sm")]: {
+            width: "100%",
+          },
+
+          [theme.fn.largerThan("lg")]: {
+            width: "80%",
+          },
+          width: "70%",
+        })}
+      >
         <MapContainer {...mapConatinerInputs} />
-      </Grid.Col>
-    </Grid>
+      </Box>
+    </Flex>
   );
 };

@@ -8,7 +8,7 @@ const getSWCoordinates = (coordinatesCollection: any) => {
   );
   // the lowest coordinate on the map is at the lowest zoomed edge of the map which is not visually pleasing
   // artifically adding some latitude degrees to centre coordinates in the map
-  const adjustedLowestLat = lowestLat - 1.0;
+  const adjustedLowestLat = lowestLat - 0.3;
 
   return [lowestLng, adjustedLowestLat];
 };
@@ -23,7 +23,7 @@ const getNECoordinates = (coordinatesCollection: any) => {
 
   // the highest coordinate on the map is at the highest zoomed edge of the map which is not visually pleasing
   // artifically adding some latitude degrees to centre coordinates in the map
-  const adjustedHighestLat = highestLat + 1.0;
+  const adjustedHighestLat = highestLat + 0.3;
 
   return [highestLng, adjustedHighestLat];
 };

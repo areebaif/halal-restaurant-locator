@@ -14,7 +14,7 @@ const MapSearch: React.FC = () => {
     urlParams.city?.length ||
     urlParams.latitude?.length ? (
     <>
-      <SearchInput />{" "}
+      <SearchInput />
       <MapProvider>
         <MapAndList />
       </MapProvider>

@@ -1,20 +1,15 @@
 import * as React from "react";
 import Link from "next/link";
 import { useRouter } from "next/router";
-import { useQuery, useQueryClient } from "@tanstack/react-query";
-
 import "mapbox-gl/dist/mapbox-gl.css";
 import mapboxgl, { MapLayerMouseEvent } from "mapbox-gl";
 import Map, { Source, Layer, Popup } from "react-map-gl";
-import { Card, Title, Text, Image, Button, Loader } from "@mantine/core";
+import { Card, Title, Text, Image, Button, px } from "@mantine/core";
+import { IconSearch } from "@tabler/icons-react";
 // local imports
-import {
-  calcBoundsFromCoordinates,
-} from "@/utils";
+import { calcBoundsFromCoordinates } from "@/utils";
 import { ErrorCard } from "@/components";
-import {
-  GeoJsonPropertiesRestaurant,
-} from "@/utils/types";
+import { GeoJsonPropertiesRestaurant } from "@/utils/types";
 
 export type PopupDataProps = {
   restaurantId: string;
@@ -141,13 +136,21 @@ export const MapContainer: React.FC<MapContainerProps> = ({
   };
 
   return (
-    <div style={{ position: "relative" }}>
+    <div style={{ position: "relative", width: "100%", marginTop: "0.4em" }}>
       <Button
         onClick={onExpandSearchRadius}
-        size="xl"
-        style={{ position: "absolute", zIndex: 1, top: 0, right: 0 }}
+        leftIcon={<IconSearch size={16} />}
+        size="md"
+        variant="outline"
+        color="dark"
+        styles={(theme) => ({
+          root: {
+            backgroundColor: theme.colors.gray[0],
+          },
+        })}
+        style={{ position: "absolute", zIndex: 1, top: "1em", right: "1em" }}
       >
-        Test
+        Expand search
       </Button>
       <Map
         id="MapA"
@@ -155,7 +158,13 @@ export const MapContainer: React.FC<MapContainerProps> = ({
         ref={mapRef}
         initialViewState={cameraViewState}
         onMove={(evt) => onViewStateChange(evt.viewState)}
-        style={{ width: "100%", maxHeight: 600, minHeight: 600, height: 600 }}
+        style={{
+          width: "100%",
+          //minWidth: "48em",
+          maxHeight: 600,
+          minHeight: 600,
+          height: 600,
+        }}
         mapStyle="mapbox://styles/mapbox/streets-v9"
         mapboxAccessToken={process.env.NEXT_PUBLIC_MAPBOX_ACCESS}
         interactiveLayerIds={["points"]}
