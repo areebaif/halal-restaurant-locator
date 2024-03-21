@@ -541,7 +541,6 @@ export default async function CreateRestaurant(
     if (req.method == "GET") {
       const { country, zipcode, state, city, latitude, longitude } = req.query;
 
-
       if (!state && !city && !zipcode && !country && !latitude && !longitude) {
         res.status(400).json({
           apiErrors: {
@@ -632,28 +631,41 @@ export default async function CreateRestaurant(
             where ST_Distance_Sphere(point(${floatLng}, ${floatLat}), point( Restaurant.longitude, Restaurant.latitude)) * 0.000621371 < ${searchRadius}
             GROUP BY Restaurant.restaurantId;`;
 
-        const restaurants = restaurantsBySearchRadiusOne.map((restaurant) => ({
-          restaurantId: restaurant.restaurantId,
-          latitude: restaurant.latitude,
-          longitude: restaurant.longitude,
-          restaurantName: restaurant.restaurantName,
-          description: restaurant.description,
-          street: restaurant.street,
-          country: restaurant.country,
-          state: restaurant.state,
-          city: restaurant.city,
-          zipcode: restaurant.zipcode,
-          FoodTag: restaurant.foodTag.split(","),
-          imageUrl: restaurant.imageUrl.split(","),
-        }));
-   
+        const restaurants = restaurantsBySearchRadiusOne.map((restaurant) => {
+          const imageUrl = restaurant.imageUrl.split(",");
+          const coverImageUrlList: string[] = [];
+          const otherImageUrlList: string[] = [];
+          imageUrl.forEach((item) => {
+            if (item.includes("cover")) {
+              coverImageUrlList.push(item);
+            } else {
+              otherImageUrlList.push(item);
+            }
+          });
+          const coverImageUrl = coverImageUrlList[0];
+          return {
+            restaurantId: restaurant.restaurantId,
+            latitude: restaurant.latitude,
+            longitude: restaurant.longitude,
+            restaurantName: restaurant.restaurantName,
+            description: restaurant.description,
+            street: restaurant.street,
+            country: restaurant.country,
+            state: restaurant.state,
+            city: restaurant.city,
+            zipcode: restaurant.zipcode,
+            FoodTag: restaurant.foodTag.split(","),
+            coverImageUrl: coverImageUrl,
+            otherImageUrlList,
+          };
+        });
+
         const geojson = dataToGeoJson(restaurants);
-        
+
         res.status(200).send({ restaurants: geojson });
 
         // We either have zipcode or city
       } else {
-   
         if (typeof country !== "string") {
           res.status(400).json({
             apiErrors: {

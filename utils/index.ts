@@ -8,7 +8,6 @@ import {
   listRestaurantBySearchCriteria,
   listFoodTags,
   getRestaurantById,
-  listRestaurantByCoordinate,
 } from "./crud-functions";
 import {
   CreateFoodTagZod,
@@ -42,7 +41,6 @@ import {
   onlyNumbers,
   isValidCoordinate,
 } from "./string-manipulation";
-
 
 import { s3Client } from "./aws-S3-Client";
 import { helperCreateUploadImageUrl } from "./image-uploads";
@@ -87,5 +85,4 @@ export {
   FilterRestaurantResponseZod,
   FilterRestaurantsErrorsZod,
   getRestaurantById,
-  listRestaurantByCoordinate,
 };

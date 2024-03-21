@@ -40,7 +40,7 @@ export const MapAndList: React.FC<MapAndList> = () => {
     address: "",
     latitude: 0,
     longitude: 0,
-    imageUrl: "",
+    coverImageUrl: "",
   });
   const [showPopup, setShowPopup] = React.useState<boolean>(false);
 

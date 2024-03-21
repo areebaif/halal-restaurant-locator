@@ -342,7 +342,8 @@ export const GeoJsonPropertiesRestaurantZod = z.object({
   city: z.string(),
   zipcode: z.string(),
   FoodTag: z.string().array(),
-  imageUrl: z.string().array(),
+  coverImageUrl: z.string(),
+  otherImageUrlList: z.string().array(),
 });
 
 export const GeoJsonFeatureRestaurantZod = z
@@ -391,7 +392,8 @@ export const ListRestaurantsZod = z.object({
       zipcode: z.string(),
       street: z.string(),
       FoodTag: z.string().array(),
-      imageUrl: z.string().array(),
+      coverImageUrl: z.string(),
+      otherImageUrlList: z.string().array(),
     })
     .array(),
 });

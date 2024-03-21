@@ -10,14 +10,10 @@ import { Card, Title, Text, Image, Button, Loader } from "@mantine/core";
 // local imports
 import {
   calcBoundsFromCoordinates,
-  listRestaurantByCoordinate,
-  FilterRestaurantResponseZod,
 } from "@/utils";
 import { ErrorCard } from "@/components";
 import {
   GeoJsonPropertiesRestaurant,
-  FilterRestaurantsErrors,
-  RestaurantGeoJsonFeatureCollectionClient,
 } from "@/utils/types";
 
 export type PopupDataProps = {
@@ -27,7 +23,7 @@ export type PopupDataProps = {
   address: string;
   latitude: number;
   longitude: number;
-  imageUrl: string;
+  coverImageUrl: string;
 };
 
 export type MapContainerProps = {
@@ -108,9 +104,8 @@ export const MapContainer: React.FC<MapContainerProps> = ({
       const zip = e.features[0].properties?.zipcode;
       const country = e.features[0].properties?.country;
       const address = `${street}, ${city}, ${state}, ${zip}, ${country}`;
-      const imageUrl = e.features[0].properties?.imageUrl;
-      const listParsedImageUrl = imageUrl.split(`"`);
-      const image = listParsedImageUrl[1];
+      const coverImageUrl = e.features[0].properties?.coverImageUrl;
+
       const id = e.features[0].id;
       setHoverId(id);
       mapRef.current.setFeatureState(
@@ -124,7 +119,7 @@ export const MapContainer: React.FC<MapContainerProps> = ({
         description,
         latitude: coordinates[1],
         longitude: coordinates[0],
-        imageUrl: image,
+        coverImageUrl: coverImageUrl,
       });
       setShowPopup(true);
     }
@@ -208,7 +203,7 @@ export const MapContainer: React.FC<MapContainerProps> = ({
                 address: "",
                 latitude: 0,
                 longitude: 0,
-                imageUrl: "",
+                coverImageUrl: "",
               });
               setHoverId(undefined);
               setShowPopup(false);
@@ -227,7 +222,7 @@ export const MapContainer: React.FC<MapContainerProps> = ({
             >
               <Card.Section>
                 <Image
-                  src={`${process.env.NEXT_PUBLIC_BASE_IMAGE_URL}/${popupData.imageUrl}`}
+                  src={`${process.env.NEXT_PUBLIC_BASE_IMAGE_URL}/${popupData.coverImageUrl}`}
                   height={120}
                   alt="cover image for restaurant"
                 />
