@@ -45,6 +45,7 @@ import {
 import { s3Client } from "./aws-S3-Client";
 import { helperCreateUploadImageUrl } from "./image-uploads";
 import { mapCountryData } from "./client-api-data-conversion";
+import { boundingBoxCalc } from "./map/bounding-box";
 export {
   s3Client,
   listUSAGeog,
@@ -85,4 +86,5 @@ export {
   FilterRestaurantResponseZod,
   FilterRestaurantsErrorsZod,
   getRestaurantById,
+  boundingBoxCalc,
 };

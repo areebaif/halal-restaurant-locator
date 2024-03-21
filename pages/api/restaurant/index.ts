@@ -18,6 +18,7 @@ import {
   FilterRestaurantsByCityZod,
   CreateRestaurantZod,
   isValidCoordinate,
+  boundingBoxCalc,
 } from "@/utils";
 import { dataToGeoJson } from "@/utils/api-utils";
 
@@ -607,10 +608,21 @@ export default async function CreateRestaurant(
           });
           return;
         }
-        // TODO: we have to optimise this query
-        // This query searches in a default 40 mile radius
+        // This query searches in a default 400 mile radius
+        //[minLat, minLng, maxLat, maxLng] in degree
+        const searchRadiusInMiles = 400;
+        const coordinates = boundingBoxCalc(
+          floatLat,
+          floatLng,
+          searchRadiusInMiles
+        );
+
+        const minLat = coordinates[0];
+        const maxLat = coordinates[2];
+        const minLng = coordinates[1];
+        const maxLng = coordinates[3];
+      
         // restaurantBySearchRadius uses group_concat sql function which returns a distinct comma separated list as string, this applies to imageUrl and foodtags.
-        const searchRadius = 4000;
         const restaurantsBySearchRadiusOne: RestaurantBySearchRadius =
           await prisma.$queryRaw`select Restaurant.restaurantId ,Restaurant.restaurantName, Restaurant.description, Restaurant.latitude, Restaurant.longitude, Restaurant.street, Country.countryName, State.stateName, City.cityName, Zipcode.zipcode, GROUP_CONCAT(distinct Restaurant_Image_Url.imageUrl) as imageUrl, GROUP_CONCAT(DISTINCT FoodTag.name) as foodTag
             from Restaurant
@@ -628,7 +640,12 @@ export default async function CreateRestaurant(
             on Restaurant.restaurantId= Restaurant_FoodTag.restaurantId
             join FoodTag
             on FoodTag.foodTagId = Restaurant_FoodTag.FoodTagId
-            where ST_Distance_Sphere(point(${floatLng}, ${floatLat}), point( Restaurant.longitude, Restaurant.latitude)) * 0.000621371 < ${searchRadius}
+            where
+            Restaurant.latitude between ${minLat} and ${maxLat}
+            and
+            Restaurant.longitude between ${minLng} and ${maxLng}
+            and 
+            ST_Distance_Sphere(point(${floatLng}, ${floatLat}), point( Restaurant.longitude, Restaurant.latitude)) * 0.000621371 < ${searchRadiusInMiles}
             GROUP BY Restaurant.restaurantId;`;
 
         const restaurants = restaurantsBySearchRadiusOne.map((restaurant) => {
