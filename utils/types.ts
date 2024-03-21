@@ -108,10 +108,4 @@ export type RestaurantGeoJsonFeatureCollectionClient = {
       properties: GeoJsonPropertiesRestaurant;
     }[];
   };
-  country?: string;
-  state?: string;
-  city?: string;
-  zipcode?: string;
-  typeError?: string;
-  restaurantError?: string;
 };

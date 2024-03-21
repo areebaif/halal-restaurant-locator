@@ -540,7 +540,7 @@ export default async function CreateRestaurant(
 
     if (req.method == "GET") {
       const { country, zipcode, state, city, latitude, longitude } = req.query;
-      console.log(req.query, " I just hit the correct end point");
+
 
       if (!state && !city && !zipcode && !country && !latitude && !longitude) {
         res.status(400).json({
@@ -611,7 +611,7 @@ export default async function CreateRestaurant(
         // TODO: we have to optimise this query
         // This query searches in a default 40 mile radius
         // restaurantBySearchRadius uses group_concat sql function which returns a distinct comma separated list as string, this applies to imageUrl and foodtags.
-        const searchRadius = 40;
+        const searchRadius = 4000;
         const restaurantsBySearchRadiusOne: RestaurantBySearchRadius =
           await prisma.$queryRaw`select Restaurant.restaurantId ,Restaurant.restaurantName, Restaurant.description, Restaurant.latitude, Restaurant.longitude, Restaurant.street, Country.countryName, State.stateName, City.cityName, Zipcode.zipcode, GROUP_CONCAT(distinct Restaurant_Image_Url.imageUrl) as imageUrl, GROUP_CONCAT(DISTINCT FoodTag.name) as foodTag
             from Restaurant
@@ -646,11 +646,14 @@ export default async function CreateRestaurant(
           FoodTag: restaurant.foodTag.split(","),
           imageUrl: restaurant.imageUrl.split(","),
         }));
+   
         const geojson = dataToGeoJson(restaurants);
+        
         res.status(200).send({ restaurants: geojson });
 
         // We either have zipcode or city
       } else {
+   
         if (typeof country !== "string") {
           res.status(400).json({
             apiErrors: {

@@ -1,5 +1,6 @@
 import * as React from "react";
 import Link from "next/link";
+import { useRouter } from "next/router";
 import { useQuery, useQueryClient } from "@tanstack/react-query";
 
 import "mapbox-gl/dist/mapbox-gl.css";
@@ -57,12 +58,8 @@ export const MapContainer: React.FC<MapContainerProps> = ({
   showPopup,
   setShowPopup,
 }) => {
-  const queryClient = useQueryClient();
+  const router = useRouter();
   const mapRef = React.useRef<any>();
-  const [queryCoordinates, setQueryCoordinates] = React.useState({
-    latitude: "",
-    longitude: "",
-  });
   const [cameraViewState, setCameraViewState] =
     React.useState<CameraViewState>();
   const onViewStateChange = (data: CameraViewState) => {
@@ -70,50 +67,6 @@ export const MapContainer: React.FC<MapContainerProps> = ({
       return { ...previousState, ...data };
     });
   };
-  console.log(queryCoordinates.latitude.length, "i am length");
-  const updateMapData = useQuery(
-    ["updateMapData", queryCoordinates],
-    () => listRestaurantByCoordinate(queryCoordinates),
-    {
-      enabled: queryCoordinates.latitude.length > 1,
-      onSuccess(data) {
-        console.log(data, " We are ready to roll");
-        const result = FilterRestaurantResponseZod.safeParse(data);
-        if (!result.success) {
-          console.log(result.error);
-          return (
-            <ErrorCard message="the server responded with incorrect types, but the restaurant may have been created in the database" />
-          );
-        }
-        if (data.hasOwnProperty("apiErrors")) {
-          const apiErrors = data as FilterRestaurantsErrors;
-          if (apiErrors.apiErrors?.generalErrors) {
-            return (
-              <ErrorCard message="something went wrong, please try again" />
-            );
-          }
-          if (apiErrors.apiErrors?.validationErrors) {
-            const errorsProps = apiErrors.apiErrors.validationErrors;
-            const { coordinates } = errorsProps;
-            let errors: string[] = [];
-            if (coordinates) errors = [...errors, ...coordinates];
-            return <ErrorCard arrayOfErrors={errors} />;
-          }
-        }
-        const validData = data as RestaurantGeoJsonFeatureCollectionClient;
-        // setQueryData for getMapData since data has been updated
-        queryClient.setQueryData(["getMapData"], validData);
-      },
-    }
-  );
-
-  if (updateMapData.isInitialLoading) {
-    return <Loader />;
-  }
-
-  if (updateMapData.isError) {
-    return <ErrorCard message="unable to load data from the server" />;
-  }
 
   const onLoad = () => {
     if (mapRef.current) {
@@ -183,12 +136,15 @@ export const MapContainer: React.FC<MapContainerProps> = ({
       lng: number;
     };
     // {lng: -93.24952280000048, lat: 45.052795108312296}
-    setQueryCoordinates({
-      latitude: centreCooridnates.lat.toString(),
-      longitude: centreCooridnates.lng.toString(),
+    router.push({
+      pathname: "/restaurants",
+      query: {
+        latitude: `${centreCooridnates.lat.toString()}`,
+        longitude: `${centreCooridnates.lng.toString()}`,
+      },
     });
   };
-  // console.log(queryCoordinates, "slslslsl");
+
   return (
     <div style={{ position: "relative" }}>
       <Button
