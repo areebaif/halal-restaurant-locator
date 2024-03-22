@@ -1,12 +1,12 @@
 import * as React from "react";
+import { useRouter } from "next/router";
 import { useQuery } from "@tanstack/react-query";
 import "mapbox-gl/dist/mapbox-gl.css";
 import mapboxgl from "mapbox-gl";
 import Map, { useMap } from "react-map-gl";
-import { Loader, Grid } from "@mantine/core";
+import { Loader, Grid, MediaQuery, Flex, Box } from "@mantine/core";
 import {
   calcBoundsFromCoordinates,
-  GeoJsonFeatureCollectionRestaurantsZod,
   listRestaurantBySearchCriteria,
   FilterRestaurantResponseZod,
 } from "@/utils";
@@ -22,13 +22,13 @@ import {
   RestaurantGeoJsonFeatureCollectionClient,
 } from "@/utils/types";
 
-export type MapAndList = {
-  query: string;
-  setQuery: (val: string) => void;
-};
-
-export const MapAndList: React.FC<MapAndList> = ({ query, setQuery }) => {
+export const MapAndList: React.FC = () => {
   const { MapA } = useMap();
+  const router = useRouter();
+  const urlParams = router.query;
+  const { country, zipcode, city, state, latitude, longitude } = urlParams;
+
+  const [query, setQuery] = React.useState("");
   const [flag, setFlag] = React.useState(false);
   const [hoverId, setHoverId] = React.useState<number | string | undefined>(
     undefined
@@ -40,7 +40,7 @@ export const MapAndList: React.FC<MapAndList> = ({ query, setQuery }) => {
     address: "",
     latitude: 0,
     longitude: 0,
-    imageUrl: "",
+    coverImageUrl: "",
   });
   const [showPopup, setShowPopup] = React.useState<boolean>(false);
 
@@ -76,20 +76,30 @@ export const MapAndList: React.FC<MapAndList> = ({ query, setQuery }) => {
         }
         setFlag(true);
       },
+      enabled: query.length > 0,
+      cacheTime: Infinity,
+      staleTime: Infinity,
     }
   );
 
   React.useEffect(() => {
-    if (query.length) {
-      const correctData =
-        mapData.data as RestaurantGeoJsonFeatureCollectionClient;
-      if (correctData && correctData.restaurants?.features.length) {
-        const mapBounds = calcBoundsFromCoordinates(correctData.restaurants);
-        MapA?.fitBounds(new mapboxgl.LngLatBounds(mapBounds));
-        setFlag(false);
-      }
+    if (city || zipcode || latitude) {
+      if (city && !zipcode && !latitude)
+        setQuery(`country=${country}&state=${state}&city=${city}`);
+      if (zipcode && !city && !latitude)
+        setQuery(`country=${country}&zipcode=${zipcode}`);
+      if (latitude && !city && !zipcode)
+        setQuery(`latitude=${latitude}&longitude=${longitude}`);
     }
-  }, [query, flag]);
+    const correctData =
+      mapData.data as RestaurantGeoJsonFeatureCollectionClient;
+
+    if (correctData && correctData.restaurants?.features.length) {
+      const mapBounds = calcBoundsFromCoordinates(correctData.restaurants);
+      MapA?.fitBounds(new mapboxgl.LngLatBounds(mapBounds));
+      setFlag(false);
+    }
+  }, [flag, country, zipcode, city, state, latitude, longitude, query]);
 
   if (mapData.isLoading) {
     return <Loader />;
@@ -99,40 +109,8 @@ export const MapAndList: React.FC<MapAndList> = ({ query, setQuery }) => {
     return <ErrorCard message="unable to load data from the server" />;
   }
 
-  const isTypeCorrect = GeoJsonFeatureCollectionRestaurantsZod.safeParse(
-    mapData.data
-  );
-  if (!isTypeCorrect.success) {
-    console.log(isTypeCorrect.error);
-    return <ErrorCard message="There is a type mismatch from the server" />;
-  }
   const correctData = mapData.data as RestaurantGeoJsonFeatureCollectionClient;
-  if (!correctData.restaurants) {
-    const data = correctData;
-    const { city, restaurantError, country, state, zipcode, typeError } = data!;
-    let ErrorMessage = "";
-    switch (true) {
-      case Boolean(city?.length):
-        ErrorMessage = city!;
-        break;
-      case Boolean(restaurantError?.length):
-        ErrorMessage = restaurantError!;
-        break;
-      case Boolean(country?.length):
-        ErrorMessage = country!;
-        break;
-      case Boolean(state?.length):
-        ErrorMessage = state!;
-        break;
-      case Boolean(zipcode?.length):
-        ErrorMessage = zipcode!;
-        break;
-      case Boolean(typeError?.length):
-        ErrorMessage = typeError!;
-        break;
-    }
-    return <ErrorCard message={ErrorMessage} />;
-  }
+
   const geolocations = correctData.restaurants;
 
   const mapConatinerInputs = {
@@ -145,20 +123,35 @@ export const MapAndList: React.FC<MapAndList> = ({ query, setQuery }) => {
     setPopupData,
   };
   return (
-    <>
-      <SearchResultCarousol
-        geolocations={geolocations}
-        hoverId={hoverId}
-        setHoverId={setHoverId}
-      />
-      <Grid>
-        <Grid.Col span={3}>
-          <SearchResultList {...mapConatinerInputs} />
-        </Grid.Col>
-        {/* <Grid.Col span={9}>
-          <MapContainer {...mapConatinerInputs} />
-        </Grid.Col> */}
-      </Grid>
-    </>
+    <Flex gap="md">
+      <Box
+        sx={(theme) => ({
+          [theme.fn.smallerThan("sm")]: {
+            display: "none",
+          },
+
+          [theme.fn.largerThan("lg")]: {
+            width: "20%",
+          },
+          width: "30%",
+        })}
+      >
+        <SearchResultList {...mapConatinerInputs} />
+      </Box>
+      <Box
+        sx={(theme) => ({
+          [theme.fn.smallerThan("sm")]: {
+            width: "100%",
+          },
+
+          [theme.fn.largerThan("lg")]: {
+            width: "80%",
+          },
+          width: "70%",
+        })}
+      >
+        <MapContainer {...mapConatinerInputs} />
+      </Box>
+    </Flex>
   );
 };

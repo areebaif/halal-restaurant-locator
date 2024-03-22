@@ -67,7 +67,8 @@ const GeoLocationCard: React.FC<GeoLocationCard> = ({
     zipcode,
     description,
     FoodTag,
-    imageUrl,
+    coverImageUrl,
+    otherImageUrlList,
   } = properties;
   const onMouseEnter = () => {
     // centre the map on the hovered location
@@ -90,7 +91,7 @@ const GeoLocationCard: React.FC<GeoLocationCard> = ({
       const zip = location.properties?.zipcode;
       const country = location.properties?.country;
       const address = `${street}, ${city}, ${state}, ${zip}, ${country}`;
-      const imageUrl = location.properties?.imageUrl;
+      const coverImageUrl = location.properties?.coverImageUrl;
 
       const id = location.id;
       MapA?.setFeatureState(
@@ -105,7 +106,7 @@ const GeoLocationCard: React.FC<GeoLocationCard> = ({
         description,
         latitude: coordinates[1],
         longitude: coordinates[0],
-        imageUrl: imageUrl[0],
+        coverImageUrl: coverImageUrl,
       });
       setShowPopup(true);
     }
@@ -125,11 +126,11 @@ const GeoLocationCard: React.FC<GeoLocationCard> = ({
       address: "",
       latitude: 0,
       longitude: 0,
-      imageUrl: "",
+      coverImageUrl: "",
     });
   };
   const baseUrl = process.env.NEXT_PUBLIC_BASE_IMAGE_URL;
-  const image = `${baseUrl}/${imageUrl[0]}`;
+  const image = `${baseUrl}/${coverImageUrl}`;
 
   return (
     <Card
