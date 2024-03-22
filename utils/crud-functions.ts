@@ -194,6 +194,7 @@ export const getRestaurantById = async (restaurantId: string) => {
 };
 
 export const listRestaurantBySearchCriteria = async (data: string) => {
+
   const response = await fetch(`/api/restaurant?${data}`, {
     method: "GET",
     headers: {

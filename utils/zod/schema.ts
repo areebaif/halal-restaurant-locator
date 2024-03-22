@@ -324,6 +324,7 @@ export const FilterRestaurantsErrorsZod = z.object({
           country: z.string().array().optional(),
           state: z.string().array().optional(),
           city: z.string().array().optional(),
+          coordinates: z.string().array().optional(),
         })
         .optional(),
       generalErrors: z.string().array().optional(),
@@ -341,7 +342,8 @@ export const GeoJsonPropertiesRestaurantZod = z.object({
   city: z.string(),
   zipcode: z.string(),
   FoodTag: z.string().array(),
-  imageUrl: z.string().array(),
+  coverImageUrl: z.string(),
+  otherImageUrlList: z.string().array(),
 });
 
 export const GeoJsonFeatureRestaurantZod = z
@@ -390,7 +392,8 @@ export const ListRestaurantsZod = z.object({
       zipcode: z.string(),
       street: z.string(),
       FoodTag: z.string().array(),
-      imageUrl: z.string().array(),
+      coverImageUrl: z.string(),
+      otherImageUrlList: z.string().array(),
     })
     .array(),
 });

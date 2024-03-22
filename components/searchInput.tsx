@@ -8,18 +8,31 @@ import { ErrorCard } from ".";
 import { listUSAGeog, mapCountryData } from "@/utils";
 import { ListCountryError, ListGeography } from "@/utils/types";
 
-export type SearchInput = {
-  queryString?: string;
-};
-
-export const SearchInput: React.FC<SearchInput> = ({ queryString }) => {
+export const SearchInput: React.FC = () => {
   const router = useRouter();
-  const [autoCompleteInputValue, setAutoCompleteInputValue] = React.useState(
-    `${queryString ? queryString : ""}`
-  );
+  const urlParams = router.query;
+  const { country, zipcode, city, state, latitude } = urlParams;
+  const [autoCompleteInputValue, setAutoCompleteInputValue] =
+    React.useState("");
   const [apiQueryFlag, setApiQueryFlag] = React.useState(false);
   const [apiSearchTerm, setApiSearchTerm] = React.useState("");
   const [error, setError] = React.useState({ inputData: "" });
+
+  React.useEffect(() => {
+    if (city && !latitude && !zipcode) {
+   
+      setAutoCompleteInputValue(`${city}, ${state}, ${country}`);
+    }
+    if (zipcode && !latitude && !city) {
+ 
+      setAutoCompleteInputValue(`${zipcode}, ${country}`);
+    }
+    if (!zipcode && latitude && !city) {
+ 
+      setAutoCompleteInputValue("");
+    }
+  }, [country, zipcode, city, state, latitude]);
+
   // Queries
   const geogData = useQuery(
     ["listGeography", apiSearchTerm],
@@ -76,7 +89,7 @@ export const SearchInput: React.FC<SearchInput> = ({ queryString }) => {
         const city = splitValue[0].trim();
         const state = splitValue[1].trim();
         const country = splitValue[2].trim();
-        console.log(city, state, country, "slslslslslslslslsl");
+      
         router.push(
           //`/restaurants?country=${country}&state=${state}&city=${city}`
           {

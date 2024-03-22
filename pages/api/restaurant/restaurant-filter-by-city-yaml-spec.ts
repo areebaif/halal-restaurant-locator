@@ -6,9 +6,9 @@
  *     get:
  *       tags:
  *         - restaurants
- *       summary: find restaurants depending on query parameters
+ *       summary: filter restaurants by zipcode and country
  *       description: Returns geojson restaurant feature collection
- *       operationId: searchRestaurant
+ *       operationId: filterRestaurantsByZipcode
  *       parameters:
  *         - name: city
  *           in: query

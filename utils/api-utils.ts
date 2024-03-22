@@ -30,7 +30,8 @@ export const dataToGeoJson = (data: ListRestaurants["restaurants"]) => {
       city,
       zipcode,
       FoodTag,
-      imageUrl,
+      coverImageUrl,
+      otherImageUrlList,
     } = restaurant;
     return {
       id: index,
@@ -49,7 +50,8 @@ export const dataToGeoJson = (data: ListRestaurants["restaurants"]) => {
         city,
         zipcode,
         FoodTag,
-        imageUrl,
+        coverImageUrl,
+        otherImageUrlList,
       },
     };
   });
@@ -111,9 +113,16 @@ export const filterRestaurants = async (searchCriteria: searchCriteria) => {
       street,
       RestaurantImageUrl,
     } = restaurantItem;
-    const coverImageUrl = RestaurantImageUrl.filter((item) =>
-      item.imageUrl.includes("cover")
-    );
+    const coverImageUrlList: string[] = [];
+    const otherImageUrlList: string[] = [];
+    RestaurantImageUrl.forEach((item) => {
+      if (item.imageUrl.includes("cover")) {
+        coverImageUrlList.push(item.imageUrl);
+      } else {
+        otherImageUrlList.push(item.imageUrl);
+      }
+    });
+    const coverImageUrl = coverImageUrlList[0];
     return {
       restaurantId,
       latitude,
@@ -126,7 +135,8 @@ export const filterRestaurants = async (searchCriteria: searchCriteria) => {
       city: City.cityName,
       zipcode: Zipcode.zipcode,
       FoodTag: FoodTag.map((tag) => tag.FoodTag.name),
-      imageUrl: coverImageUrl.map((url) => url.imageUrl),
+      coverImageUrl: coverImageUrl,
+      otherImageUrlList,
     };
   });
   const geoJson = dataToGeoJson(mappedData);
