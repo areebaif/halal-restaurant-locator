@@ -7,7 +7,10 @@ import Map, { Source, Layer, Popup } from "react-map-gl";
 import { Card, Title, Text, Image, Button, px } from "@mantine/core";
 import { IconSearch } from "@tabler/icons-react";
 // local imports
-import { calcBoundsFromCoordinates } from "@/utils";
+import {
+  calcBoundsFromCoordinates,
+  distanceBwTwoCordinatesInMiles,
+} from "@/utils";
 import { ErrorCard } from "@/components";
 import { GeoJsonPropertiesRestaurant } from "@/utils/types";
 
@@ -50,13 +53,34 @@ export const MapContainer: React.FC<MapContainerProps> = ({
   setShowPopup,
 }) => {
   const router = useRouter();
+  const { latitude, longitude } = router.query;
   const mapRef = React.useRef<any>();
   const [cameraViewState, setCameraViewState] =
     React.useState<CameraViewState>();
+  const [isEnabledSearchButton, setIsEnabledSearchcButton] =
+    React.useState(true);
+
   const onViewStateChange = (data: CameraViewState) => {
     setCameraViewState((previousState) => {
       return { ...previousState, ...data };
     });
+    if (latitude && longitude) {
+      const latString = latitude as string;
+      const lngString = longitude as string;
+      const newCenter = [data.longitude, data.latitude];
+      const distance = distanceBwTwoCordinatesInMiles(
+        newCenter[1],
+        newCenter[0],
+        parseFloat(latString),
+        parseFloat(lngString)
+      );
+      // We are setting distance as 40 miles for search to trigger again
+      if (distance > 40) {
+        setIsEnabledSearchcButton(true);
+      } else {
+        setIsEnabledSearchcButton(false);
+      }
+    }
   };
 
   const onLoad = () => {
@@ -140,7 +164,8 @@ export const MapContainer: React.FC<MapContainerProps> = ({
       <Button
         onClick={onExpandSearchRadius}
         leftIcon={<IconSearch size={16} />}
-        size="md"
+        disabled={!isEnabledSearchButton}
+        size="sm"
         variant="outline"
         color="dark"
         styles={(theme) => ({
@@ -150,7 +175,7 @@ export const MapContainer: React.FC<MapContainerProps> = ({
         })}
         style={{ position: "absolute", zIndex: 1, top: "1em", right: "1em" }}
       >
-        Expand search
+        Expand search or search area
       </Button>
       <Map
         id="MapA"

@@ -50,7 +50,7 @@ export const boundingBoxCalc = (
   return [rad2deg(minLat), rad2deg(minLng), rad2deg(maxLat), rad2deg(maxLng)];
 };
 
-const deg2rad = (degrees: number) => {
+export const deg2rad = (degrees: number) => {
   const pi = Math.PI;
   return degrees * (pi / 180);
 };
