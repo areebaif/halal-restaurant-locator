@@ -94,7 +94,7 @@ const SmallSizeRestaurantSuggestionForm: React.FC<
       )}
       <Center>
         <Button
-          mt="sm"
+          mt="md"
           component={Link}
           variant="outline"
           color="dark"
@@ -103,7 +103,7 @@ const SmallSizeRestaurantSuggestionForm: React.FC<
           href={`mailto:jamie@fakeemail.com?subject=Restaurant Suggestion&body=Hi,%0D%0DRestaurantName: ${name} %0D%0DAdress: ${adress}`}
           target="_blank"
         >
-          Send restaurant suggestion as email
+          Send suggestion as email
         </Button>
       </Center>
     </Card>

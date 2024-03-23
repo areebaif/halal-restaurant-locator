@@ -4,7 +4,18 @@ import { IconCheck } from "@tabler/icons-react";
 export const HeroText: React.FC = () => {
   return (
     <>
-      <Title py="xl" mt="xl">
+      <Title
+        py="xl"
+        mt="xl"
+        sx={(theme) => ({
+          [theme.fn.smallerThan("sm")]: {
+            paddingTop: 0,
+            marginTop: 0,
+            paddingBottom: 0,
+            marginBottom: 0,
+          },
+        })}
+      >
         Find halal restaurants near you on a map
       </Title>
 
@@ -17,6 +28,8 @@ export const HeroText: React.FC = () => {
           color: theme.white,
           [theme.fn.smallerThan("sm")]: {
             color: theme.colors.dark[5],
+
+            marginTop: 0,
           },
         })}
         my="xl"

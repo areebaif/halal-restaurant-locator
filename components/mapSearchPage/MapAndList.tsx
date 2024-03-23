@@ -11,7 +11,12 @@ import {
   FilterRestaurantResponseZod,
 } from "@/utils";
 
-import { ErrorCard, MapContainer, SearchResultList } from "@/components";
+import {
+  ErrorCard,
+  MapContainer,
+  SearchResultCarousol,
+  SearchResultList,
+} from "@/components";
 import {
   FilterRestaurantsErrors,
   RestaurantGeoJsonFeatureCollectionClient,
@@ -117,7 +122,6 @@ export const MapAndList: React.FC = () => {
     popupData,
     setPopupData,
   };
-
   return (
     <Flex gap="md">
       <Box

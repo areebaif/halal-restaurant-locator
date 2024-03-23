@@ -33,7 +33,20 @@ export const HeroComponent: React.FC = () => {
           >
             <HeroHeader />
           </Flex>
-          <Box mb="xl" pb="xl" pt="md" pl="xl" ml="md">
+          <Box
+            mb="xl"
+            pb="xl"
+            pt="md"
+            pl="xl"
+            ml="md"
+            sx={(theme) => ({
+              [theme.fn.smallerThan("sm")]: {
+                paddingLeft: 0,
+                marginLeft: 0,
+                paddingBottom: 0,
+              },
+            })}
+          >
             <SearchInput />
           </Box>
         </Flex>

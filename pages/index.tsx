@@ -17,11 +17,25 @@ export const HeroHeaderSearch: React.FC = ({}) => {
   return (
     <>
       <HeroComponent />
-      <Box sx={(theme) => ({ height: 75 })}></Box>
+      <Box
+        sx={(theme) => ({
+          height: 75,
+          [theme.fn.smallerThan("sm")]: {
+            display: "none",
+          },
+        })}
+      ></Box>
       <Container size={"xl"}>
         <MapWithText />
       </Container>
-      <Box sx={(theme) => ({ height: 75 })}></Box>
+      <Box
+        sx={(theme) => ({
+          height: 75,
+          [theme.fn.smallerThan("sm")]: {
+            display: "none",
+          },
+        })}
+      ></Box>
       <Container size={"xl"}>
         <RestaurantSuggestionForm />
       </Container>

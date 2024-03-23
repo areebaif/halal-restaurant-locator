@@ -17,10 +17,20 @@ export const AppChrome: React.FC<React.PropsWithChildren> = (props) => {
   const router = useRouter();
   return (
     <AppShell
-      //padding="md"
+      padding={"xs"}
       footer={
-        <Footer height={60} p="md">
-          <Group spacing="xs" position="center">
+        <Footer
+          height={30}
+          //p="xs"
+          sx={(theme) => ({
+            [theme.fn.smallerThan("sm")]: {
+              // height: 40,
+              // padding: 0,
+              display: "none",
+            },
+          })}
+        >
+          <Group mt={0} spacing="xs" position="center">
             <Title order={6}>Location Icon Credits:</Title>
             <Link href={"https://www.flaticon.com/free-icons/location"}>
               <Button variant="unstyled">Flaticon</Button>
@@ -31,16 +41,19 @@ export const AppChrome: React.FC<React.PropsWithChildren> = (props) => {
       header={
         <Header
           px="xl"
-          height={70}
-          sx={(theme) => ({ backgroundColor: theme.colors.gray[0] })}
+          py="sm"
+          height={50}
+          sx={(theme) => ({
+            backgroundColor: theme.colors.gray[0],
+          })}
         >
-          <Group position="apart">
+          <Group mt={0} position="apart">
             {/*<Flex gap="xl">
                <Link href={"/"}>
                 <Image src={"/zt-logo3.png"} height={100} width={100}></Image>{" "}
               </Link> */}
 
-            <Title onClick={() => router.push("/")} py="md" px="sm" order={2}>
+            <Title onClick={() => router.push("/")} px="sm" order={2}>
               Is it Halal?
             </Title>
             {/*</Flex>

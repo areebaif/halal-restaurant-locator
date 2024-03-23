@@ -126,9 +126,7 @@ const SmallSizeMapWithText: React.FC = () => {
       style={{ backgroundColor: "inherit" }}
     >
       <Card.Section>
-        {" "}
         <Title ta="center" order={1}>
-          {" "}
           Use our search functionality to browse halal restaurant on a map
         </Title>
       </Card.Section>

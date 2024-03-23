@@ -15,6 +15,7 @@ import { AddFoodTag } from "./admin/createRestaurant/AddFoodTag";
 import { SearchZipcode } from "./admin/createRestaurant/SearchZipcode";
 import { ImageUpload } from "./admin/createRestaurant/ImageUpload";
 import { AllImages } from "./restaurant-product-page/Image";
+import { SearchResultCarousol } from "./mapSearchPage/SearchResultCarousol";
 
 export {
   AdminNavigation,
@@ -34,4 +35,5 @@ export {
   SearchZipcode,
   ImageUpload,
   AllImages,
+  SearchResultCarousol,
 };

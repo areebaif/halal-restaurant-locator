@@ -13,6 +13,8 @@ export const HeroHeader: React.FC = ({}) => {
         color: theme.white,
         [theme.fn.smallerThan("sm")]: {
           color: theme.colors.dark[5],
+          padding: 0,
+          margin: 0,
         },
       })}
     >
