@@ -17,9 +17,18 @@ export const AppChrome: React.FC<React.PropsWithChildren> = (props) => {
   const router = useRouter();
   return (
     <AppShell
-      //padding="md"
+      padding={"xs"}
       footer={
-        <Footer height={60} p="md">
+        <Footer
+          height={60}
+          p="md"
+          sx={(theme) => ({
+            [theme.fn.smallerThan("sm")]: {
+              height: 40,
+              padding: 0,
+            },
+          })}
+        >
           <Group spacing="xs" position="center">
             <Title order={6}>Location Icon Credits:</Title>
             <Link href={"https://www.flaticon.com/free-icons/location"}>
@@ -31,8 +40,14 @@ export const AppChrome: React.FC<React.PropsWithChildren> = (props) => {
       header={
         <Header
           px="xl"
+          py="sm"
           height={70}
-          sx={(theme) => ({ backgroundColor: theme.colors.gray[0] })}
+          sx={(theme) => ({
+            backgroundColor: theme.colors.gray[0],
+            [theme.fn.smallerThan("sm")]: {
+              height: 50,
+            },
+          })}
         >
           <Group position="apart">
             {/*<Flex gap="xl">
@@ -40,7 +55,11 @@ export const AppChrome: React.FC<React.PropsWithChildren> = (props) => {
                 <Image src={"/zt-logo3.png"} height={100} width={100}></Image>{" "}
               </Link> */}
 
-            <Title onClick={() => router.push("/")} py="md" px="sm" order={2}>
+            <Title
+              onClick={() => router.push("/")}
+              px="sm"
+              order={2}
+            >
               Is it Halal?
             </Title>
             {/*</Flex>

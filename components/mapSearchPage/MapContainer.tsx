@@ -4,14 +4,14 @@ import { useRouter } from "next/router";
 import "mapbox-gl/dist/mapbox-gl.css";
 import mapboxgl, { MapLayerMouseEvent } from "mapbox-gl";
 import Map, { Source, Layer, Popup } from "react-map-gl";
-import { Card, Title, Text, Image, Button, px } from "@mantine/core";
+import { Card, Title, Text, Image, Button, Box } from "@mantine/core";
 import { IconSearch } from "@tabler/icons-react";
 // local imports
 import {
   calcBoundsFromCoordinates,
   distanceBwTwoCordinatesInMiles,
 } from "@/utils";
-import { ErrorCard } from "@/components";
+import { ErrorCard, SearchResultCarousol } from "@/components";
 import { GeoJsonPropertiesRestaurant } from "@/utils/types";
 
 export type PopupDataProps = {
@@ -59,7 +59,6 @@ export const MapContainer: React.FC<MapContainerProps> = ({
     React.useState<CameraViewState>();
   const [isEnabledSearchButton, setIsEnabledSearchcButton] =
     React.useState(true);
-
   const onViewStateChange = (data: CameraViewState) => {
     setCameraViewState((previousState) => {
       return { ...previousState, ...data };
@@ -126,6 +125,7 @@ export const MapContainer: React.FC<MapContainerProps> = ({
       const coverImageUrl = e.features[0].properties?.coverImageUrl;
 
       const id = e.features[0].id;
+
       setHoverId(id);
       mapRef.current.setFeatureState(
         { source: "restaurant locations", id: id },
@@ -177,6 +177,21 @@ export const MapContainer: React.FC<MapContainerProps> = ({
       >
         Expand search or search area
       </Button>
+      <Box
+        style={{
+          position: "absolute",
+          zIndex: 1,
+          bottom: "0.5em",
+          left: "50%",
+          transform: "translate(-50%, 0)",
+        }}
+      >
+        <SearchResultCarousol
+          geolocations={geolocations}
+          hoverId={hoverId}
+          setHoverId={setHoverId}
+        />
+      </Box>
       <Map
         id="MapA"
         reuseMaps={true}
