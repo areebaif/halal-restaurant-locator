@@ -3,9 +3,8 @@ import Link from "next/link";
 import { useRouter } from "next/router";
 import "mapbox-gl/dist/mapbox-gl.css";
 import mapboxgl, { MapLayerMouseEvent } from "mapbox-gl";
-import Map, { Source, Layer, Popup } from "react-map-gl";
+import Map, { Source, Layer, Popup, useMap } from "react-map-gl";
 import { Card, Title, Text, Image, Button, Box } from "@mantine/core";
-import { IconSearch } from "@tabler/icons-react";
 // local imports
 import {
   calcBoundsFromCoordinates,
@@ -162,29 +161,41 @@ export const MapContainer: React.FC<MapContainerProps> = ({
   return (
     <div style={{ position: "relative", width: "100%", marginTop: "0.4em" }}>
       <Button
+        // on xs small devices centre the button
         onClick={onExpandSearchRadius}
-        leftIcon={<IconSearch size={16} />}
         disabled={!isEnabledSearchButton}
         size="sm"
         variant="outline"
         color="dark"
         styles={(theme) => ({
-          root: {
-            backgroundColor: theme.colors.gray[0],
+          label: { whiteSpace: "break-spaces", textAlign: "center" },
+        })}
+        sx={(theme) => ({
+          backgroundColor: theme.colors.gray[0],
+          position: "absolute",
+          zIndex: 1,
+          top: "1em",
+          right: "1em",
+          [theme.fn.smallerThan("sm")]: {
+            top: "1em",
+            left: "50%",
+            transform: "translate(-50%, 0)",
           },
         })}
-        style={{ position: "absolute", zIndex: 1, top: "1em", right: "1em" }}
       >
         Expand search or search area
       </Button>
       <Box
-        style={{
+        sx={(theme) => ({
           position: "absolute",
           zIndex: 1,
           bottom: "0.5em",
           left: "50%",
           transform: "translate(-50%, 0)",
-        }}
+          [theme.fn.largerThan("sm")]: {
+            display: "none",
+          },
+        })}
       >
         <SearchResultCarousol
           geolocations={geolocations}
@@ -200,7 +211,7 @@ export const MapContainer: React.FC<MapContainerProps> = ({
         onMove={(evt) => onViewStateChange(evt.viewState)}
         style={{
           width: "100%",
-          //minWidth: "48em",
+          minWidth: 300,
           maxHeight: 600,
           minHeight: 600,
           height: 600,

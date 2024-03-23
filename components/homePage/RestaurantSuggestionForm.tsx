@@ -65,7 +65,7 @@ const SmallSizeRestaurantSuggestionForm: React.FC<
     >
       <Card.Section>
         {" "}
-        <Title ta="center" pt="xs" order={1}>
+        <Title ta="center" order={1}>
           {" "}
           Help us grow our library
         </Title>

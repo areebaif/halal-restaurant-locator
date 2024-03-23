@@ -28,18 +28,24 @@ export const SearchResultCarousol: React.FC<SearchResultCarousolProps> = ({
   setHoverId,
 }) => {
   const { MapA } = useMap();
-  console.log(MapA, "slslslslslslsl");
+
   return (
     <Carousel
-      maw={320}
-      mx="auto"
+      maw={300}
+      miw={300}
       height={170}
       controlsOffset="xs"
       controlSize={20}
       initialSlide={0}
+      loop
       onSlideChange={(index) => {
-        // remove the highlight of the last hover
-        // set the hobver to this item, id cannot go below 0
+        const coordinatesObject = geolocations.features[index]
+          .geometry as GeoJSON.Point;
+        const coordinates = coordinatesObject.coordinates.slice();
+        const centre = MapA?.getCenter();
+        if (centre?.lng !== coordinates[0] && centre?.lat !== coordinates[1]) {
+          MapA?.flyTo({ center: [coordinates[0], coordinates[1]] });
+        }
       }}
     >
       {geolocations.features.map((location) => {
@@ -53,9 +59,6 @@ export const SearchResultCarousol: React.FC<SearchResultCarousolProps> = ({
           </Carousel.Slide>
         );
       })}
-
-      <Carousel.Slide>2</Carousel.Slide>
-      <Carousel.Slide>3</Carousel.Slide>
       {/* ...other slides */}
     </Carousel>
   );
@@ -87,7 +90,6 @@ export const SearchResultCarousolCard: React.FC<
   } = properties;
 
   const baseUrl = process.env.NEXT_PUBLIC_BASE_IMAGE_URL;
-  const image = `${baseUrl}/${coverImageUrl}`;
 
   return (
     <Box
@@ -96,7 +98,7 @@ export const SearchResultCarousolCard: React.FC<
         height: "100%",
         borderRadius: theme.radius.md,
         cursor: "pointer",
-
+        paddingTop: theme.spacing.md,
         // "&:hover": {
         //   backgroundColor:
         //     theme.colorScheme === "dark"
@@ -108,7 +110,7 @@ export const SearchResultCarousolCard: React.FC<
       <ScrollArea h={170}>
         <Box
           sx={(theme) => ({
-            paddingTop: theme.spacing.md,
+            paddingBottom: theme.spacing.sm,
             paddingLeft: `calc(${theme.spacing.sm}*3)`,
             paddingRight: `calc(${theme.spacing.sm}*3)`,
           })}
@@ -125,9 +127,22 @@ export const SearchResultCarousolCard: React.FC<
             );
           })}
         </Box>
-        <Card.Section>
-          <Image src={image} height={160} alt="cover image for restaurant" />
+        <Card.Section ml="xs" mr="xs">
+          <Image
+            src={`${baseUrl}/${coverImageUrl}`}
+            height={160}
+            alt="cover image for restaurant"
+          />
         </Card.Section>
+        {otherImageUrlList?.map((url, index) => (
+          <Card.Section ml="xs" mr="xs" mt="xs" key={index}>
+            <Image
+              src={`${baseUrl}/${url}`}
+              height={160}
+              alt="cover image for restaurant"
+            />
+          </Card.Section>
+        ))}
       </ScrollArea>
     </Box>
   );
