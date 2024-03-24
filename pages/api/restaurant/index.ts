@@ -21,6 +21,7 @@ import {
   boundingBoxCalc,
 } from "@/utils";
 import { dataToGeoJson } from "@/utils/api-utils";
+import { search_radius_miles_backend } from "@/utils/constants";
 
 /**
  *
@@ -608,13 +609,12 @@ export default async function CreateRestaurant(
           });
           return;
         }
-        // This query searches in a default 400 mile radius
         //[minLat, minLng, maxLat, maxLng] in degree
-        const searchRadiusInMiles = 400;
+        //const searchRadiusInMiles = 400;
         const coordinates = boundingBoxCalc(
           floatLat,
           floatLng,
-          searchRadiusInMiles
+          search_radius_miles_backend
         );
 
         const minLat = coordinates[0];
@@ -645,7 +645,7 @@ export default async function CreateRestaurant(
             and
             Restaurant.longitude between ${minLng} and ${maxLng}
             and 
-            ST_Distance_Sphere(point(${floatLng}, ${floatLat}), point( Restaurant.longitude, Restaurant.latitude)) * 0.000621371 < ${searchRadiusInMiles}
+            ST_Distance_Sphere(point(${floatLng}, ${floatLat}), point( Restaurant.longitude, Restaurant.latitude)) * 0.000621371 < ${search_radius_miles_backend}
             GROUP BY Restaurant.restaurantId;`;
 
         const restaurants = restaurantsBySearchRadiusOne.map((restaurant) => {
