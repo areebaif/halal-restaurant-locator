@@ -344,7 +344,7 @@ type RestaurantBySearchRadius = {
   imageUrl: string;
 }[];
 
-export default async function CreateRestaurant(
+export default async function AddRestaurant(
   req: NextApiRequest,
   res: NextApiResponse<
     | CreateRestaurantSuccess
