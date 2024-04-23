@@ -145,4 +145,5 @@ model User {
   verifiedUser Boolean
   createdAt     DateTime @default(now())
   updatedAt     DateTime @updatedAt
+  password String?
 }
