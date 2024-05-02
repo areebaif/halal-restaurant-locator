@@ -113,7 +113,7 @@ export const GetZipCodeResponseSchema = z.union([
   GetZipcodeSchema,
 ]);
 
-export const ListFoodTagsErrorZod = z.object({
+export const ListFoodTagsErrorSchema = z.object({
   apiErrors: z
     .object({
       generalErrors: z.string().array().optional(),
@@ -121,13 +121,13 @@ export const ListFoodTagsErrorZod = z.object({
     .optional(),
 });
 
-export const ListFoodTagsZod = z
+export const ListFoodTagsSchema = z
   .object({ name: z.string(), foodTagId: z.string().uuid() })
   .array();
 
 export const ListFoodTagsResponseZod = z.union([
-  ListFoodTagsZod,
-  ListFoodTagsErrorZod,
+  ListFoodTagsSchema,
+  ListFoodTagsErrorSchema,
 ]);
 
 export const CreateFoodTagErrorsZod = z.object({
