@@ -130,7 +130,7 @@ export const ListFoodTagsResponseZod = z.union([
   ListFoodTagsErrorSchema,
 ]);
 
-export const CreateFoodTagErrorsZod = z.object({
+export const CreateFoodTagErrorsSchema = z.object({
   apiErrors: z
     .object({
       validationErrors: z
@@ -142,13 +142,13 @@ export const CreateFoodTagErrorsZod = z.object({
     })
     .optional(),
 });
-export const CreateFoodTagZod = z.object({
+export const CreateFoodTagSchema = z.object({
   created: z.boolean(),
 });
 
-export const CreateFoodTagResponseZod = z.union([
-  CreateFoodTagErrorsZod,
-  CreateFoodTagZod,
+export const CreateFoodTagResponseSchema = z.union([
+  CreateFoodTagErrorsSchema,
+  CreateFoodTagSchema,
 ]);
 
 export const CreateUploadImageUrlZod = z.object({
