@@ -125,7 +125,7 @@ export const ListFoodTagsSchema = z
   .object({ name: z.string(), foodTagId: z.string().uuid() })
   .array();
 
-export const ListFoodTagsResponseZod = z.union([
+export const ListFoodTagsResponseSchema = z.union([
   ListFoodTagsSchema,
   ListFoodTagsErrorSchema,
 ]);
@@ -151,7 +151,7 @@ export const CreateFoodTagResponseSchema = z.union([
   CreateFoodTagSchema,
 ]);
 
-export const CreateUploadImageUrlZod = z.object({
+export const CreateUploadImageUrlSchema = z.object({
   cover: z.object({
     type: z
       .string()
@@ -176,7 +176,7 @@ export const CreateUploadImageUrlZod = z.object({
     .array(),
 });
 
-export const ListUploadImageUrlZod = z.object({
+export const ListUploadImageUrlSchema = z.object({
   restaurantId: z.string().uuid(),
   cover: z.object({
     uploadS3Url: z.string(),
@@ -195,7 +195,7 @@ export const ListUploadImageUrlZod = z.object({
     .optional(),
 });
 
-export const ListUploadImageUrlErrorZod = z.object({
+export const ListUploadImageUrlErrorSchema = z.object({
   apiErrors: z.object({
     validationErrors: z
       .object({
@@ -206,9 +206,9 @@ export const ListUploadImageUrlErrorZod = z.object({
   }),
 });
 
-export const ListUploadImageUrlResponseZod = z.union([
-  ListUploadImageUrlErrorZod,
-  ListUploadImageUrlZod,
+export const ListUploadImageUrlResponseSchema = z.union([
+  ListUploadImageUrlErrorSchema,
+  ListUploadImageUrlSchema,
 ]);
 
 export const CreateRestaurantZod = z.object({
