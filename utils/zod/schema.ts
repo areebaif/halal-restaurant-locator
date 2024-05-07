@@ -211,7 +211,7 @@ export const ListUploadImageUrlResponseSchema = z.union([
   ListUploadImageUrlSchema,
 ]);
 
-export const CreateRestaurantZod = z.object({
+export const CreateRestaurantSchema = z.object({
   restaurantName: z
     .string()
     .min(1, { message: "please provide a value as string" }),
@@ -246,7 +246,7 @@ export const CreateRestaurantZod = z.object({
     .uuid({ message: "please provide a valid uuid as string" }),
 });
 
-export const GetRestaurantErrorZod = z.object({
+export const GetRestaurantErrorSchema = z.object({
   apiErrors: z
     .object({
       validationErrors: z
@@ -259,7 +259,7 @@ export const GetRestaurantErrorZod = z.object({
     .optional(),
 });
 
-export const GetRestaurantZod = z.object({
+export const GetRestaurantSchema = z.object({
   restaurantId: z.string().uuid(),
   restaurantName: z.string(),
   description: z.string(),
