@@ -272,12 +272,12 @@ export const GetRestaurantSchema = z.object({
   imageUrl: z.string().array(),
 });
 
-export const CreateRestaurantSuccessZod = z.object({
+export const CreateRestaurantSuccessSchema = z.object({
   created: z.boolean(),
   restaurantId: z.string().uuid(),
 });
 
-export const CreateRestaurantErrorZod = z.object({
+export const CreateRestaurantErrorSchema = z.object({
   apiErrors: z.object({
     validationErrors: z
       .object({
@@ -299,9 +299,9 @@ export const CreateRestaurantErrorZod = z.object({
   }),
 });
 
-export const CreateRestaurantResponseZod = z.union([
-  CreateRestaurantSuccessZod,
-  CreateRestaurantErrorZod,
+export const CreateRestaurantResponseSchema = z.union([
+  CreateRestaurantSuccessSchema,
+  CreateRestaurantErrorSchema,
 ]);
 
 export const FilterRestaurantsByZipcodeZod = z.object({
