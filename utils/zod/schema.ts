@@ -304,18 +304,18 @@ export const CreateRestaurantResponseSchema = z.union([
   CreateRestaurantErrorSchema,
 ]);
 
-export const FilterRestaurantsByZipcodeZod = z.object({
+export const FilterRestaurantsByZipcodeSchema = z.object({
   country: z.string(),
   zipcode: z.string(),
 });
 
-export const FilterRestaurantsByCityZod = z.object({
+export const FilterRestaurantsByCitySchema = z.object({
   country: z.string(),
   state: z.string(),
   city: z.string(),
 });
 
-export const FilterRestaurantsErrorsZod = z.object({
+export const FilterRestaurantsErrorsSchema = z.object({
   apiErrors: z
     .object({
       validationErrors: z
@@ -332,7 +332,7 @@ export const FilterRestaurantsErrorsZod = z.object({
     .optional(),
 });
 
-export const GeoJsonPropertiesRestaurantZod = z.object({
+export const GeoJsonPropertiesRestaurantSchema = z.object({
   restaurantId: z.string().uuid(),
   restaurantName: z.string(),
   description: z.string(),
