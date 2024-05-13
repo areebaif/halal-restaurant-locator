@@ -346,7 +346,7 @@ export const GeoJsonPropertiesRestaurantSchema = z.object({
   otherImageUrlList: z.string().array(),
 });
 
-export const GeoJsonFeatureRestaurantZod = z
+export const GeoJsonFeatureRestaurantSchema = z
   .object({
     id: z.number(),
     type: z.string().refine((val) => val === "Feature"),
@@ -354,7 +354,7 @@ export const GeoJsonFeatureRestaurantZod = z
       type: z.string().refine((val) => val === "Point"),
       coordinates: z.number().gte(-180).lte(180).array().length(2),
     }),
-    properties: GeoJsonPropertiesRestaurantZod,
+    properties: GeoJsonPropertiesRestaurantSchema,
   })
   .array();
 
@@ -362,7 +362,7 @@ export const GeoJsonFeatureCollectionRestaurantsZod = z.object({
   restaurants: z
     .object({
       type: z.string().refine((val) => val === "FeatureCollection"),
-      features: GeoJsonFeatureRestaurantZod,
+      features: GeoJsonFeatureRestaurantSchema,
     })
     .optional(),
   country: z.string().optional(),
@@ -375,7 +375,7 @@ export const GeoJsonFeatureCollectionRestaurantsZod = z.object({
 
 export const FilterRestaurantResponseZod = z.union([
   GeoJsonFeatureCollectionRestaurantsZod,
-  FilterRestaurantsErrorsZod,
+  FilterRestaurantsErrorsSchema,
 ]);
 
 export const ListRestaurantsZod = z.object({
