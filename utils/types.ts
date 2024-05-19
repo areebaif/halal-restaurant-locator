@@ -43,19 +43,19 @@ export type ListCountryError = z.infer<typeof ListCountryErrorSchema>;
 export type ListGeography = z.infer<typeof ListGeographySchema>;
 export type ListStates = z.infer<typeof ListStatesSchema>;
 export type ListStateError = z.infer<typeof ListStateErrorSchema>;
-export type GetZipcodeError = z.infer<typeof GetZipcodeErrorZod>;
-export type GetZipcode = z.infer<typeof GetZipcodeZod>;
-export type GetZipCodeResponse = z.infer<typeof GetZipCodeResponseZod>;
-export type CreateFoodTagErrors = z.infer<typeof CreateFoodTagErrorsZod>;
-export type CreateFoodTag = z.infer<typeof CreateFoodTagZod>;
-export type CreateFoodTagResponse = z.infer<typeof CreateFoodTagResponseZod>;
-export type ListFoodTagsError = z.infer<typeof ListFoodTagsErrorZod>;
-export type ListFoodTags = z.infer<typeof ListFoodTagsZod>;
-export type ListFoodTagsResponse = z.infer<typeof ListFoodTagsResponseZod>;
-export type CreateUploadImageUrl = z.infer<typeof CreateUploadImageUrlZod>;
-export type ListUploadImageUrl = z.infer<typeof ListUploadImageUrlZod>;
+export type GetZipcodeError = z.infer<typeof GetZipcodeErrorSchema>;
+export type GetZipcode = z.infer<typeof GetZipcodeSchema>;
+export type GetZipCodeResponse = z.infer<typeof GetZipCodeResponseSchema>;
+export type CreateFoodTagErrors = z.infer<typeof CreateFoodTagErrorsSchema>;
+export type CreateFoodTag = z.infer<typeof CreateFoodTagSchema>;
+export type CreateFoodTagResponse = z.infer<typeof CreateFoodTagResponseSchema>;
+export type ListFoodTagsError = z.infer<typeof ListFoodTagsErrorSchema>;
+export type ListFoodTags = z.infer<typeof ListFoodTagsSchema>;
+export type ListFoodTagsResponse = z.infer<typeof ListFoodTagsResponseSchema>;
+export type CreateUploadImageUrl = z.infer<typeof CreateUploadImageUrlSchema>;
+export type ListUploadImageUrl = z.infer<typeof ListUploadImageUrlSchema>;
 export type ListUploadImageUrlError = z.infer<
-  typeof ListUploadImageUrlErrorZod
+  typeof ListUploadImageUrlErrorSchema
 >;
 export type ListUploadImageUrlResponse = z.infer<
   typeof ListUploadImageUrlResponseZod
