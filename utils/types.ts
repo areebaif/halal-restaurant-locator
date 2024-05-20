@@ -58,14 +58,14 @@ export type ListUploadImageUrlError = z.infer<
   typeof ListUploadImageUrlErrorSchema
 >;
 export type ListUploadImageUrlResponse = z.infer<
-  typeof ListUploadImageUrlResponseZod
+  typeof ListUploadImageUrlResponseSchema
 >;
-export type GetRestaurantError = z.infer<typeof GetRestaurantErrorZod>;
-export type GetRestaurant = z.infer<typeof GetRestaurantZod>;
-export type CreateRestaurant = z.infer<typeof CreateRestaurantZod>;
-export type CreateRestaurantError = z.infer<typeof CreateRestaurantErrorZod>;
+export type GetRestaurantError = z.infer<typeof GetRestaurantErrorSchema>;
+export type GetRestaurant = z.infer<typeof GetRestaurantSchema>;
+export type CreateRestaurant = z.infer<typeof CreateRestaurantSchema>;
+export type CreateRestaurantError = z.infer<typeof CreateRestaurantErrorSchema>;
 export type CreateRestaurantSuccess = z.infer<
-  typeof CreateRestaurantSuccessZod
+  typeof CreateRestaurantSuccessSchema
 >;
 export type CreateRestaurantResponse = z.infer<
   typeof CreateRestaurantResponseZod

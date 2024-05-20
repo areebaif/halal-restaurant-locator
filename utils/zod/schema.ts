@@ -2,13 +2,13 @@ import z from "zod";
 // dynamic properties of objects
 //z.record(z.string().uuid(), z.string().array());
 
-export const ListCountrySchema = z.object({
+export const SchemaListCountry = z.object({
   countries: z
     .object({ countryId: z.string().uuid(), countryName: z.string() })
     .array(),
 });
 
-export const ListCountryErrorSchema = z.object({
+export const SchemaListCountryError = z.object({
   apiErrors: z
     .object({
       generalError: z.string().array().optional(),
@@ -16,12 +16,12 @@ export const ListCountryErrorSchema = z.object({
     })
     .optional(),
 });
-export const CreateCountryResponseSchema = z.object({
+export const SchemaCreateCountryResponse = z.object({
   country: z.string(),
   id: z.string(),
 });
 
-export const CreateCountryErrorSchema = z.object({
+export const SchemaCreateCountryError = z.object({
   apiErrors: z
     .object({
       generalError: z.string().array().optional(),
@@ -34,7 +34,7 @@ export const CreateCountryErrorSchema = z.object({
     .optional(),
 });
 
-export const ListStatesSchema = z
+export const SchemaListStates = z
   .object({
     countryId: z.string().uuid(),
     countryName: z.string(),
@@ -44,7 +44,7 @@ export const ListStatesSchema = z
   })
   .array();
 
-export const ListStateErrorSchema = z.object({
+export const SchemaListStateError = z.object({
   apiErrors: z
     .object({
       generalError: z.string().array().optional(),
@@ -52,7 +52,7 @@ export const ListStateErrorSchema = z.object({
     .optional(),
 });
 
-export const ListGeographySchema = z.object({
+export const SchemaListGeography = z.object({
   country: z
     .object({ countryId: z.string().uuid(), countryName: z.string().uuid() })
     .optional(),
@@ -81,7 +81,7 @@ export const ListGeographySchema = z.object({
     .optional(),
 });
 
-export const GetZipcodeSchema = z.object({
+export const SchemaGetZipcode = z.object({
   zipcode: z.object({
     zipcodeId: z.string().uuid(),
     zipcode: z.string(),
@@ -96,7 +96,7 @@ export const GetZipcodeSchema = z.object({
   }),
 });
 
-export const GetZipcodeErrorSchema = z.object({
+export const SchemaGetZipcodeError = z.object({
   apiErrors: z
     .object({
       validationErrors: z
@@ -108,12 +108,12 @@ export const GetZipcodeErrorSchema = z.object({
     })
     .optional(),
 });
-export const GetZipCodeResponseSchema = z.union([
-  GetZipcodeErrorSchema,
-  GetZipcodeSchema,
+export const SchemaGetZipCodeResponse = z.union([
+  SchemaGetZipcodeError,
+  SchemaGetZipcode,
 ]);
 
-export const ListFoodTagsErrorSchema = z.object({
+export const SchemaListFoodTagsError = z.object({
   apiErrors: z
     .object({
       generalErrors: z.string().array().optional(),
@@ -121,16 +121,16 @@ export const ListFoodTagsErrorSchema = z.object({
     .optional(),
 });
 
-export const ListFoodTagsSchema = z
+export const SchemaListFoodTags = z
   .object({ name: z.string(), foodTagId: z.string().uuid() })
   .array();
 
-export const ListFoodTagsResponseSchema = z.union([
-  ListFoodTagsSchema,
-  ListFoodTagsErrorSchema,
+export const SchemaListFoodTagsResponse = z.union([
+  SchemaListFoodTags,
+  SchemaListFoodTagsError,
 ]);
 
-export const CreateFoodTagErrorsSchema = z.object({
+export const SchemaCreateFoodTagErrors = z.object({
   apiErrors: z
     .object({
       validationErrors: z
@@ -142,16 +142,16 @@ export const CreateFoodTagErrorsSchema = z.object({
     })
     .optional(),
 });
-export const CreateFoodTagSchema = z.object({
+export const SchemaCreateFoodTag = z.object({
   created: z.boolean(),
 });
 
-export const CreateFoodTagResponseSchema = z.union([
-  CreateFoodTagErrorsSchema,
-  CreateFoodTagSchema,
+export const SchemaCreateFoodTagResponse = z.union([
+  SchemaCreateFoodTagErrors,
+  SchemaCreateFoodTag,
 ]);
 
-export const CreateUploadImageUrlSchema = z.object({
+export const SchemaCreateUploadImageUrl = z.object({
   cover: z.object({
     type: z
       .string()
