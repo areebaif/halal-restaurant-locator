@@ -68,30 +68,30 @@ export type CreateRestaurantSuccess = z.infer<
   typeof CreateRestaurantSuccessSchema
 >;
 export type CreateRestaurantResponse = z.infer<
-  typeof CreateRestaurantResponseZod
+  typeof CreateRestaurantResponseSchema
 >;
 export type FilterRestaurantsByZipcode = z.infer<
-  typeof FilterRestaurantsByZipcodeZod
+  typeof FilterRestaurantsByZipcodeSchema
 >;
 export type FilterRestaurantsByCity = z.infer<
-  typeof FilterRestaurantsByCityZod
+  typeof FilterRestaurantsByCitySchema
 >;
 export type FilterRestaurantsErrors = z.infer<
-  typeof FilterRestaurantsErrorsZod
+  typeof FilterRestaurantsErrorsSchema
 >;
 export type GeoJsonFeatureCollectionRestaurants = z.infer<
-  typeof GeoJsonFeatureCollectionRestaurantsZod
+  typeof GeoJsonFeatureCollectionRestaurantsSchema
 >;
 export type FilterRestaurantResponse = z.infer<
-  typeof FilterRestaurantResponseZod
+  typeof FilterRestaurantResponseSchema
 >;
-export type ListRestaurants = z.infer<typeof ListRestaurantsZod>;
+export type ListRestaurants = z.infer<typeof ListRestaurantsSchema>;
 
 export type GeoJsonFeatureRestaurant = z.infer<
-  typeof GeoJsonFeatureRestaurantZod
+  typeof GeoJsonFeatureRestaurantSchema
 >;
 export type GeoJsonPropertiesRestaurant = z.infer<
-  typeof GeoJsonPropertiesRestaurantZod
+  typeof GeoJsonPropertiesRestaurantSchema
 >;
 
 // for client
