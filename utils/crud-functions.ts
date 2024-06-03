@@ -1,4 +1,4 @@
-import { ListUploadImageUrlResponseZod } from ".";
+import { ListUploadImageUrlResponseSchema } from ".";
 import {
   CreateFoodTag,
   ListFoodTags,
@@ -231,7 +231,7 @@ export const helperListUploadImageUrl = async (
   try {
     const postSignedUrl = await getUploadImageUrl(allImages);
     const isSchemaCorrect =
-      ListUploadImageUrlResponseZod.safeParse(postSignedUrl);
+      ListUploadImageUrlResponseSchema.safeParse(postSignedUrl);
     if (!isSchemaCorrect.success) {
       setFormFieldsErrorMessage((prevState) => ({
         ...prevState,
