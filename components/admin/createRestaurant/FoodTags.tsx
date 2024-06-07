@@ -1,7 +1,7 @@
 import * as React from "react";
 import { useQuery } from "@tanstack/react-query";
 import { Chip, Group, Loader, Textarea, Grid, Button } from "@mantine/core";
-import { listFoodTags, ListFoodTagsResponseZod } from "@/utils";
+import { listFoodTags, ListFoodTagsResponseSchema } from "@/utils";
 import { ErrorCard, AddFoodTag } from "@/components";
 import { ListFoodTags, ListFoodTagsError } from "@/utils/types";
 import { FormFieldsErrorMessage } from "@/pages/admin/restaurant";
@@ -27,7 +27,7 @@ export const FoodTags: React.FC<FoodTags> = ({
     staleTime: Infinity,
     cacheTime: Infinity,
     onSuccess: (data) => {
-      const isFoodTagTypeCorrent = ListFoodTagsResponseZod.safeParse(data);
+      const isFoodTagTypeCorrent = ListFoodTagsResponseSchema.safeParse(data);
 
       if (!isFoodTagTypeCorrent.success) {
         console.log(isFoodTagTypeCorrent.error);

@@ -194,7 +194,6 @@ export const getRestaurantById = async (restaurantId: string) => {
 };
 
 export const listRestaurantBySearchCriteria = async (data: string) => {
-
   const response = await fetch(`/api/restaurant?${data}`, {
     method: "GET",
     headers: {
@@ -263,6 +262,7 @@ export const helperListUploadImageUrl = async (
     const listDbImageUrl = [listUrl.cover.dbUrl];
     // for cover
     const formData = new FormData();
+    // trying to introduce  a bug
     formData.append("Content-Type", allImages.cover.type);
     Object.entries(listUrl.cover.uploadS3Fields).forEach(([k, v]) => {
       formData.append(k, v);
@@ -273,6 +273,7 @@ export const helperListUploadImageUrl = async (
     listUrl.otherImages?.forEach((items, index) => {
       listDbImageUrl.push(items.dbUrl);
       const formData = new FormData();
+
       formData.append("Content-Type", images[index].type);
       Object.entries(items.uploadS3Fields).forEach(([k, v]) => {
         formData.append(k, v);

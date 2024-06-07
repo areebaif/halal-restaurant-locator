@@ -151,6 +151,7 @@ export default async function imageUpload(
               }))
             : undefined,
       };
+
       res.status(201).json(preSignedUrl);
     }
   } catch (err) {
