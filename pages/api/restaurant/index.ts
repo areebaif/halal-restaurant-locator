@@ -14,9 +14,9 @@ import {
 import {
   filterRestaurants,
   capitalizeFirstWord,
-  FilterRestaurantsByZipcodeZod,
-  FilterRestaurantsByCityZod,
-  CreateRestaurantZod,
+  FilterRestaurantsByZipcodeSchema,
+  FilterRestaurantsByCitySchema,
+  CreateRestaurantSchema,
   isValidCoordinate,
   boundingBoxCalc,
 } from "@/utils";
@@ -356,7 +356,7 @@ export default async function AddRestaurant(
   try {
     if (req.method === "POST") {
       const restaurantData = req.body;
-      const isTypeCorrect = CreateRestaurantZod.safeParse(restaurantData);
+      const isTypeCorrect = CreateRestaurantSchema.safeParse(restaurantData);
       if (!isTypeCorrect.success) {
         const {
           restaurantId,
@@ -713,7 +713,7 @@ export default async function AddRestaurant(
         }
         // search by zipcode
         if (zipcode && zipcode.length > 1) {
-          const isTypeCorrect = FilterRestaurantsByZipcodeZod.safeParse(
+          const isTypeCorrect = FilterRestaurantsByZipcodeSchema.safeParse(
             req.query
           );
           if (!isTypeCorrect.success) {
@@ -764,7 +764,9 @@ export default async function AddRestaurant(
           return;
         } else {
           // search by city
-          const isTypeCorrect = FilterRestaurantsByCityZod.safeParse(req.query);
+          const isTypeCorrect = FilterRestaurantsByCitySchema.safeParse(
+            req.query
+          );
           if (!isTypeCorrect.success) {
             console.log(isTypeCorrect.error);
             res.status(400).json({
