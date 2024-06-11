@@ -14,7 +14,7 @@ import {
 } from "@mantine/core";
 import { ErrorCard } from "@/components";
 
-import { createFoodTag, CreateFoodTagResponseZod } from "@/utils";
+import { createFoodTag, CreateFoodTagResponseSchema } from "@/utils";
 import { CreateFoodTagErrors } from "@/utils/types";
 
 type AddFoodTag = {
@@ -37,7 +37,7 @@ export const AddFoodTag: React.FC<AddFoodTag> = ({
   const mutation = useMutation({
     mutationFn: createFoodTag,
     onSuccess: (data) => {
-      const result = CreateFoodTagResponseZod.safeParse(data);
+      const result = CreateFoodTagResponseSchema.safeParse(data);
       if (!result.success) {
         console.log(result.error);
 
