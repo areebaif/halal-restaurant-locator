@@ -5,7 +5,7 @@ import {
   ListRestaurants,
 } from "./types";
 
-import { CreateUploadImageUrlZod } from ".";
+import { CreateUploadImageUrlSchema } from ".";
 import { isValidCoordinate } from ".";
 
 type searchCriteria = {
@@ -256,7 +256,7 @@ export const validateFormDataCreateRestaurant = (
     isError = true;
   }
   // check image is of proper type and size
-  const isTypeCorrent = CreateUploadImageUrlZod.safeParse(allImages);
+  const isTypeCorrent = CreateUploadImageUrlSchema.safeParse(allImages);
   if (!isTypeCorrent.success) {
     console.log(isTypeCorrent.error);
     const schemaErrors = isTypeCorrent.error.flatten().fieldErrors;

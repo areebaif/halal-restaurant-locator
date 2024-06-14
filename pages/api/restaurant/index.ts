@@ -14,13 +14,14 @@ import {
 import {
   filterRestaurants,
   capitalizeFirstWord,
-  FilterRestaurantsByZipcodeZod,
-  FilterRestaurantsByCityZod,
-  CreateRestaurantZod,
+  FilterRestaurantsByZipcodeSchema,
+  FilterRestaurantsByCitySchema,
+  CreateRestaurantSchema,
   isValidCoordinate,
   boundingBoxCalc,
 } from "@/utils";
 import { dataToGeoJson } from "@/utils/api-utils";
+import { search_radius_miles_backend } from "@/utils/constants";
 
 /**
  *
@@ -343,7 +344,7 @@ type RestaurantBySearchRadius = {
   imageUrl: string;
 }[];
 
-export default async function CreateRestaurant(
+export default async function AddRestaurant(
   req: NextApiRequest,
   res: NextApiResponse<
     | CreateRestaurantSuccess
@@ -355,7 +356,7 @@ export default async function CreateRestaurant(
   try {
     if (req.method === "POST") {
       const restaurantData = req.body;
-      const isTypeCorrect = CreateRestaurantZod.safeParse(restaurantData);
+      const isTypeCorrect = CreateRestaurantSchema.safeParse(restaurantData);
       if (!isTypeCorrect.success) {
         const {
           restaurantId,
@@ -608,13 +609,12 @@ export default async function CreateRestaurant(
           });
           return;
         }
-        // This query searches in a default 400 mile radius
         //[minLat, minLng, maxLat, maxLng] in degree
-        const searchRadiusInMiles = 400;
+        //const searchRadiusInMiles = 400;
         const coordinates = boundingBoxCalc(
           floatLat,
           floatLng,
-          searchRadiusInMiles
+          search_radius_miles_backend
         );
 
         const minLat = coordinates[0];
@@ -645,7 +645,7 @@ export default async function CreateRestaurant(
             and
             Restaurant.longitude between ${minLng} and ${maxLng}
             and 
-            ST_Distance_Sphere(point(${floatLng}, ${floatLat}), point( Restaurant.longitude, Restaurant.latitude)) * 0.000621371 < ${searchRadiusInMiles}
+            ST_Distance_Sphere(point(${floatLng}, ${floatLat}), point( Restaurant.longitude, Restaurant.latitude)) * 0.000621371 < ${search_radius_miles_backend}
             GROUP BY Restaurant.restaurantId;`;
 
         const restaurants = restaurantsBySearchRadiusOne.map((restaurant) => {
@@ -713,7 +713,7 @@ export default async function CreateRestaurant(
         }
         // search by zipcode
         if (zipcode && zipcode.length > 1) {
-          const isTypeCorrect = FilterRestaurantsByZipcodeZod.safeParse(
+          const isTypeCorrect = FilterRestaurantsByZipcodeSchema.safeParse(
             req.query
           );
           if (!isTypeCorrect.success) {
@@ -764,7 +764,9 @@ export default async function CreateRestaurant(
           return;
         } else {
           // search by city
-          const isTypeCorrect = FilterRestaurantsByCityZod.safeParse(req.query);
+          const isTypeCorrect = FilterRestaurantsByCitySchema.safeParse(
+            req.query
+          );
           if (!isTypeCorrect.success) {
             console.log(isTypeCorrect.error);
             res.status(400).json({

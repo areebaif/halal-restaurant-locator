@@ -4,6 +4,7 @@ import { GeoJsonPropertiesRestaurant } from "@/utils/types";
 import { ErrorCard } from "..";
 import { MapContainerProps, PopupDataProps } from "./MapContainer";
 import Link from "next/link";
+import { map_source_data_id_client } from "@/utils/constants";
 
 export const SearchResultList: React.FC<MapContainerProps> = ({
   geolocations,
@@ -95,7 +96,7 @@ const GeoLocationCard: React.FC<GeoLocationCard> = ({
 
       const id = location.id;
       MapA?.setFeatureState(
-        { source: "restaurant locations", id: id },
+        { source: map_source_data_id_client, id: id },
         { hover: true }
       );
       setHoverId(id);
@@ -114,7 +115,7 @@ const GeoLocationCard: React.FC<GeoLocationCard> = ({
 
   const onMouseLeave = () => {
     MapA?.setFeatureState(
-      { source: "restaurant locations", id: location.id },
+      { source: map_source_data_id_client, id: location.id },
       { hover: false }
     );
     setHoverId(undefined);

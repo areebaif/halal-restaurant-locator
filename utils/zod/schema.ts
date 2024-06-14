@@ -81,7 +81,7 @@ export const ListGeographySchema = z.object({
     .optional(),
 });
 
-export const GetZipcodeZod = z.object({
+export const GetZipcodeSchema = z.object({
   zipcode: z.object({
     zipcodeId: z.string().uuid(),
     zipcode: z.string(),
@@ -96,7 +96,7 @@ export const GetZipcodeZod = z.object({
   }),
 });
 
-export const GetZipcodeErrorZod = z.object({
+export const GetZipcodeErrorSchema = z.object({
   apiErrors: z
     .object({
       validationErrors: z
@@ -108,12 +108,12 @@ export const GetZipcodeErrorZod = z.object({
     })
     .optional(),
 });
-export const GetZipCodeResponseZod = z.union([
-  GetZipcodeErrorZod,
-  GetZipcodeZod,
+export const GetZipCodeResponseSchema = z.union([
+  GetZipcodeErrorSchema,
+  GetZipcodeSchema,
 ]);
 
-export const ListFoodTagsErrorZod = z.object({
+export const ListFoodTagsErrorSchema = z.object({
   apiErrors: z
     .object({
       generalErrors: z.string().array().optional(),
@@ -121,16 +121,16 @@ export const ListFoodTagsErrorZod = z.object({
     .optional(),
 });
 
-export const ListFoodTagsZod = z
+export const ListFoodTagsSchema = z
   .object({ name: z.string(), foodTagId: z.string().uuid() })
   .array();
 
-export const ListFoodTagsResponseZod = z.union([
-  ListFoodTagsZod,
-  ListFoodTagsErrorZod,
+export const ListFoodTagsResponseSchema = z.union([
+  ListFoodTagsSchema,
+  ListFoodTagsErrorSchema,
 ]);
 
-export const CreateFoodTagErrorsZod = z.object({
+export const CreateFoodTagErrorsSchema = z.object({
   apiErrors: z
     .object({
       validationErrors: z
@@ -142,16 +142,16 @@ export const CreateFoodTagErrorsZod = z.object({
     })
     .optional(),
 });
-export const CreateFoodTagZod = z.object({
+export const CreateFoodTagSchema = z.object({
   created: z.boolean(),
 });
 
-export const CreateFoodTagResponseZod = z.union([
-  CreateFoodTagErrorsZod,
-  CreateFoodTagZod,
+export const CreateFoodTagResponseSchema = z.union([
+  CreateFoodTagErrorsSchema,
+  CreateFoodTagSchema,
 ]);
 
-export const CreateUploadImageUrlZod = z.object({
+export const CreateUploadImageUrlSchema = z.object({
   cover: z.object({
     type: z
       .string()
@@ -176,7 +176,7 @@ export const CreateUploadImageUrlZod = z.object({
     .array(),
 });
 
-export const ListUploadImageUrlZod = z.object({
+export const ListUploadImageUrlSchema = z.object({
   restaurantId: z.string().uuid(),
   cover: z.object({
     uploadS3Url: z.string(),
@@ -195,7 +195,7 @@ export const ListUploadImageUrlZod = z.object({
     .optional(),
 });
 
-export const ListUploadImageUrlErrorZod = z.object({
+export const ListUploadImageUrlErrorSchema = z.object({
   apiErrors: z.object({
     validationErrors: z
       .object({
@@ -206,12 +206,12 @@ export const ListUploadImageUrlErrorZod = z.object({
   }),
 });
 
-export const ListUploadImageUrlResponseZod = z.union([
-  ListUploadImageUrlErrorZod,
-  ListUploadImageUrlZod,
+export const ListUploadImageUrlResponseSchema = z.union([
+  ListUploadImageUrlErrorSchema,
+  ListUploadImageUrlSchema,
 ]);
 
-export const CreateRestaurantZod = z.object({
+export const CreateRestaurantSchema = z.object({
   restaurantName: z
     .string()
     .min(1, { message: "please provide a value as string" }),
@@ -246,7 +246,7 @@ export const CreateRestaurantZod = z.object({
     .uuid({ message: "please provide a valid uuid as string" }),
 });
 
-export const GetRestaurantErrorZod = z.object({
+export const GetRestaurantErrorSchema = z.object({
   apiErrors: z
     .object({
       validationErrors: z
@@ -259,7 +259,7 @@ export const GetRestaurantErrorZod = z.object({
     .optional(),
 });
 
-export const GetRestaurantZod = z.object({
+export const GetRestaurantSchema = z.object({
   restaurantId: z.string().uuid(),
   restaurantName: z.string(),
   description: z.string(),
@@ -272,12 +272,12 @@ export const GetRestaurantZod = z.object({
   imageUrl: z.string().array(),
 });
 
-export const CreateRestaurantSuccessZod = z.object({
+export const CreateRestaurantSuccessSchema = z.object({
   created: z.boolean(),
   restaurantId: z.string().uuid(),
 });
 
-export const CreateRestaurantErrorZod = z.object({
+export const CreateRestaurantErrorSchema = z.object({
   apiErrors: z.object({
     validationErrors: z
       .object({
@@ -299,23 +299,23 @@ export const CreateRestaurantErrorZod = z.object({
   }),
 });
 
-export const CreateRestaurantResponseZod = z.union([
-  CreateRestaurantSuccessZod,
-  CreateRestaurantErrorZod,
+export const CreateRestaurantResponseSchema = z.union([
+  CreateRestaurantSuccessSchema,
+  CreateRestaurantErrorSchema,
 ]);
 
-export const FilterRestaurantsByZipcodeZod = z.object({
+export const FilterRestaurantsByZipcodeSchema = z.object({
   country: z.string(),
   zipcode: z.string(),
 });
 
-export const FilterRestaurantsByCityZod = z.object({
+export const FilterRestaurantsByCitySchema = z.object({
   country: z.string(),
   state: z.string(),
   city: z.string(),
 });
 
-export const FilterRestaurantsErrorsZod = z.object({
+export const FilterRestaurantsErrorsSchema = z.object({
   apiErrors: z
     .object({
       validationErrors: z
@@ -332,7 +332,7 @@ export const FilterRestaurantsErrorsZod = z.object({
     .optional(),
 });
 
-export const GeoJsonPropertiesRestaurantZod = z.object({
+export const GeoJsonPropertiesRestaurantSchema = z.object({
   restaurantId: z.string().uuid(),
   restaurantName: z.string(),
   description: z.string(),
@@ -346,7 +346,7 @@ export const GeoJsonPropertiesRestaurantZod = z.object({
   otherImageUrlList: z.string().array(),
 });
 
-export const GeoJsonFeatureRestaurantZod = z
+export const GeoJsonFeatureRestaurantSchema = z
   .object({
     id: z.number(),
     type: z.string().refine((val) => val === "Feature"),
@@ -354,15 +354,15 @@ export const GeoJsonFeatureRestaurantZod = z
       type: z.string().refine((val) => val === "Point"),
       coordinates: z.number().gte(-180).lte(180).array().length(2),
     }),
-    properties: GeoJsonPropertiesRestaurantZod,
+    properties: GeoJsonPropertiesRestaurantSchema,
   })
   .array();
 
-export const GeoJsonFeatureCollectionRestaurantsZod = z.object({
+export const GeoJsonFeatureCollectionRestaurantsSchema = z.object({
   restaurants: z
     .object({
       type: z.string().refine((val) => val === "FeatureCollection"),
-      features: GeoJsonFeatureRestaurantZod,
+      features: GeoJsonFeatureRestaurantSchema,
     })
     .optional(),
   country: z.string().optional(),
@@ -373,12 +373,12 @@ export const GeoJsonFeatureCollectionRestaurantsZod = z.object({
   restaurantError: z.string().optional(),
 });
 
-export const FilterRestaurantResponseZod = z.union([
-  GeoJsonFeatureCollectionRestaurantsZod,
-  FilterRestaurantsErrorsZod,
+export const FilterRestaurantResponseSchema = z.union([
+  GeoJsonFeatureCollectionRestaurantsSchema,
+  FilterRestaurantsErrorsSchema,
 ]);
 
-export const ListRestaurantsZod = z.object({
+export const ListRestaurantsSchema = z.object({
   restaurants: z
     .object({
       restaurantId: z.string().uuid(),

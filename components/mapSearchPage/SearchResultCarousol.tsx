@@ -1,5 +1,4 @@
 import * as React from "react";
-import Link from "next/link";
 import { useMap } from "react-map-gl";
 import { Carousel } from "@mantine/carousel";
 import {
@@ -12,6 +11,7 @@ import {
   ScrollArea,
 } from "@mantine/core";
 import { GeoJsonPropertiesRestaurant } from "@/utils/types";
+import { ErrorCard } from "..";
 
 type SearchResultCarousolProps = {
   geolocations: GeoJSON.FeatureCollection<
@@ -28,8 +28,7 @@ export const SearchResultCarousol: React.FC<SearchResultCarousolProps> = ({
   setHoverId,
 }) => {
   const { MapA } = useMap();
-
-  return (
+  return geolocations.features.length ? (
     <Carousel
       maw={300}
       miw={300}
@@ -61,6 +60,8 @@ export const SearchResultCarousol: React.FC<SearchResultCarousolProps> = ({
       })}
       {/* ...other slides */}
     </Carousel>
+  ) : (
+    <ErrorCard message="there is no data to display" />
   );
 };
 
@@ -139,7 +140,7 @@ export const SearchResultCarousolCard: React.FC<
             <Image
               src={`${baseUrl}/${url}`}
               height={160}
-              alt="cover image for restaurant"
+              alt="image for restaurant"
             />
           </Card.Section>
         ))}

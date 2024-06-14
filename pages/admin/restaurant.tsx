@@ -7,7 +7,7 @@ import {
   validateFormDataCreateRestaurant,
   helperListUploadImageUrl,
   createRestaurant,
-  CreateRestaurantResponseZod,
+  CreateRestaurantResponseSchema,
 } from "@/utils";
 import {
   CreateRestaurant,
@@ -68,7 +68,7 @@ const AddRestaurant: React.FC = () => {
   const mutation = useMutation({
     mutationFn: createRestaurant,
     onSuccess: (data) => {
-      const result = CreateRestaurantResponseZod.safeParse(data);
+      const result = CreateRestaurantResponseSchema.safeParse(data);
       if (!result.success) {
         console.log(result.error);
         return (

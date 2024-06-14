@@ -129,3 +129,21 @@ model Zipcode {
   @@id([zipcode, countryId])
 
 }
+
+model VerificationToken {
+  identifier String
+  token      String   @unique
+  expires    DateTime
+  @@unique([identifier, token])
+}
+
+model User {
+  id            String @unique @default(uuid())
+  name          String
+  email         String?   @unique
+  emailVerified DateTime?
+  verifiedUser Boolean
+  createdAt     DateTime @default(now())
+  updatedAt     DateTime @updatedAt
+  password String?
+}

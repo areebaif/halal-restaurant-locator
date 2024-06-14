@@ -7,33 +7,33 @@ import {
   CreateCountryErrorSchema,
   CreateCountryResponseSchema,
   ListStatesSchema,
-  GetZipcodeErrorZod,
-  GetZipcodeZod,
-  CreateFoodTagErrorsZod,
-  CreateFoodTagZod,
-  CreateFoodTagResponseZod,
-  ListFoodTagsErrorZod,
-  ListFoodTagsZod,
-  ListFoodTagsResponseZod,
-  CreateUploadImageUrlZod,
-  ListUploadImageUrlZod,
-  ListUploadImageUrlErrorZod,
-  ListUploadImageUrlResponseZod,
-  CreateRestaurantZod,
-  CreateRestaurantErrorZod,
-  CreateRestaurantSuccessZod,
-  CreateRestaurantResponseZod,
-  FilterRestaurantsByZipcodeZod,
-  FilterRestaurantsByCityZod,
-  GetZipCodeResponseZod,
-  FilterRestaurantsErrorsZod,
-  GeoJsonPropertiesRestaurantZod,
-  FilterRestaurantResponseZod,
-  GeoJsonFeatureRestaurantZod,
-  GeoJsonFeatureCollectionRestaurantsZod,
-  ListRestaurantsZod,
-  GetRestaurantErrorZod,
-  GetRestaurantZod,
+  GetZipcodeErrorSchema,
+  GetZipcodeSchema,
+  CreateFoodTagErrorsSchema,
+  CreateFoodTagSchema,
+  CreateFoodTagResponseSchema,
+  ListFoodTagsErrorSchema,
+  ListFoodTagsSchema,
+  ListFoodTagsResponseSchema,
+  CreateUploadImageUrlSchema,
+  ListUploadImageUrlSchema,
+  ListUploadImageUrlErrorSchema,
+  ListUploadImageUrlResponseSchema,
+  CreateRestaurantSchema,
+  CreateRestaurantErrorSchema,
+  CreateRestaurantSuccessSchema,
+  CreateRestaurantResponseSchema,
+  FilterRestaurantsByZipcodeSchema,
+  FilterRestaurantsByCitySchema,
+  GetZipCodeResponseSchema,
+  FilterRestaurantsErrorsSchema,
+  GeoJsonPropertiesRestaurantSchema,
+  FilterRestaurantResponseSchema,
+  GeoJsonFeatureRestaurantSchema,
+  GeoJsonFeatureCollectionRestaurantsSchema,
+  ListRestaurantsSchema,
+  GetRestaurantErrorSchema,
+  GetRestaurantSchema,
 } from "./zod/schema";
 
 export type CreateCountryResponse = z.infer<typeof CreateCountryResponseSchema>;
@@ -43,55 +43,55 @@ export type ListCountryError = z.infer<typeof ListCountryErrorSchema>;
 export type ListGeography = z.infer<typeof ListGeographySchema>;
 export type ListStates = z.infer<typeof ListStatesSchema>;
 export type ListStateError = z.infer<typeof ListStateErrorSchema>;
-export type GetZipcodeError = z.infer<typeof GetZipcodeErrorZod>;
-export type GetZipcode = z.infer<typeof GetZipcodeZod>;
-export type GetZipCodeResponse = z.infer<typeof GetZipCodeResponseZod>;
-export type CreateFoodTagErrors = z.infer<typeof CreateFoodTagErrorsZod>;
-export type CreateFoodTag = z.infer<typeof CreateFoodTagZod>;
-export type CreateFoodTagResponse = z.infer<typeof CreateFoodTagResponseZod>;
-export type ListFoodTagsError = z.infer<typeof ListFoodTagsErrorZod>;
-export type ListFoodTags = z.infer<typeof ListFoodTagsZod>;
-export type ListFoodTagsResponse = z.infer<typeof ListFoodTagsResponseZod>;
-export type CreateUploadImageUrl = z.infer<typeof CreateUploadImageUrlZod>;
-export type ListUploadImageUrl = z.infer<typeof ListUploadImageUrlZod>;
+export type GetZipcodeError = z.infer<typeof GetZipcodeErrorSchema>;
+export type GetZipcode = z.infer<typeof GetZipcodeSchema>;
+export type GetZipCodeResponse = z.infer<typeof GetZipCodeResponseSchema>;
+export type CreateFoodTagErrors = z.infer<typeof CreateFoodTagErrorsSchema>;
+export type CreateFoodTag = z.infer<typeof CreateFoodTagSchema>;
+export type CreateFoodTagResponse = z.infer<typeof CreateFoodTagResponseSchema>;
+export type ListFoodTagsError = z.infer<typeof ListFoodTagsErrorSchema>;
+export type ListFoodTags = z.infer<typeof ListFoodTagsSchema>;
+export type ListFoodTagsResponse = z.infer<typeof ListFoodTagsResponseSchema>;
+export type CreateUploadImageUrl = z.infer<typeof CreateUploadImageUrlSchema>;
+export type ListUploadImageUrl = z.infer<typeof ListUploadImageUrlSchema>;
 export type ListUploadImageUrlError = z.infer<
-  typeof ListUploadImageUrlErrorZod
+  typeof ListUploadImageUrlErrorSchema
 >;
 export type ListUploadImageUrlResponse = z.infer<
-  typeof ListUploadImageUrlResponseZod
+  typeof ListUploadImageUrlResponseSchema
 >;
-export type GetRestaurantError = z.infer<typeof GetRestaurantErrorZod>;
-export type GetRestaurant = z.infer<typeof GetRestaurantZod>;
-export type CreateRestaurant = z.infer<typeof CreateRestaurantZod>;
-export type CreateRestaurantError = z.infer<typeof CreateRestaurantErrorZod>;
+export type GetRestaurantError = z.infer<typeof GetRestaurantErrorSchema>;
+export type GetRestaurant = z.infer<typeof GetRestaurantSchema>;
+export type CreateRestaurant = z.infer<typeof CreateRestaurantSchema>;
+export type CreateRestaurantError = z.infer<typeof CreateRestaurantErrorSchema>;
 export type CreateRestaurantSuccess = z.infer<
-  typeof CreateRestaurantSuccessZod
+  typeof CreateRestaurantSuccessSchema
 >;
 export type CreateRestaurantResponse = z.infer<
-  typeof CreateRestaurantResponseZod
+  typeof CreateRestaurantResponseSchema
 >;
 export type FilterRestaurantsByZipcode = z.infer<
-  typeof FilterRestaurantsByZipcodeZod
+  typeof FilterRestaurantsByZipcodeSchema
 >;
 export type FilterRestaurantsByCity = z.infer<
-  typeof FilterRestaurantsByCityZod
+  typeof FilterRestaurantsByCitySchema
 >;
 export type FilterRestaurantsErrors = z.infer<
-  typeof FilterRestaurantsErrorsZod
+  typeof FilterRestaurantsErrorsSchema
 >;
 export type GeoJsonFeatureCollectionRestaurants = z.infer<
-  typeof GeoJsonFeatureCollectionRestaurantsZod
+  typeof GeoJsonFeatureCollectionRestaurantsSchema
 >;
 export type FilterRestaurantResponse = z.infer<
-  typeof FilterRestaurantResponseZod
+  typeof FilterRestaurantResponseSchema
 >;
-export type ListRestaurants = z.infer<typeof ListRestaurantsZod>;
+export type ListRestaurants = z.infer<typeof ListRestaurantsSchema>;
 
 export type GeoJsonFeatureRestaurant = z.infer<
-  typeof GeoJsonFeatureRestaurantZod
+  typeof GeoJsonFeatureRestaurantSchema
 >;
 export type GeoJsonPropertiesRestaurant = z.infer<
-  typeof GeoJsonPropertiesRestaurantZod
+  typeof GeoJsonPropertiesRestaurantSchema
 >;
 
 // for client

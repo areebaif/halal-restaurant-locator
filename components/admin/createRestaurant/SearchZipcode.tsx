@@ -2,7 +2,7 @@ import * as React from "react";
 import { useQuery } from "@tanstack/react-query";
 import { TextInput, Textarea, Button, Grid, Loader } from "@mantine/core";
 import { ErrorCard } from "@/components";
-import { getZipcode, GetZipCodeResponseZod, onlyNumbers } from "@/utils";
+import { getZipcode, GetZipCodeResponseSchema, onlyNumbers } from "@/utils";
 import { GetZipcode, GetZipcodeError } from "@/utils/types";
 import { Adress, FormFieldsErrorMessage } from "@/pages/admin/restaurant";
 
@@ -31,7 +31,7 @@ export const SearchZipcode: React.FC<SearchZipcodeProps> = ({
       enabled: getApiFlag,
       onSuccess: (data) => {
         setGetApiFlag(false);
-        const isTypeCorrentZipcode = GetZipCodeResponseZod.safeParse(data);
+        const isTypeCorrentZipcode = GetZipCodeResponseSchema.safeParse(data);
         if (!isTypeCorrentZipcode.success) {
           setErrors(true);
           setErrorVal({

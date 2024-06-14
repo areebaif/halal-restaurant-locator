@@ -8,7 +8,7 @@ import { Loader, Grid, MediaQuery, Flex, Box } from "@mantine/core";
 import {
   calcBoundsFromCoordinates,
   listRestaurantBySearchCriteria,
-  FilterRestaurantResponseZod,
+  FilterRestaurantResponseSchema,
 } from "@/utils";
 
 import {
@@ -49,7 +49,7 @@ export const MapAndList: React.FC = () => {
     () => listRestaurantBySearchCriteria(query),
     {
       onSuccess(data) {
-        const result = FilterRestaurantResponseZod.safeParse(data);
+        const result = FilterRestaurantResponseSchema.safeParse(data);
         if (!result.success) {
           console.log(result.error);
           return (

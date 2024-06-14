@@ -3,7 +3,7 @@ import Link from "next/link";
 import { useRouter } from "next/router";
 import "mapbox-gl/dist/mapbox-gl.css";
 import mapboxgl, { MapLayerMouseEvent } from "mapbox-gl";
-import Map, { Source, Layer, Popup, useMap } from "react-map-gl";
+import Map, { Source, Layer, Popup } from "react-map-gl";
 import { Card, Title, Text, Image, Button, Box } from "@mantine/core";
 // local imports
 import {
@@ -12,6 +12,13 @@ import {
 } from "@/utils";
 import { ErrorCard, SearchResultCarousol } from "@/components";
 import { GeoJsonPropertiesRestaurant } from "@/utils/types";
+import {
+  enable_search_button_inMiles_client,
+  map_custom_pin_id_client,
+  map_id_client,
+  map_layerId_client,
+  map_source_data_id_client,
+} from "@/utils/constants";
 
 export type PopupDataProps = {
   restaurantId: string;
@@ -72,7 +79,7 @@ export const MapContainer: React.FC<MapContainerProps> = ({
         parseFloat(latString),
         parseFloat(lngString)
       );
-      // We are setting distance as 40 miles for search to trigger again
+
       if (distance > 40) {
         setIsEnabledSearchcButton(true);
       } else {
@@ -88,9 +95,9 @@ export const MapContainer: React.FC<MapContainerProps> = ({
         (error: any, image: any) => {
           if (error)
             return <ErrorCard message="unable to load markers for the map" />;
-          mapRef.current.addImage("custom-marker", image);
+          mapRef.current.addImage(map_custom_pin_id_client, image);
           const geoJsonSource = mapRef.current.getSource(
-            "restaurant locations"
+            map_source_data_id_client
           );
           geoJsonSource.setData(geolocations);
         }
@@ -105,7 +112,7 @@ export const MapContainer: React.FC<MapContainerProps> = ({
   const onMouseEnter = (e: MapLayerMouseEvent) => {
     if (hoverId) {
       mapRef.current.setFeatureState(
-        { source: "restaurant locations", id: hoverId },
+        { source: map_source_data_id_client, id: hoverId },
         { hover: false }
       );
     }
@@ -127,7 +134,7 @@ export const MapContainer: React.FC<MapContainerProps> = ({
 
       setHoverId(id);
       mapRef.current.setFeatureState(
-        { source: "restaurant locations", id: id },
+        { source: map_source_data_id_client, id: id },
         { hover: true }
       );
       setPopupData({
@@ -148,6 +155,7 @@ export const MapContainer: React.FC<MapContainerProps> = ({
       lat: number;
       lng: number;
     };
+    console.log(centreCooridnates, " I am center cooprdinagtes");
     // {lng: -93.24952280000048, lat: 45.052795108312296}
     router.push({
       pathname: "/restaurants",
@@ -204,7 +212,7 @@ export const MapContainer: React.FC<MapContainerProps> = ({
         />
       </Box>
       <Map
-        id="MapA"
+        id={map_id_client}
         reuseMaps={true}
         ref={mapRef}
         initialViewState={cameraViewState}
@@ -218,17 +226,21 @@ export const MapContainer: React.FC<MapContainerProps> = ({
         }}
         mapStyle="mapbox://styles/mapbox/streets-v9"
         mapboxAccessToken={process.env.NEXT_PUBLIC_MAPBOX_ACCESS}
-        interactiveLayerIds={["points"]}
+        interactiveLayerIds={[map_layerId_client]}
         onMouseEnter={onMouseEnter}
         onLoad={onLoad}
       >
-        <Source id={"restaurant locations"} type="geojson" data={geolocations}>
+        <Source
+          id={map_source_data_id_client}
+          type="geojson"
+          data={geolocations}
+        >
           <Layer
-            id={"points"}
+            id={map_layerId_client}
             type="symbol"
-            source={"restaurant locations"}
+            source={map_source_data_id_client}
             layout={{
-              "icon-image": "custom-marker",
+              "icon-image": map_custom_pin_id_client,
               "icon-allow-overlap": true,
               "text-field": ["get", "restaurantName"],
               "text-offset": [0, 1.2],
@@ -250,10 +262,10 @@ export const MapContainer: React.FC<MapContainerProps> = ({
             //closeButton={false}
             longitude={popupData.longitude}
             latitude={popupData.latitude}
-            anchor="top"
+            //anchor="top"
             onClose={() => {
               mapRef.current.setFeatureState(
-                { source: "restaurant locations", id: hoverId },
+                { source: map_source_data_id_client, id: hoverId },
                 { hover: false }
               );
               setPopupData({

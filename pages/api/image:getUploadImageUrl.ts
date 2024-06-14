@@ -3,7 +3,7 @@ import type { NextApiRequest, NextApiResponse } from "next";
 import { helperCreateUploadImageUrl, s3Client } from "@/utils";
 import { HeadObjectCommand } from "@aws-sdk/client-s3";
 import { v4 as uuidv4 } from "uuid";
-import { CreateUploadImageUrlZod } from "@/utils";
+import { CreateUploadImageUrlSchema } from "@/utils";
 import {
   CreateUploadImageUrl,
   ListUploadImageUrl,
@@ -85,7 +85,7 @@ export default async function imageUpload(
       const images = req.body.image as CreateUploadImageUrl;
 
       // do zod typechecking here
-      const isTypeCorrent = CreateUploadImageUrlZod.safeParse(images);
+      const isTypeCorrent = CreateUploadImageUrlSchema.safeParse(images);
       if (!isTypeCorrent.success) {
         console.log(isTypeCorrent.error);
         const schemaErrors = isTypeCorrent.error.flatten().fieldErrors;
@@ -151,6 +151,7 @@ export default async function imageUpload(
               }))
             : undefined,
       };
+
       res.status(201).json(preSignedUrl);
     }
   } catch (err) {

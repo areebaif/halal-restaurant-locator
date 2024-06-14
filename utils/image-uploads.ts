@@ -28,6 +28,7 @@ export const helperCreateUploadImageUrl = (imageKey: string) => {
     Key: imageKey,
     // Field: {dud: "hello!!!"} => this will add dud property to the fields returned by this function. I think it is sued to set optional metadata props to objects uploaded.
     Conditions: [
+      //1024, 5242880
       ["content-length-range", 1024, 5242880],
       ["starts-with", "$Content-Type", "image/"],
       { key: imageKey },
