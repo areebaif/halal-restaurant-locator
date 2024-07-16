@@ -16,7 +16,7 @@ export default Home;
 export const HeroHeaderSearch: React.FC = ({}) => {
   return (
     <>
-      <HeroComponent />
+      {/* <HeroComponent />
       <Box
         sx={(theme) => ({
           height: 75,
@@ -38,7 +38,7 @@ export const HeroHeaderSearch: React.FC = ({}) => {
       ></Box>
       <Container size={"xl"}>
         <RestaurantSuggestionForm />
-      </Container>
+      </Container> */}
     </>
   );
 };
