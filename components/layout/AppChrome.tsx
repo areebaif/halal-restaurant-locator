@@ -3,22 +3,14 @@ import Link from "next/link";
 import { useRouter } from "next/router";
 import {
   Button,
-  Image,
   createStyles,
-  getBreakpointValue,
-  rem,
-  em,
   AppShell,
   Header,
-  Group,
   Container,
   Title,
   Flex,
   Footer,
-  Text,
-  Aside,
   Burger,
-  HoverCard,
   Menu,
   Box,
 } from "@mantine/core";
@@ -34,25 +26,11 @@ import {
 
 const useStyles = createStyles((theme) => ({
   header: {
-    height: 60,
     paddingLeft: 10,
     paddingRight: 10,
-    backgroundColor: theme.colors.gray[1],
+    backgroundColor: "white",
     display: "flex",
     alignItems: "center",
-
-    // // Media query with value from theme
-    // [`@media (max-width: ${em(getBreakpointValue(theme.breakpoints.xl) - 1)})`]:
-    //   {
-    //     backgroundColor: theme.colors.pink[6],
-    //   },
-
-    // Simplify media query writing with theme functions
-
-    // // Static media query
-    // [`@media (max-width: ${em(800)})`]: {
-    //   backgroundColor: theme.colors.orange[6],
-    // },
   },
 
   burger: {
@@ -62,7 +40,21 @@ const useStyles = createStyles((theme) => ({
     [theme.fn.smallerThan("xs")]: { display: "none" },
   },
   root: {
-    "&:hover": { backgroundColor: theme.colors.gray[3] },
+    "&:hover": { backgroundColor: theme.colors.gray[1] },
+  },
+  container: {
+    [theme.fn.smallerThan(550)]: {
+      padding: 0,
+      margin: "auto",
+      maxWidth: `calc(100% - 5px)`,
+    },
+    [theme.fn.largerThan(550)]: {
+      maxWidth: "100%",
+    },
+    [theme.fn.largerThan("lg")]: {
+      maxWidth: "90%",
+    },
+    [theme.fn.largerThan("xl")]: { maxWidth: "80%" },
   },
 }));
 
@@ -94,7 +86,7 @@ export const AppChrome: React.FC<React.PropsWithChildren> = (props) => {
       //   </Footer>
       // }
       header={
-        <Header className={classes.header}>
+        <Header height={60} className={classes.header}>
           <Flex
             direction={"row"}
             gap={{ base: "xs" }}
@@ -120,13 +112,11 @@ export const AppChrome: React.FC<React.PropsWithChildren> = (props) => {
       styles={(theme) => ({
         main: {
           backgroundColor:
-            theme.colorScheme === "dark"
-              ? theme.colors.dark[8]
-              : theme.colors.gray[0],
+            theme.colorScheme === "dark" ? theme.colors.dark[8] : "white",
         },
       })}
     >
-      <Container fluid>{props.children}</Container>
+      <Container className={classes.container}>{props.children}</Container>
     </AppShell>
   );
 };

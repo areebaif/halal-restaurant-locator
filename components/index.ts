@@ -7,7 +7,7 @@ import { MapContainer } from "./mapSearchPage/MapContainer";
 import { SearchResultList } from "./mapSearchPage/SearchResultList";
 import { HeroComponent } from "./homePage/HeroComponent";
 import { MapWithText } from "./homePage/MapWithText";
-import { RestaurantSuggestionForm } from "./homePage/RestaurantSuggestionForm";
+import { RestaurantSuggestion } from "./homePage/RestaurantSuggestionForm";
 import { MapAndList } from "./mapSearchPage/MapAndList";
 import { CustomImageButton } from "./admin/createRestaurant/ImageButton";
 import { FoodTags } from "./admin/createRestaurant/FoodTags";
@@ -27,7 +27,7 @@ export {
   SearchResultList,
   HeroComponent,
   MapWithText,
-  RestaurantSuggestionForm,
+  RestaurantSuggestion,
   MapAndList,
   CustomImageButton,
   FoodTags,

@@ -1,18 +1,40 @@
 import * as React from "react";
 import {
-  Flex,
   TextInput,
   Button,
   Card,
   Title,
   Text,
-  Grid,
   Center,
+  createStyles,
+  SimpleGrid,
+  MediaQuery,
 } from "@mantine/core";
 import Link from "next/link";
 import { ErrorCard } from "..";
 
-export const RestaurantSuggestionForm: React.FC = () => {
+const useStyles = createStyles((theme) => ({
+  textInput: {
+    input: {
+      "&:focus": { border: "1px solid black" },
+    },
+  },
+  smallScreen: {
+    [theme.fn.largerThan("md")]: {
+      display: "none",
+    },
+    backgroundColor: "inherit",
+  },
+  largeScreen: {
+    [theme.fn.smallerThan("md")]: {
+      display: "none",
+    },
+    backgroundColor: "inherit",
+  },
+}));
+
+export const RestaurantSuggestion: React.FC = () => {
+  const { classes } = useStyles();
   const [name, setName] = React.useState("");
   const [adress, setAdress] = React.useState("");
   const [isError, setIsError] = React.useState(false);
@@ -35,13 +57,24 @@ export const RestaurantSuggestionForm: React.FC = () => {
 
   return (
     <>
-      <LargeSizeRestaurantSuggestionForm {...RestaurantSuggestionFormProps} />
-      <SmallSizeRestaurantSuggestionForm {...RestaurantSuggestionFormProps} />
+      <SimpleGrid
+        breakpoints={[
+          { minWidth: "md", cols: 1 },
+          { minWidth: "lg", cols: 2 },
+        ]}
+      >
+        <FormWithText {...RestaurantSuggestionFormProps} />
+        <Card className={classes.largeScreen}>
+          <Card.Section>
+            <SuggestionForm {...RestaurantSuggestionFormProps} />
+          </Card.Section>
+        </Card>
+      </SimpleGrid>
     </>
   );
 };
 
-type RestaurantSuggestionFormProps = {
+type RestaurantSuggestionProps = {
   name: string;
   setName: (val: string) => void;
   adress: string;
@@ -50,41 +83,78 @@ type RestaurantSuggestionFormProps = {
   onSendEmail: (e: React.MouseEvent) => void;
 };
 
-const SmallSizeRestaurantSuggestionForm: React.FC<
-  RestaurantSuggestionFormProps
-> = ({ name, setName, adress, setAdress, isError, onSendEmail }) => {
+const FormWithText: React.FC<RestaurantSuggestionProps> = ({
+  name,
+  setName,
+  adress,
+  setAdress,
+  isError,
+  onSendEmail,
+}) => {
+  const { classes } = useStyles();
+  const RestaurantSuggestionFormProps = {
+    name,
+    setName,
+    adress,
+    setAdress,
+    isError,
+    onSendEmail,
+  };
   return (
-    <Card
-      sx={(theme) => ({
-        [theme.fn.largerThan("md")]: {
-          display: "none",
-        },
-      })}
-      radius={"md"}
-      style={{ backgroundColor: "inherit" }}
-    >
+    <Card style={{ backgroundColor: "inherit" }}>
       <Card.Section>
-        {" "}
-        <Title ta="center" order={1}>
-          {" "}
-          Help us grow our library
-        </Title>
-        <Text ta="center" size="xl" mt="md">
+        <MediaQuery smallerThan={"md"} styles={{ display: "none" }}>
+          <Title size={"h2"} order={1}>
+            {" "}
+            Help us grow our library
+          </Title>
+        </MediaQuery>
+        <MediaQuery largerThan={"md"} styles={{ display: "none" }}>
+          <Title size={"h3"} order={1}>
+            {" "}
+            Help us grow our library
+          </Title>
+        </MediaQuery>
+        <Text size="md" mt="sm" color="dimmed">
           Do you know a restaurant that is not on our website?
         </Text>
+        <MediaQuery smallerThan={"md"} styles={{ display: "none" }}>
+          <Text size="md" mt="sm" color="dimmed">
+            Use the form on the right to tell us the name and adress of the
+            place. We will add it to our library!
+          </Text>
+        </MediaQuery>
       </Card.Section>
+      <Card.Section className={classes.smallScreen}>
+        <SuggestionForm {...RestaurantSuggestionFormProps} />
+      </Card.Section>
+    </Card>
+  );
+};
+
+const SuggestionForm: React.FC<RestaurantSuggestionProps> = ({
+  name,
+  setName,
+  adress,
+  setAdress,
+  isError,
+  onSendEmail,
+}) => {
+  const { classes } = useStyles();
+  return (
+    <>
       <TextInput
+        className={classes.textInput}
         mt="xs"
-        placeholder="enter here"
-        label="restaurant name"
+        placeholder="name"
         withAsterisk
         value={name}
         onChange={(event) => setName(event.currentTarget.value)}
       />
       <TextInput
         mt="sm"
-        placeholder="please include street, city, zipcode"
-        label="adress"
+        className={classes.textInput}
+        placeholder="adress"
         withAsterisk
         value={adress}
         onChange={(event) => setAdress(event.currentTarget.value)}
@@ -106,86 +176,6 @@ const SmallSizeRestaurantSuggestionForm: React.FC<
           Send suggestion as email
         </Button>
       </Center>
-    </Card>
-  );
-};
-
-const LargeSizeRestaurantSuggestionForm: React.FC<
-  RestaurantSuggestionFormProps
-> = ({ name, setName, adress, setAdress, isError, onSendEmail }) => {
-  return (
-    <Card
-      sx={(theme) => ({
-        [theme.fn.smallerThan("md")]: {
-          display: "none",
-        },
-      })}
-      style={{ backgroundColor: "inherit" }}
-    >
-      <Grid align={"center"}>
-        <Grid.Col span={6}>
-          <Center>
-            <div>
-              <Text
-                fw={500}
-                sx={(theme) => ({
-                  fontSize: `calc(${theme.fontSizes.xs}*2.5)`,
-                })}
-              >
-                Help us grow our library
-              </Text>
-              <Text size="xl" mt="md">
-                Do you know a restaurant that is not on our website?
-              </Text>
-              <Text size="lg" mt="md">
-                Tell us the name and adress of the restaurant.
-              </Text>
-            </div>
-          </Center>
-        </Grid.Col>
-        <Grid.Col span={6}>
-          <Card
-            style={{ backgroundColor: "inherit" }}
-            withBorder
-            shadow="xs"
-            radius={"md"}
-          >
-            <TextInput
-              mt="xs"
-              placeholder="enter here"
-              label="restaurant name"
-              withAsterisk
-              value={name}
-              onChange={(event) => setName(event.currentTarget.value)}
-            />
-            <TextInput
-              mt="sm"
-              placeholder="please include street, city, zipcode"
-              label="adress"
-              withAsterisk
-              value={adress}
-              onChange={(event) => setAdress(event.currentTarget.value)}
-            />
-            {isError && (
-              <ErrorCard message="please enter name and adress to continue" />
-            )}
-            <Center>
-              <Button
-                variant="outline"
-                color="dark"
-                mt="sm"
-                component={Link}
-                // TODO: fix the mailTo
-                onClick={(e) => onSendEmail(e)}
-                href={`mailto:jamie@fakeemail.com?subject=Restaurant Suggestion&body=Hi,%0D%0DRestaurantName: ${name} %0D%0DAdress: ${adress}`}
-                target="_blank"
-              >
-                Send an email
-              </Button>
-            </Center>
-          </Card>
-        </Grid.Col>
-      </Grid>
-    </Card>
+    </>
   );
 };
