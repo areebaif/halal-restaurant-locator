@@ -15,7 +15,7 @@ export const ErrorCard: React.FC<ErrorCardProps> = ({
   return (
     <>
       <Alert
-        mt="xs"
+        //mt="xs"
         icon={<IconAlertCircle size="1rem" />}
         color="red"
         variant="outline"

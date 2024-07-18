@@ -3,11 +3,11 @@ import { AppChromeAdmin } from "./layout/AdminLayout";
 import { AppChrome } from "./layout/AppChrome";
 import { ErrorCard } from "./ErrorCard";
 import { SearchInput } from "./searchInput";
+import { AboveTheFold } from "./homePage/AboveTheFold";
+import { TopRated } from "./homePage/TopRated";
+import { RestaurantSuggestion } from "./homePage/RestaurantSuggestionForm";
 import { MapContainer } from "./mapSearchPage/MapContainer";
 import { SearchResultList } from "./mapSearchPage/SearchResultList";
-import { HeroComponent } from "./homePage/HeroComponent";
-import { MapWithText } from "./homePage/MapWithText";
-import { RestaurantSuggestion } from "./homePage/RestaurantSuggestionForm";
 import { MapAndList } from "./mapSearchPage/MapAndList";
 import { CustomImageButton } from "./admin/createRestaurant/ImageButton";
 import { FoodTags } from "./admin/createRestaurant/FoodTags";
@@ -23,11 +23,11 @@ export {
   AppChrome,
   ErrorCard,
   SearchInput,
+  AboveTheFold,
+  TopRated,
+  RestaurantSuggestion,
   MapContainer,
   SearchResultList,
-  HeroComponent,
-  MapWithText,
-  RestaurantSuggestion,
   MapAndList,
   CustomImageButton,
   FoodTags,

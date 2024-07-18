@@ -13,6 +13,7 @@ import {
   Burger,
   Menu,
   Box,
+  Text,
 } from "@mantine/core";
 import { useDisclosure } from "@mantine/hooks";
 
@@ -158,13 +159,44 @@ const HamburgerMenu: React.FC<HamburgerMenuProps> = ({ opened, toggle }) => {
 const NavigationItems: React.FC = () => {
   const { classes } = useStyles();
   return (
-    <Box className={classes.rightNavigation}>
-      <Button size="md" className={classes.root} variant="subtle" color="dark">
-        Restaurant
-      </Button>
-      <Button size="md" className={classes.root} variant="subtle" color="dark">
-        About
-      </Button>
-    </Box>
+    <Flex direction={"row"} className={classes.rightNavigation}>
+      <Menu shadow="md">
+        <Menu.Target>
+          <Button
+            size="md"
+            className={classes.root}
+            variant="subtle"
+            color="dark"
+          >
+            Restaurant
+          </Button>
+        </Menu.Target>
+        <Menu.Dropdown>
+          <Menu.Item icon={<IconMapPin size={14} />}>Near Me</Menu.Item>
+          <Menu.Item icon={<IconMap size={14} />}>By States in U.S.A</Menu.Item>
+          <Menu.Item icon={<IconFileDatabase size={14} />}>
+            Suggest Restaurant
+          </Menu.Item>
+        </Menu.Dropdown>
+      </Menu>
+      <Menu shadow="md">
+        <Menu.Target>
+          <Button
+            size="md"
+            className={classes.root}
+            variant="subtle"
+            color="dark"
+          >
+            About
+          </Button>
+        </Menu.Target>
+        <Menu.Dropdown>
+          <Menu.Item icon={<IconFileDatabase size={14} />}>
+            Halal Disclaimer
+          </Menu.Item>
+          <Menu.Item icon={<IconUser size={14} />}>About Us</Menu.Item>
+        </Menu.Dropdown>
+      </Menu>
+    </Flex>
   );
 };

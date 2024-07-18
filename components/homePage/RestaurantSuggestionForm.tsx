@@ -9,6 +9,7 @@ import {
   createStyles,
   SimpleGrid,
   MediaQuery,
+  Box,
 } from "@mantine/core";
 import Link from "next/link";
 import { ErrorCard } from "..";
@@ -56,21 +57,19 @@ export const RestaurantSuggestion: React.FC = () => {
   };
 
   return (
-    <>
-      <SimpleGrid
-        breakpoints={[
-          { minWidth: "md", cols: 1 },
-          { minWidth: "lg", cols: 2 },
-        ]}
-      >
-        <FormWithText {...RestaurantSuggestionFormProps} />
-        <Card className={classes.largeScreen}>
-          <Card.Section>
-            <SuggestionForm {...RestaurantSuggestionFormProps} />
-          </Card.Section>
-        </Card>
-      </SimpleGrid>
-    </>
+    <SimpleGrid
+      breakpoints={[
+        { maxWidth: "md", cols: 1 },
+        { minWidth: "md", cols: 2 },
+      ]}
+    >
+      <FormWithText {...RestaurantSuggestionFormProps} />
+      <Card className={classes.largeScreen}>
+        <Card.Section>
+          <SuggestionForm {...RestaurantSuggestionFormProps} />
+        </Card.Section>
+      </Card>
+    </SimpleGrid>
   );
 };
 
@@ -101,7 +100,7 @@ const FormWithText: React.FC<RestaurantSuggestionProps> = ({
     onSendEmail,
   };
   return (
-    <Card style={{ backgroundColor: "inherit" }}>
+    <Card pt="lg" mt="lg" style={{ backgroundColor: "inherit" }}>
       <Card.Section>
         <MediaQuery smallerThan={"md"} styles={{ display: "none" }}>
           <Title size={"h2"} order={1}>
@@ -121,7 +120,7 @@ const FormWithText: React.FC<RestaurantSuggestionProps> = ({
         <MediaQuery smallerThan={"md"} styles={{ display: "none" }}>
           <Text size="md" mt="sm" color="dimmed">
             Use the form on the right to tell us the name and adress of the
-            place. We will add it to our library!
+            place.
           </Text>
         </MediaQuery>
       </Card.Section>
@@ -142,7 +141,11 @@ const SuggestionForm: React.FC<RestaurantSuggestionProps> = ({
 }) => {
   const { classes } = useStyles();
   return (
-    <>
+    <Box
+      sx={(theme) => ({
+        [theme.fn.largerThan("md")]: { paddingTop: theme.spacing.xl },
+      })}
+    >
       <TextInput
         className={classes.textInput}
         mt="xs"
@@ -176,6 +179,6 @@ const SuggestionForm: React.FC<RestaurantSuggestionProps> = ({
           Send suggestion as email
         </Button>
       </Center>
-    </>
+    </Box>
   );
 };
