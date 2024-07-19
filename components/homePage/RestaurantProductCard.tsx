@@ -6,6 +6,8 @@ type RestaurantProductCardProps = {
   listRestaurants: any[];
 };
 
+// TODO: it gives a warning in concosle check top level render of flex. If I comment out the mapping code, it works fine
+// further investigation needed
 export const RestaurantProductCard: React.FC<RestaurantProductCardProps> = ({
   listRestaurants,
 }) => {

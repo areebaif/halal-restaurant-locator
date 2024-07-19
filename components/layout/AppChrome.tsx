@@ -1,5 +1,4 @@
 import * as React from "react";
-import Link from "next/link";
 import { useRouter } from "next/router";
 import {
   Button,
@@ -12,8 +11,6 @@ import {
   Footer,
   Burger,
   Menu,
-  Box,
-  Text,
 } from "@mantine/core";
 import { useDisclosure } from "@mantine/hooks";
 
@@ -128,6 +125,7 @@ type HamburgerMenuProps = {
 };
 
 const HamburgerMenu: React.FC<HamburgerMenuProps> = ({ opened, toggle }) => {
+  const router = useRouter();
   const { classes } = useStyles();
   return (
     <Menu shadow="md">
@@ -142,7 +140,14 @@ const HamburgerMenu: React.FC<HamburgerMenuProps> = ({ opened, toggle }) => {
       <Menu.Dropdown>
         <Menu.Label>Restaurants</Menu.Label>
         <Menu.Item icon={<IconMapPin size={14} />}>Near Me</Menu.Item>
-        <Menu.Item icon={<IconMap size={14} />}>By States in U.S.A</Menu.Item>
+        <Menu.Item
+          onClick={() => {
+            router.push("/country/U.S.A");
+          }}
+          icon={<IconMap size={14} />}
+        >
+          By States in U.S.A
+        </Menu.Item>
         <Menu.Item icon={<IconFileDatabase size={14} />}>
           Suggest Restaurant
         </Menu.Item>
@@ -157,6 +162,7 @@ const HamburgerMenu: React.FC<HamburgerMenuProps> = ({ opened, toggle }) => {
 };
 
 const NavigationItems: React.FC = () => {
+  const router = useRouter();
   const { classes } = useStyles();
   return (
     <Flex direction={"row"} className={classes.rightNavigation}>
@@ -173,7 +179,14 @@ const NavigationItems: React.FC = () => {
         </Menu.Target>
         <Menu.Dropdown>
           <Menu.Item icon={<IconMapPin size={14} />}>Near Me</Menu.Item>
-          <Menu.Item icon={<IconMap size={14} />}>By States in U.S.A</Menu.Item>
+          <Menu.Item
+            onClick={() => {
+              router.push("/country/U.S.A");
+            }}
+            icon={<IconMap size={14} />}
+          >
+            By States in U.S.A
+          </Menu.Item>
           <Menu.Item icon={<IconFileDatabase size={14} />}>
             Suggest Restaurant
           </Menu.Item>

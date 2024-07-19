@@ -40,7 +40,6 @@ export const ListStatesSchema = z
     countryName: z.string(),
     stateName: z.string(),
     stateId: z.string().uuid(),
-    countryNameStateName: z.string(),
   })
   .array();
 
@@ -52,6 +51,33 @@ export const ListStateErrorSchema = z.object({
     .optional(),
 });
 
+export const ListCitiesSchema = z.object({
+  countryId: z.string().uuid(),
+  countryName: z.string(),
+  stateName: z.record(
+    z.string(),
+    z.object({ cityId: z.string(), cityName: z.string() }).array()
+  ),
+  stateId: z.string().uuid(),
+});
+
+export const ListCitiesErrorSchema = z.object({
+  apiErrors: z
+    .object({
+      validationErrors: z
+        .object({
+          state: z.string().array(),
+        })
+        .optional(),
+      generalError: z.string().array().optional(),
+    })
+    .optional(),
+});
+
+export const ListCitiesResponseSchema = z.union([
+  ListCitiesSchema,
+  ListCitiesErrorSchema,
+]);
 export const ListGeographySchema = z.object({
   country: z
     .object({ countryId: z.string().uuid(), countryName: z.string().uuid() })

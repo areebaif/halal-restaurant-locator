@@ -3,17 +3,25 @@ import { Prisma } from "@prisma/client";
 import type { NextApiRequest, NextApiResponse } from "next";
 import { z } from "zod";
 // local imports
-import { ListStateError, ListStates } from "@/utils/types";
-
+import { ListCities, ListCitiesError } from "@/utils/types";
+// TODO: fix typing jsdocs
 /**
  * @swagger
- * /api/country/usa/states:
+ * /api/country/usa/states/{stateId}:
  *    get:
  *      tags:
  *        - country
- *      summary: list all U.S.A states stored in the database
- *      description: Returns an array of objects containing state names and state id
+ *      summary: list all cities in a particular state in U.S.A
+ *      description: Returns an array of objects containing state names and state id, city name and cityId along with country name and countryId.
  *      operationId: listState
+ *      parameters:
+ *        - name: stateId
+ *          in: path
+ *          description: state in U.S.A
+ *          required: true
+ *          schema:
+ *            type: string
+ *            example: "64b31531-28fd-4570-ad64-6aa312e53d69"
  *      responses:
  *        '200':
  *          description: successful operation
@@ -58,18 +66,42 @@ import { ListStateError, ListStates } from "@/utils/types";
 
 export default async function State(
   req: NextApiRequest,
-  res: NextApiResponse<ListStates | ListStateError>
+  res: NextApiResponse<ListCities | ListCitiesError>
 ) {
   try {
     // GET REQUEST METHOD
     if (req.method === "GET") {
-      const state = await prisma.state.findMany({
+      const { state } = req.query;
+      const isQueryParamCorrect = z.string().uuid().safeParse(state);
+      if (!isQueryParamCorrect.success) {
+        console.log(isQueryParamCorrect.error);
+        res.status(400).json({
+          apiErrors: {
+            validationErrors: {
+              state: ["expected query param as string with valid uuid"],
+            },
+          },
+        });
+        return;
+      }
+      const stateId = state as string;
+      const city = await prisma.city.findMany({
         select: {
           countryId: true,
           stateId: true,
-          stateName: true,
+          cityId: true,
+          cityName: true,
           Country: {
             select: { countryName: true },
+          },
+          State: {
+            select: { stateName: true },
+          },
+        },
+        where: {
+          stateId: stateId,
+          Country: {
+            countryName: "U.S.A",
           },
         },
         orderBy: [
@@ -78,24 +110,38 @@ export default async function State(
               countryName: "asc",
             },
           },
-          { stateName: "asc" },
+          {
+            State: {
+              stateName: "asc",
+            },
+          },
+          { cityName: "asc" },
         ],
       });
-      if (!state.length) {
+      if (!city.length) {
         // there is no data to send
-        res.status(200).send([]);
+        res.status(400).json({
+          apiErrors: {
+            validationErrors: {
+              state: ["no cities found with provided stateId"],
+            },
+          },
+        });
         return;
       }
-      const states = state.map((item, index) => {
-        return {
-          countryId: item.countryId,
-          countryName: item.Country.countryName,
-          stateName: item.stateName,
-          stateId: item.stateId,
-        };
-      });
+      const result = {
+        countryName: city[0].Country.countryName,
+        countryId: city[0].countryId,
+        stateName: {
+          [`${city[0].State.stateName}`]: city.map((city) => ({
+            cityId: city.cityId,
+            cityName: city.cityName,
+          })),
+        },
+        stateId: city[0].stateId,
+      };
 
-      res.status(200).send(states);
+      res.status(200).send(result);
     }
   } catch (err) {
     console.log(err);

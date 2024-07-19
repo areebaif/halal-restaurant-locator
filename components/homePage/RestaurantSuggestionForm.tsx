@@ -10,6 +10,7 @@ import {
   SimpleGrid,
   MediaQuery,
   Box,
+  Divider,
 } from "@mantine/core";
 import Link from "next/link";
 import { ErrorCard } from "..";
@@ -57,19 +58,34 @@ export const RestaurantSuggestion: React.FC = () => {
   };
 
   return (
-    <SimpleGrid
-      breakpoints={[
-        { maxWidth: "md", cols: 1 },
-        { minWidth: "md", cols: 2 },
-      ]}
-    >
-      <FormWithText {...RestaurantSuggestionFormProps} />
-      <Card className={classes.largeScreen}>
-        <Card.Section>
-          <SuggestionForm {...RestaurantSuggestionFormProps} />
-        </Card.Section>
-      </Card>
-    </SimpleGrid>
+    <>
+      {" "}
+      <MediaQuery smallerThan={"md"} styles={{ display: "none" }}>
+        <Title pt="lg" mt="lg" size={"h2"} order={1}>
+          {" "}
+          Help us grow our library
+        </Title>
+      </MediaQuery>
+      <MediaQuery largerThan={"md"} styles={{ display: "none" }}>
+        <Title pt="lg" mt="lg" size={"h3"} order={1}>
+          {" "}
+          Help us grow our library
+        </Title>
+      </MediaQuery>
+      <SimpleGrid
+        breakpoints={[
+          { maxWidth: "md", cols: 1 },
+          { minWidth: "md", cols: 2 },
+        ]}
+      >
+        <FormWithText {...RestaurantSuggestionFormProps} />
+        <Card className={classes.largeScreen}>
+          <Card.Section>
+            <SuggestionForm {...RestaurantSuggestionFormProps} />
+          </Card.Section>
+        </Card>
+      </SimpleGrid>
+    </>
   );
 };
 
@@ -100,27 +116,15 @@ const FormWithText: React.FC<RestaurantSuggestionProps> = ({
     onSendEmail,
   };
   return (
-    <Card pt="lg" mt="lg" style={{ backgroundColor: "inherit" }}>
+    <Card style={{ backgroundColor: "inherit" }}>
       <Card.Section>
-        <MediaQuery smallerThan={"md"} styles={{ display: "none" }}>
-          <Title size={"h2"} order={1}>
-            {" "}
-            Help us grow our library
-          </Title>
-        </MediaQuery>
-        <MediaQuery largerThan={"md"} styles={{ display: "none" }}>
-          <Title size={"h3"} order={1}>
-            {" "}
-            Help us grow our library
-          </Title>
-        </MediaQuery>
         <Text size="md" mt="sm" color="dimmed">
           Do you know a restaurant that is not on our website?
         </Text>
         <MediaQuery smallerThan={"md"} styles={{ display: "none" }}>
           <Text size="md" mt="sm" color="dimmed">
             Use the form on the right to tell us the name and adress of the
-            place.
+            place. And we will add it to our library.
           </Text>
         </MediaQuery>
       </Card.Section>
@@ -142,9 +146,9 @@ const SuggestionForm: React.FC<RestaurantSuggestionProps> = ({
   const { classes } = useStyles();
   return (
     <Box
-      sx={(theme) => ({
-        [theme.fn.largerThan("md")]: { paddingTop: theme.spacing.xl },
-      })}
+    // sx={(theme) => ({
+    //   [theme.fn.largerThan("md")]: { paddingTop: theme.spacing.xl },
+    // })}
     >
       <TextInput
         className={classes.textInput}

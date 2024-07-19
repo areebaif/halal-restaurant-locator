@@ -7,6 +7,9 @@ import {
   CreateCountryErrorSchema,
   CreateCountryResponseSchema,
   ListStatesSchema,
+  ListCitiesSchema,
+  ListCitiesErrorSchema,
+  ListCitiesResponseSchema,
   GetZipcodeErrorSchema,
   GetZipcodeSchema,
   CreateFoodTagErrorsSchema,
@@ -43,6 +46,9 @@ export type ListCountryError = z.infer<typeof ListCountryErrorSchema>;
 export type ListGeography = z.infer<typeof ListGeographySchema>;
 export type ListStates = z.infer<typeof ListStatesSchema>;
 export type ListStateError = z.infer<typeof ListStateErrorSchema>;
+export type ListCities = z.infer<typeof ListCitiesSchema>;
+export type ListCitiesError = z.infer<typeof ListCitiesErrorSchema>;
+export type ListCitiesResponse = z.infer<typeof ListCitiesResponseSchema>;
 export type GetZipcodeError = z.infer<typeof GetZipcodeErrorSchema>;
 export type GetZipcode = z.infer<typeof GetZipcodeSchema>;
 export type GetZipCodeResponse = z.infer<typeof GetZipCodeResponseSchema>;
