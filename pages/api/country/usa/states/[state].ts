@@ -72,20 +72,51 @@ export default async function State(
     // GET REQUEST METHOD
     if (req.method === "GET") {
       const { state } = req.query;
-      const isQueryParamCorrect = z.string().uuid().safeParse(state);
-      if (!isQueryParamCorrect.success) {
-        console.log(isQueryParamCorrect.error);
+      const { _page } = req.query;
+      const { _limit } = req.query;
+
+      if (!_limit?.length || !_page?.length) {
         res.status(400).json({
           apiErrors: {
             validationErrors: {
-              state: ["expected query param as string with valid uuid"],
+              state: ["there was a rpoblem with query param or query string"],
+            },
+          },
+        });
+        return;
+      }
+      const isStateParamCorrect = z.string().uuid().safeParse(state);
+      const ispageParamCorrect = z.coerce.number().safeParse(_page);
+      const islimitParamCorrect = z.coerce.number().safeParse(_limit);
+      if (
+        !isStateParamCorrect.success ||
+        !ispageParamCorrect ||
+        !islimitParamCorrect
+      ) {
+        res.status(400).json({
+          apiErrors: {
+            validationErrors: {
+              state: ["there was a rpoblem with query param or query string"],
             },
           },
         });
         return;
       }
       const stateId = state as string;
-      const city = await prisma.city.findMany({
+      const pageNum = parseInt(_page as string) as number;
+      const limitVal = parseInt(_limit as string) as number;
+
+      const cityCount = prisma.city.count({
+        where: {
+          stateId: stateId,
+          Country: {
+            countryName: "U.S.A",
+          },
+        },
+      });
+      const city = prisma.city.findMany({
+        skip: pageNum === 1 ? 0 : (pageNum - 1) * limitVal,
+        take: limitVal,
         select: {
           countryId: true,
           stateId: true,
@@ -118,7 +149,8 @@ export default async function State(
           { cityName: "asc" },
         ],
       });
-      if (!city.length) {
+      const allQueries = await Promise.all([city, cityCount]);
+      if (!allQueries[0].length) {
         // there is no data to send
         res.status(400).json({
           apiErrors: {
@@ -130,15 +162,18 @@ export default async function State(
         return;
       }
       const result = {
-        countryName: city[0].Country.countryName,
-        countryId: city[0].countryId,
+        countryName: allQueries[0][0].Country.countryName,
+        countryId: allQueries[0][0].countryId,
         stateName: {
-          [`${city[0].State.stateName}`]: city.map((city) => ({
-            cityId: city.cityId,
-            cityName: city.cityName,
-          })),
+          [`${allQueries[0][0].State.stateName}`]: allQueries[0].map(
+            (city) => ({
+              cityId: city.cityId,
+              cityName: city.cityName,
+            })
+          ),
         },
-        stateId: city[0].stateId,
+        stateId: allQueries[0][0].stateId,
+        totalCount: allQueries[1],
       };
 
       res.status(200).send(result);

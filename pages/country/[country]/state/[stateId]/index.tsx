@@ -9,32 +9,51 @@ import {
   MediaQuery,
   Title,
   Group,
+  Tooltip,
+  Box,
 } from "@mantine/core";
 import { ErrorCard } from "@/components";
 import { ListCities, ListCitiesError } from "@/utils/types";
-import { IconSortAscendingLetters } from "@tabler/icons-react";
+import {
+  IconChevronLeft,
+  IconChevronsLeft,
+  IconChevronRight,
+  IconChevronsRight,
+  IconSortAscendingLetters,
+} from "@tabler/icons-react";
 import { listCities } from "@/utils/crud-functions";
-
-// TODO: pagination!!! there is too much city data like 300 entries for each state
 
 const ListCity: React.FC = () => {
   const router = useRouter();
+
   const country = router.query.country;
   const state = router.query.stateId;
+  const page = router.query._page;
+  const limit = router.query._limit;
+
   const countryName = country as string;
   const stateId = state as string;
-  console.log(countryName, stateId);
+  const pageNumber = page as string;
+  const limitNum = limit as string;
+
+  const [pageNum, setPageNum] = React.useState(
+    pageNumber ? parseInt(pageNumber) : 1
+  );
+  React.useEffect(() => {
+    if (page) setPageNum(parseInt(pageNumber));
+  }, [page]);
+
   const getCities = useQuery(
-    ["listCities", stateId],
-    () => listCities(stateId),
+    ["listCities", stateId, pageNum, limitNum],
+    () => listCities(stateId, pageNum.toString(), limitNum),
     {
-      enabled: state ? true : false,
+      enabled: page ? true : false,
       staleTime: Infinity,
       cacheTime: Infinity,
     }
   );
 
-  if (getCities.isLoading) return <Loader />;
+  if (getCities.isLoading || getCities.isFetching) return <Loader />;
   if (getCities.isError)
     return <ErrorCard message="something went wrong please try again" />;
   const data = getCities.data;
@@ -46,6 +65,7 @@ const ListCity: React.FC = () => {
   }
   // it is safe to assume we have the states
   const cityData = data as ListCities;
+  console.log(cityData);
   const cities: { cityId: string; cityName: string }[] = [];
   let stateName = "";
   for (const [property, value] of Object.entries(cityData.stateName)) {
@@ -54,6 +74,13 @@ const ListCity: React.FC = () => {
       cities.push(element);
     });
   }
+  const paginationButtonProps = {
+    cityData,
+    pageNum,
+    stateId,
+    countryName,
+    limitNum,
+  };
   return (
     <>
       <MediaQuery smallerThan={"md"} styles={{ display: "none" }}>
@@ -61,6 +88,7 @@ const ListCity: React.FC = () => {
           <Title size={"h2"} order={1}>
             {`Cities in ${stateName}`}
           </Title>
+
           <IconSortAscendingLetters color="gray" />
         </Group>
       </MediaQuery>
@@ -99,6 +127,120 @@ const ListCity: React.FC = () => {
           </Button>
         ))}
       </SimpleGrid>
+      <Group position="center" mt="sm">
+        <PaginationButtons {...paginationButtonProps} />
+      </Group>
+    </>
+  );
+};
+
+type PaginationButtons = {
+  pageNum: number;
+  cityData: ListCities;
+  countryName: string;
+  stateId: string;
+  limitNum: string;
+};
+
+// TODO: I have to disable buttons for first and last
+// We will switch color of icon to gray and remove onclick listener woth if condition ok
+export const PaginationButtons: React.FC<PaginationButtons> = ({
+  pageNum,
+  cityData,
+  countryName,
+  stateId,
+  limitNum,
+}) => {
+  const router = useRouter();
+  console.log(
+    pageNum,
+    Math.ceil(cityData.totalCount / parseInt(limitNum)) === pageNum
+  );
+  return (
+    <>
+      <Tooltip label="First Page" color="gray" withArrow withinPortal>
+        <Button
+          compact
+          variant="unstyled"
+          styles={(theme) => ({
+            inner: { "&:hover": { backgroundColor: theme.colors.gray[4] } },
+          })}
+          onClick={() => {
+            if (pageNum !== 1) {
+              router.push(
+                `/country/${countryName}/state/${stateId}?_limit=${limitNum}&_page=${
+                  pageNum - 1
+                }`
+              );
+            }
+          }}
+        >
+          <IconChevronsLeft />
+        </Button>
+      </Tooltip>
+      <Tooltip label="Previous Page" color="gray" withArrow withinPortal>
+        <Button
+          compact
+          variant="unstyled"
+          styles={(theme) => ({
+            inner: { "&:hover": { backgroundColor: theme.colors.gray[4] } },
+          })}
+          onClick={() => {
+            if (pageNum !== 1) {
+              router.push(
+                `/country/${countryName}/state/${stateId}?_limit=${limitNum}&_page=${
+                  pageNum - 1
+                }`
+              );
+            }
+          }}
+        >
+          <IconChevronLeft />
+        </Button>
+      </Tooltip>
+      <Tooltip label="Next Page" color="gray" withArrow withinPortal>
+        <Button
+          compact
+          variant="unstyled"
+          styles={(theme) => ({
+            inner: { "&:hover": { backgroundColor: theme.colors.gray[4] } },
+          })}
+          disabled={
+            Math.ceil(cityData.totalCount / parseInt(limitNum)) === pageNum
+          }
+          onClick={() =>
+            router.push(
+              `/country/${countryName}/state/${stateId}?_limit=${limitNum}&_page=${
+                pageNum + 1
+              }`
+            )
+          }
+        >
+          <IconChevronRight />
+        </Button>
+      </Tooltip>
+
+      <Tooltip label="Last Page" color="gray" withArrow withinPortal>
+        <Button
+          compact
+          variant="unstyled"
+          styles={(theme) => ({
+            inner: { "&:hover": { backgroundColor: theme.colors.gray[4] } },
+          })}
+          disabled={
+            Math.ceil(cityData.totalCount / parseInt(limitNum)) === pageNum
+          }
+          onClick={() =>
+            router.push(
+              `/country/${countryName}/state/${stateId}?_limit=${limitNum}&_page=${Math.ceil(
+                cityData.totalCount / parseInt(limitNum)
+              )}`
+            )
+          }
+        >
+          <IconChevronsRight />
+        </Button>
+      </Tooltip>
     </>
   );
 };

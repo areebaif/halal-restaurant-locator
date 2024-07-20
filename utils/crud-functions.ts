@@ -63,13 +63,20 @@ export const listStates = async () => {
   return res;
 };
 
-export const listCities = async (stateId: string) => {
-  const response = await fetch(`/api/country/usa/states/${stateId}`, {
-    method: "GET",
-    headers: {
-      "Content-Type": "application/json",
-    },
-  });
+export const listCities = async (
+  stateId: string,
+  pageNum: string,
+  limitNum: string
+) => {
+  const response = await fetch(
+    `/api/country/usa/states/${stateId}?_limit=${limitNum}&_page=${pageNum}`,
+    {
+      method: "GET",
+      headers: {
+        "Content-Type": "application/json",
+      },
+    }
+  );
   const apiErrors = /(4|5)\d{2}/.test(`${response.status}`);
   if (apiErrors) {
     const res: ListCitiesError = await response.json();

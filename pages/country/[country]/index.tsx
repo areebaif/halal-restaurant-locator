@@ -18,7 +18,6 @@ import { IconSortAscendingLetters } from "@tabler/icons-react";
 const ListState: React.FC = () => {
   const router = useRouter();
   const country = router.query.country;
-  console.log(country);
   const countryName = country as string;
   const getRestaurant = useQuery(["listStates"], () => listStates(), {
     enabled: country ? true : false,
@@ -38,7 +37,7 @@ const ListState: React.FC = () => {
   }
   // it is safe to assume we have the states
   const stateData = data as ListStates;
-  console.log(stateData);
+
   return (
     <>
       <MediaQuery smallerThan={"md"} styles={{ display: "none" }}>
@@ -73,7 +72,11 @@ const ListState: React.FC = () => {
           <Button
             key={state.stateId}
             onClick={() => {
-              router.push(`/country/${countryName}/state/${state.stateId}`);
+              router.push(
+                `/country/${countryName}/state/${
+                  state.stateId
+                }?_limit=${50}&_page=${1}`
+              );
             }}
             size="lg"
             variant="subtle"

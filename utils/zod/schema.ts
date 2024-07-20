@@ -59,6 +59,7 @@ export const ListCitiesSchema = z.object({
     z.object({ cityId: z.string(), cityName: z.string() }).array()
   ),
   stateId: z.string().uuid(),
+  totalCount: z.number(),
 });
 
 export const ListCitiesErrorSchema = z.object({
