@@ -29,12 +29,12 @@ export const RestaurantProductCard: React.FC<RestaurantProductCardProps> = ({
           <Title pt="xs" order={1} size={"h5"}>
             {restaurant.restaurantName}
           </Title>
-          <Text size="xs" pt="xs" color="dimmed">
+          <Text size="xs" mb="xs" mt="xs" color="dimmed">
             {`${restaurant.street}, ${restaurant.city}, ${restaurant.state}, ${restaurant.zipcode}, ${restaurant.country}`}
           </Text>
-          <Flex gap="xs" direction={"row"}>
+          <Flex wrap="wrap" gap="xs" direction={"row"}>
             {restaurant.FoodTag.map((tag: any) => (
-              <Badge mt="xs" pt="xs" pb="xs" color="red" size="xs">
+              <Badge color="red" size="md">
                 {tag}
               </Badge>
             ))}

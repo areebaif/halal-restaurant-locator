@@ -1,5 +1,6 @@
 import * as React from "react";
 import { useRouter } from "next/router";
+import Link from "next/link";
 import {
   Button,
   createStyles,
@@ -21,6 +22,7 @@ import {
   IconToolsKitchen2,
   IconUser,
 } from "@tabler/icons-react";
+import { link } from "fs";
 
 const useStyles = createStyles((theme) => ({
   header: {
@@ -148,7 +150,11 @@ const HamburgerMenu: React.FC<HamburgerMenuProps> = ({ opened, toggle }) => {
         >
           By States in U.S.A
         </Menu.Item>
-        <Menu.Item icon={<IconFileDatabase size={14} />}>
+        <Menu.Item
+          component={Link}
+          href={"/#suggestionBox"}
+          icon={<IconFileDatabase size={14} />}
+        >
           Suggest Restaurant
         </Menu.Item>
         <Menu.Label>About</Menu.Label>
@@ -187,7 +193,11 @@ const NavigationItems: React.FC = () => {
           >
             By States in U.S.A
           </Menu.Item>
-          <Menu.Item icon={<IconFileDatabase size={14} />}>
+          <Menu.Item
+            component={Link}
+            href={"/#suggestionBox"}
+            icon={<IconFileDatabase size={14} />}
+          >
             Suggest Restaurant
           </Menu.Item>
         </Menu.Dropdown>

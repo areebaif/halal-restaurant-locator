@@ -73,6 +73,7 @@ export const RestaurantSuggestion: React.FC = () => {
         </Title>
       </MediaQuery>
       <SimpleGrid
+        id={"suggestionBox"}
         breakpoints={[
           { maxWidth: "md", cols: 1 },
           { minWidth: "md", cols: 2 },

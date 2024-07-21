@@ -10,7 +10,6 @@ import {
   Title,
   Group,
   Tooltip,
-  Box,
 } from "@mantine/core";
 import { ErrorCard } from "@/components";
 import { ListCities, ListCitiesError } from "@/utils/types";
@@ -151,11 +150,9 @@ export const PaginationButtons: React.FC<PaginationButtons> = ({
   stateId,
   limitNum,
 }) => {
+  const maxPageNum = Math.ceil(cityData.totalCount / parseInt(limitNum));
   const router = useRouter();
-  console.log(
-    pageNum,
-    Math.ceil(cityData.totalCount / parseInt(limitNum)) === pageNum
-  );
+
   return (
     <>
       <Tooltip label="First Page" color="gray" withArrow withinPortal>
@@ -163,19 +160,21 @@ export const PaginationButtons: React.FC<PaginationButtons> = ({
           compact
           variant="unstyled"
           styles={(theme) => ({
-            inner: { "&:hover": { backgroundColor: theme.colors.gray[4] } },
+            inner: {
+              "&:hover": {
+                backgroundColor: `${pageNum !== 1 ? theme.colors.gray[4] : ""}`,
+              },
+            },
           })}
           onClick={() => {
             if (pageNum !== 1) {
               router.push(
-                `/country/${countryName}/state/${stateId}?_limit=${limitNum}&_page=${
-                  pageNum - 1
-                }`
+                `/country/${countryName}/state/${stateId}?_limit=${limitNum}&_page=${1}`
               );
             }
           }}
         >
-          <IconChevronsLeft />
+          <IconChevronsLeft color={`${pageNum === 1 ? "gray" : "black"}`} />
         </Button>
       </Tooltip>
       <Tooltip label="Previous Page" color="gray" withArrow withinPortal>
@@ -183,7 +182,11 @@ export const PaginationButtons: React.FC<PaginationButtons> = ({
           compact
           variant="unstyled"
           styles={(theme) => ({
-            inner: { "&:hover": { backgroundColor: theme.colors.gray[4] } },
+            inner: {
+              "&:hover": {
+                backgroundColor: `${pageNum !== 1 ? theme.colors.gray[4] : ""}`,
+              },
+            },
           })}
           onClick={() => {
             if (pageNum !== 1) {
@@ -195,7 +198,7 @@ export const PaginationButtons: React.FC<PaginationButtons> = ({
             }
           }}
         >
-          <IconChevronLeft />
+          <IconChevronLeft color={`${pageNum === 1 ? "gray" : "black"}`} />
         </Button>
       </Tooltip>
       <Tooltip label="Next Page" color="gray" withArrow withinPortal>
@@ -203,20 +206,26 @@ export const PaginationButtons: React.FC<PaginationButtons> = ({
           compact
           variant="unstyled"
           styles={(theme) => ({
-            inner: { "&:hover": { backgroundColor: theme.colors.gray[4] } },
+            inner: {
+              "&:hover": {
+                backgroundColor: `${
+                  pageNum !== maxPageNum ? theme.colors.gray[4] : ""
+                }`,
+              },
+            },
           })}
-          disabled={
-            Math.ceil(cityData.totalCount / parseInt(limitNum)) === pageNum
-          }
-          onClick={() =>
-            router.push(
-              `/country/${countryName}/state/${stateId}?_limit=${limitNum}&_page=${
-                pageNum + 1
-              }`
-            )
-          }
+          onClick={() => {
+            if (pageNum !== maxPageNum)
+              router.push(
+                `/country/${countryName}/state/${stateId}?_limit=${limitNum}&_page=${
+                  pageNum + 1
+                }`
+              );
+          }}
         >
-          <IconChevronRight />
+          <IconChevronRight
+            color={`${pageNum === maxPageNum ? "gray" : "black"}`}
+          />
         </Button>
       </Tooltip>
 
@@ -225,20 +234,23 @@ export const PaginationButtons: React.FC<PaginationButtons> = ({
           compact
           variant="unstyled"
           styles={(theme) => ({
-            inner: { "&:hover": { backgroundColor: theme.colors.gray[4] } },
+            inner: {
+              "&:hover": {
+                backgroundColor: `${
+                  pageNum !== maxPageNum ? theme.colors.gray[4] : ""
+                }`,
+              },
+            },
           })}
-          disabled={
-            Math.ceil(cityData.totalCount / parseInt(limitNum)) === pageNum
-          }
           onClick={() =>
             router.push(
-              `/country/${countryName}/state/${stateId}?_limit=${limitNum}&_page=${Math.ceil(
-                cityData.totalCount / parseInt(limitNum)
-              )}`
+              `/country/${countryName}/state/${stateId}?_limit=${limitNum}&_page=${maxPageNum}`
             )
           }
         >
-          <IconChevronsRight />
+          <IconChevronsRight
+            color={`${pageNum === maxPageNum ? "gray" : "black"}`}
+          />
         </Button>
       </Tooltip>
     </>
