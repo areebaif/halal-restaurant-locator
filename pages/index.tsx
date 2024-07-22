@@ -2,7 +2,6 @@
 import * as React from "react";
 
 import { AppProps } from "next/app";
-import { Box } from "@mantine/core";
 import { AboveTheFold, RestaurantSuggestion, TopRated } from "@/components";
 
 const Home = (props: AppProps) => {
