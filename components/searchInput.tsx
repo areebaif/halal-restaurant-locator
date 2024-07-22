@@ -109,7 +109,7 @@ export const SearchInput: React.FC = () => {
     }
   };
   return (
-    <Flex direction={"column"} gap="md">
+    <>
       <Autocomplete
         error={geogData.isError}
         placeholder={
@@ -143,6 +143,6 @@ export const SearchInput: React.FC = () => {
       >
         Search
       </Button>
-    </Flex>
+    </>
   );
 };

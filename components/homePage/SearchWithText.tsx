@@ -1,5 +1,5 @@
 import * as React from "react";
-import { Title, Text, MediaQuery, Card, Box } from "@mantine/core";
+import { Title, Text, MediaQuery, Card, Box, Flex } from "@mantine/core";
 import { SearchInput } from "../searchInput";
 // local imports
 
@@ -27,9 +27,9 @@ export const SearchWithText: React.FC = ({}) => {
             Use the search button to start exploring now.
           </Text>
         </MediaQuery>
-        <Box pt="sm">
+        <Flex gap="md" pt="sm" direction={"column"}>
           <SearchInput />
-        </Box>
+        </Flex>
       </Card.Section>
     </Card>
   );

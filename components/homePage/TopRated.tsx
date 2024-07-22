@@ -18,6 +18,7 @@ export const TopRated: React.FC = () => {
       zipcode: "55433",
       country: "U.S.A",
       FoodTag: ["Middle Easter", "Indian", "Pakistani"],
+      restaurantId: "7923b6c0-a3c4-49e2-a554-0dea75422076",
       //concat: `${street}, ${city}, ${state}, ${zipcode}, ${country}`,
     },
     {
@@ -31,6 +32,7 @@ export const TopRated: React.FC = () => {
       zipcode: "55433",
       country: "U.S.A",
       FoodTag: ["Morrocon", "Pakistani"],
+      restaurantId: "7923b6c0-a3c4-49e2-a554-0dea75422076",
     },
     {
       restaurantName: "Halal Peri Peri Chicken & Grill",
@@ -43,6 +45,7 @@ export const TopRated: React.FC = () => {
       zipcode: "55433",
       country: "U.S.A",
       FoodTag: ["Morrocon", "Pakistani"],
+      restaurantId: "7923b6c0-a3c4-49e2-a554-0dea75422076",
     },
     {
       restaurantName: "Halal Peri Peri Chicken & Grill",
@@ -55,6 +58,7 @@ export const TopRated: React.FC = () => {
       zipcode: "55433",
       country: "U.S.A",
       FoodTag: ["Morrocon", "Pakistani"],
+      restaurantId: "7923b6c0-a3c4-49e2-a554-0dea75422076",
     },
   ];
 

@@ -1,5 +1,6 @@
 import * as React from "react";
 import { Card, Image, Title, Text, Flex, Box, Badge } from "@mantine/core";
+import Link from "next/link";
 
 // TODO: fix typing
 type RestaurantProductCardProps = {
@@ -15,6 +16,8 @@ export const RestaurantProductCard: React.FC<RestaurantProductCardProps> = ({
     <Flex direction={"row"} style={{ overflow: "auto" }} gap="md">
       {listRestaurants.map((restaurant) => (
         <Card
+          component={Link}
+          href={`/restaurants/${restaurant.restaurantId}`}
           style={{ minWidth: 280, maxWidth: 400, maxHeight: 300 }}
           shadow="sm"
           radius="0"

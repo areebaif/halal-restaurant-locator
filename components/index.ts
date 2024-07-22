@@ -14,8 +14,10 @@ import { FoodTags } from "./admin/createRestaurant/FoodTags";
 import { AddFoodTag } from "./admin/createRestaurant/AddFoodTag";
 import { SearchZipcode } from "./admin/createRestaurant/SearchZipcode";
 import { ImageUpload } from "./admin/createRestaurant/ImageUpload";
-import { AllImages } from "./restaurant-product-page/Image";
+import { AllImages } from "./restaurantProductPage/Image";
 import { SearchResultCarousol } from "./mapSearchPage/SearchResultCarousol";
+import { RestaurantDetails } from "./restaurantProductPage/RestaurantDetails";
+import { RestaurantProductCard } from "./homePage/RestaurantProductCard";
 
 export {
   AdminNavigation,
@@ -36,4 +38,6 @@ export {
   ImageUpload,
   AllImages,
   SearchResultCarousol,
+  RestaurantDetails,
+  RestaurantProductCard,
 };

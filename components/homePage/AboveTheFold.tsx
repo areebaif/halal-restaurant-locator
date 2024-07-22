@@ -1,7 +1,6 @@
 import { Image, Box } from "@mantine/core";
-
+import { SimpleGrid, Flex } from "@mantine/core";
 import { SearchWithText } from "./SearchWithText";
-import { SimpleGrid } from "@mantine/core";
 
 export const AboveTheFold: React.FC = () => {
   return (

@@ -1,25 +1,16 @@
 import * as React from "react";
 import { useRouter } from "next/router";
 import { useQuery } from "@tanstack/react-query";
+import { Loader, Title, SimpleGrid, MediaQuery, Divider } from "@mantine/core";
 import {
-  Box,
-  Loader,
-  Title,
-  SimpleGrid,
-  Text,
-  Badge,
-  MediaQuery,
-  Flex,
-  Divider,
-  UnstyledButton,
-} from "@mantine/core";
-import { ErrorCard, AllImages } from "@/components";
+  ErrorCard,
+  AllImages,
+  RestaurantDetails,
+  RestaurantProductCard,
+} from "@/components";
 import { getRestaurantById } from "@/utils";
 import { GetRestaurant, GetRestaurantError } from "@/utils/types";
-import { IconBrandGoogle } from "@tabler/icons-react";
-import { RestaurantProductCard } from "@/components/homePage/RestaurantProductCard";
 
-//TODO: add google search result link
 // TODO: create api to get similar restaurants in the area
 
 const testRestaurants = [
@@ -35,6 +26,7 @@ const testRestaurants = [
     zipcode: "55433",
     country: "U.S.A",
     FoodTag: ["Middle Easter", "Indian", "Pakistani"],
+    restaurantId: "7923b6c0-a3c4-49e2-a554-0dea75422076",
     //concat: `${street}, ${city}, ${state}, ${zipcode}, ${country}`,
   },
   {
@@ -48,6 +40,7 @@ const testRestaurants = [
     zipcode: "55433",
     country: "U.S.A",
     FoodTag: ["Morrocon", "Pakistani"],
+    restaurantId: "7923b6c0-a3c4-49e2-a554-0dea75422076",
   },
   {
     restaurantName: "Halal Peri Peri Chicken & Grill",
@@ -60,6 +53,7 @@ const testRestaurants = [
     zipcode: "55433",
     country: "U.S.A",
     FoodTag: ["Morrocon", "Pakistani"],
+    restaurantId: "7923b6c0-a3c4-49e2-a554-0dea75422076",
   },
   {
     restaurantName: "Halal Peri Peri Chicken & Grill",
@@ -72,6 +66,7 @@ const testRestaurants = [
     zipcode: "55433",
     country: "U.S.A",
     FoodTag: ["Morrocon", "Pakistani"],
+    restaurantId: "7923b6c0-a3c4-49e2-a554-0dea75422076",
   },
 ];
 
@@ -133,53 +128,6 @@ export const RestaurantProduct: React.FC = () => {
       <Divider my="xs" />
       <RestaurantProductCard listRestaurants={testRestaurants} />
     </>
-  );
-};
-
-type RestauratnDetailProps = {
-  restaurantData: GetRestaurant;
-};
-
-const RestaurantDetails: React.FC<RestauratnDetailProps> = ({
-  restaurantData,
-}) => {
-  return (
-    <Box>
-      <MediaQuery smallerThan={"md"} styles={{ display: "none" }}>
-        <Title size={"h2"} order={1}>
-          {" "}
-          {restaurantData.restaurantName}
-        </Title>
-      </MediaQuery>
-      <MediaQuery largerThan={"md"} styles={{ display: "none" }}>
-        <Title pt="sm" size={"h3"} order={1}>
-          {" "}
-          {restaurantData.restaurantName}
-        </Title>
-      </MediaQuery>
-      <Text size="xs" color="dimmed">
-        {`${restaurantData.street}, ${restaurantData.city}, ${restaurantData.state}, ${restaurantData.zipcode}, ${restaurantData.country}`}
-      </Text>
-      <UnstyledButton>
-        <Text color="blue" size="xs">
-          {"  "}
-          Google search result link{"  "}
-        </Text>
-      </UnstyledButton>
-      <Divider mt="xs" />
-
-      <Flex wrap="wrap" gap="xs" pt="xs" direction={"row"}>
-        {restaurantData.FoodTag.map((tag: any) => (
-          <Badge color="red" size="md">
-            {tag}
-          </Badge>
-        ))}
-      </Flex>
-
-      <Text size="md" pt="xs">
-        {restaurantData.description}
-      </Text>
-    </Box>
   );
 };
 
