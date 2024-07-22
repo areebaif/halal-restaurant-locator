@@ -1,5 +1,5 @@
 import * as React from "react";
-import { Title, MediaQuery } from "@mantine/core";
+import { Title, MediaQuery, Divider } from "@mantine/core";
 import { RestaurantProductCard } from "./RestaurantProductCard";
 
 export const TopRated: React.FC = () => {
@@ -61,17 +61,18 @@ export const TopRated: React.FC = () => {
   return (
     <>
       <MediaQuery smallerThan={"md"} styles={{ display: "none" }}>
-        <Title mt="lg" pb="sm" size={"h2"} order={1}>
+        <Title mt="lg" size={"h2"} order={1}>
           {" "}
           Recently added
         </Title>
       </MediaQuery>
       <MediaQuery largerThan={"md"} styles={{ display: "none" }}>
-        <Title pt="lg" mt="lg" pb="sm" size={"h3"} order={1}>
+        <Title pt="lg" mt="lg" size={"h3"} order={1}>
           {" "}
           Recently added
         </Title>
       </MediaQuery>
+      <Divider my="sm" />
       <RestaurantProductCard listRestaurants={testRestaurants} />
     </>
   );

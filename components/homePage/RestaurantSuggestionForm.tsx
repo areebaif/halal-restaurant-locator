@@ -18,7 +18,8 @@ import { ErrorCard } from "..";
 const useStyles = createStyles((theme) => ({
   textInput: {
     input: {
-      "&:focus": { border: "1px solid black" },
+      "&:focus": { border: "1px solid gray" },
+      border: "1px solid black",
     },
   },
   smallScreen: {
@@ -72,6 +73,7 @@ export const RestaurantSuggestion: React.FC = () => {
           Help us grow our library
         </Title>
       </MediaQuery>
+      <Divider my="xs" />
       <SimpleGrid
         id={"suggestionBox"}
         breakpoints={[

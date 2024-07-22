@@ -158,10 +158,20 @@ const HamburgerMenu: React.FC<HamburgerMenuProps> = ({ opened, toggle }) => {
           Suggest Restaurant
         </Menu.Item>
         <Menu.Label>About</Menu.Label>
-        <Menu.Item icon={<IconFileDatabase size={14} />}>
+        <Menu.Item
+          component={Link}
+          href={"/about#halal-disclaimer"}
+          icon={<IconFileDatabase size={14} />}
+        >
           Halal Disclaimer
         </Menu.Item>
-        <Menu.Item icon={<IconUser size={14} />}>About Us</Menu.Item>
+        <Menu.Item
+          component={Link}
+          href={"/about#about"}
+          icon={<IconUser size={14} />}
+        >
+          Contact Us
+        </Menu.Item>
       </Menu.Dropdown>
     </Menu>
   );
@@ -214,10 +224,20 @@ const NavigationItems: React.FC = () => {
           </Button>
         </Menu.Target>
         <Menu.Dropdown>
-          <Menu.Item icon={<IconFileDatabase size={14} />}>
+          <Menu.Item
+            component={Link}
+            href={"/about#halal-disclaimer"}
+            icon={<IconFileDatabase size={14} />}
+          >
             Halal Disclaimer
           </Menu.Item>
-          <Menu.Item icon={<IconUser size={14} />}>About Us</Menu.Item>
+          <Menu.Item
+            component={Link}
+            href={"/about#about"}
+            icon={<IconUser size={14} />}
+          >
+            Contact Us
+          </Menu.Item>
         </Menu.Dropdown>
       </Menu>
     </Flex>

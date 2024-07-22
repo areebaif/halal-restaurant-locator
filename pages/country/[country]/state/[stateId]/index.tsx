@@ -10,6 +10,7 @@ import {
   Title,
   Group,
   Tooltip,
+  UnstyledButton,
 } from "@mantine/core";
 import { ErrorCard } from "@/components";
 import { ListCities, ListCitiesError } from "@/utils/types";
@@ -156,9 +157,7 @@ export const PaginationButtons: React.FC<PaginationButtons> = ({
   return (
     <>
       <Tooltip label="First Page" color="gray" withArrow withinPortal>
-        <Button
-          compact
-          variant="unstyled"
+        <UnstyledButton
           styles={(theme) => ({
             inner: {
               "&:hover": {
@@ -175,12 +174,10 @@ export const PaginationButtons: React.FC<PaginationButtons> = ({
           }}
         >
           <IconChevronsLeft color={`${pageNum === 1 ? "gray" : "black"}`} />
-        </Button>
+        </UnstyledButton>
       </Tooltip>
       <Tooltip label="Previous Page" color="gray" withArrow withinPortal>
-        <Button
-          compact
-          variant="unstyled"
+        <UnstyledButton
           styles={(theme) => ({
             inner: {
               "&:hover": {
@@ -199,12 +196,10 @@ export const PaginationButtons: React.FC<PaginationButtons> = ({
           }}
         >
           <IconChevronLeft color={`${pageNum === 1 ? "gray" : "black"}`} />
-        </Button>
+        </UnstyledButton>
       </Tooltip>
       <Tooltip label="Next Page" color="gray" withArrow withinPortal>
-        <Button
-          compact
-          variant="unstyled"
+        <UnstyledButton
           styles={(theme) => ({
             inner: {
               "&:hover": {
@@ -226,13 +221,11 @@ export const PaginationButtons: React.FC<PaginationButtons> = ({
           <IconChevronRight
             color={`${pageNum === maxPageNum ? "gray" : "black"}`}
           />
-        </Button>
+        </UnstyledButton>
       </Tooltip>
 
-      <Tooltip label="Last Page" color="gray" withArrow withinPortal>
-        <Button
-          compact
-          variant="unstyled"
+      <Tooltip label="Last Page" color="gray" withArrow>
+        <UnstyledButton
           styles={(theme) => ({
             inner: {
               "&:hover": {
@@ -251,7 +244,7 @@ export const PaginationButtons: React.FC<PaginationButtons> = ({
           <IconChevronsRight
             color={`${pageNum === maxPageNum ? "gray" : "black"}`}
           />
-        </Button>
+        </UnstyledButton>
       </Tooltip>
     </>
   );
