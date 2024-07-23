@@ -155,8 +155,7 @@ export const MapContainer: React.FC<MapContainerProps> = ({
       lat: number;
       lng: number;
     };
-    console.log(centreCooridnates, " I am center cooprdinagtes");
-    // {lng: -93.24952280000048, lat: 45.052795108312296}
+
     router.push({
       pathname: "/restaurants",
       query: {

@@ -18,6 +18,7 @@ import { AllImages } from "./restaurantProductPage/Image";
 import { SearchResultCarousol } from "./mapSearchPage/SearchResultCarousol";
 import { RestaurantDetails } from "./restaurantProductPage/RestaurantDetails";
 import { RestaurantProductCard } from "./homePage/RestaurantProductCard";
+import { getUserLocation } from "./homePage/getUserLocation";
 
 export {
   AdminNavigation,
@@ -40,4 +41,5 @@ export {
   SearchResultCarousol,
   RestaurantDetails,
   RestaurantProductCard,
+  getUserLocation,
 };

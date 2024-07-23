@@ -14,8 +14,9 @@ export const RestaurantProductCard: React.FC<RestaurantProductCardProps> = ({
 }) => {
   return (
     <Flex direction={"row"} style={{ overflow: "auto" }} gap="md">
-      {listRestaurants.map((restaurant) => (
+      {listRestaurants.map((restaurant, index) => (
         <Card
+          key={index}
           component={Link}
           href={`/restaurants/${restaurant.restaurantId}`}
           style={{ minWidth: 280, maxWidth: 400, maxHeight: 300 }}
@@ -37,7 +38,7 @@ export const RestaurantProductCard: React.FC<RestaurantProductCardProps> = ({
           </Text>
           <Flex wrap="wrap" gap="xs" direction={"row"}>
             {restaurant.FoodTag.map((tag: any) => (
-              <Badge color="red" size="md">
+              <Badge key={tag} color="red" size="md">
                 {tag}
               </Badge>
             ))}

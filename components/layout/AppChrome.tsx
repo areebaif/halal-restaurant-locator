@@ -9,11 +9,10 @@ import {
   Container,
   Title,
   Flex,
-  Footer,
   Burger,
   Menu,
+  Loader,
 } from "@mantine/core";
-import { useDisclosure } from "@mantine/hooks";
 
 import {
   IconFileDatabase,
@@ -22,7 +21,11 @@ import {
   IconToolsKitchen2,
   IconUser,
 } from "@tabler/icons-react";
-import { link } from "fs";
+
+export type UserLocation = {
+  latitude: number;
+  longitude: number;
+} | null;
 
 const useStyles = createStyles((theme) => ({
   header: {
@@ -61,7 +64,44 @@ const useStyles = createStyles((theme) => ({
 export const AppChrome: React.FC<React.PropsWithChildren> = (props) => {
   const router = useRouter();
   const { classes } = useStyles();
-  const [opened, { toggle }] = useDisclosure();
+  const [opened, setOpened] = React.useState(false);
+  // const [userLocation, setUserLocation] = React.useState<{
+  //   latitude: number;
+  //   longitude: number;
+  // } | null>(null);
+  const [isLoading, setIsLoading] = React.useState(false);
+
+  // TODO: there is a big, the menu doesnt close
+  const getUserLocation = () => {
+    navigator.geolocation.getCurrentPosition(
+      (position) => {
+        const { latitude, longitude } = position.coords;
+
+        setOpened(false);
+        setIsLoading(false);
+        router.push(`/restaurants?latitude=${latitude}&longitude=${longitude}`);
+      },
+      (error) => {
+        //TODO: do error handling
+        console.log("Error get user location: ", error);
+        // todo error handling
+      }
+    );
+  };
+
+  const hamburgerMenu = {
+    setIsLoading,
+    isLoading,
+    opened,
+    setOpened,
+    getUserLocation,
+  };
+  const navigationProps = {
+    setIsLoading,
+    isLoading,
+
+    getUserLocation,
+  };
   return (
     <AppShell
       //padding={"xs"}
@@ -104,8 +144,8 @@ export const AppChrome: React.FC<React.PropsWithChildren> = (props) => {
             align={"center"}
             style={{ marginLeft: "auto" }}
           >
-            <HamburgerMenu opened={opened} toggle={toggle} />
-            <NavigationItems />
+            <HamburgerMenu {...hamburgerMenu} />
+            <NavigationItems {...navigationProps} />
           </Flex>
         </Header>
       }
@@ -123,10 +163,20 @@ export const AppChrome: React.FC<React.PropsWithChildren> = (props) => {
 
 type HamburgerMenuProps = {
   opened: boolean;
-  toggle: () => void;
+  setOpened: (val: boolean) => void;
+  //setUserLocation: (val: UserLocation) => void;
+  setIsLoading: (val: boolean) => void;
+  isLoading: boolean;
+  getUserLocation: () => void;
 };
 
-const HamburgerMenu: React.FC<HamburgerMenuProps> = ({ opened, toggle }) => {
+const HamburgerMenu: React.FC<HamburgerMenuProps> = ({
+  opened,
+  setOpened,
+  getUserLocation,
+  setIsLoading,
+  isLoading,
+}) => {
   const router = useRouter();
   const { classes } = useStyles();
   return (
@@ -135,13 +185,27 @@ const HamburgerMenu: React.FC<HamburgerMenuProps> = ({ opened, toggle }) => {
         <Burger
           className={classes.burger}
           opened={opened}
-          onClick={toggle}
+          onClick={() => {
+            if (opened) setOpened(false);
+            else {
+              setOpened(true);
+            }
+          }}
           size="sm"
         />
       </Menu.Target>
       <Menu.Dropdown>
         <Menu.Label>Restaurants</Menu.Label>
-        <Menu.Item icon={<IconMapPin size={14} />}>Near Me</Menu.Item>
+        <Menu.Item
+          onClick={() => {
+            setIsLoading(true);
+            getUserLocation();
+          }}
+          closeMenuOnClick={false}
+          icon={isLoading ? <Loader size="xs" /> : <IconMapPin size={14} />}
+        >
+          Near Me
+        </Menu.Item>
         <Menu.Item
           onClick={() => {
             router.push("/country/U.S.A");
@@ -177,7 +241,16 @@ const HamburgerMenu: React.FC<HamburgerMenuProps> = ({ opened, toggle }) => {
   );
 };
 
-const NavigationItems: React.FC = () => {
+type NavigationItemsProp = {
+  setIsLoading: (val: boolean) => void;
+  isLoading: boolean;
+  getUserLocation: () => void;
+};
+const NavigationItems: React.FC<NavigationItemsProp> = ({
+  setIsLoading,
+  isLoading,
+  getUserLocation,
+}) => {
   const router = useRouter();
   const { classes } = useStyles();
   return (
@@ -194,7 +267,16 @@ const NavigationItems: React.FC = () => {
           </Button>
         </Menu.Target>
         <Menu.Dropdown>
-          <Menu.Item icon={<IconMapPin size={14} />}>Near Me</Menu.Item>
+          <Menu.Item
+            onClick={() => {
+              setIsLoading(true);
+              getUserLocation();
+            }}
+            closeMenuOnClick={false}
+            icon={isLoading ? <Loader size="xs" /> : <IconMapPin size={14} />}
+          >
+            Near Me
+          </Menu.Item>
           <Menu.Item
             onClick={() => {
               router.push("/country/U.S.A");
