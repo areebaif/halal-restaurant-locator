@@ -64,67 +64,46 @@ const useStyles = createStyles((theme) => ({
 export const AppChrome: React.FC<React.PropsWithChildren> = (props) => {
   const router = useRouter();
   const { classes } = useStyles();
-  const [opened, setOpened] = React.useState(false);
-  // const [userLocation, setUserLocation] = React.useState<{
-  //   latitude: number;
-  //   longitude: number;
-  // } | null>(null);
+  const [openBurgerIcon, setOpenBurgerIcon] = React.useState(false);
+  const [openSmallScreenMenu, setOpenSmallScreenMenu] = React.useState(false);
+  const [openlargeScreenMenu, setOpenLargeScreenMenu] = React.useState(false);
   const [isLoading, setIsLoading] = React.useState(false);
 
-  // TODO: there is a big, the menu doesnt close
   const getUserLocation = () => {
     navigator.geolocation.getCurrentPosition(
       (position) => {
         const { latitude, longitude } = position.coords;
-
-        setOpened(false);
+        setOpenSmallScreenMenu(false);
+        setOpenLargeScreenMenu(false);
+        setOpenBurgerIcon(false);
         setIsLoading(false);
         router.push(`/restaurants?latitude=${latitude}&longitude=${longitude}`);
       },
       (error) => {
         //TODO: do error handling
         console.log("Error get user location: ", error);
-        // todo error handling
       }
     );
   };
 
   const hamburgerMenu = {
+    openBurgerIcon,
+    setOpenBurgerIcon,
+    openSmallScreenMenu,
+    setOpenSmallScreenMenu,
     setIsLoading,
     isLoading,
-    opened,
-    setOpened,
     getUserLocation,
   };
-  const navigationProps = {
+  const navigationLargeScreenProps = {
+    openlargeScreenMenu,
+    setOpenLargeScreenMenu,
     setIsLoading,
     isLoading,
-
     getUserLocation,
   };
   return (
     <AppShell
-      //padding={"xs"}
-      // footer={
-      //   <Footer
-      //     height={300}
-      //     //p="xs"
-      //     sx={(theme) => ({
-      //       [theme.fn.smallerThan("sm")]: {
-      //         // height: 40,
-      //         // padding: 0,
-      //         display: "none",
-      //       },
-      //     })}
-      //   >
-      //     <Group mt={0} spacing="xs" position="center">
-      //       <Title order={6}>Location Icon Credits:</Title>
-      //       <Link href={"https://www.flaticon.com/free-icons/location"}>
-      //         <Button variant="unstyled">Flaticon</Button>
-      //       </Link>
-      //     </Group>
-      //   </Footer>
-      // }
       header={
         <Header height={60} className={classes.header}>
           <Flex
@@ -145,7 +124,7 @@ export const AppChrome: React.FC<React.PropsWithChildren> = (props) => {
             style={{ marginLeft: "auto" }}
           >
             <HamburgerMenu {...hamburgerMenu} />
-            <NavigationItems {...navigationProps} />
+            <NavigationLargeScreen {...navigationLargeScreenProps} />
           </Flex>
         </Header>
       }
@@ -162,8 +141,10 @@ export const AppChrome: React.FC<React.PropsWithChildren> = (props) => {
 };
 
 type HamburgerMenuProps = {
-  opened: boolean;
-  setOpened: (val: boolean) => void;
+  openBurgerIcon: boolean;
+  setOpenBurgerIcon: (val: boolean) => void;
+  openSmallScreenMenu: boolean;
+  setOpenSmallScreenMenu: (val: boolean) => void;
   //setUserLocation: (val: UserLocation) => void;
   setIsLoading: (val: boolean) => void;
   isLoading: boolean;
@@ -171,8 +152,10 @@ type HamburgerMenuProps = {
 };
 
 const HamburgerMenu: React.FC<HamburgerMenuProps> = ({
-  opened,
-  setOpened,
+  openBurgerIcon,
+  setOpenBurgerIcon,
+  openSmallScreenMenu,
+  setOpenSmallScreenMenu,
   getUserLocation,
   setIsLoading,
   isLoading,
@@ -180,15 +163,24 @@ const HamburgerMenu: React.FC<HamburgerMenuProps> = ({
   const router = useRouter();
   const { classes } = useStyles();
   return (
-    <Menu shadow="md">
+    <Menu
+      opened={openSmallScreenMenu}
+      shadow="md"
+      onChange={() => {
+        if (openSmallScreenMenu) setOpenSmallScreenMenu(false);
+        else {
+          setOpenSmallScreenMenu(true);
+        }
+      }}
+    >
       <Menu.Target>
         <Burger
           className={classes.burger}
-          opened={opened}
+          opened={openBurgerIcon}
           onClick={() => {
-            if (opened) setOpened(false);
+            if (openBurgerIcon) setOpenBurgerIcon(false);
             else {
-              setOpened(true);
+              setOpenBurgerIcon(true);
             }
           }}
           size="sm"
@@ -209,6 +201,10 @@ const HamburgerMenu: React.FC<HamburgerMenuProps> = ({
         <Menu.Item
           onClick={() => {
             router.push("/country/U.S.A");
+            if (openBurgerIcon) setOpenBurgerIcon(false);
+            else {
+              setOpenBurgerIcon(true);
+            }
           }}
           icon={<IconMap size={14} />}
         >
@@ -217,19 +213,37 @@ const HamburgerMenu: React.FC<HamburgerMenuProps> = ({
         <Menu.Item
           component={Link}
           href={"/#suggestionBox"}
+          onClick={() => {
+            if (openBurgerIcon) setOpenBurgerIcon(false);
+            else {
+              setOpenBurgerIcon(true);
+            }
+          }}
           icon={<IconFileDatabase size={14} />}
         >
-          Suggest Restaurant
+          Submit restaurant suggestion
         </Menu.Item>
         <Menu.Label>About</Menu.Label>
         <Menu.Item
           component={Link}
+          onClick={() => {
+            if (openBurgerIcon) setOpenBurgerIcon(false);
+            else {
+              setOpenBurgerIcon(true);
+            }
+          }}
           href={"/about#halal-disclaimer"}
           icon={<IconFileDatabase size={14} />}
         >
           Halal Disclaimer
         </Menu.Item>
         <Menu.Item
+          onClick={() => {
+            if (openBurgerIcon) setOpenBurgerIcon(false);
+            else {
+              setOpenBurgerIcon(true);
+            }
+          }}
           component={Link}
           href={"/about#about"}
           icon={<IconUser size={14} />}
@@ -241,21 +255,34 @@ const HamburgerMenu: React.FC<HamburgerMenuProps> = ({
   );
 };
 
-type NavigationItemsProp = {
+type NavigationLargeProps = {
   setIsLoading: (val: boolean) => void;
   isLoading: boolean;
   getUserLocation: () => void;
+  openlargeScreenMenu: boolean;
+  setOpenLargeScreenMenu: (val: boolean) => void;
 };
-const NavigationItems: React.FC<NavigationItemsProp> = ({
+const NavigationLargeScreen: React.FC<NavigationLargeProps> = ({
   setIsLoading,
   isLoading,
   getUserLocation,
+  openlargeScreenMenu,
+  setOpenLargeScreenMenu,
 }) => {
   const router = useRouter();
   const { classes } = useStyles();
   return (
     <Flex direction={"row"} className={classes.rightNavigation}>
-      <Menu shadow="md">
+      <Menu
+        opened={openlargeScreenMenu}
+        onChange={() => {
+          if (openlargeScreenMenu) setOpenLargeScreenMenu(false);
+          else {
+            setOpenLargeScreenMenu(true);
+          }
+        }}
+        shadow="md"
+      >
         <Menu.Target>
           <Button
             size="md"
@@ -290,7 +317,7 @@ const NavigationItems: React.FC<NavigationItemsProp> = ({
             href={"/#suggestionBox"}
             icon={<IconFileDatabase size={14} />}
           >
-            Suggest Restaurant
+            Submit restaurant suggestion
           </Menu.Item>
         </Menu.Dropdown>
       </Menu>
