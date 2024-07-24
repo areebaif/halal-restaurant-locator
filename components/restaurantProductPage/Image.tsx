@@ -14,7 +14,7 @@ export const AllImages: React.FC<AllImagesProps> = ({ listImageUrls }) => {
     <Flex direction={{ base: "column", sm: "row" }} gap="xs">
       <Flex
         gap="xs"
-        justify={"center"}
+        //justify={"center"}
         align="center"
         direction={{ base: "row", sm: "column" }}
         sx={(theme) => ({
@@ -41,7 +41,7 @@ export const AllImages: React.FC<AllImagesProps> = ({ listImageUrls }) => {
             background: theme.colors.gray[0],
           },
         })}
-        mah={300}
+        mah={350}
         maw={700}
       >
         <Image

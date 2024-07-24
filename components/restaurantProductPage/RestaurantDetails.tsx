@@ -11,12 +11,24 @@ import {
   Divider,
   Button,
   Grid,
+  Group,
+  SimpleGrid,
 } from "@mantine/core";
-import { IconBrandFacebook, IconPhone, IconWorld } from "@tabler/icons-react";
+import {
+  IconBrandFacebook,
+  IconBrandUber,
+  IconCircleLetterD,
+  IconLetterD,
+  IconPhone,
+  IconSquareLetterD,
+  IconWorld,
+} from "@tabler/icons-react";
 
 export type RestauratnDetailProps = {
   restaurantData: GetRestaurant;
 };
+
+// TODO: add links to button and make them disabled if they dont exist for contact delivery
 
 export const RestaurantDetails: React.FC<RestauratnDetailProps> = ({
   restaurantData,
@@ -25,13 +37,11 @@ export const RestaurantDetails: React.FC<RestauratnDetailProps> = ({
     <Box>
       <MediaQuery smallerThan={"md"} styles={{ display: "none" }}>
         <Title size={"h2"} order={1}>
-          {" "}
           {restaurantData.restaurantName}
         </Title>
       </MediaQuery>
       <MediaQuery largerThan={"md"} styles={{ display: "none" }}>
         <Title pt="sm" size={"h3"} order={1}>
-          {" "}
           {restaurantData.restaurantName}
         </Title>
       </MediaQuery>
@@ -40,7 +50,6 @@ export const RestaurantDetails: React.FC<RestauratnDetailProps> = ({
       </Text>
       <UnstyledButton>
         <Text color="blue" size="xs">
-          {"  "}
           Google search link
         </Text>
         <Flex wrap="wrap" gap="xs" pt="xs" direction={"row"}>
@@ -55,18 +64,19 @@ export const RestaurantDetails: React.FC<RestauratnDetailProps> = ({
         {restaurantData.description}
       </Text>
       <Divider my="xs" />
-      <Title size={"h3"} order={1}>
+      <Title pb="xs" size={"h3"} order={1}>
         {" "}
         Contact
       </Title>
+
       <ContactSmallScreen />
       <ContactLargeScreen />
       <Divider my="xs" />
-
-      <Title size={"h3"} order={1}>
+      <Title size={"h3"} pb="xs" order={1}>
         {" "}
         Delivery
       </Title>
+      <Delivery />
     </Box>
   );
 };
@@ -78,14 +88,15 @@ const ContactSmallScreen: React.FC = () => {
       direction={"column"}
       gap={"sm"}
       justify={"center"}
+      pb="xs"
     >
-      <Button variant={"outline"} leftIcon={<IconPhone />}>
+      <Button variant={"outline"} color={"dark"} leftIcon={<IconPhone />}>
         (123) 456-7890
       </Button>
       <Button variant={"outline"} color="blue" leftIcon={<IconBrandFacebook />}>
         link
       </Button>{" "}
-      <Button variant={"outline"} color="blue" leftIcon={<IconWorld />}>
+      <Button variant={"outline"} color={"lime"} leftIcon={<IconWorld />}>
         website
       </Button>
     </Flex>
@@ -94,16 +105,43 @@ const ContactSmallScreen: React.FC = () => {
 
 const ContactLargeScreen: React.FC = () => {
   return (
-    <Grid
-      sx={(theme) => ({ [theme.fn.smallerThan("sm")]: { display: "none" } })}
-      gutter={"xs"}
-    >
-      <Grid.Col sm={6}>
-        <Button variant={"outline"} leftIcon={<IconPhone />}>
+    <>
+      <Grid
+        sx={(theme) => ({
+          [theme.fn.smallerThan("sm")]: { display: "none" },
+          [theme.fn.largerThan("md")]: { display: "none" },
+        })}
+        pb="xs"
+        gutter={"xs"}
+      >
+        <Grid.Col sm={6}>
+          <Button color={"dark"} variant={"outline"} leftIcon={<IconPhone />}>
+            (123) 456-7890
+          </Button>
+        </Grid.Col>
+        <Grid.Col sm={1}>
+          <Button
+            variant={"outline"}
+            color="blue"
+            leftIcon={<IconBrandFacebook />}
+          >
+            link
+          </Button>
+        </Grid.Col>
+        <Grid.Col sm={6}>
+          <Button color={"lime"} variant={"outline"} leftIcon={<IconWorld />}>
+            website
+          </Button>
+        </Grid.Col>
+      </Grid>
+      <Group
+        sx={(theme) => ({ [theme.fn.smallerThan("md")]: { display: "none" } })}
+        position="apart"
+        pb="xs"
+      >
+        <Button color={"dark"} variant={"outline"} leftIcon={<IconPhone />}>
           (123) 456-7890
         </Button>
-      </Grid.Col>
-      <Grid.Col sm={1}>
         <Button
           variant={"outline"}
           color="blue"
@@ -111,13 +149,29 @@ const ContactLargeScreen: React.FC = () => {
         >
           link
         </Button>
-      </Grid.Col>
-      <Grid.Col sm={6}>
-        {" "}
-        <Button variant={"outline"} color="blue" leftIcon={<IconWorld />}>
+        <Button color={"lime"} variant={"outline"} leftIcon={<IconWorld />}>
           website
         </Button>
-      </Grid.Col>
-    </Grid>
+      </Group>
+    </>
+  );
+};
+
+const Delivery: React.FC = () => {
+  return (
+    <SimpleGrid
+      breakpoints={[
+        { maxWidth: "md", cols: 1, spacing: "sm" },
+        { minWidth: "48rem", cols: 2, spacing: "xl" },
+      ]}
+    >
+      <Button variant={"outline"} color="teal" leftIcon={<IconBrandUber />}>
+        Uber Eats
+      </Button>
+
+      <Button variant={"outline"} color="red" leftIcon={<IconCircleLetterD />}>
+        DoorDash
+      </Button>
+    </SimpleGrid>
   );
 };
