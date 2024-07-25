@@ -9,19 +9,11 @@ import {
   MediaQuery,
   Title,
   Group,
-  Tooltip,
-  UnstyledButton,
   Pagination,
 } from "@mantine/core";
 import { ErrorCard } from "@/components";
 import { ListCities, ListCitiesError } from "@/utils/types";
-import {
-  IconChevronLeft,
-  IconChevronsLeft,
-  IconChevronRight,
-  IconChevronsRight,
-  IconSortAscendingLetters,
-} from "@tabler/icons-react";
+import { IconSortAscendingLetters } from "@tabler/icons-react";
 import { listCities } from "@/utils/crud-functions";
 
 const ListCity: React.FC = () => {
@@ -76,13 +68,7 @@ const ListCity: React.FC = () => {
     });
   }
   const maxPageNum = Math.ceil(cityData.totalCount / parseInt(limitNum));
-  const paginationButtonProps = {
-    cityData,
-    pageNum,
-    stateId,
-    countryName,
-    limitNum,
-  };
+
   return (
     <>
       <MediaQuery smallerThan={"md"} styles={{ display: "none" }}>
@@ -90,7 +76,6 @@ const ListCity: React.FC = () => {
           <Title size={"h2"} order={1}>
             {`Cities in ${stateName}`}
           </Title>
-
           <IconSortAscendingLetters color="gray" />
         </Group>
       </MediaQuery>
@@ -146,14 +131,6 @@ const ListCity: React.FC = () => {
       />
     </>
   );
-};
-
-type PaginationButtons = {
-  pageNum: number;
-  cityData: ListCities;
-  countryName: string;
-  stateId: string;
-  limitNum: string;
 };
 
 export default ListCity;

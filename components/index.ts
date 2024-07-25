@@ -6,8 +6,8 @@ import { SearchInput } from "./searchInput";
 import { AboveTheFold } from "./homePage/AboveTheFold";
 import { TopRated } from "./homePage/TopRated";
 import { RestaurantSuggestion } from "./homePage/RestaurantSuggestionForm";
-import { MapContainer } from "./mapSearchPage/MapContainer";
-import { SearchResultList } from "./mapSearchPage/SearchResultList";
+import { MapContainer } from "./mapSearchPage/Map/MapContainer";
+import { SearchResultList } from "./mapSearchPage/List/SearchResultList";
 import { MapAndList } from "./mapSearchPage/MapAndList";
 import { CustomImageButton } from "./admin/createRestaurant/ImageButton";
 import { FoodTags } from "./admin/createRestaurant/FoodTags";
@@ -15,7 +15,6 @@ import { AddFoodTag } from "./admin/createRestaurant/AddFoodTag";
 import { SearchZipcode } from "./admin/createRestaurant/SearchZipcode";
 import { ImageUpload } from "./admin/createRestaurant/ImageUpload";
 import { AllImages } from "./restaurantProductPage/Image";
-import { SearchResultCarousol } from "./mapSearchPage/SearchResultCarousol";
 import { RestaurantDetails } from "./restaurantProductPage/RestaurantDetails";
 import { RestaurantProductCard } from "./homePage/RestaurantProductCard";
 import { getUserLocation } from "./homePage/getUserLocation";
@@ -38,7 +37,6 @@ export {
   SearchZipcode,
   ImageUpload,
   AllImages,
-  SearchResultCarousol,
   RestaurantDetails,
   RestaurantProductCard,
   getUserLocation,

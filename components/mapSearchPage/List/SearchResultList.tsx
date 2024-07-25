@@ -1,8 +1,8 @@
 import { Card, Flex, Title, Text, Badge, Image } from "@mantine/core";
 import { useMap } from "react-map-gl";
 import { GeoJsonPropertiesRestaurant } from "@/utils/types";
-import { ErrorCard, RestaurantProductCard } from "..";
-import { MapContainerProps, PopupDataProps } from "./MapContainer";
+import { ErrorCard, RestaurantProductCard } from "../..";
+import { MapContainerProps, PopupDataProps } from "../Map/MapContainer";
 import Link from "next/link";
 import { map_source_data_id_client } from "@/utils/constants";
 

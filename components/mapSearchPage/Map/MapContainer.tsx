@@ -4,13 +4,24 @@ import { useRouter } from "next/router";
 import "mapbox-gl/dist/mapbox-gl.css";
 import mapboxgl, { MapLayerMouseEvent } from "mapbox-gl";
 import Map, { Source, Layer, Popup } from "react-map-gl";
-import { Card, Title, Text, Image, Button, MediaQuery } from "@mantine/core";
+import {
+  Card,
+  Title,
+  Text,
+  Image,
+  Button,
+  MediaQuery,
+  Box,
+} from "@mantine/core";
 // local imports
+import { ErrorCard } from "@/components";
+import { SmallScreenPopupCard } from "./SmallScreenPopup";
+import { LargeScreenPopup } from "./LargeScreenPopup";
 import {
   calcBoundsFromCoordinates,
   distanceBwTwoCordinatesInMiles,
 } from "@/utils";
-import { ErrorCard, SearchResultCarousol } from "@/components";
+
 import { GeoJsonPropertiesRestaurant } from "@/utils/types";
 import {
   enable_search_button_inMiles_client,
@@ -61,10 +72,13 @@ export const MapContainer: React.FC<MapContainerProps> = ({
   const router = useRouter();
   const { latitude, longitude } = router.query;
   const mapRef = React.useRef<any>();
+
+  const [showSmallScreenPopup, setShowSmallScreenPopup] = React.useState(false);
   const [cameraViewState, setCameraViewState] =
     React.useState<CameraViewState>();
   const [isEnabledSearchButton, setIsEnabledSearchcButton] =
     React.useState(true);
+
   const onViewStateChange = (data: CameraViewState) => {
     setCameraViewState((previousState) => {
       return { ...previousState, ...data };
@@ -110,6 +124,7 @@ export const MapContainer: React.FC<MapContainerProps> = ({
     }
   };
   const onMouseEnter = (e: MapLayerMouseEvent) => {
+    console.log(" I enterd, !!!!!");
     if (hoverId) {
       mapRef.current.setFeatureState(
         { source: map_source_data_id_client, id: hoverId },
@@ -129,14 +144,8 @@ export const MapContainer: React.FC<MapContainerProps> = ({
       const country = e.features[0].properties?.country;
       const address = `${street}, ${city}, ${state}, ${zip}, ${country}`;
       const coverImageUrl = e.features[0].properties?.coverImageUrl;
-
       const id = e.features[0].id;
 
-      setHoverId(id);
-      mapRef.current.setFeatureState(
-        { source: map_source_data_id_client, id: id },
-        { hover: true }
-      );
       setPopupData({
         restaurantId,
         restaurantName,
@@ -146,10 +155,20 @@ export const MapContainer: React.FC<MapContainerProps> = ({
         longitude: coordinates[0],
         coverImageUrl: coverImageUrl,
       });
-      setShowPopup(true);
+      // if screenwidth is smaller than md dont show popup
+      if (window.innerWidth >= 1024) {
+        setShowPopup(true);
+        setHoverId(id);
+        mapRef.current.setFeatureState(
+          { source: map_source_data_id_client, id: id },
+          { hover: true }
+        );
+      } else {
+        setShowSmallScreenPopup(true);
+      }
     }
   };
-
+  // TODO: fix this to search in visible area
   const onExpandSearchRadius = () => {
     const centreCooridnates = mapRef.current.getCenter() as {
       lat: number;
@@ -164,7 +183,18 @@ export const MapContainer: React.FC<MapContainerProps> = ({
       },
     });
   };
-
+  const smallScreenPopupProps = {
+    popupData,
+    setPopupData,
+    setShowSmallScreenPopup,
+  };
+  const largeScreenPopupProps = {
+    popupData,
+    setPopupData,
+    setShowPopup,
+    hoverId,
+    setHoverId,
+  };
   return (
     <div style={{ position: "relative", width: "100%", marginTop: "0.4em" }}>
       <MediaQuery largerThan={"sm"} styles={{ display: "none" }}>
@@ -223,24 +253,23 @@ export const MapContainer: React.FC<MapContainerProps> = ({
           Search this area
         </Button>
       </MediaQuery>
-      {/* <Box
-        sx={(theme) => ({
-          position: "absolute",
-          zIndex: 1,
-          bottom: "0.5em",
-          left: "50%",
-          transform: "translate(-50%, 0)",
-          [theme.fn.largerThan("sm")]: {
-            display: "none",
-          },
-        })}
-      >
-        <SearchResultCarousol
-          geolocations={geolocations}
-          hoverId={hoverId}
-          setHoverId={setHoverId}
-        />
-      </Box> */}
+      {showSmallScreenPopup && (
+        <Box
+          sx={(theme) => ({
+            position: "absolute",
+            zIndex: 1,
+            bottom: "0.5em",
+            left: "50%",
+            transform: "translate(-50%, 0)",
+            [theme.fn.largerThan("sm")]: {
+              display: "none",
+            },
+          })}
+        >
+          {" "}
+          <SmallScreenPopupCard {...smallScreenPopupProps} />{" "}
+        </Box>
+      )}
       <Map
         id={map_id_client}
         reuseMaps={true}
@@ -249,7 +278,7 @@ export const MapContainer: React.FC<MapContainerProps> = ({
         onMove={(evt) => onViewStateChange(evt.viewState)}
         style={{
           width: "100%",
-          minHeight: 650,
+          minHeight: 500,
         }}
         mapStyle="mapbox://styles/mapbox/streets-v9"
         mapboxAccessToken={process.env.NEXT_PUBLIC_MAPBOX_ACCESS}
@@ -286,7 +315,7 @@ export const MapContainer: React.FC<MapContainerProps> = ({
         {/* TODO: do styling */}
         {showPopup && (
           <Popup
-            //closeButton={false}
+            closeButton={false}
             longitude={popupData.longitude}
             latitude={popupData.latitude}
             //anchor="top"
@@ -308,34 +337,7 @@ export const MapContainer: React.FC<MapContainerProps> = ({
               setShowPopup(false);
             }}
           >
-            <Card
-              component={Link}
-              href={`/restaurants/${popupData.restaurantId}`}
-              target="_blank"
-              style={{
-                marginTop: "-10px",
-                marginLeft: "-10px",
-                marginRight: "-10px",
-                marginBottom: "-15px",
-              }}
-              shadow="sm"
-              radius="0"
-              withBorder
-            >
-              <Card.Section style={{ maxHeight: 120, overflow: "hidden" }}>
-                <Image
-                  src={`${process.env.NEXT_PUBLIC_BASE_IMAGE_URL}/${popupData.coverImageUrl}`}
-                  alt="picture of a dish in restaurant"
-                />
-              </Card.Section>
-
-              <Title pt="xs" order={1} size={"h5"}>
-                {popupData.restaurantName}
-              </Title>
-              <Text size="xs" mb="xs" color="dimmed">
-                {`${popupData.address}`}
-              </Text>
-            </Card>
+            <LargeScreenPopup {...largeScreenPopupProps} />
           </Popup>
         )}
       </Map>
