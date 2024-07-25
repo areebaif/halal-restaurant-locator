@@ -11,6 +11,7 @@ import {
   Group,
   Tooltip,
   UnstyledButton,
+  Pagination,
 } from "@mantine/core";
 import { ErrorCard } from "@/components";
 import { ListCities, ListCitiesError } from "@/utils/types";
@@ -65,7 +66,7 @@ const ListCity: React.FC = () => {
   }
   // it is safe to assume we have the states
   const cityData = data as ListCities;
-  console.log(cityData);
+
   const cities: { cityId: string; cityName: string }[] = [];
   let stateName = "";
   for (const [property, value] of Object.entries(cityData.stateName)) {
@@ -74,6 +75,7 @@ const ListCity: React.FC = () => {
       cities.push(element);
     });
   }
+  const maxPageNum = Math.ceil(cityData.totalCount / parseInt(limitNum));
   const paginationButtonProps = {
     cityData,
     pageNum,
@@ -127,9 +129,21 @@ const ListCity: React.FC = () => {
           </Button>
         ))}
       </SimpleGrid>
-      <Group position="center" mt="sm">
-        <PaginationButtons {...paginationButtonProps} />
-      </Group>
+      <Pagination
+        withEdges
+        radius="xs"
+        color="gray"
+        position="center"
+        value={pageNum}
+        onChange={(val) => {
+          console.log(val, "sksksk, onchange");
+          setPageNum(val);
+          router.push(
+            `/country/${countryName}/state/${stateId}?_limit=${limitNum}&_page=${val}`
+          );
+        }}
+        total={maxPageNum}
+      />
     </>
   );
 };
@@ -140,114 +154,6 @@ type PaginationButtons = {
   countryName: string;
   stateId: string;
   limitNum: string;
-};
-
-// TODO: I have to disable buttons for first and last
-// We will switch color of icon to gray and remove onclick listener woth if condition ok
-export const PaginationButtons: React.FC<PaginationButtons> = ({
-  pageNum,
-  cityData,
-  countryName,
-  stateId,
-  limitNum,
-}) => {
-  const maxPageNum = Math.ceil(cityData.totalCount / parseInt(limitNum));
-  const router = useRouter();
-
-  return (
-    <>
-      <Tooltip label="First Page" color="gray" withArrow withinPortal>
-        <UnstyledButton
-          styles={(theme) => ({
-            inner: {
-              "&:hover": {
-                backgroundColor: `${pageNum !== 1 ? theme.colors.gray[4] : ""}`,
-              },
-            },
-          })}
-          onClick={() => {
-            if (pageNum !== 1) {
-              router.push(
-                `/country/${countryName}/state/${stateId}?_limit=${limitNum}&_page=${1}`
-              );
-            }
-          }}
-        >
-          <IconChevronsLeft color={`${pageNum === 1 ? "gray" : "black"}`} />
-        </UnstyledButton>
-      </Tooltip>
-      <Tooltip label="Previous Page" color="gray" withArrow withinPortal>
-        <UnstyledButton
-          styles={(theme) => ({
-            inner: {
-              "&:hover": {
-                backgroundColor: `${pageNum !== 1 ? theme.colors.gray[4] : ""}`,
-              },
-            },
-          })}
-          onClick={() => {
-            if (pageNum !== 1) {
-              router.push(
-                `/country/${countryName}/state/${stateId}?_limit=${limitNum}&_page=${
-                  pageNum - 1
-                }`
-              );
-            }
-          }}
-        >
-          <IconChevronLeft color={`${pageNum === 1 ? "gray" : "black"}`} />
-        </UnstyledButton>
-      </Tooltip>
-      <Tooltip label="Next Page" color="gray" withArrow withinPortal>
-        <UnstyledButton
-          styles={(theme) => ({
-            inner: {
-              "&:hover": {
-                backgroundColor: `${
-                  pageNum !== maxPageNum ? theme.colors.gray[4] : ""
-                }`,
-              },
-            },
-          })}
-          onClick={() => {
-            if (pageNum !== maxPageNum)
-              router.push(
-                `/country/${countryName}/state/${stateId}?_limit=${limitNum}&_page=${
-                  pageNum + 1
-                }`
-              );
-          }}
-        >
-          <IconChevronRight
-            color={`${pageNum === maxPageNum ? "gray" : "black"}`}
-          />
-        </UnstyledButton>
-      </Tooltip>
-
-      <Tooltip label="Last Page" color="gray" withArrow>
-        <UnstyledButton
-          styles={(theme) => ({
-            inner: {
-              "&:hover": {
-                backgroundColor: `${
-                  pageNum !== maxPageNum ? theme.colors.gray[4] : ""
-                }`,
-              },
-            },
-          })}
-          onClick={() =>
-            router.push(
-              `/country/${countryName}/state/${stateId}?_limit=${limitNum}&_page=${maxPageNum}`
-            )
-          }
-        >
-          <IconChevronsRight
-            color={`${pageNum === maxPageNum ? "gray" : "black"}`}
-          />
-        </UnstyledButton>
-      </Tooltip>
-    </>
-  );
 };
 
 export default ListCity;
