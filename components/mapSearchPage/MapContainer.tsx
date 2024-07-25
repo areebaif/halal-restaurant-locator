@@ -4,7 +4,7 @@ import { useRouter } from "next/router";
 import "mapbox-gl/dist/mapbox-gl.css";
 import mapboxgl, { MapLayerMouseEvent } from "mapbox-gl";
 import Map, { Source, Layer, Popup } from "react-map-gl";
-import { Card, Title, Text, Image, Button, Box } from "@mantine/core";
+import { Card, Title, Text, Image, Button, MediaQuery } from "@mantine/core";
 // local imports
 import {
   calcBoundsFromCoordinates,
@@ -167,32 +167,63 @@ export const MapContainer: React.FC<MapContainerProps> = ({
 
   return (
     <div style={{ position: "relative", width: "100%", marginTop: "0.4em" }}>
-      <Button
-        // on xs small devices centre the button
-        onClick={onExpandSearchRadius}
-        disabled={!isEnabledSearchButton}
-        size="sm"
-        variant="outline"
-        color="dark"
-        styles={(theme) => ({
-          label: { whiteSpace: "break-spaces", textAlign: "center" },
-        })}
-        sx={(theme) => ({
-          backgroundColor: theme.colors.gray[0],
-          position: "absolute",
-          zIndex: 1,
-          top: "1em",
-          right: "1em",
-          [theme.fn.smallerThan("sm")]: {
+      <MediaQuery largerThan={"sm"} styles={{ display: "none" }}>
+        <Button
+          // on xs small devices centre the button
+          onClick={onExpandSearchRadius}
+          disabled={!isEnabledSearchButton}
+          size="xs"
+          variant="outline"
+          color="dark"
+          styles={(theme) => ({
+            label: { whiteSpace: "break-spaces", textAlign: "center" },
+          })}
+          sx={(theme) => ({
+            backgroundColor: theme.colors.gray[0],
+            position: "absolute",
+            zIndex: 1,
             top: "1em",
-            left: "50%",
-            transform: "translate(-50%, 0)",
-          },
-        })}
-      >
-        Expand search or search area
-      </Button>
-      <Box
+            right: "1em",
+            [theme.fn.smallerThan("sm")]: {
+              top: "1em",
+              left: "50%",
+
+              transform: "translate(-50%, 0)",
+            },
+          })}
+        >
+          Search this area
+        </Button>
+      </MediaQuery>
+      <MediaQuery smallerThan={"sm"} styles={{ display: "none" }}>
+        <Button
+          // on xs small devices centre the button
+          onClick={onExpandSearchRadius}
+          disabled={!isEnabledSearchButton}
+          size="sm"
+          variant="outline"
+          color="dark"
+          styles={(theme) => ({
+            label: { whiteSpace: "break-spaces", textAlign: "center" },
+          })}
+          sx={(theme) => ({
+            backgroundColor: theme.colors.gray[0],
+            position: "absolute",
+            zIndex: 1,
+            top: "1em",
+            right: "1em",
+            [theme.fn.smallerThan("sm")]: {
+              top: "1em",
+              left: "50%",
+
+              transform: "translate(-50%, 0)",
+            },
+          })}
+        >
+          Search this area
+        </Button>
+      </MediaQuery>
+      {/* <Box
         sx={(theme) => ({
           position: "absolute",
           zIndex: 1,
@@ -209,7 +240,7 @@ export const MapContainer: React.FC<MapContainerProps> = ({
           hoverId={hoverId}
           setHoverId={setHoverId}
         />
-      </Box>
+      </Box> */}
       <Map
         id={map_id_client}
         reuseMaps={true}
@@ -218,10 +249,7 @@ export const MapContainer: React.FC<MapContainerProps> = ({
         onMove={(evt) => onViewStateChange(evt.viewState)}
         style={{
           width: "100%",
-          minWidth: 300,
-          maxHeight: 600,
-          minHeight: 600,
-          height: 600,
+          minHeight: 650,
         }}
         mapStyle="mapbox://styles/mapbox/streets-v9"
         mapboxAccessToken={process.env.NEXT_PUBLIC_MAPBOX_ACCESS}
@@ -288,20 +316,23 @@ export const MapContainer: React.FC<MapContainerProps> = ({
                 marginTop: "-10px",
                 marginLeft: "-10px",
                 marginRight: "-10px",
-                marginBottom: "-10px",
+                marginBottom: "-15px",
               }}
+              shadow="sm"
+              radius="0"
+              withBorder
             >
-              <Card.Section>
+              <Card.Section style={{ maxHeight: 120, overflow: "hidden" }}>
                 <Image
                   src={`${process.env.NEXT_PUBLIC_BASE_IMAGE_URL}/${popupData.coverImageUrl}`}
-                  height={120}
-                  alt="cover image for restaurant"
+                  alt="picture of a dish in restaurant"
                 />
               </Card.Section>
-              <Title mt="xs" order={5}>
+
+              <Title pt="xs" order={1} size={"h5"}>
                 {popupData.restaurantName}
               </Title>
-              <Text size="xs" color="dimmed">
+              <Text size="xs" mb="xs" color="dimmed">
                 {`${popupData.address}`}
               </Text>
             </Card>

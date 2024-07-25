@@ -122,36 +122,40 @@ export const MapAndList: React.FC = () => {
     popupData,
     setPopupData,
   };
-  return (
-    <Flex gap="md">
-      <Box
-        sx={(theme) => ({
-          [theme.fn.smallerThan("sm")]: {
-            display: "none",
-          },
-
-          [theme.fn.largerThan("lg")]: {
-            width: "20%",
-          },
-          width: "30%",
-        })}
-      >
-        <SearchResultList {...mapConatinerInputs} />
-      </Box>
-      <Box
-        sx={(theme) => ({
-          [theme.fn.smallerThan("sm")]: {
-            width: "100%",
-          },
-
-          [theme.fn.largerThan("lg")]: {
-            width: "80%",
-          },
-          width: "70%",
-        })}
-      >
-        <MapContainer {...mapConatinerInputs} />
-      </Box>
-    </Flex>
-  );
+  return <MapContainer {...mapConatinerInputs} />;
 };
+
+// const oldThing = () => {
+//   return (
+//     <Flex gap="md">
+//       <Box
+//         sx={(theme) => ({
+//           [theme.fn.smallerThan("sm")]: {
+//             display: "none",
+//           },
+
+//           [theme.fn.largerThan("lg")]: {
+//             width: "20%",
+//           },
+//           width: "30%",
+//         })}
+//       >
+//         <SearchResultList {...mapConatinerInputs} />
+//       </Box>
+//       <Box
+//         sx={(theme) => ({
+//           [theme.fn.smallerThan("sm")]: {
+//             width: "100%",
+//           },
+
+//           [theme.fn.largerThan("lg")]: {
+//             width: "80%",
+//           },
+//           width: "70%",
+//         })}
+//       >
+//         <MapContainer {...mapConatinerInputs} />
+//       </Box>
+//     </Flex>
+//   );
+// };

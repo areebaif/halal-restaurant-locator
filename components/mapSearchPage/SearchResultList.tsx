@@ -1,7 +1,7 @@
 import { Card, Flex, Title, Text, Badge, Image } from "@mantine/core";
 import { useMap } from "react-map-gl";
 import { GeoJsonPropertiesRestaurant } from "@/utils/types";
-import { ErrorCard } from "..";
+import { ErrorCard, RestaurantProductCard } from "..";
 import { MapContainerProps, PopupDataProps } from "./MapContainer";
 import Link from "next/link";
 import { map_source_data_id_client } from "@/utils/constants";
@@ -135,35 +135,72 @@ const GeoLocationCard: React.FC<GeoLocationCard> = ({
 
   return (
     <Card
-      shadow="sm"
-      radius="md"
       component={Link}
       href={`/restaurants/${restaurantId}`}
-      target="_blank"
+      style={{
+        minWidth: 280,
+        maxWidth: 400,
+        maxHeight: 300,
+        margin: "5px 0",
+      }}
+      shadow="sm"
+      radius="0"
       withBorder
+      target="_blank"
       onMouseEnter={onMouseEnter}
       onMouseLeave={onMouseLeave}
-      style={{
-        overflow: "inherit",
-        margin: "5px 0 0 0",
-      }}
     >
-      <Card.Section>
-        <Image src={image} height={160} alt="cover image for restaurant" />
+      <Card.Section style={{ maxHeight: 120, overflow: "hidden" }}>
+        <Image src={image} alt="picture of a dish in restaurant" />
       </Card.Section>
-      <Title mt="md" order={4}>
+      <Title pt="xs" order={1} size={"h5"}>
         {restaurantName}
       </Title>
-      <Text size="xs" color="dimmed">
+      <Text size="xs" mb="xs" mt="xs" color="dimmed">
         {`${street}, ${city}, ${state}, ${zipcode}, ${country}`}
       </Text>
-      {FoodTag.map((badge, index) => {
-        return (
-          <Badge key={index} mt="xs" size="xs">
-            {badge}
+      <Flex wrap="wrap" gap="xs" direction={"row"}>
+        {FoodTag.map((tag: any) => (
+          <Badge key={tag} color="red" size="md">
+            {tag}
           </Badge>
-        );
-      })}
+        ))}
+      </Flex>
     </Card>
   );
 };
+
+// const oldCard = () => {
+//   return (
+//     <Card
+//       shadow="sm"
+//       component={Link}
+//       href={`/restaurants/${restaurantId}`}
+//       target="_blank"
+//       withBorder
+//       onMouseEnter={onMouseEnter}
+//       onMouseLeave={onMouseLeave}
+//       style={{
+//         overflow: "inherit",
+//         margin: "5px 0 0 0",
+//       }}
+//     >
+//       <Card.Section>
+//         <Image src={image} height={160} alt="cover image for restaurant" />
+//       </Card.Section>
+//       <Title mt="md" order={4}>
+//         {restaurantName}
+//       </Title>
+//       <Text size="xs" color="dimmed">
+//         {`${street}, ${city}, ${state}, ${zipcode}, ${country}`}
+//       </Text>
+//       {FoodTag.map((badge, index) => {
+//         return (
+//           <Badge key={index} mt="xs" size="xs">
+//             {badge}
+//           </Badge>
+//         );
+//       })}
+//     </Card>
+//   );
+// };
