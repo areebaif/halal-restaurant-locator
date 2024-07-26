@@ -1,9 +1,18 @@
 import * as React from "react";
 import { useRouter } from "next/router";
 import { useMap } from "react-map-gl";
-import { Card, Image, Title, Text, CloseButton, Box } from "@mantine/core";
+import {
+  Card,
+  Image,
+  Title,
+  Text,
+  CloseButton,
+  Box,
+  Paper,
+} from "@mantine/core";
 import { PopupDataProps } from "./MapContainer";
 import { map_source_data_id_client } from "@/utils/constants";
+import Link from "next/link";
 
 export type LargeScreenPopupProps = {
   popupData: PopupDataProps;
@@ -63,28 +72,23 @@ export const LargeScreenPopup: React.FC<LargeScreenPopupProps> = ({
           }}
         />
         <Image
+          withPlaceholder
           src={`${process.env.NEXT_PUBLIC_BASE_IMAGE_URL}/${popupData.coverImageUrl}`}
           alt="picture of a dish in restaurant"
         />
       </Card.Section>
-      <Box
-        onClick={() => {
-          router.push(`/restaurants/${popupData.restaurantId}`);
-        }}
-        sx={(theme) => ({
-          "&:hover": {
-            cursor: "pointer",
-          },
-        })}
+      <Paper
+        component={Link}
+        href={`/restaurants/${popupData.restaurantId}`}
+        target="blank"
       >
-        {" "}
         <Title pt="xs" order={1} size={"h5"}>
           {popupData.restaurantName}
         </Title>
         <Text size="xs" mb="xs" color="dimmed">
           {`${popupData.address}`}
         </Text>
-      </Box>
+      </Paper>
     </Card>
   );
 };

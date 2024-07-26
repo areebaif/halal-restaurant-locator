@@ -25,6 +25,7 @@ export const AllImages: React.FC<AllImagesProps> = ({ listImageUrls }) => {
       >
         {listImageUrls.map((image) => (
           <Image
+            withPlaceholder
             onClick={() => setSelectedImageUrl(image)}
             src={`${process.env.NEXT_PUBLIC_BASE_IMAGE_URL}/${image}`}
             width={50}
@@ -64,6 +65,7 @@ export const AllImages: React.FC<AllImagesProps> = ({ listImageUrls }) => {
       >
         {listImageUrls.map((image) => (
           <Image
+            withPlaceholder
             onClick={() => setSelectedImageUrl(image)}
             src={`${process.env.NEXT_PUBLIC_BASE_IMAGE_URL}/${image}`}
             width={50}

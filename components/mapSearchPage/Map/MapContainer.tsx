@@ -2,7 +2,7 @@ import * as React from "react";
 import { useRouter } from "next/router";
 import mapboxgl, { MapLayerMouseEvent } from "mapbox-gl";
 import Map, { Source, Layer, Popup } from "react-map-gl";
-import { Button, MediaQuery, Box } from "@mantine/core";
+import { Box } from "@mantine/core";
 // local imports
 import { ErrorCard } from "@/components";
 import { SmallScreenPopupCard } from "./SmallScreenPopup";
@@ -141,6 +141,7 @@ export const MapContainer: React.FC<MapContainerProps> = ({
         longitude: coordinates[0],
         coverImageUrl: coverImageUrl,
       });
+      console.log(window, window.innerWidth, "s;lsls;ls;ls");
       // if screenwidth is smaller than md dont show popup
       if (window.innerWidth >= 1024) {
         setShowPopup(true);
@@ -193,7 +194,6 @@ export const MapContainer: React.FC<MapContainerProps> = ({
     <Box style={{ position: "relative", width: "100%", marginTop: "0.4em" }}>
       <ResponsiveSearchAreaButton {...ResponsiveSearchAReaButtonProps} />
       <SmallScreenToggleMapButton {...smallScreenToggleMapButton} />
-
       {showSmallScreenPopup && (
         <Box
           sx={(theme) => ({
@@ -201,8 +201,9 @@ export const MapContainer: React.FC<MapContainerProps> = ({
             zIndex: 1,
             bottom: "0.5em",
             left: "50%",
+            maxWidth: 350,
             transform: "translate(-50%, 0)",
-            [theme.fn.largerThan("sm")]: {
+            [theme.fn.largerThan("md")]: {
               display: "none",
             },
           })}
@@ -210,7 +211,6 @@ export const MapContainer: React.FC<MapContainerProps> = ({
           <SmallScreenPopupCard {...smallScreenPopupProps} />{" "}
         </Box>
       )}
-
       <Map
         id={map_id_client}
         reuseMaps={true}

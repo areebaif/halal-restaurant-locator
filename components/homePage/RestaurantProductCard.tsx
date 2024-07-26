@@ -26,6 +26,7 @@ export const RestaurantProductCard: React.FC<RestaurantProductCardProps> = ({
         >
           <Card.Section style={{ maxHeight: 120, overflow: "hidden" }}>
             <Image
+              withPlaceholder
               src="https://raw.githubusercontent.com/mantinedev/mantine/master/.demo/images/bg-5.png"
               alt="Avatar"
             />
