@@ -11,16 +11,12 @@ import {
   FilterRestaurantResponseSchema,
 } from "@/utils";
 
-import {
-  ErrorCard,
-  MapContainer,
-  SearchResultCarousol,
-  SearchResultList,
-} from "@/components";
+import { ErrorCard, MapContainer, SearchResultList } from "@/components";
 import {
   FilterRestaurantsErrors,
   RestaurantGeoJsonFeatureCollectionClient,
 } from "@/utils/types";
+import { SmallScreenToggleMapButton } from "./Map/SMallScreenToggleMapButton";
 
 export const MapAndList: React.FC = () => {
   const { MapA } = useMap();
@@ -43,6 +39,7 @@ export const MapAndList: React.FC = () => {
     coverImageUrl: "",
   });
   const [showPopup, setShowPopup] = React.useState<boolean>(false);
+  const [toggleSmallScreenMap, setToggleSmallScreenMap] = React.useState(true);
 
   const mapData = useQuery(
     ["getMapData", query],
@@ -121,8 +118,15 @@ export const MapAndList: React.FC = () => {
     setHoverId,
     popupData,
     setPopupData,
+    setToggleSmallScreenMap,
+    toggleSmallScreenMap,
   };
-  return <MapContainer {...mapConatinerInputs} />;
+  
+  return toggleSmallScreenMap ? (
+    <MapContainer {...mapConatinerInputs} />
+  ) : (
+    <SearchResultList {...mapConatinerInputs} />
+  );
 };
 
 // const oldThing = () => {

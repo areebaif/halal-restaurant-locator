@@ -1,18 +1,8 @@
 import * as React from "react";
-import Link from "next/link";
 import { useRouter } from "next/router";
-import "mapbox-gl/dist/mapbox-gl.css";
 import mapboxgl, { MapLayerMouseEvent } from "mapbox-gl";
 import Map, { Source, Layer, Popup } from "react-map-gl";
-import {
-  Card,
-  Title,
-  Text,
-  Image,
-  Button,
-  MediaQuery,
-  Box,
-} from "@mantine/core";
+import { Button, MediaQuery, Box } from "@mantine/core";
 // local imports
 import { ErrorCard } from "@/components";
 import { SmallScreenPopupCard } from "./SmallScreenPopup";
@@ -21,7 +11,6 @@ import {
   calcBoundsFromCoordinates,
   distanceBwTwoCordinatesInMiles,
 } from "@/utils";
-
 import { GeoJsonPropertiesRestaurant } from "@/utils/types";
 import {
   enable_search_button_inMiles_client,
@@ -30,6 +19,8 @@ import {
   map_layerId_client,
   map_source_data_id_client,
 } from "@/utils/constants";
+import { ResponsiveSearchAreaButton } from "./SearchMapAreaResponsiveButton";
+import { SmallScreenToggleMapButton } from "./SmallScreenToggleMapButton";
 
 export type PopupDataProps = {
   restaurantId: string;
@@ -52,6 +43,8 @@ export type MapContainerProps = {
   setShowPopup: (val: boolean) => void;
   popupData: PopupDataProps;
   setPopupData: (data: PopupDataProps) => void;
+  setToggleSmallScreenMap: (val: boolean) => void;
+  toggleSmallScreenMap: boolean;
 };
 
 type CameraViewState = {
@@ -68,6 +61,8 @@ export const MapContainer: React.FC<MapContainerProps> = ({
   popupData,
   showPopup,
   setShowPopup,
+  setToggleSmallScreenMap,
+  toggleSmallScreenMap,
 }) => {
   const router = useRouter();
   const { latitude, longitude } = router.query;
@@ -76,8 +71,6 @@ export const MapContainer: React.FC<MapContainerProps> = ({
   const [showSmallScreenPopup, setShowSmallScreenPopup] = React.useState(false);
   const [cameraViewState, setCameraViewState] =
     React.useState<CameraViewState>();
-  const [isEnabledSearchButton, setIsEnabledSearchcButton] =
-    React.useState(true);
 
   const onViewStateChange = (data: CameraViewState) => {
     setCameraViewState((previousState) => {
@@ -93,12 +86,6 @@ export const MapContainer: React.FC<MapContainerProps> = ({
         parseFloat(latString),
         parseFloat(lngString)
       );
-
-      if (distance > 40) {
-        setIsEnabledSearchcButton(true);
-      } else {
-        setIsEnabledSearchcButton(false);
-      }
     }
   };
 
@@ -124,7 +111,6 @@ export const MapContainer: React.FC<MapContainerProps> = ({
     }
   };
   const onMouseEnter = (e: MapLayerMouseEvent) => {
-    console.log(" I enterd, !!!!!");
     if (hoverId) {
       mapRef.current.setFeatureState(
         { source: map_source_data_id_client, id: hoverId },
@@ -183,6 +169,7 @@ export const MapContainer: React.FC<MapContainerProps> = ({
       },
     });
   };
+
   const smallScreenPopupProps = {
     popupData,
     setPopupData,
@@ -195,64 +182,18 @@ export const MapContainer: React.FC<MapContainerProps> = ({
     hoverId,
     setHoverId,
   };
+  const ResponsiveSearchAReaButtonProps = {
+    onExpandSearchRadius,
+  };
+  const smallScreenToggleMapButton = {
+    setToggleSmallScreenMap,
+    toggleSmallScreenMap,
+  };
   return (
-    <div style={{ position: "relative", width: "100%", marginTop: "0.4em" }}>
-      <MediaQuery largerThan={"sm"} styles={{ display: "none" }}>
-        <Button
-          // on xs small devices centre the button
-          onClick={onExpandSearchRadius}
-          disabled={!isEnabledSearchButton}
-          size="xs"
-          variant="outline"
-          color="dark"
-          styles={(theme) => ({
-            label: { whiteSpace: "break-spaces", textAlign: "center" },
-          })}
-          sx={(theme) => ({
-            backgroundColor: theme.colors.gray[0],
-            position: "absolute",
-            zIndex: 1,
-            top: "1em",
-            right: "1em",
-            [theme.fn.smallerThan("sm")]: {
-              top: "1em",
-              left: "50%",
+    <Box style={{ position: "relative", width: "100%", marginTop: "0.4em" }}>
+      <ResponsiveSearchAreaButton {...ResponsiveSearchAReaButtonProps} />
+      <SmallScreenToggleMapButton {...smallScreenToggleMapButton} />
 
-              transform: "translate(-50%, 0)",
-            },
-          })}
-        >
-          Search this area
-        </Button>
-      </MediaQuery>
-      <MediaQuery smallerThan={"sm"} styles={{ display: "none" }}>
-        <Button
-          // on xs small devices centre the button
-          onClick={onExpandSearchRadius}
-          disabled={!isEnabledSearchButton}
-          size="sm"
-          variant="outline"
-          color="dark"
-          styles={(theme) => ({
-            label: { whiteSpace: "break-spaces", textAlign: "center" },
-          })}
-          sx={(theme) => ({
-            backgroundColor: theme.colors.gray[0],
-            position: "absolute",
-            zIndex: 1,
-            top: "1em",
-            right: "1em",
-            [theme.fn.smallerThan("sm")]: {
-              top: "1em",
-              left: "50%",
-
-              transform: "translate(-50%, 0)",
-            },
-          })}
-        >
-          Search this area
-        </Button>
-      </MediaQuery>
       {showSmallScreenPopup && (
         <Box
           sx={(theme) => ({
@@ -266,10 +207,10 @@ export const MapContainer: React.FC<MapContainerProps> = ({
             },
           })}
         >
-          {" "}
           <SmallScreenPopupCard {...smallScreenPopupProps} />{" "}
         </Box>
       )}
+
       <Map
         id={map_id_client}
         reuseMaps={true}
@@ -341,6 +282,6 @@ export const MapContainer: React.FC<MapContainerProps> = ({
           </Popup>
         )}
       </Map>
-    </div>
+    </Box>
   );
 };
