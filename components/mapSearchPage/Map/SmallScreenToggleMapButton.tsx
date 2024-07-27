@@ -1,5 +1,6 @@
 import * as React from "react";
 import { Button, Box } from "@mantine/core";
+import { responsive_map_resize_value_pixels } from "@/utils/constants";
 
 type SmallScreenToggleMapButtonProps = {
   setToggleSmallScreenMap: (val: boolean) => void;
@@ -12,12 +13,7 @@ export const SmallScreenToggleMapButton: React.FC<
   return (
     <Box
       sx={(theme) => ({
-        position: "absolute",
-        zIndex: 1,
-        bottom: "0.5em",
-        left: "50%",
-        transform: "translate(-50%, 0)",
-        [theme.fn.largerThan("md")]: {
+        [theme.fn.largerThan(`${responsive_map_resize_value_pixels}`)]: {
           display: "none",
         },
       })}

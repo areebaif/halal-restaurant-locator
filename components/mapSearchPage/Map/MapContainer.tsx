@@ -193,7 +193,18 @@ export const MapContainer: React.FC<MapContainerProps> = ({
   return (
     <Box style={{ position: "relative", width: "100%", marginTop: "0.4em" }}>
       <ResponsiveSearchAreaButton {...ResponsiveSearchAReaButtonProps} />
-      <SmallScreenToggleMapButton {...smallScreenToggleMapButton} />
+      <Box
+        sx={(theme) => ({
+          position: "absolute",
+          zIndex: 1,
+          bottom: "0.5em",
+          left: "50%",
+          transform: "translate(-50%, 0)",
+        })}
+      >
+        <SmallScreenToggleMapButton {...smallScreenToggleMapButton} />
+      </Box>
+
       {showSmallScreenPopup && (
         <Box
           sx={(theme) => ({

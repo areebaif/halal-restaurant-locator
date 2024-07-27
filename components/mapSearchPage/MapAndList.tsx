@@ -3,24 +3,36 @@ import { useRouter } from "next/router";
 import { useQuery } from "@tanstack/react-query";
 import "mapbox-gl/dist/mapbox-gl.css";
 import mapboxgl from "mapbox-gl";
-import Map, { useMap } from "react-map-gl";
-import { Loader, Grid, MediaQuery, Flex, Box } from "@mantine/core";
+import { useMap } from "react-map-gl";
+import { Loader, Flex, em, getBreakpointValue } from "@mantine/core";
+import {
+  ErrorCard,
+  MapContainer,
+  LargeVPSearchResultList,
+  useViewport,
+  SmallScreenSearchResultList,
+} from "@/components";
 import {
   calcBoundsFromCoordinates,
   listRestaurantBySearchCriteria,
   FilterRestaurantResponseSchema,
 } from "@/utils";
-
-import { ErrorCard, MapContainer, SearchResultList } from "@/components";
 import {
   FilterRestaurantsErrors,
   RestaurantGeoJsonFeatureCollectionClient,
 } from "@/utils/types";
-import { SmallScreenToggleMapButton } from "./Map/SMallScreenToggleMapButton";
+import { responsive_map_resize_value_pixels } from "@/utils/constants";
+import { useTheme } from "@emotion/react";
+
+// FAQ:
+// Why do we have two separate list, one for small screen and one for large screen?
+// On Small Screen either the map or the list, conditionally renders, hence there is no interaction between the map and the list.
+// Thus, onHover functionality on individual restaurant card produces an error as map doesnt exist to center the map on that restaurant.
 
 export const MapAndList: React.FC = () => {
   const { MapA } = useMap();
   const router = useRouter();
+  const { width } = useViewport();
   const urlParams = router.query;
   const { country, zipcode, city, state, latitude, longitude } = urlParams;
 
@@ -39,8 +51,11 @@ export const MapAndList: React.FC = () => {
     coverImageUrl: "",
   });
   const [showPopup, setShowPopup] = React.useState<boolean>(false);
-  const [toggleSmallScreenMap, setToggleSmallScreenMap] = React.useState(true);
 
+  const [toggleSmallScreenMap, setToggleSmallScreenMap] = React.useState(
+    width < responsive_map_resize_value_pixels ? true : false
+  );
+  console.log(width, toggleSmallScreenMap);
   const mapData = useQuery(
     ["getMapData", query],
     () => listRestaurantBySearchCriteria(query),
@@ -121,45 +136,26 @@ export const MapAndList: React.FC = () => {
     setToggleSmallScreenMap,
     toggleSmallScreenMap,
   };
-  
-  return toggleSmallScreenMap ? (
-    <MapContainer {...mapConatinerInputs} />
-  ) : (
-    <SearchResultList {...mapConatinerInputs} />
+  const smallScreenSearchResultProps = {
+    geolocations,
+    setToggleSmallScreenMap,
+    toggleSmallScreenMap,
+  };
+
+  return (
+    <>
+      {width >= responsive_map_resize_value_pixels ? (
+        <LargeVPSearchResultList {...mapConatinerInputs} />
+      ) : (
+        !toggleSmallScreenMap && (
+          <SmallScreenSearchResultList {...smallScreenSearchResultProps} />
+        )
+      )}
+
+      {(toggleSmallScreenMap ||
+        width >= responsive_map_resize_value_pixels) && (
+        <MapContainer {...mapConatinerInputs} />
+      )}
+    </>
   );
 };
-
-// const oldThing = () => {
-//   return (
-//     <Flex gap="md">
-//       <Box
-//         sx={(theme) => ({
-//           [theme.fn.smallerThan("sm")]: {
-//             display: "none",
-//           },
-
-//           [theme.fn.largerThan("lg")]: {
-//             width: "20%",
-//           },
-//           width: "30%",
-//         })}
-//       >
-//         <SearchResultList {...mapConatinerInputs} />
-//       </Box>
-//       <Box
-//         sx={(theme) => ({
-//           [theme.fn.smallerThan("sm")]: {
-//             width: "100%",
-//           },
-
-//           [theme.fn.largerThan("lg")]: {
-//             width: "80%",
-//           },
-//           width: "70%",
-//         })}
-//       >
-//         <MapContainer {...mapConatinerInputs} />
-//       </Box>
-//     </Flex>
-//   );
-// };

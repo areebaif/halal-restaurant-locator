@@ -1,0 +1,83 @@
+import * as React from "react";
+import {
+  Box,
+  SimpleGrid,
+  Group,
+  Card,
+  Image,
+  Title,
+  Text,
+} from "@mantine/core";
+import { ErrorCard } from "@/components";
+import { SmallScreenGeolocationCard } from "./SmallScreenGeolocationCard";
+import { SmallScreenToggleMapButton } from "../../map/SmallScreenToggleMapButton";
+import { GeoJsonPropertiesRestaurant } from "@/utils/types";
+
+export type SmallScreenSearchResultListProps = {
+  setToggleSmallScreenMap: (val: boolean) => void;
+  toggleSmallScreenMap: boolean;
+  geolocations: GeoJSON.FeatureCollection<
+    GeoJSON.Geometry,
+    GeoJsonPropertiesRestaurant
+  >;
+};
+
+export const SmallScreenSearchResultList: React.FC<
+  SmallScreenSearchResultListProps
+> = ({ setToggleSmallScreenMap, toggleSmallScreenMap, geolocations }) => {
+  const smallScreenToggleMapButton = {
+    setToggleSmallScreenMap,
+    toggleSmallScreenMap,
+  };
+  return geolocations.features.length > 0 ? (
+    <>
+      <SimpleGrid
+        mt={5}
+        cols={3}
+        style={{ justifyItems: "center" }}
+        verticalSpacing="md"
+        breakpoints={[
+          { maxWidth: 630, cols: 1, spacing: "xs" },
+          { maxWidth: 930, cols: 2, spacing: "xs" },
+        ]}
+      >
+        {geolocations.features.map((location, index) => {
+          return (
+            <>
+              <SmallScreenGeolocationCard key={index} location={location} />
+              <Card
+                style={{
+                  minWidth: 280,
+                  maxWidth: 300,
+                  maxHeight: 300,
+                }}
+                shadow="sm"
+                radius="0"
+                withBorder
+              >
+                <Card.Section style={{ maxHeight: 120, overflow: "hidden" }}>
+                  <Image
+                    withPlaceholder
+                    src={""}
+                    alt="picture of a dish in restaurant"
+                  />
+                </Card.Section>
+                <Title pt="xs" order={1} size={"h5"}>
+                  New York Gyro
+                </Title>
+                <Text size="xs" mb="xs" mt="xs" color="dimmed">
+                  9952 Zilla St NW, Coon rapids, MN, 55433, U.S.A
+                </Text>
+              </Card>
+            </>
+          );
+        })}
+      </SimpleGrid>
+      <Group mt={"sm"} position="center">
+        <SmallScreenToggleMapButton {...smallScreenToggleMapButton} />
+      </Group>
+    </>
+  ) : (
+    <ErrorCard message="This location has no data" />
+  );
+};
