@@ -143,7 +143,7 @@ export const MapAndList: React.FC = () => {
   };
 
   return (
-    <>
+    <Flex direction="row" gap={"xs"}>
       {width >= responsive_map_resize_value_pixels ? (
         <LargeVPSearchResultList {...mapConatinerInputs} />
       ) : (
@@ -156,6 +156,6 @@ export const MapAndList: React.FC = () => {
         width >= responsive_map_resize_value_pixels) && (
         <MapContainer {...mapConatinerInputs} />
       )}
-    </>
+    </Flex>
   );
 };

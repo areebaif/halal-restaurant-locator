@@ -104,6 +104,7 @@ export const LargeVPGeolocationCard: React.FC<LargeVPGeolocationCardProps> = ({
   return (
     <Card
       component={Link}
+      mb="md"
       href={`/restaurants/${restaurantId}`}
       style={{
         minWidth: 280,
