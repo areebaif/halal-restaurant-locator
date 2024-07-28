@@ -4,13 +4,14 @@ import { useQuery } from "@tanstack/react-query";
 import "mapbox-gl/dist/mapbox-gl.css";
 import mapboxgl from "mapbox-gl";
 import { useMap } from "react-map-gl";
-import { Loader, Flex, em, getBreakpointValue } from "@mantine/core";
+import { Loader, Flex } from "@mantine/core";
 import {
   ErrorCard,
   MapContainer,
   LargeVPSearchResultList,
   useViewport,
   SmallScreenSearchResultList,
+  ClientFilters,
 } from "@/components";
 import {
   calcBoundsFromCoordinates,
@@ -55,7 +56,6 @@ export const MapAndList: React.FC = () => {
   const [toggleSmallScreenMap, setToggleSmallScreenMap] = React.useState(
     width < responsive_map_resize_value_pixels ? true : false
   );
-  console.log(width, toggleSmallScreenMap);
   const mapData = useQuery(
     ["getMapData", query],
     () => listRestaurantBySearchCriteria(query),
@@ -124,7 +124,8 @@ export const MapAndList: React.FC = () => {
   const correctData = mapData.data as RestaurantGeoJsonFeatureCollectionClient;
 
   const geolocations = correctData.restaurants;
-
+  const FiltersTypeofFood = new Set<string>();
+  
   const mapConatinerInputs = {
     geolocations,
     showPopup,
@@ -143,19 +144,22 @@ export const MapAndList: React.FC = () => {
   };
 
   return (
-    <Flex direction="row" gap={"xs"}>
-      {width >= responsive_map_resize_value_pixels ? (
-        <LargeVPSearchResultList {...mapConatinerInputs} />
-      ) : (
-        !toggleSmallScreenMap && (
-          <SmallScreenSearchResultList {...smallScreenSearchResultProps} />
-        )
-      )}
+    <>
+      <ClientFilters />
+      <Flex direction="row" gap={"xs"}>
+        {width >= responsive_map_resize_value_pixels ? (
+          <LargeVPSearchResultList {...mapConatinerInputs} />
+        ) : (
+          !toggleSmallScreenMap && (
+            <SmallScreenSearchResultList {...smallScreenSearchResultProps} />
+          )
+        )}
 
-      {(toggleSmallScreenMap ||
-        width >= responsive_map_resize_value_pixels) && (
-        <MapContainer {...mapConatinerInputs} />
-      )}
-    </Flex>
+        {(toggleSmallScreenMap ||
+          width >= responsive_map_resize_value_pixels) && (
+          <MapContainer {...mapConatinerInputs} />
+        )}
+      </Flex>
+    </>
   );
 };
