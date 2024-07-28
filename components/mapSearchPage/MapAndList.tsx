@@ -125,7 +125,11 @@ export const MapAndList: React.FC = () => {
 
   const geolocations = correctData.restaurants;
   const FiltersTypeofFood = new Set<string>();
-  
+  geolocations.features?.map((feature) => {
+    const { properties } = feature;
+    properties.FoodTag.forEach((item) => FiltersTypeofFood.add(item));
+  });
+  const foodTypeFilters = Array.from(FiltersTypeofFood);
   const mapConatinerInputs = {
     geolocations,
     showPopup,
@@ -145,7 +149,7 @@ export const MapAndList: React.FC = () => {
 
   return (
     <>
-      <ClientFilters />
+      {foodTypeFilters.length && <ClientFilters foodType={foodTypeFilters} />}
       <Flex direction="row" gap={"xs"}>
         {width >= responsive_map_resize_value_pixels ? (
           <LargeVPSearchResultList {...mapConatinerInputs} />

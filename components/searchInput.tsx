@@ -124,6 +124,7 @@ export const SearchInput: React.FC = () => {
           setAutoCompleteInputValue(e);
           onInputSearch(e);
         }}
+        radius={"xs"}
         styles={(theme) => ({
           input: {
             border: `1px solid`,
@@ -135,6 +136,7 @@ export const SearchInput: React.FC = () => {
       />
       {error.inputData ? <ErrorCard message={error.inputData} /> : <></>}
       <Button
+        radius={"xs"}
         onClick={() => {
           onSubmit(autoCompleteInputValue);
         }}

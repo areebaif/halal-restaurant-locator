@@ -154,6 +154,7 @@ const SuggestionForm: React.FC<RestaurantSuggestionProps> = ({
     // })}
     >
       <TextInput
+        radius={"xs"}
         className={classes.textInput}
         mt="xs"
         placeholder="name"
@@ -162,6 +163,7 @@ const SuggestionForm: React.FC<RestaurantSuggestionProps> = ({
         onChange={(event) => setName(event.currentTarget.value)}
       />
       <TextInput
+        radius={"xs"}
         mt="sm"
         className={classes.textInput}
         placeholder="adress"
@@ -174,6 +176,7 @@ const SuggestionForm: React.FC<RestaurantSuggestionProps> = ({
       )}
       <Center>
         <Button
+          radius={"xs"}
           mt="md"
           component={Link}
           variant="outline"

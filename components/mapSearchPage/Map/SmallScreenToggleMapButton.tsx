@@ -27,6 +27,8 @@ export const SmallScreenToggleMapButton: React.FC<
         }}
         sx={(theme) => ({ backgroundColor: theme.colors.gray[0] })}
         size="xs"
+        radius={"xs"}
+        fw={500}
         variant="outline"
         color="dark"
         styles={(theme) => ({

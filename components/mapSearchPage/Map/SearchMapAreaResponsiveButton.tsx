@@ -9,60 +9,41 @@ export const ResponsiveSearchAreaButton: React.FC<
   ResponsiveSearchAreaButtonProps
 > = ({ onExpandSearchRadius }) => {
   return (
-    <>
-      <MediaQuery largerThan={"md"} styles={{ display: "none" }}>
-        <Button
-          // on xs small devices centre the button
-          onClick={onExpandSearchRadius}
-          size="xs"
-          variant="outline"
-          color="dark"
-          styles={(theme) => ({
-            label: {
-              whiteSpace: "break-spaces",
-              textAlign: "center",
-            },
-          })}
-          sx={(theme) => ({
-            backgroundColor: theme.colors.gray[0],
-            zIndex: 1,
-
-            [theme.fn.smallerThan("md")]: {
-              width: "30%",
-              position: "absolute",
-              top: "1em",
-              left: 0,
-              right: 0,
-              bottom: 0,
-              margin: "0 auto",
-            },
-            [theme.fn.smallerThan("xs")]: { width: "40%" },
-          })}
-        >
-          Search this area
-        </Button>
-      </MediaQuery>
-      <MediaQuery smallerThan={"md"} styles={{ display: "none" }}>
-        <Button
-          // on xs small devices centre the button
-          onClick={onExpandSearchRadius}
-          size="xs"
-          variant="outline"
-          color="dark"
-          styles={(theme) => ({
-            label: { whiteSpace: "break-spaces", textAlign: "center" },
-          })}
-          sx={(theme) => ({
-            backgroundColor: theme.colors.gray[0],
-            position: "absolute",
-            zIndex: 1,
-            top: "1em",
-            right: "1em",
-          })}
-        >
-          Search this area
-        </Button>
-      </MediaQuery>
-    </>
+    <Button
+      // on xs small devices centre the button
+      onClick={onExpandSearchRadius}
+      size="xs"
+      radius={"xs"}
+      variant="outline"
+      color="dark"
+      styles={(theme) => ({
+        label: {
+          whiteSpace: "break-spaces",
+          textAlign: "center",
+        },
+      })}
+      sx={(theme) => ({
+        backgroundColor: theme.colors.gray[0],
+        zIndex: 1,
+        position: "absolute",
+        [theme.fn.smallerThan("md")]: {
+          width: "25%",
+          top: "1em",
+          left: 0,
+          right: 0,
+          // bottom: 0,
+          margin: "0 auto",
+          fontWeight: 500,
+        },
+        [theme.fn.smallerThan("xs")]: { width: "40%" },
+        [theme.fn.largerThan("md")]: {
+          top: "1em",
+          right: "1em",
+          fontWeight: 500,
+        },
+      })}
+    >
+      Search this area
+    </Button>
   );
 };
