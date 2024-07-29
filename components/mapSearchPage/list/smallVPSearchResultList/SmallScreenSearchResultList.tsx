@@ -7,6 +7,7 @@ import {
   Image,
   Title,
   Text,
+  Flex,
 } from "@mantine/core";
 import { ErrorCard } from "@/components";
 import { SmallScreenGeolocationCard } from "./SmallScreenGeolocationCard";
@@ -30,20 +31,37 @@ export const SmallScreenSearchResultList: React.FC<
     toggleSmallScreenMap,
   };
   return geolocations.features.length > 0 ? (
-    <Box style={{ margin: "auto" }}>
-      <SimpleGrid
-        mt={5}
-        cols={3}
-        verticalSpacing="md"
-        breakpoints={[
-          { maxWidth: 630, cols: 1, spacing: "xs" },
-          { maxWidth: 930, cols: 2, spacing: "xs" },
-        ]}
-      >
+    <Box>
+      <Flex justify="center" gap="xs" wrap={"wrap"}>
         {geolocations.features.map((location, index) => {
-          return <SmallScreenGeolocationCard key={index} location={location} />;
+          return (
+            <>
+              <Card
+                key={index}
+                style={{ minWidth: 280, maxWidth: 300, maxHeight: 300 }}
+                shadow="sm"
+                radius="0"
+                withBorder
+              >
+                <Card.Section style={{ maxHeight: 120, overflow: "hidden" }}>
+                  <Image
+                    withPlaceholder
+                    src="https://raw.githubusercontent.com/mantinedev/mantine/master/.demo/images/bg-5.png"
+                    alt="Avatar"
+                  />
+                </Card.Section>
+                <Title pt="xs" order={1} size={"h5"}>
+                  {"New York Gyro"}
+                </Title>
+                <Text size="xs" mb="xs" mt="xs" color="dimmed">
+                  {"9952 Zilla ST Nw, Coon Rapids, MN, 55433, U.S.A"}
+                </Text>
+              </Card>
+              <SmallScreenGeolocationCard key={index} location={location} />
+            </>
+          );
         })}
-      </SimpleGrid>
+      </Flex>
       <Group mt={"sm"} position="center">
         <SmallScreenToggleMapButton {...smallScreenToggleMapButton} />
       </Group>

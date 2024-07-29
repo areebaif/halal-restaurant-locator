@@ -10,7 +10,6 @@ export const ResponsiveSearchAreaButton: React.FC<
 > = ({ onExpandSearchRadius }) => {
   return (
     <Button
-      // on xs small devices centre the button
       onClick={onExpandSearchRadius}
       size="xs"
       radius={"xs"}

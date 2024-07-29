@@ -23,7 +23,6 @@ import {
   RestaurantGeoJsonFeatureCollectionClient,
 } from "@/utils/types";
 import { responsive_map_resize_value_pixels } from "@/utils/constants";
-import { useTheme } from "@emotion/react";
 
 // FAQ:
 // Why do we have two separate list, one for small screen and one for large screen?
@@ -52,10 +51,10 @@ export const MapAndList: React.FC = () => {
     coverImageUrl: "",
   });
   const [showPopup, setShowPopup] = React.useState<boolean>(false);
-
   const [toggleSmallScreenMap, setToggleSmallScreenMap] = React.useState(
     width < responsive_map_resize_value_pixels ? true : false
   );
+  const [foodTypeFilters, setFoodTypeFilters] = React.useState<string[]>([]);
   const mapData = useQuery(
     ["getMapData", query],
     () => listRestaurantBySearchCriteria(query),
@@ -129,7 +128,8 @@ export const MapAndList: React.FC = () => {
     const { properties } = feature;
     properties.FoodTag.forEach((item) => FiltersTypeofFood.add(item));
   });
-  const foodTypeFilters = Array.from(FiltersTypeofFood);
+  const AllFoodFilterVal = Array.from(FiltersTypeofFood);
+
   const mapConatinerInputs = {
     geolocations,
     showPopup,
@@ -146,10 +146,16 @@ export const MapAndList: React.FC = () => {
     setToggleSmallScreenMap,
     toggleSmallScreenMap,
   };
-
+  console.log(foodTypeFilters, "these are client set filters");
   return (
     <>
-      {foodTypeFilters.length && <ClientFilters foodType={foodTypeFilters} />}
+      {AllFoodFilterVal.length > 0 && (
+        <ClientFilters
+          AllFoodFilterVal={AllFoodFilterVal}
+          foodTypeFilters={foodTypeFilters}
+          setFoodTypeFilters={setFoodTypeFilters}
+        />
+      )}
       <Flex direction="row" gap={"xs"}>
         {width >= responsive_map_resize_value_pixels ? (
           <LargeVPSearchResultList {...mapConatinerInputs} />
