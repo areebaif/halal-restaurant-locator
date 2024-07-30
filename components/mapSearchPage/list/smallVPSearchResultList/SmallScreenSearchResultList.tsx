@@ -2,7 +2,7 @@ import * as React from "react";
 import { Box, Group, Card, Image, Title, Text, Flex } from "@mantine/core";
 import { ErrorCard } from "@/components";
 import { SmallScreenGeolocationCard } from "./SmallScreenGeolocationCard";
-import { SmallScreenToggleMapButton } from "../../map/SmallScreenToggleMapButton";
+import { SmallScreenToggleMapButton } from "../../Map/SmallScreenToggleMapButton";
 import { GeoJsonPropertiesRestaurant } from "@/utils/types";
 import { filterRestaurantsClient } from "@/utils";
 

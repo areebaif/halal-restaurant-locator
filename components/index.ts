@@ -18,7 +18,7 @@ import { getUserLocation } from "./homePage/getUserLocation";
 import { LargeVPSearchResultList } from "./mapSearchPage/list/largeVPSearchResultList/LargeVPSearchResultList";
 import { SmallScreenGeolocationCard } from "./mapSearchPage/list/smallVPSearchResultList/SmallScreenGeolocationCard";
 import { SmallScreenSearchResultList } from "./mapSearchPage/list/smallVPSearchResultList/SmallScreenSearchResultList";
-import { SmallScreenPopupCard } from "./mapSearchPage/map/SmallScreenPopup";
+import { SmallScreenPopupCard } from "./mapSearchPage/Map/SmallScreenPopup";
 import { ClientFilters } from "./mapSearchPage/Filters";
 import { MapContainer } from "./mapSearchPage/Container";
 import { MapAndList } from "./mapSearchPage/MapAndList";

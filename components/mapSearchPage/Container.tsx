@@ -5,7 +5,7 @@ import Map, { Source, Layer, Popup } from "react-map-gl";
 import { Box } from "@mantine/core";
 // local imports
 import { ErrorCard, SmallScreenPopupCard } from "@/components";
-import { LargeScreenPopup } from "./map/LargeScreenPopup";
+import { LargeScreenPopup } from "./Map/LargeScreenPopup";
 import {
   calcBoundsFromCoordinates,
   distanceBwTwoCordinatesInMiles,
@@ -19,8 +19,8 @@ import {
   map_layerId_client,
   map_source_data_id_client,
 } from "@/utils/constants";
-import { ResponsiveSearchAreaButton } from "./map/SearchMapAreaResponsiveButton";
-import { SmallScreenToggleMapButton } from "./map/SmallScreenToggleMapButton";
+import { ResponsiveSearchAreaButton } from "./Map/SearchMapAreaResponsiveButton";
+import { SmallScreenToggleMapButton } from "./Map/SmallScreenToggleMapButton";
 
 export type PopupDataProps = {
   restaurantId: string;
