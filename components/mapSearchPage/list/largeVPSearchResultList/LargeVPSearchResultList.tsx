@@ -1,47 +1,10 @@
 import * as React from "react";
-
-import { Flex, Box, Card, Image, Title, Text, ScrollArea } from "@mantine/core";
-import { ErrorCard } from "../../..";
+import { Flex, ScrollArea } from "@mantine/core";
+import { ErrorCard } from "@/components";
 import { MapContainerProps } from "../../map/MapContainer";
 import { LargeVPGeolocationCard } from "./LargeVPSearchResultRestaurantCard";
+import { filterRestaurantsClient } from "@/utils";
 import { GeoJsonPropertiesRestaurant } from "@/utils/types";
-
-type filteredRestaurantTypes = {
-  restaurantId: string;
-  restaurantName: string;
-  description: string;
-  street: string;
-  country: string;
-  state: string;
-  city: string;
-  zipcode: string;
-  FoodTag: string[];
-  coverImageUrl: string;
-  otherImageUrlList: string[];
-  visited: boolean;
-};
-const filterList = (
-  filterVal: string,
-  // these are the filteredGeolocations
-  filteredGeoLocations: GeoJSON.FeatureCollection<
-    GeoJSON.Geometry,
-    GeoJsonPropertiesRestaurant
-  >,
-  // these are the shallowCopy
-  restaurantLocations: GeoJSON.FeatureCollection<
-    GeoJSON.Geometry,
-    filteredRestaurantTypes
-  >
-) => {
-  restaurantLocations.features.forEach((location) => {
-    location.properties.FoodTag.forEach((tag) => {
-      if (tag === filterVal) {
-        location.properties.visited = true;
-        filteredGeoLocations.features.push(location);
-      }
-    });
-  });
-};
 
 export const LargeVPSearchResultList: React.FC<MapContainerProps> = ({
   geolocations,
@@ -66,36 +29,15 @@ export const LargeVPSearchResultList: React.FC<MapContainerProps> = ({
     GeoJSON.Geometry,
     GeoJsonPropertiesRestaurant
   >;
-  if (foodTypeFilters.length > 0 && geolocations.features.length > 0) {
-    // this is the array where  we will push the filtered geolocations
-    const filtered: GeoJSON.FeatureCollection<
-      GeoJSON.Geometry,
-      GeoJsonPropertiesRestaurant
-    > = { type: "FeatureCollection", features: [] };
+  if (geolocations.features.length > 0) {
+    const visibleList = React.useMemo(
+      () => filterRestaurantsClient(geolocations, foodTypeFilters),
+      [geolocations, foodTypeFilters]
+    );
 
-    // create a copy of geolocations with visited flag
-    const restaurantLocations: GeoJSON.FeatureCollection<
-      GeoJSON.Geometry,
-      filteredRestaurantTypes
-    > = {
-      type: "FeatureCollection",
-      features: [],
-    };
-    geolocations.features.forEach((feature) => {
-      const { properties, id, type, geometry } = feature;
-      const newProps = { ...feature.properties, visited: false };
-      restaurantLocations.features.push({
-        id,
-        type,
-        geometry,
-        properties: newProps,
-      });
-    }),
-      foodTypeFilters.forEach((foodType) =>
-        filterList(foodType, filtered, restaurantLocations)
-      );
-
-    filteredGeolocations = filtered;
+    filteredGeolocations = visibleList.features.length
+      ? visibleList
+      : geolocations;
   } else {
     filteredGeolocations = geolocations;
   }

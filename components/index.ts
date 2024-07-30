@@ -25,6 +25,7 @@ import { ClientFilters } from "./mapSearchPage/Filters";
 import { AllImages } from "./restaurantProductPage/Image";
 import { RestaurantDetails } from "./restaurantProductPage/RestaurantDetails";
 //generic components
+
 import { useViewport } from "./useViewPort";
 import { ErrorCard } from "./ErrorCard";
 import { SearchInput } from "./searchInput";
