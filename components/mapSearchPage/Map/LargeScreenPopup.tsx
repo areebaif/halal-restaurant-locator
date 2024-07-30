@@ -7,7 +7,8 @@ import {
   Title,
   Text,
   CloseButton,
-  Box,
+  Flex,
+  Badge,
   Paper,
 } from "@mantine/core";
 import { PopupDataProps } from "./MapContainer";
@@ -30,6 +31,7 @@ export const LargeScreenPopup: React.FC<LargeScreenPopupProps> = ({
 }) => {
   const router = useRouter();
   const { MapA } = useMap();
+  console.log(popupData, popupData.FoodTag);
   return (
     <Card
       shadow="sm"
@@ -61,6 +63,7 @@ export const LargeScreenPopup: React.FC<LargeScreenPopupProps> = ({
             );
             setHoverId(undefined);
             setPopupData({
+              FoodTag: "",
               restaurantId: "",
               restaurantName: "",
               description: "",
@@ -88,6 +91,13 @@ export const LargeScreenPopup: React.FC<LargeScreenPopupProps> = ({
         <Text size="xs" mb="xs" color="dimmed">
           {`${popupData.address}`}
         </Text>
+        <Flex wrap="wrap" gap="xs" direction={"row"}>
+          {JSON.parse(popupData.FoodTag).map((tag: string) => (
+            <Badge key={tag} color="red" size="md">
+              {tag}
+            </Badge>
+          ))}
+        </Flex>
       </Paper>
     </Card>
   );

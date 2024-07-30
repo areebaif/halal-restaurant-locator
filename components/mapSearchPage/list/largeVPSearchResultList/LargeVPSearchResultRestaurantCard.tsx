@@ -59,6 +59,7 @@ export const LargeVPGeolocationCard: React.FC<LargeVPGeolocationCardProps> = ({
       const state = location.properties?.state;
       const zip = location.properties?.zipcode;
       const country = location.properties?.country;
+      const FoodTag = JSON.stringify(location.properties.FoodTag);
       const address = `${street}, ${city}, ${state}, ${zip}, ${country}`;
       const coverImageUrl = location.properties?.coverImageUrl;
 
@@ -69,6 +70,7 @@ export const LargeVPGeolocationCard: React.FC<LargeVPGeolocationCardProps> = ({
       );
       setHoverId(id);
       setPopupData({
+        FoodTag,
         restaurantId,
         restaurantName,
         address,
@@ -89,6 +91,7 @@ export const LargeVPGeolocationCard: React.FC<LargeVPGeolocationCardProps> = ({
     setHoverId(undefined);
     setShowPopup(false);
     setPopupData({
+      FoodTag: "",
       restaurantId: "",
       restaurantName: "",
       description: "",

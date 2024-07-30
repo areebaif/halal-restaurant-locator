@@ -9,6 +9,8 @@ import {
   Title,
   Text,
   Paper,
+  Flex,
+  Badge,
 } from "@mantine/core";
 
 export type SmallScreenPopupProps = {
@@ -43,6 +45,7 @@ export const SmallScreenPopupCard: React.FC<SmallScreenPopupProps> = ({
           onClick={() => {
             setShowSmallScreenPopup(false);
             setPopupData({
+              FoodTag: "",
               restaurantId: "",
               restaurantName: "",
               description: "",
@@ -70,6 +73,13 @@ export const SmallScreenPopupCard: React.FC<SmallScreenPopupProps> = ({
         <Text size="xs" mb="xs" color="dimmed">
           {`${popupData.address}`}
         </Text>
+        <Flex wrap="wrap" gap="xs" direction={"row"}>
+          {JSON.parse(popupData.FoodTag).map((tag: string) => (
+            <Badge key={tag} color="red" size="md">
+              {tag}
+            </Badge>
+          ))}
+        </Flex>
       </Paper>
     </Card>
   );

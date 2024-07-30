@@ -31,6 +31,7 @@ export type PopupDataProps = {
   latitude: number;
   longitude: number;
   coverImageUrl: string;
+  FoodTag: string;
 };
 
 export type MapContainerProps = {
@@ -131,11 +132,13 @@ export const MapContainer: React.FC<MapContainerProps> = ({
       const state = e.features[0].properties?.state;
       const zip = e.features[0].properties?.zipcode;
       const country = e.features[0].properties?.country;
+      const FoodTag = e.features[0].properties?.FoodTag;
       const address = `${street}, ${city}, ${state}, ${zip}, ${country}`;
       const coverImageUrl = e.features[0].properties?.coverImageUrl;
       const id = e.features[0].id;
 
       setPopupData({
+        FoodTag,
         restaurantId,
         restaurantName,
         address,
@@ -291,6 +294,7 @@ export const MapContainer: React.FC<MapContainerProps> = ({
                 { hover: false }
               );
               setPopupData({
+                FoodTag: "",
                 restaurantId: "",
                 restaurantName: "",
                 description: "",

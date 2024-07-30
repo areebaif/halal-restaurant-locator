@@ -17,14 +17,12 @@ import {
   calcBoundsFromCoordinates,
   listRestaurantBySearchCriteria,
   FilterRestaurantResponseSchema,
-  parseFoodTypeFilter,
 } from "@/utils";
 import {
   FilterRestaurantsErrors,
   RestaurantGeoJsonFeatureCollectionClient,
 } from "@/utils/types";
 import { responsive_map_resize_value_pixels } from "@/utils/constants";
-import { map_layerId_client } from "@/utils/constants";
 
 // FAQ:
 // Why do we have two separate list, one for small screen and one for large screen?
@@ -44,6 +42,9 @@ export const MapAndList: React.FC = () => {
     undefined
   );
   const [popupData, setPopupData] = React.useState({
+    // react map-gl does auto conversion and converts data to JSON,
+    // although, foodtag is a string[], but it gets converted
+    FoodTag: "",
     restaurantId: "",
     restaurantName: "",
     description: "",
@@ -149,6 +150,7 @@ export const MapAndList: React.FC = () => {
     geolocations,
     setToggleSmallScreenMap,
     toggleSmallScreenMap,
+    foodTypeFilters,
   };
 
   return (
