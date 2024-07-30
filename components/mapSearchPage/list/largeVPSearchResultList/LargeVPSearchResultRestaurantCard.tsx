@@ -132,7 +132,7 @@ export const LargeVPGeolocationCard: React.FC<LargeVPGeolocationCardProps> = ({
         {`${street}, ${city}, ${state}, ${zipcode}, ${country}`}
       </Text>
       <Flex wrap="wrap" gap="xs" direction={"row"}>
-        {FoodTag.map((tag: any) => (
+        {FoodTag.map((tag: string) => (
           <Badge key={tag} color="red" size="md">
             {tag}
           </Badge>

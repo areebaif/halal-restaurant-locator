@@ -373,6 +373,8 @@ export const GeoJsonPropertiesRestaurantSchema = z.object({
   otherImageUrlList: z.string().array(),
 });
 
+
+
 export const GeoJsonFeatureRestaurantSchema = z
   .object({
     id: z.number(),

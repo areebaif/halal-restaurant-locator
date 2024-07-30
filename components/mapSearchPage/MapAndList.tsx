@@ -17,12 +17,14 @@ import {
   calcBoundsFromCoordinates,
   listRestaurantBySearchCriteria,
   FilterRestaurantResponseSchema,
+  parseFoodTypeFilter,
 } from "@/utils";
 import {
   FilterRestaurantsErrors,
   RestaurantGeoJsonFeatureCollectionClient,
 } from "@/utils/types";
 import { responsive_map_resize_value_pixels } from "@/utils/constants";
+import { map_layerId_client } from "@/utils/constants";
 
 // FAQ:
 // Why do we have two separate list, one for small screen and one for large screen?
@@ -55,6 +57,7 @@ export const MapAndList: React.FC = () => {
     width < responsive_map_resize_value_pixels ? true : false
   );
   const [foodTypeFilters, setFoodTypeFilters] = React.useState<string[]>([]);
+
   const mapData = useQuery(
     ["getMapData", query],
     () => listRestaurantBySearchCriteria(query),
@@ -140,13 +143,14 @@ export const MapAndList: React.FC = () => {
     setPopupData,
     setToggleSmallScreenMap,
     toggleSmallScreenMap,
+    foodTypeFilters,
   };
   const smallScreenSearchResultProps = {
     geolocations,
     setToggleSmallScreenMap,
     toggleSmallScreenMap,
   };
-  console.log(foodTypeFilters, "these are client set filters");
+
   return (
     <>
       {AllFoodFilterVal.length > 0 && (

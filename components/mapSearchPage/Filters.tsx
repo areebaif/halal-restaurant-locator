@@ -1,12 +1,4 @@
-import {
-  NavLink,
-  Text,
-  Group,
-  Button,
-  Flex,
-  ThemeIcon,
-  Chip,
-} from "@mantine/core";
+import { Flex, ThemeIcon, Chip } from "@mantine/core";
 import { IconAdjustments } from "@tabler/icons-react";
 import * as React from "react";
 

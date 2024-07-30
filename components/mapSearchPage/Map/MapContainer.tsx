@@ -10,6 +10,7 @@ import { LargeScreenPopup } from "./LargeScreenPopup";
 import {
   calcBoundsFromCoordinates,
   distanceBwTwoCordinatesInMiles,
+  parseFoodTypeFilter,
 } from "@/utils";
 import { GeoJsonPropertiesRestaurant } from "@/utils/types";
 import {
@@ -45,6 +46,7 @@ export type MapContainerProps = {
   setPopupData: (data: PopupDataProps) => void;
   setToggleSmallScreenMap: (val: boolean) => void;
   toggleSmallScreenMap: boolean;
+  foodTypeFilters: string[];
 };
 
 type CameraViewState = {
@@ -63,6 +65,7 @@ export const MapContainer: React.FC<MapContainerProps> = ({
   setShowPopup,
   setToggleSmallScreenMap,
   toggleSmallScreenMap,
+  foodTypeFilters,
 }) => {
   const router = useRouter();
   const { latitude, longitude } = router.query;
@@ -141,7 +144,7 @@ export const MapContainer: React.FC<MapContainerProps> = ({
         longitude: coordinates[0],
         coverImageUrl: coverImageUrl,
       });
-      console.log(window, window.innerWidth, "s;lsls;ls;ls");
+
       // if screenwidth is smaller than md dont show popup
       if (window.innerWidth >= 1024) {
         setShowPopup(true);
@@ -190,6 +193,7 @@ export const MapContainer: React.FC<MapContainerProps> = ({
     setToggleSmallScreenMap,
     toggleSmallScreenMap,
   };
+
   return (
     <Box style={{ position: "relative", width: "100%", marginTop: "0.4em" }}>
       <ResponsiveSearchAreaButton {...ResponsiveSearchAReaButtonProps} />
@@ -204,7 +208,6 @@ export const MapContainer: React.FC<MapContainerProps> = ({
       >
         <SmallScreenToggleMapButton {...smallScreenToggleMapButton} />
       </Box>
-
       {showSmallScreenPopup && (
         <Box
           sx={(theme) => ({
@@ -253,7 +256,18 @@ export const MapContainer: React.FC<MapContainerProps> = ({
               "text-field": ["get", "restaurantName"],
               "text-offset": [0, 1.2],
               "text-allow-overlap": true,
+              "text-size": 14,
             }}
+            filter={
+              parseFoodTypeFilter(foodTypeFilters)?.length
+                ? parseFoodTypeFilter(foodTypeFilters)
+                : ["all"]
+              //[
+              //"any",
+              //["in", "Pakistani", ["get", "FoodTag"]],
+              //["in", "Middle Eastern", ["get", "FoodTag"]],
+              //]
+            }
             paint={{
               "icon-opacity": [
                 "case",
