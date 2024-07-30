@@ -15,7 +15,7 @@ import { RestaurantSuggestion } from "./homePage/RestaurantSuggestionForm";
 import { RestaurantProductCard } from "./homePage/RestaurantProductCard";
 import { getUserLocation } from "./homePage/getUserLocation";
 //mapSearchPage
-import { MapContainer } from "./mapSearchPage/map/MapContainer";
+import { MapContainer } from "./mapSearchPage/map/Container";
 import { LargeVPSearchResultList } from "./mapSearchPage/list/largeVPSearchResultList/LargeVPSearchResultList";
 import { MapAndList } from "./mapSearchPage/MapAndList";
 import { SmallScreenGeolocationCard } from "./mapSearchPage/list/smallVPSearchResultList/SmallScreenGeolocationCard";

@@ -1,7 +1,7 @@
 import * as React from "react";
 import Link from "next/link";
 import { useRouter } from "next/router";
-import { PopupDataProps } from "./MapContainer";
+import { PopupDataProps } from "./Container";
 import {
   Card,
   CloseButton,
