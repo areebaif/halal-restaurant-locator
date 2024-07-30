@@ -1,7 +1,7 @@
 import * as React from "react";
 import { Flex, ScrollArea } from "@mantine/core";
 import { ErrorCard } from "@/components";
-import { MapContainerProps } from "../../map/Container";
+import { MapContainerProps } from "../../Container";
 import { LargeVPGeolocationCard } from "./LargeVPSearchResultRestaurantCard";
 import { filterRestaurantsClient } from "@/utils";
 import { GeoJsonPropertiesRestaurant } from "@/utils/types";

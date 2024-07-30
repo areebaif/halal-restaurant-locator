@@ -11,7 +11,7 @@ import {
   Badge,
   Paper,
 } from "@mantine/core";
-import { PopupDataProps } from "./Container";
+import { PopupDataProps } from "../Container";
 import { map_source_data_id_client } from "@/utils/constants";
 import Link from "next/link";
 

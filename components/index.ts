@@ -19,8 +19,9 @@ import { LargeVPSearchResultList } from "./mapSearchPage/list/largeVPSearchResul
 import { MapAndList } from "./mapSearchPage/MapAndList";
 import { SmallScreenGeolocationCard } from "./mapSearchPage/list/smallVPSearchResultList/SmallScreenGeolocationCard";
 import { SmallScreenSearchResultList } from "./mapSearchPage/list/smallVPSearchResultList/SmallScreenSearchResultList";
-import { MapContainer } from "./mapSearchPage/map/Container";
 import { ClientFilters } from "./mapSearchPage/Filters";
+import { MapContainer } from "./mapSearchPage/Container";
+
 //restaurantPage
 import { AllImages } from "./restaurantProductPage/Image";
 import { RestaurantDetails } from "./restaurantProductPage/RestaurantDetails";

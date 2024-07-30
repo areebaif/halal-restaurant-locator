@@ -3,7 +3,7 @@ import Link from "next/link";
 import { useMap } from "react-map-gl";
 
 import { Card, Flex, Title, Text, Badge, Image } from "@mantine/core";
-import { PopupDataProps } from "../../map/Container";
+import { PopupDataProps } from "../../Container";
 import { map_source_data_id_client } from "@/utils/constants";
 import { GeoJsonPropertiesRestaurant } from "@/utils/types";
 
