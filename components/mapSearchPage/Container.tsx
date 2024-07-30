@@ -4,8 +4,7 @@ import mapboxgl, { MapLayerMouseEvent } from "mapbox-gl";
 import Map, { Source, Layer, Popup } from "react-map-gl";
 import { Box } from "@mantine/core";
 // local imports
-import { ErrorCard } from "@/components";
-import { SmallScreenPopupCard } from "./map/SmallScreenPopup";
+import { ErrorCard, SmallScreenPopupCard } from "@/components";
 import { LargeScreenPopup } from "./map/LargeScreenPopup";
 import {
   calcBoundsFromCoordinates,
