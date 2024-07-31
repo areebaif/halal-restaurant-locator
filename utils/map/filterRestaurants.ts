@@ -12,6 +12,7 @@ export const filterRestaurantsClient = (
     GeoJSON.Geometry,
     GeoJsonPropertiesRestaurant
   > = { type: "FeatureCollection", features: [] };
+  if (activeClientFoodTypeFilters.length === 0) return filteredList;
   for (let x = 0; x < allGeolocations.features.length; x++) {
     let isFilterValValid = false;
     const { FoodTag } = allGeolocations.features[x].properties;

@@ -127,6 +127,7 @@ export const MapAndList: React.FC = () => {
   const correctData = mapData.data as RestaurantGeoJsonFeatureCollectionClient;
 
   const geolocations = correctData.restaurants;
+
   const FiltersTypeofFood = new Set<string>();
   geolocations.features?.map((feature) => {
     const { properties } = feature;

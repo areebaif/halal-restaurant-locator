@@ -95,7 +95,7 @@ export const MapContainer: React.FC<MapContainerProps> = ({
   const onLoad = () => {
     if (mapRef.current) {
       mapRef.current.loadImage(
-        "/marker-icons/red-location-pin.png",
+        "/location-pin.png",
         (error: any, image: any) => {
           if (error)
             return <ErrorCard message="unable to load markers for the map" />;
@@ -237,7 +237,7 @@ export const MapContainer: React.FC<MapContainerProps> = ({
           width: "100%",
           minHeight: 500,
         }}
-        mapStyle="mapbox://styles/mapbox/streets-v9"
+        mapStyle="mapbox://styles/mapbox/streets-v12"
         mapboxAccessToken={process.env.NEXT_PUBLIC_MAPBOX_ACCESS}
         interactiveLayerIds={[map_layerId_client]}
         onMouseEnter={onMouseEnter}
@@ -256,9 +256,13 @@ export const MapContainer: React.FC<MapContainerProps> = ({
               "icon-image": map_custom_pin_id_client,
               "icon-allow-overlap": true,
               "text-field": ["get", "restaurantName"],
-              "text-offset": [0, 1.2],
-              "text-allow-overlap": true,
+              //"text-offset": [0, 2],
+              "text-variable-anchor": ["top", "bottom", "left", "right"],
+              "text-radial-offset": 1.5,
+              "text-justify": "auto",
               "text-size": 14,
+              "text-font": ["Open Sans Bold"],
+              //"text-letter-spacing": 0.1,
             }}
             filter={
               parseFoodTypeFilter(foodTypeFilters)?.length
