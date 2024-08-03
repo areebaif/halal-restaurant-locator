@@ -94,18 +94,15 @@ export const MapContainer: React.FC<MapContainerProps> = ({
 
   const onLoad = () => {
     if (mapRef.current) {
-      mapRef.current.loadImage(
-        "/location-pin.png",
-        (error: any, image: any) => {
-          if (error)
-            return <ErrorCard message="unable to load markers for the map" />;
-          mapRef.current.addImage(map_custom_pin_id_client, image);
-          const geoJsonSource = mapRef.current.getSource(
-            map_source_data_id_client
-          );
-          geoJsonSource.setData(geolocations);
-        }
-      );
+      mapRef.current.loadImage("/4975305-32.png", (error: any, image: any) => {
+        if (error)
+          return <ErrorCard message="unable to load markers for the map" />;
+        mapRef.current.addImage(map_custom_pin_id_client, image);
+        const geoJsonSource = mapRef.current.getSource(
+          map_source_data_id_client
+        );
+        geoJsonSource.setData(geolocations);
+      });
       //programmatically calculate mapZoom and mapBound for initial load of data.
       if (geolocations.features.length) {
         const mapBounds = calcBoundsFromCoordinates(geolocations);
@@ -258,7 +255,7 @@ export const MapContainer: React.FC<MapContainerProps> = ({
               "text-field": ["get", "restaurantName"],
               //"text-offset": [0, 2],
               "text-variable-anchor": ["top", "bottom", "left", "right"],
-              "text-radial-offset": 1.5,
+              "text-radial-offset": 1,
               "text-justify": "auto",
               "text-size": 14,
               "text-font": ["Open Sans Bold"],
