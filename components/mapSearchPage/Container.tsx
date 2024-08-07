@@ -157,7 +157,9 @@ export const MapContainer: React.FC<MapContainerProps> = ({
       }
     }
   };
-  // TODO: fix this to search in visible area
+  // TODO: fix this to search to visible area, right now it jyust does a search in 40 mile radius.
+  // We need to get the upper and lower latitude and longitude and then send them to backedn to get all data points between these ranges.
+  // The api is also not built for this
   const onExpandSearchRadius = () => {
     const centreCooridnates = mapRef.current.getCenter() as {
       lat: number;
