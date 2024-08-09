@@ -11,6 +11,7 @@ import {
   MediaQuery,
   Box,
   Divider,
+  rem,
 } from "@mantine/core";
 import Link from "next/link";
 import { ErrorCard } from "..";
@@ -60,19 +61,21 @@ export const RestaurantSuggestion: React.FC = () => {
 
   return (
     <>
-      {" "}
-      <MediaQuery smallerThan={"md"} styles={{ display: "none" }}>
-        <Title pt="lg" mt="lg" size={"h2"} order={1}>
-          {" "}
-          Help us grow our library
-        </Title>
-      </MediaQuery>
-      <MediaQuery largerThan={"md"} styles={{ display: "none" }}>
-        <Title pt="lg" mt="lg" size={"h3"} order={1}>
-          {" "}
-          Help us grow our library
-        </Title>
-      </MediaQuery>
+      <Title
+        sx={(theme) => ({
+          [theme.fn.smallerThan("md")]: {
+            fontSize: theme.headings.sizes.h3.fontSize,
+          },
+          [theme.fn.largerThan("md")]: {
+            fontSize: theme.headings.sizes.h2.fontSize,
+          },
+        })}
+        pt="lg"
+        mt="lg"
+        order={1}
+      >
+        Help us grow our library
+      </Title>
       <Divider my="xs" />
       <SimpleGrid
         id={"suggestionBox"}
