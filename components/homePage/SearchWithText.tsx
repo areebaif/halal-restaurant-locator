@@ -7,18 +7,21 @@ export const SearchWithText: React.FC = ({}) => {
   return (
     <Card style={{ backgroundColor: "inherit" }}>
       <Card.Section>
-        <MediaQuery smallerThan={"md"} styles={{ display: "none" }}>
-          <Title size={"h1"} order={1}>
-            {" "}
-            Find halal food with ease
-          </Title>
-        </MediaQuery>
-        <MediaQuery largerThan={"md"} styles={{ display: "none" }}>
-          <Title size={"h3"} order={1}>
-            {" "}
-            Find halal food with ease
-          </Title>
-        </MediaQuery>
+        <Title
+          sx={(theme) => ({
+            [theme.fn.smallerThan("md")]: {
+              fontSize: theme.headings.sizes.h3.fontSize,
+            },
+            [theme.fn.largerThan("md")]: {
+              fontSize: theme.headings.sizes.h1.fontSize,
+            },
+          })}
+          size={"h1"}
+          order={1}
+        >
+          {" "}
+          Find halal food with ease
+        </Title>
         <Text size="md" mt="sm" color="dimmed">
           Discover halal food options with our integrated map search.
         </Text>
