@@ -16,7 +16,6 @@ export const SearchWithText: React.FC = ({}) => {
               fontSize: theme.headings.sizes.h1.fontSize,
             },
           })}
-          size={"h1"}
           order={1}
         >
           {" "}
