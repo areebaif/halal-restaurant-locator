@@ -15,22 +15,14 @@ const MapSearch: React.FC = () => {
     <>
       <Flex
         sx={(theme) => ({
-          [theme.fn.largerThan("md")]: { display: "none" },
+          [theme.fn.largerThan("md")]: { flexDirection: "row" },
+          [theme.fn.smallerThan("md")]: { flexDirection: "column" },
         })}
         gap="md"
-        direction={"column"}
       >
         <SearchInput />
       </Flex>
-      <Group
-        spacing="md"
-        sx={(theme) => ({
-          [theme.fn.smallerThan("md")]: { display: "none" },
-        })}
-        grow={true}
-      >
-        <SearchInput />
-      </Group>
+
       <MapProvider>
         <MapAndList />
       </MapProvider>

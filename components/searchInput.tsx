@@ -125,9 +125,11 @@ export const SearchInput: React.FC = () => {
           onInputSearch(e);
         }}
         radius={"xs"}
+        style={{ width: "100%" }}
         styles={(theme) => ({
           input: {
             border: `1px solid`,
+
             "&:focus": {
               border: `1px solid`,
             },
@@ -140,6 +142,7 @@ export const SearchInput: React.FC = () => {
         onClick={() => {
           onSubmit(autoCompleteInputValue);
         }}
+        style={{ width: "100%" }}
         variant="outline"
         color="dark"
       >
