@@ -1,45 +1,13 @@
-import { Card, Flex, Title, Text, Badge, Image } from "@mantine/core";
-import { useMap } from "react-map-gl";
-import { GeoJsonPropertiesRestaurant } from "@/utils/types";
-import { ErrorCard } from "..";
-import { MapContainerProps, PopupDataProps } from "./MapContainer";
+import * as React from "react";
 import Link from "next/link";
-import { map_source_data_id_client } from "@/utils/constants";
+import { useMap } from "react-map-gl";
 
-export const SearchResultList: React.FC<MapContainerProps> = ({
-  geolocations,
-  hoverId,
-  setHoverId,
-  showPopup,
-  setShowPopup,
-  popupData,
-  setPopupData,
-}) => {
-  const geoLocationCardProps = {
-    hoverId,
-    setHoverId,
-    showPopup,
-    setShowPopup,
-    popupData,
-    setPopupData,
-  };
-  return geolocations.features.length > 0 ? (
-    <Flex direction="column">
-      {geolocations.features.map((location, index) => {
-        return (
-          <GeoLocationCard
-            key={index}
-            location={location}
-            {...geoLocationCardProps}
-          />
-        );
-      })}
-    </Flex>
-  ) : (
-    <ErrorCard message="This location has no data" />
-  );
-};
-type GeoLocationCard = {
+import { Card, Flex, Title, Text, Badge, Image } from "@mantine/core";
+import { PopupDataProps } from "../../Container";
+import { map_source_data_id_client } from "@/utils/constants";
+import { GeoJsonPropertiesRestaurant } from "@/utils/types";
+
+export type LargeVPGeolocationCardProps = {
   location: GeoJSON.Feature<GeoJSON.Geometry, GeoJsonPropertiesRestaurant>;
   hoverId: string | number | undefined;
   setHoverId: (val: string | number | undefined) => void;
@@ -49,7 +17,7 @@ type GeoLocationCard = {
   setPopupData: (data: PopupDataProps) => void;
 };
 
-const GeoLocationCard: React.FC<GeoLocationCard> = ({
+export const LargeVPGeolocationCard: React.FC<LargeVPGeolocationCardProps> = ({
   location,
   hoverId,
   setHoverId,
@@ -91,6 +59,7 @@ const GeoLocationCard: React.FC<GeoLocationCard> = ({
       const state = location.properties?.state;
       const zip = location.properties?.zipcode;
       const country = location.properties?.country;
+      const FoodTag = JSON.stringify(location.properties.FoodTag);
       const address = `${street}, ${city}, ${state}, ${zip}, ${country}`;
       const coverImageUrl = location.properties?.coverImageUrl;
 
@@ -101,6 +70,7 @@ const GeoLocationCard: React.FC<GeoLocationCard> = ({
       );
       setHoverId(id);
       setPopupData({
+        FoodTag,
         restaurantId,
         restaurantName,
         address,
@@ -121,6 +91,7 @@ const GeoLocationCard: React.FC<GeoLocationCard> = ({
     setHoverId(undefined);
     setShowPopup(false);
     setPopupData({
+      FoodTag: "",
       restaurantId: "",
       restaurantName: "",
       description: "",
@@ -135,35 +106,41 @@ const GeoLocationCard: React.FC<GeoLocationCard> = ({
 
   return (
     <Card
-      shadow="sm"
-      radius="md"
       component={Link}
+      mb="md"
       href={`/restaurants/${restaurantId}`}
-      target="_blank"
+      style={{
+        minWidth: 280,
+        maxWidth: 300,
+        maxHeight: 300,
+      }}
+      shadow="sm"
+      radius="0"
       withBorder
+      target="_blank"
       onMouseEnter={onMouseEnter}
       onMouseLeave={onMouseLeave}
-      style={{
-        overflow: "inherit",
-        margin: "5px 0 0 0",
-      }}
     >
-      <Card.Section>
-        <Image src={image} height={160} alt="cover image for restaurant" />
+      <Card.Section style={{ maxHeight: 120, overflow: "hidden" }}>
+        <Image
+          withPlaceholder
+          src={image}
+          alt="picture of a dish in restaurant"
+        />
       </Card.Section>
-      <Title mt="md" order={4}>
+      <Title pt="xs" order={1} size={"h5"}>
         {restaurantName}
       </Title>
-      <Text size="xs" color="dimmed">
+      <Text size="xs" mb="xs" mt="xs" color="dimmed">
         {`${street}, ${city}, ${state}, ${zipcode}, ${country}`}
       </Text>
-      {FoodTag.map((badge, index) => {
-        return (
-          <Badge key={index} mt="xs" size="xs">
-            {badge}
+      <Flex wrap="wrap" gap="xs" direction={"row"}>
+        {FoodTag.map((tag: string) => (
+          <Badge key={tag} color="red" size="md">
+            {tag}
           </Badge>
-        );
-      })}
+        ))}
+      </Flex>
     </Card>
   );
 };

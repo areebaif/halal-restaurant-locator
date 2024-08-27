@@ -1,39 +1,61 @@
+//layout
 import { AdminNavigation } from "./layout/AdminNavbar";
 import { AppChromeAdmin } from "./layout/AdminLayout";
 import { AppChrome } from "./layout/AppChrome";
-import { ErrorCard } from "./ErrorCard";
-import { SearchInput } from "./searchInput";
-import { MapContainer } from "./mapSearchPage/MapContainer";
-import { SearchResultList } from "./mapSearchPage/SearchResultList";
-import { HeroComponent } from "./homePage/HeroComponent";
-import { MapWithText } from "./homePage/MapWithText";
-import { RestaurantSuggestionForm } from "./homePage/RestaurantSuggestionForm";
-import { MapAndList } from "./mapSearchPage/MapAndList";
+//admin
 import { CustomImageButton } from "./admin/createRestaurant/ImageButton";
 import { FoodTags } from "./admin/createRestaurant/FoodTags";
 import { AddFoodTag } from "./admin/createRestaurant/AddFoodTag";
 import { SearchZipcode } from "./admin/createRestaurant/SearchZipcode";
 import { ImageUpload } from "./admin/createRestaurant/ImageUpload";
-import { AllImages } from "./restaurant-product-page/Image";
-import { SearchResultCarousol } from "./mapSearchPage/SearchResultCarousol";
+// homepage
+import { AboveTheFold } from "./homePage/AboveTheFold";
+import { TopRated } from "./homePage/TopRated";
+import { RestaurantSuggestion } from "./homePage/RestaurantSuggestionForm";
+import { RestaurantProductCard } from "./homePage/RestaurantProductCard";
+import { getUserLocation } from "./homePage/getUserLocation";
+//mapSearchPage
+import { LargeVPSearchResultList } from "./mapSearchPage/list/largeVPSearchResultList/LargeVPSearchResultList";
+import { SmallScreenGeolocationCard } from "./mapSearchPage/list/smallVPSearchResultList/SmallScreenGeolocationCard";
+import { SmallScreenSearchResultList } from "./mapSearchPage/list/smallVPSearchResultList/SmallScreenSearchResultList";
+import { SmallScreenPopupCard } from "./mapSearchPage/Map/SmallScreenPopup";
+import { ClientFilters } from "./mapSearchPage/Filters";
+import { MapContainer } from "./mapSearchPage/Container";
+import { MapAndList } from "./mapSearchPage/MapAndList";
+
+//restaurantPage
+import { AllImages } from "./restaurantProductPage/Image";
+import { RestaurantDetails } from "./restaurantProductPage/RestaurantDetails";
+//generic components
+
+import { useViewport } from "./useViewPort";
+import { ErrorCard } from "./ErrorCard";
+import { SearchInput } from "./searchInput";
 
 export {
   AdminNavigation,
   AppChromeAdmin,
   AppChrome,
-  ErrorCard,
-  SearchInput,
-  MapContainer,
-  SearchResultList,
-  HeroComponent,
-  MapWithText,
-  RestaurantSuggestionForm,
-  MapAndList,
   CustomImageButton,
   FoodTags,
   AddFoodTag,
   SearchZipcode,
   ImageUpload,
+  AboveTheFold,
+  TopRated,
+  RestaurantSuggestion,
+  RestaurantProductCard,
+  getUserLocation,
+  MapContainer,
+  LargeVPSearchResultList,
+  MapAndList,
+  ClientFilters,
+  SmallScreenSearchResultList,
+  SmallScreenGeolocationCard,
   AllImages,
-  SearchResultCarousol,
+  RestaurantDetails,
+  useViewport,
+  ErrorCard,
+  SearchInput,
+  SmallScreenPopupCard,
 };

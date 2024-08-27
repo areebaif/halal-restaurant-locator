@@ -4,3 +4,4 @@ export const map_custom_pin_id_client = "custom-marker";
 export const map_source_data_id_client = "restaurant locations";
 export const map_id_client = "MapA";
 export const map_layerId_client = "points";
+export const responsive_map_resize_value_pixels = 1024;

@@ -20,6 +20,7 @@ import {
   FilterRestaurantsErrors,
   GetRestaurantError,
   GetRestaurant,
+  ListCitiesError,
 } from "./types";
 
 export const listUSAGeog = async (searchTerm: string) => {
@@ -59,6 +60,33 @@ export const listStates = async () => {
     throw new Error("something went wrong");
   }
   const res: ListStates = await response.json();
+  return res;
+};
+
+export const listCities = async (
+  stateId: string,
+  pageNum: string,
+  limitNum: string
+) => {
+  const response = await fetch(
+    `/api/country/usa/states/${stateId}?_limit=${limitNum}&_page=${pageNum}`,
+    {
+      method: "GET",
+      headers: {
+        "Content-Type": "application/json",
+      },
+    }
+  );
+  const apiErrors = /(4|5)\d{2}/.test(`${response.status}`);
+  if (apiErrors) {
+    const res: ListCitiesError = await response.json();
+    return res;
+  }
+  // anything other than apiErrors went wrong
+  if (!response.ok) {
+    throw new Error("something went wrong");
+  }
+  const res: ListCitiesError = await response.json();
   return res;
 };
 

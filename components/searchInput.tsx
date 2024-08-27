@@ -1,7 +1,7 @@
 import * as React from "react";
 import { useRouter } from "next/router";
 import { useQuery } from "@tanstack/react-query";
-import { Autocomplete, Button, Grid, Loader } from "@mantine/core";
+import { Autocomplete, Button, Flex, Box } from "@mantine/core";
 import { IconSearch } from "@tabler/icons-react";
 // local imports
 import { ErrorCard } from ".";
@@ -20,15 +20,12 @@ export const SearchInput: React.FC = () => {
 
   React.useEffect(() => {
     if (city && !latitude && !zipcode) {
-   
       setAutoCompleteInputValue(`${city}, ${state}, ${country}`);
     }
     if (zipcode && !latitude && !city) {
- 
       setAutoCompleteInputValue(`${zipcode}, ${country}`);
     }
     if (!zipcode && latitude && !city) {
- 
       setAutoCompleteInputValue("");
     }
   }, [country, zipcode, city, state, latitude]);
@@ -89,7 +86,7 @@ export const SearchInput: React.FC = () => {
         const city = splitValue[0].trim();
         const state = splitValue[1].trim();
         const country = splitValue[2].trim();
-      
+
         router.push(
           //`/restaurants?country=${country}&state=${state}&city=${city}`
           {
@@ -112,57 +109,45 @@ export const SearchInput: React.FC = () => {
     }
   };
   return (
-    <Grid>
-      <Grid.Col md={12} lg={9}>
-        <Autocomplete
-          error={geogData.isError}
-          placeholder={
-            geogData.isError
-              ? "uanble to load data from the server"
-              : "search restaurants by city or zipcode"
-          }
-          icon={<IconSearch />}
-          data={mergedData.length ? mergedData : []}
-          value={autoCompleteInputValue}
-          onChange={(e) => {
-            setAutoCompleteInputValue(e);
-            onInputSearch(e);
-          }}
-          styles={(theme) => ({
-            input: {
-              backgroundColor: theme.colors.gray[0],
+    <>
+      <Autocomplete
+        error={geogData.isError}
+        placeholder={
+          geogData.isError
+            ? "uanble to load data from the server"
+            : "search restaurants by city or zipcode"
+        }
+        icon={<IconSearch />}
+        data={mergedData.length ? mergedData : []}
+        value={autoCompleteInputValue}
+        onChange={(e) => {
+          setAutoCompleteInputValue(e);
+          onInputSearch(e);
+        }}
+        radius={"xs"}
+        style={{ width: "100%" }}
+        styles={(theme) => ({
+          input: {
+            border: `1px solid`,
+
+            "&:focus": {
               border: `1px solid`,
-              "&:hover": {
-                backgroundColor: theme.colors.gray[1],
-              },
             },
-          })}
-        />
-        {error.inputData ? <ErrorCard message={error.inputData} /> : <></>}
-      </Grid.Col>
-      <Grid.Col md={12} lg={3}>
-        <Button
-          onClick={() => {
-            onSubmit(autoCompleteInputValue);
-          }}
-          variant="outline"
-          color="dark"
-          styles={(theme) => ({
-            root: {
-              backgroundColor: theme.colors.gray[0],
-              border: `1px solid`,
-              "&:hover": {
-                backgroundColor: theme.colors.gray[1],
-              },
-              [theme.fn.smallerThan("lg")]: {
-                width: "100%",
-              },
-            },
-          })}
-        >
-          Search
-        </Button>
-      </Grid.Col>
-    </Grid>
+          },
+        })}
+      />
+      {error.inputData ? <ErrorCard message={error.inputData} /> : <></>}
+      <Button
+        radius={"xs"}
+        onClick={() => {
+          onSubmit(autoCompleteInputValue);
+        }}
+        style={{ width: "100%" }}
+        variant="outline"
+        color="dark"
+      >
+        Search
+      </Button>
+    </>
   );
 };

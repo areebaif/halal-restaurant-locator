@@ -1,5 +1,6 @@
 import * as React from "react";
 import type { AppProps } from "next/app";
+import "mapbox-gl/dist/mapbox-gl.css";
 import { MantineProvider } from "@mantine/core";
 import { QueryClient, QueryClientProvider } from "@tanstack/react-query";
 import { ltrCache } from "@/ltr-cache";

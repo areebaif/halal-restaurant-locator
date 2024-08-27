@@ -38,9 +38,6 @@ import { ListStateError, ListStates } from "@/utils/types";
  *                        stateName:
  *                          type: string
  *                          example: "Minnesota"
- *                        countryNameStateName:
- *                          type: string
- *                          example: "U.S.A - Minnesota"
  *        '500':
  *          description: Internal server error
  *          content:
@@ -75,11 +72,14 @@ export default async function State(
             select: { countryName: true },
           },
         },
-        orderBy: {
-          Country: {
-            countryName: "asc",
+        orderBy: [
+          {
+            Country: {
+              countryName: "asc",
+            },
           },
-        },
+          { stateName: "asc" },
+        ],
       });
       if (!state.length) {
         // there is no data to send
@@ -92,7 +92,6 @@ export default async function State(
           countryName: item.Country.countryName,
           stateName: item.stateName,
           stateId: item.stateId,
-          countryNameStateName: `${item.Country.countryName} - ${item.stateName}`,
         };
       });
 

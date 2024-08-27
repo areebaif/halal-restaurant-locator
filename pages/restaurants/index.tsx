@@ -1,8 +1,7 @@
 import * as React from "react";
 import { useRouter } from "next/router";
-import "mapbox-gl/dist/mapbox-gl.css";
 import { MapProvider } from "react-map-gl";
-import { Loader } from "@mantine/core";
+import { Loader, Flex, Group } from "@mantine/core";
 // local imports
 import { SearchInput, MapAndList } from "@/components";
 
@@ -14,7 +13,16 @@ const MapSearch: React.FC = () => {
     urlParams.city?.length ||
     urlParams.latitude?.length ? (
     <>
-      <SearchInput />
+      <Flex
+        sx={(theme) => ({
+          [theme.fn.largerThan("md")]: { flexDirection: "row" },
+          [theme.fn.smallerThan("md")]: { flexDirection: "column" },
+        })}
+        gap="md"
+      >
+        <SearchInput />
+      </Flex>
+
       <MapProvider>
         <MapAndList />
       </MapProvider>

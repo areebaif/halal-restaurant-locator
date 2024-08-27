@@ -1,16 +1,16 @@
 import * as React from "react";
-import Link from "next/link";
 import { useRouter } from "next/router";
-import "mapbox-gl/dist/mapbox-gl.css";
 import mapboxgl, { MapLayerMouseEvent } from "mapbox-gl";
 import Map, { Source, Layer, Popup } from "react-map-gl";
-import { Card, Title, Text, Image, Button, Box } from "@mantine/core";
+import { Box } from "@mantine/core";
 // local imports
+import { ErrorCard, SmallScreenPopupCard } from "@/components";
+import { LargeScreenPopup } from "./Map/LargeScreenPopup";
 import {
   calcBoundsFromCoordinates,
   distanceBwTwoCordinatesInMiles,
+  parseFoodTypeFilter,
 } from "@/utils";
-import { ErrorCard, SearchResultCarousol } from "@/components";
 import { GeoJsonPropertiesRestaurant } from "@/utils/types";
 import {
   enable_search_button_inMiles_client,
@@ -19,6 +19,8 @@ import {
   map_layerId_client,
   map_source_data_id_client,
 } from "@/utils/constants";
+import { ResponsiveSearchAreaButton } from "./Map/SearchMapAreaResponsiveButton";
+import { SmallScreenToggleMapButton } from "./Map/SmallScreenToggleMapButton";
 
 export type PopupDataProps = {
   restaurantId: string;
@@ -28,6 +30,7 @@ export type PopupDataProps = {
   latitude: number;
   longitude: number;
   coverImageUrl: string;
+  FoodTag: string;
 };
 
 export type MapContainerProps = {
@@ -41,6 +44,9 @@ export type MapContainerProps = {
   setShowPopup: (val: boolean) => void;
   popupData: PopupDataProps;
   setPopupData: (data: PopupDataProps) => void;
+  setToggleSmallScreenMap: (val: boolean) => void;
+  toggleSmallScreenMap: boolean;
+  foodTypeFilters: string[];
 };
 
 type CameraViewState = {
@@ -57,14 +63,18 @@ export const MapContainer: React.FC<MapContainerProps> = ({
   popupData,
   showPopup,
   setShowPopup,
+  setToggleSmallScreenMap,
+  toggleSmallScreenMap,
+  foodTypeFilters,
 }) => {
   const router = useRouter();
   const { latitude, longitude } = router.query;
   const mapRef = React.useRef<any>();
+
+  const [showSmallScreenPopup, setShowSmallScreenPopup] = React.useState(false);
   const [cameraViewState, setCameraViewState] =
     React.useState<CameraViewState>();
-  const [isEnabledSearchButton, setIsEnabledSearchcButton] =
-    React.useState(true);
+
   const onViewStateChange = (data: CameraViewState) => {
     setCameraViewState((previousState) => {
       return { ...previousState, ...data };
@@ -79,29 +89,20 @@ export const MapContainer: React.FC<MapContainerProps> = ({
         parseFloat(latString),
         parseFloat(lngString)
       );
-
-      if (distance > 40) {
-        setIsEnabledSearchcButton(true);
-      } else {
-        setIsEnabledSearchcButton(false);
-      }
     }
   };
 
   const onLoad = () => {
     if (mapRef.current) {
-      mapRef.current.loadImage(
-        "/marker-icons/red-location-pin.png",
-        (error: any, image: any) => {
-          if (error)
-            return <ErrorCard message="unable to load markers for the map" />;
-          mapRef.current.addImage(map_custom_pin_id_client, image);
-          const geoJsonSource = mapRef.current.getSource(
-            map_source_data_id_client
-          );
-          geoJsonSource.setData(geolocations);
-        }
-      );
+      mapRef.current.loadImage("/4975305-32.png", (error: any, image: any) => {
+        if (error)
+          return <ErrorCard message="unable to load markers for the map" />;
+        mapRef.current.addImage(map_custom_pin_id_client, image);
+        const geoJsonSource = mapRef.current.getSource(
+          map_source_data_id_client
+        );
+        geoJsonSource.setData(geolocations);
+      });
       //programmatically calculate mapZoom and mapBound for initial load of data.
       if (geolocations.features.length) {
         const mapBounds = calcBoundsFromCoordinates(geolocations);
@@ -127,17 +128,13 @@ export const MapContainer: React.FC<MapContainerProps> = ({
       const state = e.features[0].properties?.state;
       const zip = e.features[0].properties?.zipcode;
       const country = e.features[0].properties?.country;
+      const FoodTag = e.features[0].properties?.FoodTag;
       const address = `${street}, ${city}, ${state}, ${zip}, ${country}`;
       const coverImageUrl = e.features[0].properties?.coverImageUrl;
-
       const id = e.features[0].id;
 
-      setHoverId(id);
-      mapRef.current.setFeatureState(
-        { source: map_source_data_id_client, id: id },
-        { hover: true }
-      );
       setPopupData({
+        FoodTag,
         restaurantId,
         restaurantName,
         address,
@@ -146,17 +143,29 @@ export const MapContainer: React.FC<MapContainerProps> = ({
         longitude: coordinates[0],
         coverImageUrl: coverImageUrl,
       });
-      setShowPopup(true);
+
+      // if screenwidth is smaller than md dont show popup
+      if (window.innerWidth >= 1024) {
+        setShowPopup(true);
+        setHoverId(id);
+        mapRef.current.setFeatureState(
+          { source: map_source_data_id_client, id: id },
+          { hover: true }
+        );
+      } else {
+        setShowSmallScreenPopup(true);
+      }
     }
   };
-
+  // TODO: fix this to search to visible area, right now it jyust does a search in 40 mile radius.
+  // We need to get the upper and lower latitude and longitude and then send them to backedn to get all data points between these ranges.
+  // The api is also not built for this
   const onExpandSearchRadius = () => {
     const centreCooridnates = mapRef.current.getCenter() as {
       lat: number;
       lng: number;
     };
-    console.log(centreCooridnates, " I am center cooprdinagtes");
-    // {lng: -93.24952280000048, lat: 45.052795108312296}
+
     router.push({
       pathname: "/restaurants",
       query: {
@@ -166,33 +175,29 @@ export const MapContainer: React.FC<MapContainerProps> = ({
     });
   };
 
+  const smallScreenPopupProps = {
+    popupData,
+    setPopupData,
+    setShowSmallScreenPopup,
+  };
+  const largeScreenPopupProps = {
+    popupData,
+    setPopupData,
+    setShowPopup,
+    hoverId,
+    setHoverId,
+  };
+  const ResponsiveSearchAReaButtonProps = {
+    onExpandSearchRadius,
+  };
+  const smallScreenToggleMapButton = {
+    setToggleSmallScreenMap,
+    toggleSmallScreenMap,
+  };
+
   return (
-    <div style={{ position: "relative", width: "100%", marginTop: "0.4em" }}>
-      <Button
-        // on xs small devices centre the button
-        onClick={onExpandSearchRadius}
-        disabled={!isEnabledSearchButton}
-        size="sm"
-        variant="outline"
-        color="dark"
-        styles={(theme) => ({
-          label: { whiteSpace: "break-spaces", textAlign: "center" },
-        })}
-        sx={(theme) => ({
-          backgroundColor: theme.colors.gray[0],
-          position: "absolute",
-          zIndex: 1,
-          top: "1em",
-          right: "1em",
-          [theme.fn.smallerThan("sm")]: {
-            top: "1em",
-            left: "50%",
-            transform: "translate(-50%, 0)",
-          },
-        })}
-      >
-        Expand search or search area
-      </Button>
+    <Box style={{ position: "relative", width: "100%", marginTop: "0.4em" }}>
+      <ResponsiveSearchAreaButton {...ResponsiveSearchAReaButtonProps} />
       <Box
         sx={(theme) => ({
           position: "absolute",
@@ -200,17 +205,27 @@ export const MapContainer: React.FC<MapContainerProps> = ({
           bottom: "0.5em",
           left: "50%",
           transform: "translate(-50%, 0)",
-          [theme.fn.largerThan("sm")]: {
-            display: "none",
-          },
         })}
       >
-        <SearchResultCarousol
-          geolocations={geolocations}
-          hoverId={hoverId}
-          setHoverId={setHoverId}
-        />
+        <SmallScreenToggleMapButton {...smallScreenToggleMapButton} />
       </Box>
+      {showSmallScreenPopup && (
+        <Box
+          sx={(theme) => ({
+            position: "absolute",
+            zIndex: 1,
+            bottom: "0.5em",
+            left: "50%",
+            maxWidth: 350,
+            transform: "translate(-50%, 0)",
+            [theme.fn.largerThan("md")]: {
+              display: "none",
+            },
+          })}
+        >
+          <SmallScreenPopupCard {...smallScreenPopupProps} />{" "}
+        </Box>
+      )}
       <Map
         id={map_id_client}
         reuseMaps={true}
@@ -219,12 +234,9 @@ export const MapContainer: React.FC<MapContainerProps> = ({
         onMove={(evt) => onViewStateChange(evt.viewState)}
         style={{
           width: "100%",
-          minWidth: 300,
-          maxHeight: 600,
-          minHeight: 600,
-          height: 600,
+          minHeight: 500,
         }}
-        mapStyle="mapbox://styles/mapbox/streets-v9"
+        mapStyle="mapbox://styles/mapbox/streets-v12"
         mapboxAccessToken={process.env.NEXT_PUBLIC_MAPBOX_ACCESS}
         interactiveLayerIds={[map_layerId_client]}
         onMouseEnter={onMouseEnter}
@@ -243,9 +255,24 @@ export const MapContainer: React.FC<MapContainerProps> = ({
               "icon-image": map_custom_pin_id_client,
               "icon-allow-overlap": true,
               "text-field": ["get", "restaurantName"],
-              "text-offset": [0, 1.2],
-              "text-allow-overlap": true,
+              //"text-offset": [0, 2],
+              "text-variable-anchor": ["top", "bottom", "left", "right"],
+              "text-radial-offset": 1,
+              "text-justify": "auto",
+              "text-size": 14,
+              "text-font": ["Open Sans Bold"],
+              //"text-letter-spacing": 0.1,
             }}
+            filter={
+              parseFoodTypeFilter(foodTypeFilters)?.length
+                ? parseFoodTypeFilter(foodTypeFilters)
+                : ["all"]
+              //[
+              //"any",
+              //["in", "Pakistani", ["get", "FoodTag"]],
+              //["in", "Middle Eastern", ["get", "FoodTag"]],
+              //]
+            }
             paint={{
               "icon-opacity": [
                 "case",
@@ -259,7 +286,7 @@ export const MapContainer: React.FC<MapContainerProps> = ({
         {/* TODO: do styling */}
         {showPopup && (
           <Popup
-            //closeButton={false}
+            closeButton={false}
             longitude={popupData.longitude}
             latitude={popupData.latitude}
             //anchor="top"
@@ -269,6 +296,7 @@ export const MapContainer: React.FC<MapContainerProps> = ({
                 { hover: false }
               );
               setPopupData({
+                FoodTag: "",
                 restaurantId: "",
                 restaurantName: "",
                 description: "",
@@ -281,34 +309,10 @@ export const MapContainer: React.FC<MapContainerProps> = ({
               setShowPopup(false);
             }}
           >
-            <Card
-              component={Link}
-              href={`/restaurants/${popupData.restaurantId}`}
-              target="_blank"
-              style={{
-                marginTop: "-10px",
-                marginLeft: "-10px",
-                marginRight: "-10px",
-                marginBottom: "-10px",
-              }}
-            >
-              <Card.Section>
-                <Image
-                  src={`${process.env.NEXT_PUBLIC_BASE_IMAGE_URL}/${popupData.coverImageUrl}`}
-                  height={120}
-                  alt="cover image for restaurant"
-                />
-              </Card.Section>
-              <Title mt="xs" order={5}>
-                {popupData.restaurantName}
-              </Title>
-              <Text size="xs" color="dimmed">
-                {`${popupData.address}`}
-              </Text>
-            </Card>
+            <LargeScreenPopup {...largeScreenPopupProps} />
           </Popup>
         )}
       </Map>
-    </div>
+    </Box>
   );
 };
